@@ -1,0 +1,293 @@
+x-env: &common-env
+  ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+
+  # RabbitMQ (container içi)
+  RABBITMQ_HOST: rabbitmq
+  RABBITMQ_PORT: 5672
+  RABBITMQ_USER: ${RABBITMQ_USER}
+  RABBITMQ_PASS: ${RABBITMQ_PASS}
+
+  # .NET Options alias'ları
+  RabbitMq__Host: rabbitmq
+  RabbitMq__Port: "5672"
+  RabbitMq__User: ${RABBITMQ_USER}
+  RabbitMq__Pass: ${RABBITMQ_PASS}
+
+  # Redis (container içi)
+  REDIS_HOST: redis
+  REDIS_PORT: 6379
+
+  # .NET Options alias'ları
+  Caching__Redis__ConnectionString: "redis:6379"
+  Caching__Redis__InstanceName: "maden:"
+  Caching__Redis__DefaultExpirationMinutes: "60"
+  Caching__Memory__SizeLimitMB: "1024"
+  Caching__Memory__CompactionPercentage: "0.25"
+
+  # MinIO (container içi)
+  MINIO_ENDPOINT: minio:9000
+  MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-madenadmin}
+  MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-MadenSecure123!}
+  MINIO_USE_SSL: "false"
+  MINIO_BUCKET_NAME: "keepzo-backups"
+
+  # .NET Options alias'ları
+  MinIO__Endpoint: "minio:9000"
+  MinIO__AccessKey: ${MINIO_ROOT_USER:-madenadmin}
+  MinIO__SecretKey: ${MINIO_ROOT_PASSWORD:-MadenSecure123!}
+  MinIO__UseSSL: "false"
+  MinIO__BucketName: "keepzo-backups"
+
+networks:
+  maden-network: {}
+
+volumes:
+  sql_data: {}
+  redis_data: {}
+  minio_data: {}
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      SA_PASSWORD: ${SA_PASSWORD}
+      ACCEPT_EULA: "Y"
+    ports:
+      - "${SQL_PORT}:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+    networks: [maden-network]
+    healthcheck:
+      test:
+        ["CMD-SHELL", "timeout 5 bash -lc '</dev/tcp/127.0.0.1/1433' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+    ports:
+      - "${RMQ_AMQP_PORT}:5672"
+      - "127.0.0.1:${RMQ_MGMT_PORT}:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks: [maden-network]
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 2gb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks: [maden-network]
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "127.0.0.1:${MINIO_CONSOLE_PORT:-9001}:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-madenadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-MadenSecure123!}
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      maden-network:
+        aliases: [minio-container]
+    restart: unless-stopped
+
+  # APIs
+  hirovo-api:
+    image: ${REG}/hirovo-api:${TAG}
+    environment: *common-env
+    ports: ["${HIROVO_API_PORT}:8080"]
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      maden-network:
+        aliases: [hirovo-api-container]
+    restart: unless-stopped
+
+  iam-api:
+    image: ${REG}/maden-iam-api:${TAG}
+    environment: *common-env
+    ports: ["${IAM_API_PORT}:8080"]
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      maden-network:
+        aliases: [iam-api-container]
+    restart: unless-stopped
+
+  fileprovider-api:
+    image: ${REG}/maden-fileprovider-api:${TAG}
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+    ports: ["${FILEPROV_API_PORT}:8080"]
+    volumes:
+      - ${HIROVO_FILE_STORAGE_PATH}:/app/wwwroot/hirovo-storage
+      - ${ANIMALMARKET_FILE_STORAGE_PATH}:/app/wwwroot/animalmarket-storage
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      maden-network:
+        aliases: [fileprovider-api-container]
+    restart: unless-stopped
+
+  animalmarket-api:
+    image: ${REG}/animalmarket-api:${TAG}
+    environment: *common-env
+    ports: ["${ANIMALMARKET_API_PORT}:8080"]
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      maden-network:
+        aliases: [animalmarket-api-container]
+    restart: unless-stopped
+
+  api-gateway:
+    image: ${REG}/maden-api-gateway:${TAG}
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+    ports: ["${GATEWAY_PORT}:8080"]
+    volumes:
+      - ${HIROVO_FILE_STORAGE_PATH}:/mnt/file-storage/hirovo-storage:ro
+      - ${ANIMALMARKET_FILE_STORAGE_PATH}:/mnt/file-storage/animalmarket-storage:ro
+    depends_on:
+      hirovo-api:
+        condition: service_started
+      iam-api:
+        condition: service_started
+      fileprovider-api:
+        condition: service_started
+      animalmarket-api:
+        condition: service_started
+    networks: [maden-network]
+    restart: unless-stopped
+
+  # Workers (Hirovo)
+  notification-worker:
+    image: ${REG}/hirovo-notification-worker:${TAG}
+    environment: *common-env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks: [maden-network]
+    restart: unless-stopped
+
+  email-worker:
+    image: ${REG}/hirovo-email-worker:${TAG}
+    environment: *common-env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks: [maden-network]
+    restart: unless-stopped
+
+  sms-worker:
+    image: ${REG}/hirovo-sms-worker:${TAG}
+    environment: *common-env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks: [maden-network]
+    restart: unless-stopped
+
+  # Workers (IAM)
+  iam-email-worker:
+    image: ${REG}/iam-email-worker:${TAG}
+    environment: *common-env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks: [maden-network]
+    restart: unless-stopped
+
+  iam-sms-worker:
+    image: ${REG}/iam-sms-worker:${TAG}
+    environment: *common-env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks: [maden-network]
+    restart: unless-stopped
+
+  # Workers (AnimalMarket)
+  animalmarket-notification-worker:
+    image: ${REG}/animalmarket-notification-worker:${TAG}
+    environment: *common-env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      sqlserver:
+        condition: service_healthy
+    networks: [maden-network]
+    restart: unless-stopped
+
+  animalmarket-email-worker:
+    image: ${REG}/animalmarket-email-worker:${TAG}
+    environment: *common-env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks: [maden-network]
+    restart: unless-stopped
+
+  animalmarket-sms-worker:
+    image: ${REG}/animalmarket-sms-worker:${TAG}
+    environment: *common-env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks: [maden-network]
+    restart: unless-stopped

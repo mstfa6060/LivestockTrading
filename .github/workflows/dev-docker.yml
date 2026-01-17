@@ -1,0 +1,174 @@
+name: Build & Deploy (DEV)
+
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "Sadece şu imajı derle (örn: hirovo-api)"
+        required: false
+        type: string
+      no_cache:
+        description: "Docker build cache kullanma"
+        required: false
+        type: boolean
+        default: false
+      plain_logs:
+        description: "Detaylı build logları (--progress=plain)"
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  generate-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.mk.outputs.matrix }}
+      plain_logs: ${{ steps.mk.outputs.plain_logs }}
+      no_cache: ${{ steps.mk.outputs.no_cache }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - id: mk
+        name: Define matrix (dynamic)
+        run: |
+          MODS=(
+            "hirovo-api ./_devops/docker/Dockerfile-modules-hirovo mstfaock/hirovo-api"
+            "iam-api ./_devops/docker/Dockerfile-modules-iam mstfaock/maden-iam-api"
+            "api-gateway ./_devops/docker/Dockerfile-api-gateway mstfaock/maden-api-gateway"
+            "fileprovider-api ./_devops/docker/Dockerfile-modules-fileprovider mstfaock/maden-fileprovider-api"
+            "sms-worker ./_devops/docker/Dockerfile-modules-sms mstfaock/hirovo-sms-worker"
+            "email-worker ./_devops/docker/Dockerfile-modules-mail mstfaock/hirovo-email-worker"
+            "notification-worker ./_devops/docker/Dockerfile-modules-notification mstfaock/hirovo-notification-worker"
+            "iam-email-worker ./_devops/docker/Dockerfile-modules-iam-mail mstfaock/iam-email-worker"
+            "iam-sms-worker ./_devops/docker/Dockerfile-modules-iam-sms mstfaock/iam-sms-worker"
+            "animalmarket-notification-worker ./_devops/docker/Dockerfile-modules-animalmarket-notification mstfaock/animalmarket-notification-worker"
+            "animalmarket-email-worker ./_devops/docker/Dockerfile-modules-animalmarket-mail mstfaock/animalmarket-email-worker"
+            "animalmarket-sms-worker ./_devops/docker/Dockerfile-modules-animalmarket-sms mstfaock/animalmarket-sms-worker"
+            "animalmarket-api ./_devops/docker/Dockerfile-modules-animalmarket mstfaock/animalmarket-api"
+            "hangfire-scheduler ./_devops/docker/Dockerfile-hangfire-scheduler mstfaock/hangfire-scheduler"
+          )
+
+          # workflow_dispatch ise inputs, push ise boş gelir
+          ONLY="${{ github.event_name == 'workflow_dispatch' && inputs.only || '' }}"
+          OUT='['; SEP=''
+          for m in "${MODS[@]}"; do
+            set -- $m
+            NAME=$1; DOCKERFILE=$2; IMAGE=$3
+            if [ -n "$ONLY" ] && [ "$NAME" != "$ONLY" ]; then
+              continue
+            fi
+            OUT="${OUT}${SEP}{\"name\":\"${NAME}\",\"dockerfile\":\"${DOCKERFILE}\",\"image\":\"${IMAGE}\"}"
+            SEP=','
+          done
+          OUT="${OUT}]"
+          echo "matrix=${OUT}" >> "$GITHUB_OUTPUT"
+
+          # defaults (push tetiklerinde)
+          PLAIN_LOGS=${{ github.event_name == 'workflow_dispatch' && inputs.plain_logs || 'true' }}
+          NO_CACHE=${{ github.event_name == 'workflow_dispatch' && inputs.no_cache || 'false' }}
+          echo "plain_logs=${PLAIN_LOGS}" >> "$GITHUB_OUTPUT"
+          echo "no_cache=${NO_CACHE}" >> "$GITHUB_OUTPUT"
+
+  build-images:
+    runs-on: ubuntu-latest
+    needs: generate-matrix
+    permissions:
+      contents: read
+    env:
+      REGISTRY: docker.io
+      TAG_SUFFIX: dev-latest
+      IMMUTABLE_TAG: dev-${{ github.run_id }}-${{ github.sha }}
+      DOCKER_BUILDKIT: "1"
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.generate-matrix.outputs.matrix) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: DockerHub Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build & Push ${{ matrix.name }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: |
+            ${{ matrix.image }}:${{ env.TAG_SUFFIX }}
+            ${{ matrix.image }}:${{ env.IMMUTABLE_TAG }}
+          cache-from: type=registry,ref=${{ matrix.image }}:cache
+          cache-to: type=registry,ref=${{ matrix.image }}:cache,mode=max
+          no-cache: ${{ needs.generate-matrix.outputs.no_cache == 'true' }}
+          provenance: false
+          sbom: false
+          build-args: |
+            ASPNETCORE_URLS=http://+:8080
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
+          pull: true
+
+      - name: Force plain logs (group)
+        if: ${{ needs.generate-matrix.outputs.plain_logs == 'true' }}
+        run: echo "::group::Build logs are plain; errors will be visible::endgroup::"
+
+  deploy-dev:
+    runs-on: ubuntu-latest
+    needs: build-images
+    if: ${{ success() && endsWith(github.ref, '/dev') }}
+    steps:
+      - name: Deploy DEV (pull + up)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: root
+          key: ${{ secrets.PEM_KEY }}
+          command_timeout: 60m
+          timeout: 60m
+          envs: DOCKER_USERNAME,DOCKER_PASSWORD
+          script: |
+            set -e
+            export COMPOSE_HTTP_TIMEOUT=1200
+            export DOCKER_CLIENT_TIMEOUT=1200
+
+            PROJECT_DIR=""
+            for d in /maden/backend /root/maden-backend /opt/maden/backend "$(pwd)/maden-backend"; do
+              if [ -d "$d" ]; then PROJECT_DIR="$d"; break; fi
+            done
+            [ -n "$PROJECT_DIR" ] || { echo "❌ Proje dizini bulunamadı"; exit 1; }
+
+            cd "$PROJECT_DIR"
+            # Yerel değişiklikler pull'u engellemesin diye uzak dala zorla hizala
+            git fetch origin dev
+            git reset --hard origin/dev
+
+            if [ -n "$DOCKER_USERNAME" ] && [ -n "$DOCKER_PASSWORD" ]; then
+              echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            fi
+
+            cd "$PROJECT_DIR/_devops/docker"
+            [ -f "env/dev.env" ] || { echo "❌ env/dev.env yok"; exit 1; }
+
+            docker compose -p maden_dev --env-file env/dev.env -f compose/common.yml -f compose/dev.yml pull --no-parallel
+            docker compose -p maden_dev --env-file env/dev.env -f compose/common.yml -f compose/dev.yml up -d
+            docker image prune -f

@@ -1,0 +1,130 @@
+name: Build, Push and Deploy (PROD)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      REGISTRY: docker.io
+      TAG: latest
+      IMMUTABLE_TAG: prod-${{ github.run_id }}-${{ github.sha }}
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔧 Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🔐 DockerHub Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: 🐳 Build & Push images (PROD)
+        run: |
+          set -e
+          MODULES=(
+            "hirovo-api ./_devops/docker/Dockerfile-modules-hirovo mstfaock/hirovo-api"
+            "iam-api ./_devops/docker/Dockerfile-modules-iam mstfaock/maden-iam-api"
+            "api-gateway ./_devops/docker/Dockerfile-api-gateway mstfaock/maden-api-gateway"
+            "fileprovider-api ./_devops/docker/Dockerfile-modules-fileprovider mstfaock/maden-fileprovider-api"
+            "sms-worker ./_devops/docker/Dockerfile-modules-sms mstfaock/hirovo-sms-worker"
+            "email-worker ./_devops/docker/Dockerfile-modules-mail mstfaock/hirovo-email-worker"
+            "notification-worker ./_devops/docker/Dockerfile-modules-notification mstfaock/hirovo-notification-worker"
+            "iam-email-worker ./_devops/docker/Dockerfile-modules-iam-mail mstfaock/iam-email-worker"
+            "iam-sms-worker ./_devops/docker/Dockerfile-modules-iam-sms mstfaock/iam-sms-worker"
+            "animalmarket-notification-worker ./_devops/docker/Dockerfile-modules-animalmarket-notification mstfaock/animalmarket-notification-worker"
+            "animalmarket-email-worker ./_devops/docker/Dockerfile-modules-animalmarket-mail mstfaock/animalmarket-email-worker"
+            "animalmarket-sms-worker ./_devops/docker/Dockerfile-modules-animalmarket-sms mstfaock/animalmarket-sms-worker"
+            "animalmarket-api ./_devops/docker/Dockerfile-modules-animalmarket mstfaock/animalmarket-api"
+            "hangfire-scheduler ./_devops/docker/Dockerfile-hangfire-scheduler mstfaock/hangfire-scheduler"
+          )
+          for m in "${MODULES[@]}"; do
+            set -- $m
+            DOCKERFILE=$2 IMAGE=$3
+            echo "📦 $IMAGE:$TAG  (also $IMAGE:$IMMUTABLE_TAG)"
+            docker buildx build --push -t $IMAGE:$TAG -t $IMAGE:$IMMUTABLE_TAG -f $DOCKERFILE .
+          done
+
+      - name: 🚀 Deploy PROD (pull + up + migrate + seed)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: root
+          key: ${{ secrets.PEM_KEY }}
+          command_timeout: 60m
+          timeout: 60m
+          script: |
+            set -e
+
+            # Find project directory
+            echo "📁 Proje dizini kontrol ediliyor..."
+            PROJECT_DIR=""
+            if [ -d "/maden/backend" ]; then
+              PROJECT_DIR="/maden/backend"
+            elif [ -d "/root/maden-backend" ]; then
+              PROJECT_DIR="/root/maden-backend"
+            elif [ -d "/opt/maden/backend" ]; then
+              PROJECT_DIR="/opt/maden/backend"
+            elif [ -d "$(pwd)/maden-backend" ]; then
+              PROJECT_DIR="$(pwd)/maden-backend"
+            else
+              echo "❌ Proje dizini bulunamadı!"
+              echo "Mevcut dizinler:"
+              ls -la /
+              ls -la /root/ || true
+              exit 1
+            fi
+
+            echo " Proje dizini bulundu: $PROJECT_DIR"
+
+            # Git pull latest changes
+            echo "🔄 Git pull yapılıyor..."
+            cd "$PROJECT_DIR"
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Deploy with new structure
+            echo "🚀 Production deployment başlatılıyor..."
+            cd "$PROJECT_DIR/_devops/docker"
+
+            # Check if files exist
+            if [ ! -f "env/prod.env" ]; then
+              echo "❌ env/prod.env dosyası bulunamadı!"
+              echo "Mevcut dosyalar:"
+              find . -name "*.env" -o -name "*.yml" | head -10
+              exit 1
+            fi
+
+            docker compose -p maden_prod --env-file env/prod.env -f compose/common.yml -f compose/prod.yml pull
+            docker compose -p maden_prod --env-file env/prod.env -f compose/common.yml -f compose/prod.yml up -d
+
+            # Run MigrationJob
+            echo "🧩 MigrationJob container'da çalıştırılıyor..."
+            docker run --rm \
+              -v "$PROJECT_DIR":/app \
+              -w /app/Jobs/RelationalDB/MigrationJob \
+              mcr.microsoft.com/dotnet/sdk:8.0 \
+              dotnet run production
+
+            # Run ResourceSeeder
+            echo "🌱 ResourceSeeder container'da çalıştırılıyor..."
+            docker run --rm \
+              -v "$PROJECT_DIR":/app \
+              -w /app/Jobs/SpecialPurpose/ResourceSeeder \
+              mcr.microsoft.com/dotnet/sdk:8.0 \
+              dotnet run production
+
+            # Cleanup
+            echo "🧹 Temizlik yapılıyor..."
+            docker image prune -f
+
+            echo " Deployment, migration ve seeding başarıyla tamamlandı!"

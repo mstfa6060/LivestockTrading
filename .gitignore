@@ -1,0 +1,52 @@
+# Derleme ve geçici dosyalar
+bin/
+obj/
+publish/
+TestResults/
+*.dll
+*.pdb
+*.exe
+*.cache
+*.log
+*.zip
+
+# Visual Studio ve Rider gereksiz dosyalar
+.vs/
+.idea/
+*.suo
+*.user
+*.sln.docstates
+
+# Dokümantasyon SSH anahtarı
+_devops/ssh/id_rsa_mobileapp
+_devops/ssh/
+
+# Firebase service account dosyaları
+firebase-service-account.json
+**/firebase-service-account.json
+firebase-adminsdk-*.json
+ 
+
+
+# Environment files with sensitive data
+# env/*.env  # Commented out - env files are now tracked
+!env/*.env.example
+
+# Docker secrets
+secrets/
+
+# Local development overrides
+docker-compose.override.yml
+
+# SSL certificates
+nginx/ssl/
+
+# Temporary files
+*.tmp
+*.log
+
+# Node modules
+node_modules/
+_doc/excel/node_modules/
+_doc/excel/package-lock.json
+nul

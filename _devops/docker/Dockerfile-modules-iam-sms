@@ -1,0 +1,33 @@
+# ============================================================
+# 🧱 Build Stage
+# ============================================================
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Gereken dosyalar dışında hiçbir şeyi kopyalama
+COPY ["Hirovo.sln", "./"]
+COPY ["BaseModules/", "BaseModules/"]
+COPY ["BusinessModules/", "BusinessModules/"]
+COPY ["Common/", "Common/"]
+COPY ["Gateways/", "Gateways/"]
+COPY ["Jobs/", "Jobs/"]
+
+RUN dotnet restore "Hirovo.sln"
+
+RUN dotnet publish \
+    "BaseModules/IAM/BaseModules.IAM.Workers/SmsSender/BaseModules.IAM.Workers.SmsSender.csproj" \
+    -c Release -o /app/publish --no-restore \
+    /p:DebugType=None /p:DebugSymbols=false
+
+# ============================================================
+# 🚀 Runtime Stage
+# ============================================================
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
+COPY --from=build /app/publish .
+USER appuser
+EXPOSE 8080
+ENTRYPOINT ["dotnet", "BaseModules.IAM.Workers.SmsSender.dll"]

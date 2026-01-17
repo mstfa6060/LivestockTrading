@@ -1,0 +1,50 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+    batchwait: 1s
+    batchsize: 1048576
+
+scrape_configs:
+  # Docker Container Loglari
+  - job_name: docker-containers
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/(.*)'
+        target_label: 'container'
+      - source_labels: ['__meta_docker_container_label_com_docker_compose_service']
+        target_label: 'service'
+      - source_labels: ['__meta_docker_container_label_com_docker_compose_project']
+        target_label: 'project'
+      - replacement: 'docker'
+        target_label: 'job'
+    pipeline_stages:
+      # JSON log parse (Serilog Compact JSON)
+      - json:
+          expressions:
+            level: '@l'
+            message: '@m'
+            timestamp: '@t'
+            exception: '@x'
+            service_name: Properties.ServiceName
+            correlation_id: Properties.CorrelationId
+            user_id: Properties.UserId
+            email: Properties.Email
+            first_name: Properties.FirstName
+            last_name: Properties.LastName
+      - labels:
+          level:
+          service_name:
+      - timestamp:
+          source: timestamp
+          format: RFC3339Nano
+      - output:
+          source: message

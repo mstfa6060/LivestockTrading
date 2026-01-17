@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Arfware.ArfBlocks.Core" Version="2.0.0" />
+    <PackageReference Include="Google.Apis.Auth" Version="1.70.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Services\Common.Services.ErrorCodeGenerator\Common.Services.ErrorCodeGenerator.csproj" />
+    <ProjectReference Include="..\Common.Definitions.Domain\Common.Definitions.Domain.csproj" />
+    <ProjectReference Include="..\..\Services\Common.Services.Environment\Common.Services.Environment.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,269 @@
+services:
+  hirovo-api:
+    image: ${REG}/hirovo-api:${TAG}
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ProjectConfigurations__RelationalDbConfiguration__ConnectionString: "Server=sqlserver,1433;Database=maden_production;User Id=sa;Password=${SA_PASSWORD};Encrypt=True;TrustServerCertificate=True;MultipleActiveResultSets=True;"
+      ProjectConfigurations__EnvironmentConfiguration__EnvironmentName: "Production"
+      ProjectConfigurations__EnvironmentConfiguration__ApiUrl: "${HIROVO_API_URL}"
+      # RabbitMQ
+      RabbitMq__Host: "rabbitmq"
+      RabbitMq__Port: "5672"
+      RabbitMq__User: "${RABBITMQ_USER}"
+      RabbitMq__Pass: "${RABBITMQ_PASS}"
+      # Redis Cache
+      Caching__Redis__ConnectionString: "redis:6379"
+      Caching__Redis__InstanceName: "maden:"
+      Caching__Redis__DefaultExpirationMinutes: "60"
+    ports:
+      - "${HIROVO_API_PORT}:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      maden-network:
+        aliases: [hirovo-api-container]
+    restart: unless-stopped
+
+  iam-api:
+    image: ${REG}/maden-iam-api:${TAG}
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ProjectConfigurations__EnvironmentConfiguration__EnvironmentName: "Production"
+      ProjectConfigurations__EnvironmentConfiguration__ApiUrl: "${IAM_API_URL}"
+      ProjectConfigurations__RelationalDbConfiguration__ConnectionString: "Server=sqlserver,1433;Database=maden_production;User Id=sa;Password=${SA_PASSWORD};Encrypt=True;TrustServerCertificate=True;MultipleActiveResultSets=True;"
+      ProjectConfigurations__ExternalAuth__Google__ClientId: "${GOOGLE_CLIENT_ID}"
+      ProjectConfigurations__ExternalAuth__Google__ClientSecret: "${GOOGLE_CLIENT_SECRET}"
+      ProjectConfigurations__ExternalAuth__Apple__ClientId: "${APPLE_CLIENT_ID}"
+      ProjectConfigurations__ExternalAuth__Apple__ClientSecret: "${APPLE_CLIENT_SECRET}"
+      # Redis Cache
+      Caching__Redis__ConnectionString: "redis:6379"
+      Caching__Redis__InstanceName: "maden:"
+      Caching__Redis__DefaultExpirationMinutes: "60"
+    ports:
+      - "${IAM_API_PORT}:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      maden-network:
+        aliases: [iam-api-container]
+    restart: unless-stopped
+
+  fileprovider-api:
+    image: ${REG}/maden-fileprovider-api:${TAG}
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ProjectConfigurations__EnvironmentConfiguration__EnvironmentName: "Production"
+      ProjectConfigurations__EnvironmentConfiguration__ApiUrl: "${FILEPROVIDER_API_URL}"
+      ProjectConfigurations__RelationalDbConfiguration__ConnectionString: "Server=sqlserver,1433;Database=maden_production;User Id=sa;Password=${SA_PASSWORD};Encrypt=True;TrustServerCertificate=True;MultipleActiveResultSets=True;"
+      ProjectConfigurations__DocumentDbOptions__ConnectionString: "${MONGODB_CONNECTION_STRING}"
+      ProjectConfigurations__DocumentDbOptions__DatabaseName: "${MONGODB_DATABASE_NAME}"
+    volumes:
+      - /maden/file-storage:/app/wwwroot
+    ports:
+      - "${FILEPROV_API_PORT}:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      maden-network:
+        aliases: [fileprovider-api-container]
+    restart: unless-stopped
+
+  #  AnimalMarket API
+  animalmarket-api:
+    image: ${REG}/animalmarket-api:${TAG}
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ProjectConfigurations__RelationalDbConfiguration__ConnectionString: "Server=sqlserver,1433;Database=maden_production;User Id=sa;Password=${SA_PASSWORD};Encrypt=True;TrustServerCertificate=True;MultipleActiveResultSets=True;"
+      ProjectConfigurations__EnvironmentConfiguration__EnvironmentName: "Production"
+      ProjectConfigurations__EnvironmentConfiguration__ApiUrl: "${ANIMALMARKET_API_URL}"
+      # RabbitMQ
+      RabbitMq__Host: "rabbitmq"
+      RabbitMq__Port: "5672"
+      RabbitMq__User: "${RABBITMQ_USER}"
+      RabbitMq__Pass: "${RABBITMQ_PASS}"
+      # Redis Cache
+      Caching__Redis__ConnectionString: "redis:6379"
+      Caching__Redis__InstanceName: "maden:"
+      Caching__Redis__DefaultExpirationMinutes: "60"
+    ports:
+      - "${ANIMALMARKET_API_PORT}:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      maden-network:
+        aliases: [animalmarket-api-container]
+    restart: unless-stopped
+
+  # Workers (Email)
+  email-worker:
+    image: ${REG}/hirovo-email-worker:${TAG}
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASS: ${RABBITMQ_PASS}
+      RabbitMq__Host: "rabbitmq"
+      RabbitMq__Port: "5672"
+      RabbitMq__User: "${RABBITMQ_USER}"
+      RabbitMq__Pass: "${RABBITMQ_PASS}"
+      Brevo__SmtpHost: "${BREVO_SMTP_HOST}"
+      Brevo__SmtpPort: "${BREVO_SMTP_PORT}"
+      Brevo__SmtpUser: "${BREVO_SMTP_USER}"
+      Brevo__SmtpPass: "${BREVO_SMTP_PASS}"
+      Brevo__FromEmail: "${BREVO_FROM_EMAIL}"
+      Brevo__FromName: "${BREVO_FROM_NAME}"
+      SendGrid__ApiKey: "${SENDGRID_API_KEY}"
+      SendGrid__FromEmail: "${SENDGRID_FROM_EMAIL}"
+      SendGrid__FromName: "${SENDGRID_FROM_NAME}"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks: [maden-network]
+    restart: unless-stopped
+
+  iam-email-worker:
+    image: ${REG}/iam-email-worker:${TAG}
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASS: ${RABBITMQ_PASS}
+      RabbitMq__Host: "rabbitmq"
+      RabbitMq__Port: "5672"
+      RabbitMq__User: "${RABBITMQ_USER}"
+      RabbitMq__Pass: "${RABBITMQ_PASS}"
+      Brevo__SmtpHost: "${BREVO_SMTP_HOST}"
+      Brevo__SmtpPort: "${BREVO_SMTP_PORT}"
+      Brevo__SmtpUser: "${BREVO_SMTP_USER}"
+      Brevo__SmtpPass: "${BREVO_SMTP_PASS}"
+      Brevo__FromEmail: "${BREVO_FROM_EMAIL}"
+      Brevo__FromName: "${BREVO_FROM_NAME}"
+      SendGrid__ApiKey: "${SENDGRID_API_KEY}"
+      SendGrid__FromEmail: "${SENDGRID_FROM_EMAIL}"
+      SendGrid__FromName: "${SENDGRID_FROM_NAME}"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks: [maden-network]
+    restart: unless-stopped
+
+  animalmarket-email-worker:
+    image: ${REG}/animalmarket-email-worker:${TAG}
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASS: ${RABBITMQ_PASS}
+      RabbitMq__Host: "rabbitmq"
+      RabbitMq__Port: "5672"
+      RabbitMq__User: "${RABBITMQ_USER}"
+      RabbitMq__Pass: "${RABBITMQ_PASS}"
+      Brevo__SmtpHost: "${BREVO_SMTP_HOST}"
+      Brevo__SmtpPort: "${BREVO_SMTP_PORT}"
+      Brevo__SmtpUser: "${BREVO_SMTP_USER}"
+      Brevo__SmtpPass: "${BREVO_SMTP_PASS}"
+      Brevo__FromEmail: "${BREVO_FROM_EMAIL}"
+      Brevo__FromName: "${BREVO_FROM_NAME}"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks: [maden-network]
+    restart: unless-stopped
+
+  #  AnimalMarket Notification Worker - PROD Database Connection
+  animalmarket-notification-worker:
+    image: ${REG}/animalmarket-notification-worker:${TAG}
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ProjectConfigurations__RelationalDbConfiguration__ConnectionString: "Server=sqlserver,1433;Database=maden_production;User Id=sa;Password=${SA_PASSWORD};Encrypt=True;TrustServerCertificate=True;MultipleActiveResultSets=True;"
+      RabbitMq__Host: "rabbitmq"
+      RabbitMq__Port: "5672"
+      RabbitMq__User: "${RABBITMQ_USER}"
+      RabbitMq__Pass: "${RABBITMQ_PASS}"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      sqlserver:
+        condition: service_healthy
+    networks: [maden-network]
+    restart: unless-stopped
+
+  # Hangfire Scheduler
+  hangfire-scheduler:
+    image: ${REG}/hangfire-scheduler:${TAG}
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__Hangfire: "Server=sqlserver,1433;Database=maden_production;User Id=sa;Password=${SA_PASSWORD};Encrypt=True;TrustServerCertificate=True;MultipleActiveResultSets=True;"
+      # AnimalMarket API URLs
+      ApplicationSettings__Urls__AnimalMarketApi: "http://animalmarket-api-container:8080"
+      ApplicationSettings__Urls__AnimalMarket__CheckExpiredBids: "/AnimalBids/CheckExpiredBids"
+      ApplicationSettings__Urls__AnimalMarket__NotifyEndingAuctions: "/AnimalBids/NotifyEndingAuctions"
+      ApplicationSettings__Urls__AnimalMarket__SendVeterinaryNotifications: "/VeterinaryNotifications/SendPendingNotifications"
+      ApplicationSettings__Urls__AnimalMarket__CheckExpiredPayments: "/PaymentTransactions/CheckExpiredPayments"
+      ApplicationSettings__Urls__AnimalMarket__NotifyApproachingDisputeDeadlines: "/Disputes/NotifyApproachingDeadlines"
+      ApplicationSettings__Urls__AnimalMarket__AutoReleaseEscrowAfterDisputePeriod: "/EscrowTransactions/AutoReleaseAfterDisputePeriod"
+      # Hirovo API URLs
+      ApplicationSettings__Urls__HirovoApi: "http://hirovo-api-container:8080"
+      ApplicationSettings__Urls__Hirovo__SeedAndTranslateSkills: "/api/hirovo/Skills.SeedAndTranslate"
+      # Hangfire Dashboard Auth
+      HangfireSettings__User__Username: "${HANGFIRE_USERNAME}"
+      HangfireSettings__User__Password: "${HANGFIRE_PASSWORD}"
+      HangfireSettings__SystemSecret: "${HANGFIRE_SYSTEM_SECRET}"
+    ports:
+      - "${HANGFIRE_PORT}:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      animalmarket-api:
+        condition: service_started
+      hirovo-api:
+        condition: service_started
+    networks:
+      maden-network:
+        aliases: [hangfire-scheduler-container]
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 2gb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks: [maden-network]
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+    driver: local
+
+networks:
+  maden-network:
+    name: maden-network-prod

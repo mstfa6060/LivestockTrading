@@ -1,0 +1,37 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0
+
+RUN apt-get update && apt-get install -y \
+    git \
+    openssh-client
+
+RUN git config --global user.name "CI/CD-BOT" && \
+    git config --global user.email "bot@hirovo.com" && \
+    git config --global push.default matching && \
+    git config --global pull.rebase false && \
+    git config --global http.sslVerify false && \
+    mkdir -p /root/.ssh
+
+COPY _devops/ssh/id_rsa_mobileapp /root/.ssh/id_rsa
+RUN chmod 600 /root/.ssh/id_rsa && ssh-keyscan github.com >> /root/.ssh/known_hosts
+
+RUN dotnet tool install --global Arfware.ArfBlocks-cli --version 2.0.0
+ENV PATH="${PATH}:/root/.dotnet/tools"
+
+WORKDIR /maden/backend
+COPY . .
+
+RUN mkdir -p _devops/tmp/webapp/common/hirovo-api/src/api/business_modules/hirovo && \
+    mkdir -p _devops/tmp/webapp/common/hirovo-api/src/api/base_modules/iam && \
+    mkdir -p _devops/tmp/webapp/common/hirovo-api/src/errors/locales/modules/common && \
+    mkdir -p _devops/tmp/webapp/common/hirovo-api/src/errors/locales/modules/workers
+
+RUN arfblocks-cli exec --file _devops/arfblocks-cli/hirovo.arfblocks-cli.json
+RUN arfblocks-cli exec --file _devops/arfblocks-cli/hirovo-iam.arfblocks-cli.json
+
+RUN dotnet run --project Jobs/SpecialPurpose/DevTasks/ErrorCodeExporter/ErrorCodeExporter.csproj || true
+
+RUN mkdir -p /maden/maden-frontend/common && \
+    cp -r _devops/tmp/webapp/common/* /maden/maden-frontend/common/ || true
+
+RUN mkdir -p /maden/mobileapp/common && \
+    cp -r _devops/tmp/mobileapp/common/* /maden/mobileapp/common/ || true

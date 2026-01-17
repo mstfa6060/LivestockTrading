@@ -1,0 +1,74 @@
+{
+  "minCliVersion": "2.0.0",
+  "project": "FileProvider Module",
+  "description": "FileProvider modülü için endpoint dokümantasyonu",
+  "company": "mstfa6060",
+  "commands": [
+    {
+      "name": "generate-docs",
+      "parameters": [
+        {
+          "key": "targetProject",
+          "value": "BaseModules/FileProvider/BaseModules.FileProvider.Application/BaseModules.FileProvider.Application.csproj"
+        },
+        {
+          "key": "output",
+          "value": "../frontend-hirovo/common/hirovo-api/src/api/base_modules/FileProvider"
+        },
+        {
+          "key": "outputImports",
+          "value": "// Imports \nimport { AppConfig, api as axios } from 'hirovo-config'; \nimport { ApiService } from '../../../../services';"
+        },
+        {
+          "key": "outputTypes",
+          "value": "// Custom Types \ntype Guid = string; \ntype Double = number;"
+        },
+        {
+          "key": "outputSettings",
+          "value": "// Settings..."
+        },
+        {
+          "key": "nameSpace",
+          "value": "FileProviderAPI"
+        },
+        {
+          "key": "requestUrl",
+          "value": "AppConfig.FileProviderUrl"
+        }
+      ]
+    },
+    {
+      "name": "generate-docs",
+      "parameters": [
+        {
+          "key": "targetProject",
+          "value": "BaseModules/FileProvider/BaseModules.FileProvider.Application/BaseModules.FileProvider.Application.csproj"
+        },
+        {
+          "key": "output",
+          "value": "../hirovo_mobil_bare/common/hirovo-api/src/api/base_modules/FileProvider"
+        },
+        {
+          "key": "outputImports",
+          "value": "// Imports \nimport { AppConfig, api as axios } from 'hirovo-config'; \nimport { ApiService } from '../../../../services';"
+        },
+        {
+          "key": "outputTypes",
+          "value": "// Custom Types \ntype Guid = string; \ntype Double = number;"
+        },
+        {
+          "key": "outputSettings",
+          "value": "// Settings..."
+        },
+        {
+          "key": "nameSpace",
+          "value": "FileProviderAPI"
+        },
+        {
+          "key": "requestUrl",
+          "value": "AppConfig.FileProviderUrl"
+        }
+      ]
+    }
+  ]
+}

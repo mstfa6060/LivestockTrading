@@ -1,0 +1,20 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+COPY ["Hirovo.sln", "./"]
+COPY ["BusinessModules/", "BusinessModules/"]
+COPY ["BaseModules/", "BaseModules/"]
+COPY ["Common/", "Common/"]
+COPY ["Gateways/", "Gateways/"]
+COPY ["Jobs/", "Jobs/"]
+RUN dotnet restore "Hirovo.sln"
+RUN dotnet publish "BusinessModules/Keepzo/BusinessModules.Keepzo.Api/BusinessModules.Keepzo.Api.csproj" \
+    -c Release -o /app/publish --no-restore \
+    /p:DebugType=None /p:DebugSymbols=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+EXPOSE 8080
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+USER appuser
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "BusinessModules.Keepzo.Api.dll"]

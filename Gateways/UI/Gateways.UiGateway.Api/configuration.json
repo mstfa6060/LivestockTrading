@@ -1,0 +1,200 @@
+{
+	"Routes": [
+		{
+			"DownstreamPathTemplate": "/{everything}",
+			"DownstreamScheme": "http",
+			"DownstreamHeaderTransform": {
+				"Content-Security-Policy": "default-src 'self' *.toprak.tkholding.com.tr https: wss: ; script-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-eval'; style-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-inline'; object-src 'none'; img-src 'self' *.toprak.tkholding.com.tr https: wss:",
+				"Strict-Transport-Security": "max-age=3600; includeSubDomains; preload"
+			},
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "ui-container-service",
+					"Port": 80
+				}
+			],
+			"UpstreamPathTemplate": "/container/{everything}",
+			"UpstreamHttpMethod": []
+		},
+		{
+			"DownstreamPathTemplate": "/",
+			"DownstreamScheme": "http",
+			"DownstreamHeaderTransform": {
+				"Content-Security-Policy": "default-src 'self' *.toprak.tkholding.com.tr https: wss: ; script-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-eval'; style-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-inline'; object-src 'none'; img-src 'self' *.toprak.tkholding.com.tr https: wss:",
+				"Strict-Transport-Security": "max-age=3600; includeSubDomains; preload"
+			},
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "ui-container-service",
+					"Port": 80
+				}
+			],
+			"UpstreamPathTemplate": "/container/",
+			"UpstreamHttpMethod": []
+		},
+		{
+			"DownstreamPathTemplate": "/{everything}",
+			"DownstreamScheme": "http",
+			"DownstreamHeaderTransform": {
+				"Content-Security-Policy": "default-src 'self' *.toprak.tkholding.com.tr https: wss: ; script-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-eval'; style-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-inline'; object-src 'none'; img-src 'self' *.toprak.tkholding.com.tr https: wss:",
+				"Strict-Transport-Security": "max-age=3600; includeSubDomains; preload"
+			},
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "ui-management-service",
+					"Port": 80
+				}
+			],
+			"UpstreamPathTemplate": "/management/{everything}",
+			"UpstreamHttpMethod": []
+		},
+		{
+			"DownstreamPathTemplate": "/{everything}",
+			"DownstreamScheme": "http",
+			"DownstreamHeaderTransform": {
+				"Content-Security-Policy": "default-src 'self' *.toprak.tkholding.com.tr https: wss: ; script-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-eval'; style-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-inline'; object-src 'none'; img-src 'self' *.toprak.tkholding.com.tr https: wss:",
+				"Strict-Transport-Security": "max-age=3600; includeSubDomains; preload"
+			},
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "ui-todo-service",
+					"Port": 80
+				}
+			],
+			"UpstreamPathTemplate": "/todo/{everything}",
+			"UpstreamHttpMethod": []
+		},
+		{
+			"DownstreamPathTemplate": "/{everything}",
+			"DownstreamScheme": "http",
+			"DownstreamHeaderTransform": {
+				"Content-Security-Policy": "default-src 'self' *.toprak.tkholding.com.tr https: wss: ; script-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-eval'; style-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-inline'; object-src 'none'; img-src 'self' *.toprak.tkholding.com.tr https: wss:",
+				"Strict-Transport-Security": "max-age=3600; includeSubDomains; preload"
+			},
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "ui-document-service",
+					"Port": 80
+				}
+			],
+			"UpstreamPathTemplate": "/document/{everything}",
+			"UpstreamHttpMethod": []
+		},
+		{
+			"DownstreamPathTemplate": "/{everything}",
+			"DownstreamScheme": "http",
+			"DownstreamHeaderTransform": {
+				"Content-Security-Policy": "default-src 'self' *.toprak.tkholding.com.tr https: wss: ; script-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-eval'; style-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-inline'; object-src 'none'; img-src 'self' *.toprak.tkholding.com.tr https: wss:",
+				"Strict-Transport-Security": "max-age=3600; includeSubDomains; preload"
+			},
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "ui-ebys-service",
+					"Port": 80
+				}
+			],
+			"UpstreamPathTemplate": "/ebys/{everything}",
+			"UpstreamHttpMethod": []
+		},
+		{
+			"DownstreamPathTemplate": "/{everything}",
+			"DownstreamScheme": "http",
+			"DownstreamHeaderTransform": {
+				"Content-Security-Policy": "default-src 'self' *.toprak.tkholding.com.tr https: wss: ; script-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-eval'; style-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-inline'; object-src 'none'; img-src 'self' *.toprak.tkholding.com.tr https: wss:",
+				"Strict-Transport-Security": "max-age=3600; includeSubDomains; preload"
+			},
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "ui-ebysdv-service",
+					"Port": 80
+				}
+			],
+			"UpstreamPathTemplate": "/ebysdv/{everything}",
+			"UpstreamHttpMethod": []
+		},
+		{
+			"DownstreamPathTemplate": "/{everything}",
+			"DownstreamScheme": "http",
+			"DownstreamHeaderTransform": {
+				"Content-Security-Policy": "default-src 'self' *.toprak.tkholding.com.tr https: wss: ; script-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-eval'; style-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-inline'; object-src 'none'; img-src 'self' *.toprak.tkholding.com.tr https: wss:",
+				"Strict-Transport-Security": "max-age=3600; includeSubDomains; preload"
+			},
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "ui-cis-service",
+					"Port": 80
+				}
+			],
+			"UpstreamPathTemplate": "/cis/{everything}",
+			"UpstreamHttpMethod": []
+		},
+		{
+			"DownstreamPathTemplate": "/{everything}",
+			"DownstreamScheme": "http",
+			"DownstreamHeaderTransform": {
+				"Content-Security-Policy": "default-src 'self' *.toprak.tkholding.com.tr https: wss: ; script-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-eval'; style-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-inline'; object-src 'none'; img-src 'self' *.toprak.tkholding.com.tr https: wss:",
+				"Strict-Transport-Security": "max-age=3600; includeSubDomains; preload"
+			},
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "ui-koopposbackoffice-service",
+					"Port": 80
+				}
+			],
+			"UpstreamPathTemplate": "/kooppos_backoffice/{everything}",
+			"UpstreamHttpMethod": []
+		},
+		{
+			"DownstreamPathTemplate": "/{everything}",
+			"DownstreamScheme": "http",
+			"DownstreamHeaderTransform": {
+				"Content-Security-Policy": "default-src 'self' *.toprak.tkholding.com.tr https: wss: ; script-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-eval'; style-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-inline'; object-src 'none'; img-src 'self' *.toprak.tkholding.com.tr https: wss:",
+				"Strict-Transport-Security": "max-age=3600; includeSubDomains; preload"
+			},
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "ui-intranet-service",
+					"Port": 80
+				}
+			],
+			"UpstreamPathTemplate": "/intranet/{everything}",
+			"UpstreamHttpMethod": []
+		},
+		{
+			"DownstreamPathTemplate": "/{everything}",
+			"DownstreamScheme": "http",
+			"DownstreamHeaderTransform": {
+				"Content-Security-Policy": "default-src 'self' *.toprak.tkholding.com.tr https: wss: ; script-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-eval'; style-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-inline'; object-src 'none'; img-src 'self' *.toprak.tkholding.com.tr https: wss:",
+				"Strict-Transport-Security": "max-age=3600; includeSubDomains; preload"
+			},
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "ui-pdks-service",
+					"Port": 80
+				}
+			],
+			"UpstreamPathTemplate": "/pdks/{everything}",
+			"UpstreamHttpMethod": []
+		},
+		{
+			"DownstreamPathTemplate": "/{everything}",
+			"DownstreamScheme": "http",
+			"DownstreamHeaderTransform": {
+				"Content-Security-Policy": "default-src 'self' *.toprak.tkholding.com.tr https: wss: ; script-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-eval'; style-src 'self' *.toprak.tkholding.com.tr https: wss: 'unsafe-inline'; object-src 'none'; img-src 'self' *.toprak.tkholding.com.tr https: wss:",
+				"Strict-Transport-Security": "max-age=3600; includeSubDomains; preload"
+			},
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "ui-automate-service",
+					"Port": 80
+				}
+			],
+			"UpstreamPathTemplate": "/automate/{everything}",
+			"UpstreamHttpMethod": []
+		}
+	],
+	"GlobalConfiguration": {
+		"RequestIdKey": "OcRequestId",
+		"BaseUrl": "http://infrastructure-ui-gateway-service"
+	}
+}
