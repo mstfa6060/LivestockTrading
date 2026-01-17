@@ -1,0 +1,62 @@
+###############################################################################
+#                SELLER PAYMENT INFOS (Satıcı Ödeme Bilgileri)                 #
+#                                                                              #
+#  Satıcıların IBAN ve banka hesap bilgilerinin yönetimi                      #
+#  Emanet ödemeleri bu hesap bilgilerine aktarılır                            #
+###############################################################################
+
+@baseUrl = http://localhost:22321
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJjNGU3YTU2YS0yMTgxLTQ3YjAtOTQzYy1kNTNhMTI2YTQ0ZWUiLCJnaXZlbl9uYW1lIjoibWFkZW50ZWNobm9sb2d5QGdtYWlsLmNvbSIsInVuaXF1ZV9uYW1lIjoiTWFkZW4gVGVjaCAiLCJlbWFpbCI6Im1hZGVudGVjaG5vbG9neUBnbWFpbC5jb20iLCJidWNrZXRJZCI6IiIsInRlbmFudElkIjoiOWRhZTljYmQtODJiMS00ZWFkLWJkMmItOWM1ZmU1MTQ2YTJhIiwicGxhdGZvcm0iOiIwIiwidXNlclNvdXJjZSI6IjEiLCJyZWZyZXNoVG9rZW5JZCI6IjE2Y2ViMDVjLTgxMjItNDAwYy1hNDdmLTJmMDU0Y2MzZjI0ZiIsImNvbXBhbnlJZCI6IjlkYWU5Y2JkLTgyYjEtNGVhZC1iZDJiLTljNWZlNTE0NmEyYSIsInJvbGUiOiJBbmltYWxNYXJrZXQuQWRtaW5pc3RyYXRvciIsIm5iZiI6MTc2NjYwMTE2MiwiZXhwIjoxNzY3MjA1OTYyLCJpYXQiOjE3NjY2MDExNjIsImF1ZCI6ImFwaS5oaXJvdm8uY29tIn0.kBq8z4dwphRffZ8ZB8oN5VToeQl3PRRylVIwsqOvlWU
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              COMMANDS
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Satıcı Ödeme Bilgisi Oluştur/Güncelle (Bireysel)
+# Bireysel satıcı için IBAN ve banka hesap bilgilerini ekler/günceller.
+# sellerType: 0=Bireysel, 1=Kurumsal
+POST {{baseUrl}}/SellerPaymentInfos/CreateOrUpdate
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "iban": "TR000000000000000000000000",
+    "bankName": "Ziraat Bankası",
+    "accountHolderName": "Ahmet Yılmaz",
+    "identityNumber": "12345678901",
+    "taxNumber": null,
+    "sellerType": 0,
+    "isDefault": true
+}
+
+###
+
+### Satıcı Ödeme Bilgisi Oluştur/Güncelle (Kurumsal)
+# Şirket olarak satış yapanlar için vergi numaralı kayıt.
+POST {{baseUrl}}/SellerPaymentInfos/CreateOrUpdate
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "iban": "TR000000000000000000000000",
+    "bankName": "İş Bankası",
+    "accountHolderName": "Yeşil Vadi Hayvancılık Ltd. Şti.",
+    "identityNumber": null,
+    "taxNumber": "1234567890",
+    "sellerType": 1,
+    "isDefault": true
+}
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              QUERIES
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Satıcı Ödeme Bilgisi Detayı
+# Belirli kullanıcının kayıtlı ödeme bilgilerini getirir.
+POST {{baseUrl}}/SellerPaymentInfos/Detail
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "userId": "00000000-0000-0000-0000-000000000000"
+}

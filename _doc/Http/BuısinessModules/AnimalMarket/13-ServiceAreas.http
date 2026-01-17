@@ -1,0 +1,79 @@
+###############################################################################
+#                       SERVICE AREAS (Hizmet Bölgeleri)                       #
+#                                                                              #
+#  Veteriner ve nakliyecilerin hizmet verdiği bölgelerin yönetimi             #
+#  Google Places API entegrasyonu ile konum bilgisi                           #
+###############################################################################
+
+@baseUrl = http://localhost:22321
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJjNGU3YTU2YS0yMTgxLTQ3YjAtOTQzYy1kNTNhMTI2YTQ0ZWUiLCJnaXZlbl9uYW1lIjoibWFkZW50ZWNobm9sb2d5QGdtYWlsLmNvbSIsInVuaXF1ZV9uYW1lIjoiTWFkZW4gVGVjaCAiLCJlbWFpbCI6Im1hZGVudGVjaG5vbG9neUBnbWFpbC5jb20iLCJidWNrZXRJZCI6IiIsInRlbmFudElkIjoiOWRhZTljYmQtODJiMS00ZWFkLWJkMmItOWM1ZmU1MTQ2YTJhIiwicGxhdGZvcm0iOiIwIiwidXNlclNvdXJjZSI6IjEiLCJyZWZyZXNoVG9rZW5JZCI6IjE2Y2ViMDVjLTgxMjItNDAwYy1hNDdmLTJmMDU0Y2MzZjI0ZiIsImNvbXBhbnlJZCI6IjlkYWU5Y2JkLTgyYjEtNGVhZC1iZDJiLTljNWZlNTE0NmEyYSIsInJvbGUiOiJBbmltYWxNYXJrZXQuQWRtaW5pc3RyYXRvciIsIm5iZiI6MTc2NjYwMTE2MiwiZXhwIjoxNzY3MjA1OTYyLCJpYXQiOjE3NjY2MDExNjIsImF1ZCI6ImFwaS5oaXJvdm8uY29tIn0.kBq8z4dwphRffZ8ZB8oN5VToeQl3PRRylVIwsqOvlWU
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              COMMANDS
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Hizmet Bölgesi Oluştur veya Getir
+# Google Places ID ile hizmet bölgesi oluşturur.
+# Eğer aynı PlaceId ile kayıt varsa mevcut kaydı döndürür.
+POST {{baseUrl}}/ServiceAreas/CreateOrGet
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "placeId": "ChIJxxxxxxxxxx",
+    "description": "Konya, Selçuklu",
+    "province": "Konya",
+    "district": "Selçuklu",
+    "neighborhood": null,
+    "latitude": 37.8714,
+    "longitude": 32.4846
+}
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              QUERIES
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Tüm Hizmet Bölgelerini Listele
+# Sistemdeki tüm hizmet bölgelerini listeler.
+POST {{baseUrl}}/ServiceAreas/All
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "sorting": {
+        "field": "province",
+        "order": "asc"
+    },
+    "filters": {},
+    "pageRequest": {
+        "page": 1,
+        "pageSize": 50
+    }
+}
+
+###
+
+### Hizmet Bölgesi Detayı
+# Belirli bir hizmet bölgesinin detayını getirir.
+POST {{baseUrl}}/ServiceAreas/Detail
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+###
+
+### Hizmet Bölgesi Seç (Pick)
+# Dropdown/autocomplete için hizmet bölgesi listesi.
+# Veteriner veya nakliyeci profili oluştururken kullanılır.
+POST {{baseUrl}}/ServiceAreas/Pick
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "selectedIds": [],
+    "keyword": "konya",
+    "limit": 10
+}

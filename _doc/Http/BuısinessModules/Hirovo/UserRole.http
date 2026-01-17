@@ -1,0 +1,200 @@
+
+ @Url= http://localhost:5000
+# @Url= https://api-test.toprak.tkholding.com.tr/koopposbackoffice
+
+//mustafa.ocak
+  @Jwt =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI5OWQyM2YxZi1kMmVlLTQwYjUtOTRlZS00Yjg4MGRkMjM1NGUiLCJnaXZlbl9uYW1lIjoiQmlsYWwwMTEiLCJ1bmlxdWVfbmFtZSI6IkJpbGFsIEtheWFyIiwiZW1haWwiOiJrYXJhYmV5bGl5aW1AZ21haWwuY29tIiwicHJvZmlsZVVybCI6IiIsInRlbmFudElkIjoiYzlkOGM4NDYtMTBmYy00NjZkLThmNDUtYTRmYTRlODU2YWJkIiwicGxhdGZvcm0iOiIxIiwidXNlclNvdXJjZSI6IjAiLCJyZWZyZXNoVG9rZW5JZCI6IjM3NzI0NmY3LTY5MDUtNDY5ZS1hMmQ5LWZjYWQwYWZhYTEyYiIsImNvbXBhbnlJZCI6ImM5ZDhjODQ2LTEwZmMtNDY2ZC04ZjQ1LWE0ZmE0ZTg1NmFiZCIsInVzZXJUeXBlIjoiMCIsIm5iZiI6MTc1MDYyNDUzOSwiZXhwIjoxNzUxMjI5MzM5LCJpYXQiOjE3NTA2MjQ1MzksImF1ZCI6ImFwaS5oaXJvdm8uY29tIn0.NSYJO4Z54ANMShufG-KTnRaSvTHdSmd5SJh4yq_a5gI"
+
+### Role Create
+POST {{Url}}/Roles/Create
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{Jwt}}
+ 
+{
+  "name": "Test 10",
+  "companyId": "C9D8C846-10FC-466D-8F45-A4FA4E856ABD"
+
+}
+ 
+### Role Update
+POST {{Url}}/Roles/Update
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{Jwt}}
+ 
+{
+  "id": "1ef71278-015c-4afb-b0f3-d9803a14d897",
+  "name": "Test 12",
+  "companyId": "C9D8C846-10FC-466D-8F45-A4FA4E856ABD"
+}
+ 
+### Role Delete
+POST  {{Url}}/Roles/Delete
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{Jwt}}
+ 
+{
+  "id": "1ef71278-015c-4afb-b0f3-d9803a14d897",
+  "isDeleted": true
+}
+ 
+### Queries
+ 
+### Roles All
+POST {{Url}}/Roles/All
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{Jwt}}
+ 
+{
+  "filters": [],
+  "pageRequest": {
+    "currentPage": 1,
+    "perPageCount": 10,
+    "listAll": true
+  }
+}
+ 
+### Pick Roles
+POST {{Url}}/Roles/Pick
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{Jwt}}
+ 
+{
+  "keyword": "Test ",
+  "limit": 5
+}
+
+### RelUserRoles Create
+POST {{Url}}/RelRoleResources/Create
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{Jwt}}
+ 
+{
+  "resoruceIds":
+  [
+    "F9F87750-8668-49D5-A179-05411EBBAF66"
+  ],
+  "roleId": "1ef71278-015c-4afb-b0f3-d9803a14d897"
+}
+ 
+
+
+### Roles Create
+POST  {{Url}}/RelUserRoles/Create
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{Jwt}}
+ 
+{
+  "roleIds": [
+    "B3F8A7D1-4E2C-4A3E-8B5A-D3E7B9C5E2F1"
+  ],
+  "userId": "c4ff4cba-82ed-41a2-9241-5c3624eed6f9",
+  "companyId": "C9D8C846-10FC-466D-8F45-A4FA4E856ABD"
+}
+
+### Queries
+ 
+### CmmsResources All
+POST {{Url}}/Resources/All
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{Jwt}}
+ 
+{
+  "roleId" :   "9FA6B48D-9117-4965-8F90-08DD6AC76E70"
+}
+  
+### Roles All
+POST {{Url}}/Roles/Detail
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{Jwt}}
+ 
+{
+  "id" :   "1ef71278-015c-4afb-b0f3-d9803a14d897"
+}
+ 
+  
+### Roles UIDC
+POST {{Url}}/Roles/UIDC
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{Jwt}}
+ 
+{
+  "id" :   "b5dff803-768f-4c3a-199d-08dd776b8ca0"
+}
+ 
+
+
+ 
+  
+### Update Profile
+POST {{Url}}/UpdateProfile/Update
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{Jwt}}
+ 
+{
+  "userId": "99d23f1f-d2ee-40b5-94ee-4b880dd2354e",
+  "phoneNumber": "+905555555555",
+  "city": "İstanbul",
+  "district": "Kadıköy",
+  "description": "Haftaiçi tüm gün müsaitim. Tempolu çalışırım.",
+  "birthDate": "1995-04-12T00:00:00",
+  "isAvailable": true
+}
+
+
+  
+### Update Profile Detail
+POST {{Url}}/DetailProfile/Detail
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{Jwt}}
+ 
+{
+  "userId": "99d23f1f-d2ee-40b5-94ee-4b880dd2354e"
+}
+
+
+
+
+### Kullanıcı Bilgilerini All
+POST {{Url}}/AllProfile/All
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "userId": "99d23f1f-d2ee-40b5-94ee-4b880dd2354e",
+  "sorting": null,
+  "filters": [],
+  "pageRequest": {
+    "perPageCount": 20,
+    "currentPage": 1,
+    "listAll": false
+  }
+}
+
+
+
+
+
+### Kullanıcı Bilgilerini Sil
+POST {{Url}}/DeleteProfile/Delete
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "userId": "99d23f1f-d2ee-40b5-94ee-4b880dd2354e",
+  "isDeleted": false
+}
+

@@ -1,0 +1,64 @@
+
+ @Url= http://localhost:5000
+#  @Url=http://3.88.252.189:5000
+# @Url= https://api-test.toprak.tkholding.com.tr/koopposbackoffice
+
+  @Jwt =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJkOTJlMDJkYS02MDZiLTRmYzQtYTNhNC1kYmNiZTJlMDRhZjIiLCJnaXZlbl9uYW1lIjoibW9jYWsiLCJ1bmlxdWVfbmFtZSI6Ik11c3RhZmEgT2NhayIsInRlbmFudElkIjoiYzlkOGM4NDYtMTBmYy00NjZkLThmNDUtYTRmYTRlODU2YWJkIiwicGxhdGZvcm0iOiIwIiwidXNlclNvdXJjZSI6IjAiLCJuYmYiOjE3NDczNDEzNDIsImV4cCI6MTc0Nzk0NjE0MiwiaWF0IjoxNzQ3MzQxMzQyLCJhdWQiOiJhcGkuaGlyb3ZvLmNvbSJ9.x2NG1XRMMNmsqCTZXpBCMe-rVJrxALX8PqQ8piru-0Q"
+
+
+### Create
+POST {{Url}}/Buckets/Detail
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "bucketId": "6867c9086e267ed0ea905af9",
+  "changeId": "00000000-0000-0000-0000-000000000000"
+}
+
+
+
+### Update
+POST {{Url}}/Roles/Update
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "id": "A1D5B3E4-8E5A-4B3C-9EF5-D3E5A3B7C1F8",
+  "name": "Admin"
+}
+
+
+
+### Delete
+POST {{Url}}/Roles/Delete
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "id": "A1D5B3E4-8E5A-4B3C-9EF5-D3E5A3B7C1F8",
+  "isDeleted": false
+}
+
+
+
+### Delete
+POST {{Url}}/Roles/All
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": {
+        "perPageCount": 20,
+        "currentPage": 1,
+        "listAll": false
+    }
+}
+
+

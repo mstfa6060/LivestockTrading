@@ -1,0 +1,95 @@
+###############################################################################
+#                   PAYMENT TRANSACTIONS (Ödeme İşlemleri)                     #
+#                                                                              #
+#  Ödeme sağlayıcı entegrasyonu (Stripe, iyzico vb.)                          #
+#  Ödeme başlatma, tamamlama ve iade işlemleri                                #
+###############################################################################
+
+@baseUrl = http://localhost:22321
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJjNGU3YTU2YS0yMTgxLTQ3YjAtOTQzYy1kNTNhMTI2YTQ0ZWUiLCJnaXZlbl9uYW1lIjoibWFkZW50ZWNobm9sb2d5QGdtYWlsLmNvbSIsInVuaXF1ZV9uYW1lIjoiTWFkZW4gVGVjaCAiLCJlbWFpbCI6Im1hZGVudGVjaG5vbG9neUBnbWFpbC5jb20iLCJidWNrZXRJZCI6IiIsInRlbmFudElkIjoiOWRhZTljYmQtODJiMS00ZWFkLWJkMmItOWM1ZmU1MTQ2YTJhIiwicGxhdGZvcm0iOiIwIiwidXNlclNvdXJjZSI6IjEiLCJyZWZyZXNoVG9rZW5JZCI6IjE2Y2ViMDVjLTgxMjItNDAwYy1hNDdmLTJmMDU0Y2MzZjI0ZiIsImNvbXBhbnlJZCI6IjlkYWU5Y2JkLTgyYjEtNGVhZC1iZDJiLTljNWZlNTE0NmEyYSIsInJvbGUiOiJBbmltYWxNYXJrZXQuQWRtaW5pc3RyYXRvciIsIm5iZiI6MTc2NjYwMTE2MiwiZXhwIjoxNzY3MjA1OTYyLCJpYXQiOjE3NjY2MDExNjIsImF1ZCI6ImFwaS5oaXJvdm8uY29tIn0.kBq8z4dwphRffZ8ZB8oN5VToeQl3PRRylVIwsqOvlWU
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              COMMANDS
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Ödeme Başlat
+# Yeni ödeme işlemi başlatır.
+# method: 0=Kredi Kartı, 1=Havale/EFT, 2=Kapıda Ödeme
+POST {{baseUrl}}/PaymentTransactions/InitiatePayment
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "animalId": "00000000-0000-0000-0000-000000000000",
+    "offerId": "00000000-0000-0000-0000-000000000000",
+    "payerId": "00000000-0000-0000-0000-000000000000",
+    "payeeId": "00000000-0000-0000-0000-000000000000",
+    "amount": 50000.00,
+    "method": 0
+}
+
+###
+
+### Ödeme Tamamla
+# Ödeme işlemini tamamlar.
+# Ödeme sağlayıcısının webhook'u veya callback'i tarafından çağrılır.
+POST {{baseUrl}}/PaymentTransactions/CompletePayment
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "paymentTransactionId": "00000000-0000-0000-0000-000000000000",
+    "providerTransactionId": "pi_xxxxx",
+    "providerChargeId": "ch_xxxxx",
+    "webhookData": "{}",
+    "webhookSignature": "sig_xxxxx",
+    "provider": "Stripe"
+}
+
+###
+
+### Ödeme İade Et
+# Ödemeyi kısmen veya tamamen iade eder.
+POST {{baseUrl}}/PaymentTransactions/RefundPayment
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "paymentId": "00000000-0000-0000-0000-000000000000",
+    "refundAmount": 50000.00,
+    "reason": "Sipariş iptal edildi"
+}
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              QUERIES
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Tüm Ödeme İşlemlerini Listele
+# Tüm ödeme işlemlerini listeler.
+POST {{baseUrl}}/PaymentTransactions/All
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "sorting": {
+        "field": "createdAt",
+        "order": "desc"
+    },
+    "filters": {},
+    "pageRequest": {
+        "page": 1,
+        "pageSize": 20
+    }
+}
+
+###
+
+### Ödeme Durumu
+# Belirli bir ödemenin güncel durumunu getirir.
+POST {{baseUrl}}/PaymentTransactions/GetStatus
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "paymentId": "00000000-0000-0000-0000-000000000000"
+}

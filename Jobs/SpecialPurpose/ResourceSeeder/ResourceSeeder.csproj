@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Arfware.ArfBlocks.Core" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+    <None Include="appsettings.development.json" CopyToPublishDirectory="Always" />
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BaseModules\IAM\BaseModules.IAM.Application\BaseModules.IAM.Application.csproj" />
+    <ProjectReference Include="..\..\..\BaseModules\FileProvider\BaseModules.FileProvider.Application\BaseModules.FileProvider.Application.csproj" />
+    <ProjectReference Include="..\..\..\Common\Definitions\Common.Definitions.Domain\Common.Definitions.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Common\Definitions\Common.Definitions.Infrastructure\Common.Definitions.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\Common\Services\Common.Services.Environment\Common.Services.Environment.csproj" />
+  </ItemGroup>
+
+</Project>

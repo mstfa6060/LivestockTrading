@@ -1,0 +1,90 @@
+
+ @Url= http://localhost:5000
+#  @Url=http://3.88.252.189:5000
+# @Url= https://api-test.toprak.tkholding.com.tr/koopposbackoffice
+
+  @Jwt =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI5OWQyM2YxZi1kMmVlLTQwYjUtOTRlZS00Yjg4MGRkMjM1NGUiLCJnaXZlbl9uYW1lIjoiQmlsYWwwMTEiLCJ1bmlxdWVfbmFtZSI6IkJpbGFsIEtheWFyIiwiZW1haWwiOiJrYXJhYmV5bGl5aW1AZ21haWwuY29tIiwicHJvZmlsZVVybCI6IiIsInRlbmFudElkIjoiYzlkOGM4NDYtMTBmYy00NjZkLThmNDUtYTRmYTRlODU2YWJkIiwicGxhdGZvcm0iOiIwIiwidXNlclNvdXJjZSI6IjAiLCJyZWZyZXNoVG9rZW5JZCI6ImIxNDNjYmJkLWRiZjctNGRlZi04YWJiLTBjMjRkNjhiZDg5NiIsImNvbXBhbnlJZCI6ImM5ZDhjODQ2LTEwZmMtNDY2ZC04ZjQ1LWE0ZmE0ZTg1NmFiZCIsInVzZXJUeXBlIjoiMCIsIm5iZiI6MTc1MDUyNDUyNSwiZXhwIjoxNzUxMTI5MzI1LCJpYXQiOjE3NTA1MjQ1MjUsImF1ZCI6ImFwaS5oaXJvdm8uY29tIn0.oRP2sLKfCloAPQes0tN8w5ozo18wVxDJTSY1lL6m8E0"
+
+
+### update-profile
+POST {{Url}}/Workers/UpdateProfile
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "userId": "b73b783c-de5b-424e-8912-a1de14d02ddf",
+  "city": "Gümüşhane",
+  "phoneNumber": "05001232828"
+}
+
+
+### detail
+
+POST {{Url}}/Workers/Detail
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "userId": "99D23F1F-D2EE-40B5-94EE-4B880DD2354E"
+}
+
+
+### Pick
+
+POST {{Url}}/Workers/Pick
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "selectedIds": [],
+  "keyword": "Jo",
+  "limit": 5
+}
+
+
+
+### Get All Workers
+POST {{Url}}/hirovo/Workers/All
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "sorting": null,
+  "filters": [],
+  "pageRequest": {
+    "perPageCount": 20,
+    "currentPage": 1,
+    "listAll": false
+  }
+}
+
+
+
+### Worker Sil / Silmeyi Geri Al
+POST {{Url}}/hirovo/Workers/Delete
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "userId": "28D0B73D-9F54-4A53-BC04-57B87AB09200",
+  "isDeleted": false
+}
+
+
+
+
+### Set Expo Push Token
+POST {{Url}}/hirovo/Workers/SetExpoPushToken
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "userId": "d92e02da-606b-4fc4-a3a4-dbcbe2e04af2",
+  "expoPushToken": "ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]"
+}

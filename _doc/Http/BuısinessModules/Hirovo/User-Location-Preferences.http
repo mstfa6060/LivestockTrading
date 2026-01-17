@@ -1,0 +1,89 @@
+@Url= https://api-test.toprak.tkholding.com.tr/koopposbackoffice
+@Jwt= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJkOTJlMDJkYS02MDZiLTRmYzQtYTNhNC1kYmNiZTJlMDRhZjIiLCJnaXZlbl9uYW1lIjoibW9jYWsiLCJ1bmlxdWVfbmFtZSI6Ik11c3RhZmEgT2NhayIsInRlbmFudElkIjoiYzlkOGM4NDYtMTBmYy00NjZkLThmNDUtYTRmYTRlODU2YWJkIiwicGxhdGZvcm0iOiIwIiwidXNlclNvdXJjZSI6IjAiLCJuYmYiOjE3NDczNDEzNDIsImV4cCI6MTc0Nzk0NjE0MiwiaWF0IjoxNzQ3MzQxMzQyLCJhdWQiOiJhcGkuaGlyb3ZvLmNvbSJ9.x2NG1XRMMNmsqCTZXpBCMe-rVJrxALX8PqQ8piru-0Q
+
+### Kullanıcı Mesafe Tercihini Güncelle
+POST {{Url}}/Users/UpdateLocationPreference
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+    "userId": "d92e02da-606b-4fc4-a3a4-dbcb2e204af2",
+    "preferredRadiusKm": 25.0
+}
+
+### Kullanıcı Mesafe Tercihini Güncelle - 1 km
+POST {{Url}}/Users/UpdateLocationPreference
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+    "userId": "d92e02da-606b-4fc4-a3a4-dbcb2e204af2",
+    "preferredRadiusKm": 1.0
+}
+
+### Kullanıcı Mesafe Tercihini Güncelle - 5 km
+POST {{Url}}/Users/UpdateLocationPreference
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+    "userId": "d92e02da-606b-4fc4-a3a4-dbcb2e204af2",
+    "preferredRadiusKm": 5.0
+}
+
+### Kullanıcı Mesafe Tercihini Güncelle - 10 km
+POST {{Url}}/Users/UpdateLocationPreference
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+    "userId": "d92e02da-606b-4fc4-a3a4-dbcb2e204af2",
+    "preferredRadiusKm": 10.0
+}
+
+### Kullanıcı Mesafe Tercihini Güncelle - 50 km
+POST {{Url}}/Users/UpdateLocationPreference
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+    "userId": "d92e02da-606b-4fc4-a3a4-dbcb2e204af2",
+    "preferredRadiusKm": 50.0
+}
+
+### Kullanıcı Mesafe Tercihini Güncelle - 100 km
+POST {{Url}}/Users/UpdateLocationPreference
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+    "userId": "d92e02da-606b-4fc4-a3a4-dbcb2e204af2",
+    "preferredRadiusKm": 100.0
+}
+
+### Kullanıcı Mesafe Tercihini Güncelle - 500 km
+POST {{Url}}/Users/UpdateLocationPreference
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+    "userId": "d92e02da-606b-4fc4-a3a4-dbcb2e204af2",
+    "preferredRadiusKm": 500.0
+}
+
+### Yakındaki İş İlanlarını Getir - Kullanıcı Tercihine Göre
+GET {{Url}}/Location/GetNearbyJobs?userId=d92e02da-606b-4fc4-a3a4-dbcb2e204af2&latitude=41.0082&longitude=28.9784&companyId=c9d8c846-10fc-466d-8f45-a4fa4e856abd&limit=20
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+
+### Yakındaki İş İlanlarını Getir - Özel Radius ile
+GET {{Url}}/Location/GetNearbyJobs?userId=d92e02da-606b-4fc4-a3a4-dbcb2e204af2&latitude=41.0082&longitude=28.9784&companyId=c9d8c846-10fc-466d-8f45-a4fa4e856abd&limit=20&customRadiusKm=15.0
+Authorization: Bearer {{Jwt}}
+Accept: application/json

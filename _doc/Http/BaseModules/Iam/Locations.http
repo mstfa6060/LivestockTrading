@@ -1,0 +1,97 @@
+###############################################################################
+#                         LOCATIONS (İl/İlçe/Mahalle)                          #
+#                                                                              #
+#  Ortak kullanım için Common.Definitions seviyesinde                         #
+#  API: BaseModules.IAM                                                        #
+###############################################################################
+
+@baseUrl = http://localhost:22321
+@token = Bearer YOUR_JWT_TOKEN_HERE
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              PROVINCES (İller)
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Tüm İlleri Listele
+POST {{baseUrl}}/Provinces/All
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "keyword": ""
+}
+
+###
+
+### İl Ara (örn: "istan" → İstanbul)
+POST {{baseUrl}}/Provinces/All
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "keyword": "istan"
+}
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              DISTRICTS (İlçeler)
+### ═══════════════════════════════════════════════════════════════════════════
+
+### İstanbul'un İlçeleri (ProvinceId: 34)
+POST {{baseUrl}}/Districts/ByProvince
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "provinceId": 34,
+    "keyword": ""
+}
+
+###
+
+### Ankara'nın İlçeleri (ProvinceId: 6)
+POST {{baseUrl}}/Districts/ByProvince
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "provinceId": 6,
+    "keyword": ""
+}
+
+###
+
+### İlçe Ara (örn: Kadıköy)
+POST {{baseUrl}}/Districts/ByProvince
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "provinceId": 34,
+    "keyword": "kadı"
+}
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                          NEIGHBORHOODS (Mahalleler)
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Kadıköy'ün Mahalleleri
+POST {{baseUrl}}/Neighborhoods/ByDistrict
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "districtId": 3,
+    "keyword": ""
+}
+
+###
+
+### Mahalle Ara
+POST {{baseUrl}}/Neighborhoods/ByDistrict
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "districtId": 3,
+    "keyword": "cafer"
+}

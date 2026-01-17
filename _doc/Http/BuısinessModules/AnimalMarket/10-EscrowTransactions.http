@@ -1,0 +1,135 @@
+###############################################################################
+#                    ESCROW TRANSACTIONS (Emanet İşlemleri)                    #
+#                                                                              #
+#  Güvenli ödeme sistemi - Alıcı ve satıcı arasında emanet hesabı             #
+#  Akış: Oluştur -> Fonla -> (Teslimat+Vet Onayı) -> Serbest Bırak            #
+###############################################################################
+
+@baseUrl = http://localhost:22321
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJjNGU3YTU2YS0yMTgxLTQ3YjAtOTQzYy1kNTNhMTI2YTQ0ZWUiLCJnaXZlbl9uYW1lIjoibWFkZW50ZWNobm9sb2d5QGdtYWlsLmNvbSIsInVuaXF1ZV9uYW1lIjoiTWFkZW4gVGVjaCAiLCJlbWFpbCI6Im1hZGVudGVjaG5vbG9neUBnbWFpbC5jb20iLCJidWNrZXRJZCI6IiIsInRlbmFudElkIjoiOWRhZTljYmQtODJiMS00ZWFkLWJkMmItOWM1ZmU1MTQ2YTJhIiwicGxhdGZvcm0iOiIwIiwidXNlclNvdXJjZSI6IjEiLCJyZWZyZXNoVG9rZW5JZCI6IjE2Y2ViMDVjLTgxMjItNDAwYy1hNDdmLTJmMDU0Y2MzZjI0ZiIsImNvbXBhbnlJZCI6IjlkYWU5Y2JkLTgyYjEtNGVhZC1iZDJiLTljNWZlNTE0NmEyYSIsInJvbGUiOiJBbmltYWxNYXJrZXQuQWRtaW5pc3RyYXRvciIsIm5iZiI6MTc2NjYwMTE2MiwiZXhwIjoxNzY3MjA1OTYyLCJpYXQiOjE3NjY2MDExNjIsImF1ZCI6ImFwaS5oaXJvdm8uY29tIn0.kBq8z4dwphRffZ8ZB8oN5VToeQl3PRRylVIwsqOvlWU
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              COMMANDS
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Emanet Oluştur
+# Teklif kabul edildikten sonra güvenli ödeme için emanet hesabı oluşturur.
+# commissionRate: Platform komisyonu (yüzde olarak, örn: 3.5 = %3.5)
+POST {{baseUrl}}/EscrowTransactions/Create
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "animalId": "00000000-0000-0000-0000-000000000000",
+    "offerId": "00000000-0000-0000-0000-000000000000",
+    "buyerId": "00000000-0000-0000-0000-000000000000",
+    "sellerId": "00000000-0000-0000-0000-000000000000",
+    "amount": 50000.00,
+    "commissionRate": 3.5
+}
+
+###
+
+### Emaneti Fonla
+# Alıcı emanet hesabına ödeme yapar.
+# Ödeme sağlayıcısından (Stripe, iyzico vb.) gelen referans ile çağrılır.
+POST {{baseUrl}}/EscrowTransactions/Fund
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "escrowId": "00000000-0000-0000-0000-000000000000",
+    "paymentTransactionId": "00000000-0000-0000-0000-000000000000",
+    "providerRef": "pi_stripe_payment_intent_id"
+}
+
+###
+
+### Emaneti Serbest Bırak
+# Teslimat tamamlanıp veteriner onayı alındıktan sonra parayı satıcıya aktarır.
+# Bu işlem admin veya sistem tarafından tetiklenir.
+POST {{baseUrl}}/EscrowTransactions/Release
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "escrowId": "00000000-0000-0000-0000-000000000000",
+    "deliveryOrderId": "00000000-0000-0000-0000-000000000000",
+    "vetApprovalId": "00000000-0000-0000-0000-000000000000",
+    "releaseNote": "Tüm şartlar sağlandı, ödeme satıcıya aktarıldı"
+}
+
+###
+
+### Emaneti İade Et
+# Sorun durumunda (veteriner reddi, teslimat problemi) parayı alıcıya iade eder.
+POST {{baseUrl}}/EscrowTransactions/Refund
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "escrowId": "00000000-0000-0000-0000-000000000000",
+    "reason": "Veteriner onayı alınamadı - hayvan sağlık durumu uygun değil"
+}
+
+###
+
+### Emaneti İptal Et
+# İşlem tamamlanmadan emaneti iptal eder.
+# Henüz fonlanmamış emanetler için kullanılır.
+POST {{baseUrl}}/EscrowTransactions/Cancel
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "escrowId": "00000000-0000-0000-0000-000000000000",
+    "reason": "Alıcı satın almadan vazgeçti"
+}
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              QUERIES
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Tüm Emanet İşlemlerini Listele
+# Filtreleme ve sayfalama ile tüm emanet işlemlerini listeler.
+POST {{baseUrl}}/EscrowTransactions/All
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "languageCode": "tr",
+    "sorting": {
+        "field": "createdAt",
+        "order": "desc"
+    },
+    "filters": {},
+    "pageRequest": {
+        "page": 1,
+        "pageSize": 20
+    }
+}
+
+###
+
+### Emanet Detayı
+# Belirli bir emanet işleminin detaylı bilgilerini getirir.
+POST {{baseUrl}}/EscrowTransactions/Detail
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+###
+
+### Teklife Göre Emanet
+# Belirli bir teklife ait emanet bilgisini getirir.
+# Teklif detay sayfasında emanet durumunu göstermek için kullanılır.
+POST {{baseUrl}}/EscrowTransactions/ByOffer
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "offerId": "00000000-0000-0000-0000-000000000000"
+}

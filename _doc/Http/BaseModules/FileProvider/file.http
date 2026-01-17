@@ -1,0 +1,90 @@
+
+ @Url= http://localhost:5000
+#  @Url=http://3.88.252.189:5000
+# @Url= https://api-test.toprak.tkholding.com.tr/koopposbackoffice
+
+  @Jwt =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJkOTJlMDJkYS02MDZiLTRmYzQtYTNhNC1kYmNiZTJlMDRhZjIiLCJnaXZlbl9uYW1lIjoibW9jYWsiLCJ1bmlxdWVfbmFtZSI6Ik11c3RhZmEgT2NhayIsInRlbmFudElkIjoiYzlkOGM4NDYtMTBmYy00NjZkLThmNDUtYTRmYTRlODU2YWJkIiwicGxhdGZvcm0iOiIwIiwidXNlclNvdXJjZSI6IjAiLCJuYmYiOjE3NDczNDEzNDIsImV4cCI6MTc0Nzk0NjE0MiwiaWF0IjoxNzQ3MzQxMzQyLCJhdWQiOiJhcGkuaGlyb3ZvLmNvbSJ9.x2NG1XRMMNmsqCTZXpBCMe-rVJrxALX8PqQ8piru-0Q"
+
+
+### Create
+
+POST {{Url}}/Companies/Create
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+	"name": "Test Şirketi A.Ş.",
+	"taxNumber": "1234567890",
+	"address": "İstanbul / Türkiye",
+	"phone": "+90 212 123 45 67"
+}
+
+### Update
+
+POST {{Url}}/Companies/Update
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "id": "c9d8c846-10fc-466d-8f45-a4fa4e856abd",
+  "name": "Güncellenmiş Şirket A.Ş.",
+  "taxNumber": "9876543210",
+  "address": "Ankara / Türkiye",
+  "phone": "+90 312 555 55 55"
+}
+
+### Delete
+
+POST {{Url}}/Companies/Delete
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "id": "c9d8c846-10fc-466d-8f45-a4fa4e856abd",
+  "isDeleted": false
+}
+
+
+### All
+
+POST {{Url}}/Companies/All
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "sorting": null,
+  "filters": [],
+  "pageRequest": {
+    "perPageCount": 20,
+    "currentPage": 1,
+    "listAll": false
+  }
+}
+
+### Detail
+
+POST {{Url}}/Companies/Detail
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "id": "c9d8c846-10fc-466d-8f45-a4fa4e856abd"
+}
+
+### Pick
+
+POST {{Url}}/Companies/Pick
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "keyword": "şir",
+  "selectedIds": ["e33ec23c-d7fc-4565-a913-d6e9e45b3621"],
+  "limit": 5
+}

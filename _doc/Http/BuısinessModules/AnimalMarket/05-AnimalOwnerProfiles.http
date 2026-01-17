@@ -1,0 +1,110 @@
+###############################################################################
+#                 ANIMAL OWNER PROFILES (Hayvan Sahibi Profilleri)             #
+#                                                                              #
+#  Çiftçi/hayvan sahibi profillerinin yönetimi                                #
+#  Tecrübe, uzmanlık alanları ve sertifikalar                                 #
+###############################################################################
+
+@baseUrl = http://localhost:22321
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJjNGU3YTU2YS0yMTgxLTQ3YjAtOTQzYy1kNTNhMTI2YTQ0ZWUiLCJnaXZlbl9uYW1lIjoibWFkZW50ZWNobm9sb2d5QGdtYWlsLmNvbSIsInVuaXF1ZV9uYW1lIjoiTWFkZW4gVGVjaCAiLCJlbWFpbCI6Im1hZGVudGVjaG5vbG9neUBnbWFpbC5jb20iLCJidWNrZXRJZCI6IiIsInRlbmFudElkIjoiOWRhZTljYmQtODJiMS00ZWFkLWJkMmItOWM1ZmU1MTQ2YTJhIiwicGxhdGZvcm0iOiIwIiwidXNlclNvdXJjZSI6IjEiLCJyZWZyZXNoVG9rZW5JZCI6IjE2Y2ViMDVjLTgxMjItNDAwYy1hNDdmLTJmMDU0Y2MzZjI0ZiIsImNvbXBhbnlJZCI6IjlkYWU5Y2JkLTgyYjEtNGVhZC1iZDJiLTljNWZlNTE0NmEyYSIsInJvbGUiOiJBbmltYWxNYXJrZXQuQWRtaW5pc3RyYXRvciIsIm5iZiI6MTc2NjYwMTE2MiwiZXhwIjoxNzY3MjA1OTYyLCJpYXQiOjE3NjY2MDExNjIsImF1ZCI6ImFwaS5oaXJvdm8uY29tIn0.kBq8z4dwphRffZ8ZB8oN5VToeQl3PRRylVIwsqOvlWU
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              COMMANDS
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Hayvan Sahibi Profili Oluştur
+# Kullanıcıya hayvan sahibi profili ekler.
+POST {{baseUrl}}/AnimalOwnerProfiles/Create
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "userId": "00000000-0000-0000-0000-000000000000",
+    "experienceYears": 10,
+    "specializations": ["Büyükbaş", "Süt Hayvancılığı"],
+    "biography": "10 yıldır hayvancılıkla uğraşıyorum",
+    "certifications": ["Çiftlik Yönetimi Sertifikası"],
+    "verificationStatus": 0,
+    "businessHours": "08:00-18:00"
+}
+
+###
+
+### Hayvan Sahibi Profili Güncelle
+# Mevcut profili günceller.
+POST {{baseUrl}}/AnimalOwnerProfiles/Update
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "userId": "00000000-0000-0000-0000-000000000000",
+    "experienceYears": 12,
+    "specializations": ["Büyükbaş", "Süt Hayvancılığı", "Besi"],
+    "biography": "Güncellenen biyografi",
+    "certifications": ["Çiftlik Yönetimi Sertifikası", "Organik Tarım"],
+    "verificationStatus": 1,
+    "verifiedAt": "2025-01-01T00:00:00",
+    "businessHours": "08:00-20:00"
+}
+
+###
+
+### Hayvan Sahibi Profili Sil
+# Profili siler.
+POST {{baseUrl}}/AnimalOwnerProfiles/Delete
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "isDeleted": true
+}
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              QUERIES
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Tüm Hayvan Sahibi Profillerini Listele
+# Tüm profilleri listeler.
+POST {{baseUrl}}/AnimalOwnerProfiles/All
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "sorting": {
+        "field": "createdAt",
+        "order": "desc"
+    },
+    "filters": {},
+    "pageRequest": {
+        "page": 1,
+        "pageSize": 20
+    }
+}
+
+###
+
+### Hayvan Sahibi Profil Detayı
+# Belirli bir profilin detayını getirir.
+POST {{baseUrl}}/AnimalOwnerProfiles/Detail
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+###
+
+### Hayvan Sahibi Profili Seç (Pick)
+# Dropdown için profil listesi.
+POST {{baseUrl}}/AnimalOwnerProfiles/Pick
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}

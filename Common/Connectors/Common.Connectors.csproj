@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Common.Connectors.File\**" />
+    <EmbeddedResource Remove="Common.Connectors.File\**" />
+    <None Remove="Common.Connectors.File\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="2.24.0" />
   </ItemGroup>
 

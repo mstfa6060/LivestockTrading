@@ -1,0 +1,62 @@
+
+# Direct API
+@Url = http://localhost:5000
+
+# Gateway
+# @Url = http://localhost:8080/keepzo/api/keepzo
+
+@Jwt = YOUR_JWT_TOKEN_HERE
+@CompanyId = 07fad52f-9279-42f6-9a90-e193be532c1a
+
+###############################################
+# AUTH - Commands & Queries
+###############################################
+
+### Register
+# Yeni kullanici kaydi olusturur
+POST {{Url}}/Auth/Register
+Accept: application/json
+Content-Type: application/json
+
+{
+  "email": "test@keepzo.com",
+  "password": "Test123!",
+  "firstName": "Test",
+  "lastName": "User",
+  "phoneNumber": "+905551234567"
+}
+
+
+### Login (IAM Endpoint - Gateway uzerinden)
+# Kullanici girisi yapar
+POST http://localhost:8080/iam/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "provider": "native",
+  "userName": "test@keepzo.com",
+  "password": "Test123!",
+  "companyId": "{{CompanyId}}",
+  "platform": 1
+}
+
+
+### Profile
+# Kullanici profil bilgilerini getirir (JWT gerekli)
+POST {{Url}}/Auth/Profile
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{}
+
+
+### My Licenses
+# Kullanicinin lisanslarini listeler (JWT gerekli)
+POST {{Url}}/Auth/MyLicenses
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{}

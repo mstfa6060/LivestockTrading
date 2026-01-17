@@ -1,0 +1,81 @@
+
+# Direct API
+@Url = http://localhost:5000
+
+# Gateway
+# @Url = http://localhost:8080/keepzo/api/keepzo
+
+@LicenseKey = YOUR_LICENSE_KEY_HERE
+@FileId = 00000000-0000-0000-0000-000000000000
+
+###############################################
+# RESTORE - Queries
+###############################################
+
+### List Files (Root)
+# Root klasordeki dosya ve klasorleri listeler
+POST {{Url}}/Restore/Files
+Accept: application/json
+Content-Type: application/json
+
+{
+  "licenseKey": "{{LicenseKey}}",
+  "path": null,
+  "searchTerm": null,
+  "page": 1,
+  "pageSize": 50
+}
+
+
+### List Files (Specific Path)
+# Belirli bir klasordeki dosyalari listeler
+POST {{Url}}/Restore/Files
+Accept: application/json
+Content-Type: application/json
+
+{
+  "licenseKey": "{{LicenseKey}}",
+  "path": "Documents/Projects",
+  "searchTerm": null,
+  "page": 1,
+  "pageSize": 50
+}
+
+
+### Search Files
+# Dosya araması yapar
+POST {{Url}}/Restore/Files
+Accept: application/json
+Content-Type: application/json
+
+{
+  "licenseKey": "{{LicenseKey}}",
+  "path": null,
+  "searchTerm": "report",
+  "page": 1,
+  "pageSize": 20
+}
+
+
+### Get File Versions
+# Dosyanin tum versiyonlarini getirir
+POST {{Url}}/Restore/FileVersions
+Accept: application/json
+Content-Type: application/json
+
+{
+  "licenseKey": "{{LicenseKey}}",
+  "relativePath": "Documents/Projects/report.pdf"
+}
+
+
+### Download File
+# Dosyayi indirmek icin URL getirir
+POST {{Url}}/Restore/Download
+Accept: application/json
+Content-Type: application/json
+
+{
+  "licenseKey": "{{LicenseKey}}",
+  "fileId": "{{FileId}}"
+}

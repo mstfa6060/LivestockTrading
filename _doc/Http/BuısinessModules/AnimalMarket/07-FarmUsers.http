@@ -1,0 +1,106 @@
+###############################################################################
+#                        FARM USERS (Çiftlik Kullanıcıları)                    #
+#                                                                              #
+#  Çiftliklerde çalışan personelin yönetimi                                   #
+#  Rol ve sorumluluk atamaları                                                #
+###############################################################################
+
+@baseUrl = http://localhost:22321
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJjNGU3YTU2YS0yMTgxLTQ3YjAtOTQzYy1kNTNhMTI2YTQ0ZWUiLCJnaXZlbl9uYW1lIjoibWFkZW50ZWNobm9sb2d5QGdtYWlsLmNvbSIsInVuaXF1ZV9uYW1lIjoiTWFkZW4gVGVjaCAiLCJlbWFpbCI6Im1hZGVudGVjaG5vbG9neUBnbWFpbC5jb20iLCJidWNrZXRJZCI6IiIsInRlbmFudElkIjoiOWRhZTljYmQtODJiMS00ZWFkLWJkMmItOWM1ZmU1MTQ2YTJhIiwicGxhdGZvcm0iOiIwIiwidXNlclNvdXJjZSI6IjEiLCJyZWZyZXNoVG9rZW5JZCI6IjE2Y2ViMDVjLTgxMjItNDAwYy1hNDdmLTJmMDU0Y2MzZjI0ZiIsImNvbXBhbnlJZCI6IjlkYWU5Y2JkLTgyYjEtNGVhZC1iZDJiLTljNWZlNTE0NmEyYSIsInJvbGUiOiJBbmltYWxNYXJrZXQuQWRtaW5pc3RyYXRvciIsIm5iZiI6MTc2NjYwMTE2MiwiZXhwIjoxNzY3MjA1OTYyLCJpYXQiOjE3NjY2MDExNjIsImF1ZCI6ImFwaS5oaXJvdm8uY29tIn0.kBq8z4dwphRffZ8ZB8oN5VToeQl3PRRylVIwsqOvlWU
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              COMMANDS
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Çiftlik Kullanıcısı Ekle
+# Çiftliğe yeni kullanıcı ekler (çalışan, yönetici vb.).
+POST {{baseUrl}}/FarmUsers/Create
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "userId": "00000000-0000-0000-0000-000000000000",
+    "farmId": "00000000-0000-0000-0000-000000000000",
+    "role": "Çiftlik Müdürü",
+    "responsibilities": "Tüm operasyonların yönetimi",
+    "startDate": "2025-01-01",
+    "endDate": null,
+    "isActive": true
+}
+
+###
+
+### Çiftlik Kullanıcısı Güncelle
+# Mevcut çiftlik kullanıcısı bilgilerini günceller.
+POST {{baseUrl}}/FarmUsers/Update
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "role": "Kıdemli Çiftlik Müdürü",
+    "responsibilities": "Genişletilmiş sorumluluklar",
+    "startDate": "2025-01-01",
+    "endDate": null,
+    "isActive": true
+}
+
+###
+
+### Çiftlik Kullanıcısı Sil
+# Çiftlik kullanıcısını kaldırır.
+POST {{baseUrl}}/FarmUsers/Delete
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              QUERIES
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Tüm Çiftlik Kullanıcılarını Listele
+# Tüm çiftlik kullanıcılarını listeler.
+POST {{baseUrl}}/FarmUsers/All
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "sorting": {
+        "field": "createdAt",
+        "order": "desc"
+    },
+    "filters": {},
+    "page": {
+        "page": 1,
+        "pageSize": 20
+    }
+}
+
+###
+
+### Çiftlik Kullanıcısı Detayı
+# Belirli bir çiftlik kullanıcısının detayını getirir.
+POST {{baseUrl}}/FarmUsers/Detail
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+###
+
+### Çiftlik Kullanıcısı Seç (Pick)
+# Dropdown için çiftlik kullanıcısı listesi.
+POST {{baseUrl}}/FarmUsers/Pick
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "search": "",
+    "top": 10,
+    "filters": {}
+}

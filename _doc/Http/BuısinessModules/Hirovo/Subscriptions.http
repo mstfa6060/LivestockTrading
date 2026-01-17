@@ -1,0 +1,42 @@
+
+ @Url= http://localhost:5000
+#  @Url=http://3.88.252.189:5000
+# @Url= https://api-test.toprak.tkholding.com.tr/koopposbackoffice
+
+  @Jwt =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJkOTJlMDJkYS02MDZiLTRmYzQtYTNhNC1kYmNiZTJlMDRhZjIiLCJnaXZlbl9uYW1lIjoibW9jYWsiLCJ1bmlxdWVfbmFtZSI6Ik11c3RhZmEgT2NhayIsInRlbmFudElkIjoiYzlkOGM4NDYtMTBmYy00NjZkLThmNDUtYTRmYTRlODU2YWJkIiwicGxhdGZvcm0iOiIwIiwidXNlclNvdXJjZSI6IjAiLCJuYmYiOjE3NDczNDEzNDIsImV4cCI6MTc0Nzk0NjE0MiwiaWF0IjoxNzQ3MzQxMzQyLCJhdWQiOiJhcGkuaGlyb3ZvLmNvbSJ9.x2NG1XRMMNmsqCTZXpBCMe-rVJrxALX8PqQ8piru-0Q"
+
+ 
+
+### Üyelik Başlatma - Abdullah Karotçu (Manual kayıtlı)
+POST {{Url}}/Subscriptions/StartTrial
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "userId": "E7ECBE7F-B013-47EF-B47F-88479E6677DF"
+}
+
+
+
+### Kullanıcının aktif üyelik planını getirir
+POST {{Url}}/hirovo/Subscriptions/GetPlanDetail
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "userId": "E7ECBE7F-B013-47EF-B47F-88479E6677DF"
+}
+
+
+### Kullanıcının aktif üyelik planını günceller
+POST {{Url}}/Subscriptions/UpgradePlan
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "userId": "E7ECBE7F-B013-47EF-B47F-88479E6677DF",
+  "newPlan": 2
+}

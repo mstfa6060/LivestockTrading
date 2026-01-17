@@ -1,0 +1,38 @@
+###############################################################################
+#               MOBILE APP VERSION (Mobil Uygulama Versiyonu)                  #
+#                                                                              #
+#  Mobil uygulama için versiyon kontrolü                                      #
+#  Zorunlu güncelleme ve minimum versiyon bilgisi                             #
+###############################################################################
+
+@baseUrl = http://localhost:22321
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJjNGU3YTU2YS0yMTgxLTQ3YjAtOTQzYy1kNTNhMTI2YTQ0ZWUiLCJnaXZlbl9uYW1lIjoibWFkZW50ZWNobm9sb2d5QGdtYWlsLmNvbSIsInVuaXF1ZV9uYW1lIjoiTWFkZW4gVGVjaCAiLCJlbWFpbCI6Im1hZGVudGVjaG5vbG9neUBnbWFpbC5jb20iLCJidWNrZXRJZCI6IiIsInRlbmFudElkIjoiOWRhZTljYmQtODJiMS00ZWFkLWJkMmItOWM1ZmU1MTQ2YTJhIiwicGxhdGZvcm0iOiIwIiwidXNlclNvdXJjZSI6IjEiLCJyZWZyZXNoVG9rZW5JZCI6IjE2Y2ViMDVjLTgxMjItNDAwYy1hNDdmLTJmMDU0Y2MzZjI0ZiIsImNvbXBhbnlJZCI6IjlkYWU5Y2JkLTgyYjEtNGVhZC1iZDJiLTljNWZlNTE0NmEyYSIsInJvbGUiOiJBbmltYWxNYXJrZXQuQWRtaW5pc3RyYXRvciIsIm5iZiI6MTc2NjYwMTE2MiwiZXhwIjoxNzY3MjA1OTYyLCJpYXQiOjE3NjY2MDExNjIsImF1ZCI6ImFwaS5oaXJvdm8uY29tIn0.kBq8z4dwphRffZ8ZB8oN5VToeQl3PRRylVIwsqOvlWU
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              QUERIES
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Mobil Uygulama Versiyonunu Getir (Android)
+# Android platformu için güncel uygulama versiyon bilgisini getirir.
+# Minimum versiyon ve zorunlu güncelleme durumunu döner.
+POST {{baseUrl}}/MobilApplicationVersiyon/GetVersion
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "companyId": "00000000-0000-0000-0000-000000000000",
+    "platform": "android"
+}
+
+###
+
+### Mobil Uygulama Versiyonunu Getir (iOS)
+# iOS platformu için güncel uygulama versiyon bilgisini getirir.
+POST {{baseUrl}}/MobilApplicationVersiyon/GetVersion
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "companyId": "00000000-0000-0000-0000-000000000000",
+    "platform": "ios"
+}

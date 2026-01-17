@@ -1,0 +1,134 @@
+###############################################################################
+#                      ANIMAL OFFERS (Hayvan Teklifleri)                       #
+#                                                                              #
+#  Sabit fiyatlı ilanlar için fiyat pazarlığı/teklif sistemi                  #
+#  Alıcı teklif yapar, satıcı kabul/red eder                                  #
+###############################################################################
+
+@baseUrl = http://localhost:22321
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJjNGU3YTU2YS0yMTgxLTQ3YjAtOTQzYy1kNTNhMTI2YTQ0ZWUiLCJnaXZlbl9uYW1lIjoibWFkZW50ZWNobm9sb2d5QGdtYWlsLmNvbSIsInVuaXF1ZV9uYW1lIjoiTWFkZW4gVGVjaCAiLCJlbWFpbCI6Im1hZGVudGVjaG5vbG9neUBnbWFpbC5jb20iLCJidWNrZXRJZCI6IiIsInRlbmFudElkIjoiOWRhZTljYmQtODJiMS00ZWFkLWJkMmItOWM1ZmU1MTQ2YTJhIiwicGxhdGZvcm0iOiIwIiwidXNlclNvdXJjZSI6IjEiLCJyZWZyZXNoVG9rZW5JZCI6IjE2Y2ViMDVjLTgxMjItNDAwYy1hNDdmLTJmMDU0Y2MzZjI0ZiIsImNvbXBhbnlJZCI6IjlkYWU5Y2JkLTgyYjEtNGVhZC1iZDJiLTljNWZlNTE0NmEyYSIsInJvbGUiOiJBbmltYWxNYXJrZXQuQWRtaW5pc3RyYXRvciIsIm5iZiI6MTc2NjYwMTE2MiwiZXhwIjoxNzY3MjA1OTYyLCJpYXQiOjE3NjY2MDExNjIsImF1ZCI6ImFwaS5oaXJvdm8uY29tIn0.kBq8z4dwphRffZ8ZB8oN5VToeQl3PRRylVIwsqOvlWU
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              COMMANDS
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Teklif Oluştur
+# Hayvana direkt fiyat teklifi yapar.
+POST {{baseUrl}}/AnimalOffers/Create
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "animalId": "00000000-0000-0000-0000-000000000000",
+    "buyerId": "00000000-0000-0000-0000-000000000000",
+    "offerAmount": 48000.00,
+    "message": "Bu fiyatı verebilirim, nakit ödeme yapabilirim",
+    "expiryDate": "2025-12-31T23:59:59"
+}
+
+###
+
+### Teklif Güncelle
+# Mevcut teklifi günceller.
+POST {{baseUrl}}/AnimalOffers/Update
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "offerId": "00000000-0000-0000-0000-000000000000",
+    "buyerId": "00000000-0000-0000-0000-000000000000",
+    "offerAmount": 50000.00,
+    "message": "Teklifimi artırdım",
+    "expiryDate": "2025-12-31T23:59:59"
+}
+
+###
+
+### Teklifi Kabul Et (Satıcı)
+# Satıcı olarak teklifi kabul eder.
+# Kabul sonrası emanet süreci başlar.
+POST {{baseUrl}}/AnimalOffers/Accept
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "offerId": "00000000-0000-0000-0000-000000000000",
+    "sellerId": "00000000-0000-0000-0000-000000000000",
+    "responseMessage": "Teklifiniz kabul edildi, ödeme bekleniyor"
+}
+
+###
+
+### Teklifi Reddet (Satıcı)
+# Satıcı olarak teklifi reddeder.
+POST {{baseUrl}}/AnimalOffers/Reject
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "offerId": "00000000-0000-0000-0000-000000000000",
+    "sellerId": "00000000-0000-0000-0000-000000000000",
+    "responseMessage": "Teklifiniz reddedildi, fiyat çok düşük"
+}
+
+###
+
+### Teklif Sil
+# Kendi teklifini iptal eder.
+POST {{baseUrl}}/AnimalOffers/Delete
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "offerId": "00000000-0000-0000-0000-000000000000",
+    "buyerId": "00000000-0000-0000-0000-000000000000"
+}
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              QUERIES
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Tüm Teklifleri Listele
+# Tüm teklifleri listeler.
+POST {{baseUrl}}/AnimalOffers/All
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "sorting": {
+        "field": "createdAt",
+        "order": "desc"
+    },
+    "filters": {},
+    "pageRequest": {
+        "page": 1,
+        "pageSize": 20
+    }
+}
+
+###
+
+### Teklif Detayı
+# Belirli bir teklifin detayını getirir.
+POST {{baseUrl}}/AnimalOffers/Detail
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "offerId": "00000000-0000-0000-0000-000000000000"
+}
+
+###
+
+### Teklif Seç (Pick)
+# Dropdown için teklif listesi.
+POST {{baseUrl}}/AnimalOffers/Pick
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "animalId": "00000000-0000-0000-0000-000000000000",
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}

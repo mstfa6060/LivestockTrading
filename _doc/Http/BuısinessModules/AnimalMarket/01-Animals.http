@@ -1,0 +1,180 @@
+###############################################################################
+#                             ANIMALS (Hayvanlar)                              #
+#                                                                              #
+#  Hayvan ilanlarının yönetimi                                                #
+#  Satış tipi: Sabit Fiyat veya Açık Artırma                                  #
+###############################################################################
+
+@baseUrl = http://localhost:22321
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJjNGU3YTU2YS0yMTgxLTQ3YjAtOTQzYy1kNTNhMTI2YTQ0ZWUiLCJnaXZlbl9uYW1lIjoibWFkZW50ZWNobm9sb2d5QGdtYWlsLmNvbSIsInVuaXF1ZV9uYW1lIjoiTWFkZW4gVGVjaCAiLCJlbWFpbCI6Im1hZGVudGVjaG5vbG9neUBnbWFpbC5jb20iLCJidWNrZXRJZCI6IiIsInRlbmFudElkIjoiOWRhZTljYmQtODJiMS00ZWFkLWJkMmItOWM1ZmU1MTQ2YTJhIiwicGxhdGZvcm0iOiIwIiwidXNlclNvdXJjZSI6IjEiLCJyZWZyZXNoVG9rZW5JZCI6IjE2Y2ViMDVjLTgxMjItNDAwYy1hNDdmLTJmMDU0Y2MzZjI0ZiIsImNvbXBhbnlJZCI6IjlkYWU5Y2JkLTgyYjEtNGVhZC1iZDJiLTljNWZlNTE0NmEyYSIsInJvbGUiOiJBbmltYWxNYXJrZXQuQWRtaW5pc3RyYXRvciIsIm5iZiI6MTc2NjYwMTE2MiwiZXhwIjoxNzY3MjA1OTYyLCJpYXQiOjE3NjY2MDExNjIsImF1ZCI6ImFwaS5oaXJvdm8uY29tIn0.kBq8z4dwphRffZ8ZB8oN5VToeQl3PRRylVIwsqOvlWU
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              COMMANDS
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Hayvan Oluştur
+# Yeni bir hayvan ilanı oluşturur.
+# type: 0=Büyükbaş, 1=Küçükbaş, 2=Kanatlı, 3=At, 4=Diğer
+# saleType: 0=Sabit Fiyat, 1=Açık Artırma
+# gender: 0=Erkek, 1=Dişi
+POST {{baseUrl}}/Animals/Create
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "name": "Holstein İnek",
+    "farmId": "00000000-0000-0000-0000-000000000000",
+    "sellerId": "00000000-0000-0000-0000-000000000000",
+    "type": 0,
+    "breedId": "00000000-0000-0000-0000-000000000000",
+    "price": 50000.00,
+    "mediaBucketId": null,
+    "coverFileId": null,
+    "description": "Sağlıklı, süt verimi yüksek inek",
+    "gender": 1,
+    "birthDate": "2021-01-15",
+    "weight": 450.5,
+    "healthStatus": 0,
+    "isNegotiable": true,
+    "saleType": 0,
+    "city": "Konya",
+    "district": "Selçuklu",
+    "latitude": 37.8714,
+    "longitude": 32.4846,
+    "auctionStartDate": null,
+    "auctionEndDate": null,
+    "reservePrice": null,
+    "includeDelivery": false,
+    "totalCount": 1,
+    "femaleCount": 1,
+    "maleCount": 0,
+    "pregnantCount": 0
+}
+
+###
+
+### Hayvan Güncelle
+# Mevcut hayvan bilgilerini günceller.
+POST {{baseUrl}}/Animals/Update
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "animalId": "00000000-0000-0000-0000-000000000000",
+    "name": "Holstein İnek - Güncellendi",
+    "description": "Güncellenmiş açıklama",
+    "type": 0,
+    "breedId": "00000000-0000-0000-0000-000000000000",
+    "gender": 1,
+    "birthDate": "2021-01-15",
+    "weight": 460.0,
+    "healthStatus": 0,
+    "price": 55000.00,
+    "isNegotiable": true,
+    "saleType": 0,
+    "status": 0,
+    "latitude": 37.8714,
+    "longitude": 32.4846,
+    "city": "Konya",
+    "district": "Selçuklu",
+    "sellerId": "00000000-0000-0000-0000-000000000000",
+    "farmId": "00000000-0000-0000-0000-000000000000",
+    "auctionStartDate": null,
+    "auctionEndDate": null,
+    "reservePrice": null,
+    "expireAt": null,
+    "listingStatus": 0,
+    "includeDelivery": false,
+    "totalCount": 1,
+    "femaleCount": 1,
+    "maleCount": 0,
+    "pregnantCount": 0
+}
+
+###
+
+### Hayvan Sil
+# Hayvanı soft-delete ile siler.
+POST {{baseUrl}}/Animals/Delete
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "animalId": "00000000-0000-0000-0000-000000000000",
+    "isDeleted": true
+}
+
+###
+
+### Hayvana Medya Ekle
+# Hayvana resim/video ekler.
+POST {{baseUrl}}/Animals/AttachMedia
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "animalId": "00000000-0000-0000-0000-000000000000",
+    "bucketId": "bucket-id-here",
+    "coverFileId": "cover-file-id-here"
+}
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              QUERIES
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Tüm Hayvanları Listele
+# Filtreleme ve sayfalama ile tüm hayvanları getirir.
+POST {{baseUrl}}/Animals/All
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "sorting": {
+        "field": "createdAt",
+        "order": "desc"
+    },
+    "filters": [],
+    "pageRequest": {
+        "page": 1,
+        "pageSize": 20
+    }
+}
+
+
+###
+
+### Hayvan Detayı
+# Belirli bir hayvanın detay bilgilerini getirir.
+POST {{baseUrl}}/Animals/Detail
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "animalId": "00000000-0000-0000-0000-000000000000"
+}
+
+###
+
+### Hayvan Medya Detayı
+# Hayvana ait medya dosyalarını getirir.
+POST {{baseUrl}}/Animals/MediaDetail
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "animalId": "00000000-0000-0000-0000-000000000000"
+}
+
+###
+
+### Hayvan Seç (Pick)
+# Dropdown/autocomplete için hayvan listesi.
+POST {{baseUrl}}/Animals/Pick
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "selectedIds": [],
+    "keyword": "inek",
+    "limit": 10
+}

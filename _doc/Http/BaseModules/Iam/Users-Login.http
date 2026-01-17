@@ -1,0 +1,251 @@
+@Url= http://localhost:5000
+#  @Url=http://3.88.252.189:5000
+# @Url= https://api-test.toprak.tkholding.com.tr/koopposbackoffice
+
+  @Jwt =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJjNTAzY2U3ZC1kMTJlLTRjOGUtYTFhNS03MTQxMTA2MjUxNzMiLCJnaXZlbl9uYW1lIjoibWFkZW50ZWNobm9sb2d5QGdtYWlsLmNvbSIsInVuaXF1ZV9uYW1lIjoiTWFkZW4gVGVjaCIsImVtYWlsIjoibWFkZW50ZWNobm9sb2d5QGdtYWlsLmNvbSIsImJ1Y2tldElkIjoiIiwidGVuYW50SWQiOiJjOWQ4Yzg0Ni0xMGZjLTQ2NmQtOGY0NS1hNGZhNGU4NTZhYmQiLCJwbGF0Zm9ybSI6IjEiLCJ1c2VyU291cmNlIjoiMSIsInJlZnJlc2hUb2tlbklkIjoiZDZiZWM0MzItZjc3My00MWNiLWJjZWYtNmE5Zjg5NjY2OGEzIiwiY29tcGFueUlkIjoiYzlkOGM4NDYtMTBmYy00NjZkLThmNDUtYTRmYTRlODU2YWJkIiwidXNlclR5cGUiOiIyIiwibmJmIjoxNzUyNDMxOTM1LCJleHAiOjE3NTMwMzY3MzMsImlhdCI6MTc1MjQzMTkzNSwiYXVkIjoiYXBpLmhpcm92by5jb20ifQ.tWhLiFj-3PJZRR9E6nsPjTDaT6dc4gFLzybHUur7e30"
+
+
+
+### Manuel Kayıt
+POST {{Url}}/Users/Create
+Accept: application/json
+Content-Type: application/json
+
+{
+    "userName": "elif",
+    "firstName": "Abdullah",
+    "surname": "Karotçu",
+    "email": "karatcuApo@example11.com",
+    "password": "SecureP@ss123",
+    "userType": 1,
+    "companyId": "c9d8c846-10fc-466d-8f45-a4fa4e856abd",
+    "userSource": 0
+}
+
+
+### Google Kayıt (OAuth)
+POST {{Url}}/Users/Create
+Accept: application/json
+Content-Type: application/json
+
+{
+    "userName": "johndoe_google",
+    "firstName": "John",
+    "surname": "Doe",
+    "email": "johndowe@gmail.com",
+    "providerId": "11223344556677889900",
+    "userType": 1,
+    "companyId": "c9d8c846-10fc-466d-8f45-a4fa4e856abd",
+    "userSource": 1
+}
+
+
+
+### Apple Kayıt (OAuth)cd
+POST {{Url}}/Users/Create
+Accept: application/json
+Content-Type: application/json
+
+{
+    "userName": "johndoe_apple",
+    "firstName": "John",
+    "surname": "Doe",
+    "email": "johndoe@icloud.com",
+    "providerId": "A1B2C3D4E5F6G7H8I9J0",
+    "userType": 1,
+    "companyId": "c9d8c846-10fc-466d-8f45-a4fa4e856abd",
+    "userSource": 2
+}
+
+
+
+### Login 
+POST {{Url}}/Auth/Login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "provider": "google",
+  "userName": "madentechnology@gmail.com",
+  "password": "",
+  "token": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImYxMDMzODYwNzE2ZTNhMmFhYjM4MGYwMGRiZTM5YTcxMTQ4NDZiYTEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI4ODkyNjIwODA2MC0zdmV2aXJpazRpNzRwZWVicnFuZTRpMGk2ODBnYmI4bi5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImF1ZCI6Ijg4OTI2MjA4MDYwLXJwZWFsNDRvNjNycHFjb2pyOTRiZGxhbm5kMXZrbzR0LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTE3NzI2NDI3MTQ2MjEyNDcwMzQwIiwiZW1haWwiOiJtYWRlbnRlY2hub2xvZ3lAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5hbWUiOiJNYWRlbiBUZWNoIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FDZzhvY0lYUDFJb3ZQVW51RFNFYnhoVlFDQTg4RnN3azd4eTNxclFxaVo2V2RrNnFFS0pHZz1zOTYtYyIsImdpdmVuX25hbWUiOiJNYWRlbiBUZWNoIiwiaWF0IjoxNzUzMDI4NzAwLCJleHAiOjE3NTMwMzIzMDB9.ZAWXpWUi6f2xvJvu5hhKUN43l1sTjEzkwJr0ASL1t9sWshArIu78TyPTZFsAA2ghWyp3DQcKfQqNJ-e-2E_v5rzYalE4eU2FV3M_eYSEDn-uNtIApeDUtBK0TD9IXqahYTcFvlBleShg0h6AE8dRM2F6rPkndl8fYC73WKMP_-FvyI4W5weQLm7vJTY-E4sMXUZ2_elHfAAs-b39tzE4OQm37LCRh_dh1UdcgVurNv76IcdRQmDzcmjBv-3xDFq_q7B_cQ333l_a7FfAZ2-QpLbZTzhPApcy7L4Jt0nmljdjgfIxVFcj2OLCqCyjE4Y1jXJ8IGEbrgkyEAOtBN-UPw",
+  "platform": 1,
+  "isCompanyHolding": false,
+  "companyId": "c9d8c846-10fc-466d-8f45-a4fa4e856abd",
+  "firstName": "Maden Tech",
+  "surname": "",
+  "phoneNumber": "0000000000",
+  "birthDate": "1990-01-01T00:00:00.000Z",
+  "externalProviderUserId": "117726427146212470340"
+}
+
+
+
+
+### Login
+POST {{Url}}/Auth/Login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "provider": "google",
+  "userName": "madentechnology@gmail.com",
+  "token": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImYxMDMzODYwNzE2ZTNhMmFhYjM4MGYwMGRiZTM5YTcxMTQ4NDZiYTEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI4ODkyNjIwODA2MC0zdmV2aXJpazRpNzRwZWVicnFuZTRpMGk2ODBnYmI4bi5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImF1ZCI6Ijg4OTI2MjA4MDYwLXJwZWFsNDRvNjNycHFjb2pyOTRiZGxhbm5kMXZrbzR0LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTE3NzI2NDI3MTQ2MjEyNDcwMzQwIiwiZW1haWwiOiJtYWRlbnRlY2hub2xvZ3lAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5hbWUiOiJNYWRlbiBUZWNoIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FDZzhvY0lYUDFJb3ZQVW51RFNFYnhoVlFDQTg4RnN3azd4eTNxclFxaVo2V2RrNnFFS0pHZz1zOTYtYyIsImdpdmVuX25hbWUiOiJNYWRlbiBUZWNoIiwiaWF0IjoxNzUzMDE0Njc4LCJleHAiOjE3NTMwMTgyNzh9.JpR4IBJ6hiDX4bR7lp3gNo3b8XL8v99SZnChSUX-lppX8RqaRADrWLo8m0MzYgRVVNS3WKl6AoS-cRp1xQ1cbqsFr6xevB_rNUUOyXHUlNCzm0Jr--NpXZ5mmX34uIfMfW3Qu3E6mkkWNU6E3GLjXg0zn8uWa0of4-GbOSgXrPQ79r6BCpKz51aeFnPOJeeVQMe60ln-HKf-C7k8L_vpH4geXAqJ1Nsd2c1ugHuKl8BUJh-TZ29I58FFRfVPSPB3VEtXudVRSzYtUR1pqpJ5beqtMRBZwD7dCwP2IMyrl_lJSN8FAZnTEFv-GiJ5fV29GUWozf2OH2iFswR68JrPPQ",
+  "password": "",
+  "platform": 1,
+  "isCompanyHolding": false,
+  "companyId": "c9d8c846-10fc-466d-8f45-a4fa4e856abd",
+  "firstName": "Maden",
+  "surname": "Tech",
+  "phoneNumber": "05551234567",
+  "birthDate": "1990-01-01"
+}
+
+
+### Apple Login (Sign in with Apple)
+POST {{Url}}/Auth/Login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "provider": "apple",
+  "userName": "user@privaterelay.appleid.com",
+  "token": "APPLE_AUTHORIZATION_CODE_HERE",
+  "platform": 1,
+  "isCompanyHolding": false,
+  "companyId": "c9d8c846-10fc-466d-8f45-a4fa4e856abd",
+  "firstName": "Apple",
+  "surname": "User",
+  "phoneNumber": "05551234567",
+  "birthDate": "1990-01-01T00:00:00.000Z",
+  "externalProviderUserId": "APPLE_USER_ID_HERE"
+}
+
+
+### REFRESH TOKEN (yenileme)
+POST {{Url}}/iam/auth/RefreshToken
+Content-Type: application/json
+Accept: application/json
+
+{
+  "refreshToken": "Vy8xsRtv6XVuxY2XhL8Vd7OdFLKtDWYoxpM1oFmtj9fNMfbbkaJan44k0cEsmlk+/OEcuNBmERZiljlioC4AcA==",
+  "platform": 1
+}
+
+
+
+### Logout
+POST {{Url}}/Auth/Logout
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+
+}
+
+
+### Refresh Token Revoke
+POST {{Url}}/Auth/RevokeRefreshToken
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "refreshTokenId": "4C1D5187-AC16-4B21-AD17-DDF65B0971A6"
+}
+
+
+
+### Şifre Güncelleme (Update Password)
+POST {{Url}}/Users/UpdatePassword
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "userId": "D92E02DA-606B-4FC4-A3A4-DBCBE2E04AF2",
+  "oldPassword": "SecureP@ss123",
+  "newPassword": "YeniSifre456!"
+}
+
+
+### ForgotPassword
+POST {{Url}}/Users/ForgotPassword
+Authorization: Bearer {{Jwt}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "m.mustafaocak@gmail.com"
+}
+
+
+
+### Reset Password
+POST {{Url}}/Users/ResetPassword
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "token": "abc123",
+  "newPassword": "YeniSifre123!"
+}
+
+
+
+### Users.Queries.Detail
+POST {{Url}}/Users/Detail
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "userId": "C503CE7D-D12E-4C8E-A1A5-714110625173",
+  "companyId": "c9d8c846-10fc-466d-8f45-a4fa4e856abd"
+}
+
+
+### Users.Queries.All
+POST {{Url}}/Users/All
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "companyId": "c9d8c846-10fc-466d-8f45-a4fa4e856abd"
+}
+
+### Auth.SendOtp
+POST {{Url}}/Auth/SendOtp
+Content-Type: application/json
+
+{
+  "phoneNumber": "+905555555555",
+  "companyId": "c9d8c846-10fc-466d-8f45-a4fa4e856abd",
+  "language": "tr",
+  "userId": "64733F75-840D-4219-9E77-543445E08022"
+}
+
+
+### Auth.VerifyOtp
+POST {{Url}}/Auth/VerifyOtp
+Content-Type: application/json
+
+{
+  "userId": "642212E1-51BB-4693-BD61-67A0BDAF8825",
+  "phoneNumber": "+905396500009",
+  "companyId": "c9d8c846-10fc-466d-8f45-a4fa4e856abd",
+  "otpCode": "797780"
+}
+
+
+### User.Delete
+POST {{Url}}/User/Delete
+Content-Type: application/json
+
+{
+  "userId": "6FA5FCA4-02AC-48D9-815F-44EE68AB8CDD",
+  "isDeleted": true
+}

@@ -1,0 +1,82 @@
+
+# Direct API
+@Url = http://localhost:5000
+
+# Gateway
+# @Url = http://localhost:8080/keepzo/api/keepzo
+
+@LicenseKey = YOUR_LICENSE_KEY_HERE
+
+###############################################
+# AGENT - Commands & Queries
+###############################################
+
+### Health Check
+# Sistem durumunu kontrol eder
+POST {{Url}}/Agent/Health
+Accept: application/json
+Content-Type: application/json
+
+{}
+
+
+### Get Config
+# Agent konfigurasyonunu getirir
+POST {{Url}}/Agent/GetConfig
+Accept: application/json
+Content-Type: application/json
+
+{
+  "licenseKey": "{{LicenseKey}}"
+}
+
+
+### Report Log
+# Backup log raporlar
+POST {{Url}}/Agent/ReportLog
+Accept: application/json
+Content-Type: application/json
+
+{
+  "licenseKey": "{{LicenseKey}}",
+  "fileName": "documents.zip",
+  "fileSizeBytes": 1048576,
+  "status": "completed",
+  "errorMessage": null,
+  "startedAt": "2024-01-15T10:00:00Z",
+  "completedAt": "2024-01-15T10:05:00Z",
+  "storageUrl": "https://storage.example.com/backups/documents.zip",
+  "checksum": "abc123def456",
+  "deviceId": "device-001",
+  "deviceName": "MyPC"
+}
+
+
+### Upload (Multipart/Form-Data)
+# Dosya yükler - Form-Data olarak gönderilmeli
+POST {{Url}}/Agent/Upload
+Accept: application/json
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="licenseKey"
+
+{{LicenseKey}}
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="checksum"
+
+abc123def456789
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="deviceId"
+
+device-001
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="deviceName"
+
+MyPC
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="backup.zip"
+Content-Type: application/octet-stream
+
+< ./test-file.zip
+------WebKitFormBoundary7MA4YWxkTrZu0gW--

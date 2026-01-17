@@ -1,0 +1,235 @@
+###############################################################################
+#                    DELIVERY ORDERS (Teslimat Siparişleri)                    #
+#                                                                              #
+#  Hayvan teslimat sürecinin yönetimi                                         #
+#  Akış: Sipariş -> Nakliyeci Talepleri -> Atama -> Başlat -> Tamamla         #
+###############################################################################
+
+# @baseUrl = https://dev-api.besilik.com
+@baseUrl = http://localhost:22321
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIzZTk3ZjZhNy0yNTcwLTQyNGYtYmQyMC03NzVhZWVkZDg3ZjciLCJnaXZlbl9uYW1lIjoiYnVyY3Zha2ZpMDZAZ21haWwuY29tIiwidW5pcXVlX25hbWUiOiJCdXJjIFZha2bEsSAiLCJlbWFpbCI6ImJ1cmN2YWtmaTA2QGdtYWlsLmNvbSIsImJ1Y2tldElkIjoiIiwidGVuYW50SWQiOiI5ZGFlOWNiZC04MmIxLTRlYWQtYmQyYi05YzVmZTUxNDZhMmEiLCJwbGF0Zm9ybSI6IjAiLCJ1c2VyU291cmNlIjoiMSIsInJlZnJlc2hUb2tlbklkIjoiOGM3NzU4NTMtMTFkNi00MmJiLTk3MzMtNmE1OThmODhhNGQyIiwiY29tcGFueUlkIjoiOWRhZTljYmQtODJiMS00ZWFkLWJkMmItOWM1ZmU1MTQ2YTJhIiwicm9sZSI6IkFuaW1hbE1hcmtldC5UcmFuc3BvcnRlciIsIm5iZiI6MTc2Njg1OTQwMCwiZXhwIjoxNzY3NDY0MjAwLCJpYXQiOjE3NjY4NTk0MDAsImF1ZCI6ImFwaS5oaXJvdm8uY29tIn0.sg9dbqLVgLaym5NLKMOp_oHmrxsW6Q5vTagpr2vTKC0
+
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              COMMANDS
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Teslimat Siparişi Oluştur
+# Yeni teslimat siparişi oluşturur.
+# Veteriner onayından sonra otomatik oluşturulur.
+# carrierId başlangıçta null olur, nakliyeci atanınca dolar.
+POST {{baseUrl}}/DeliveryOrders/Create
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "animalId": "00000000-0000-0000-0000-000000000000",
+    "carrierId": null,
+    "pickupCity": "Konya",
+    "pickupDistrict": "Selçuklu",
+    "dropoffCity": "Ankara",
+    "dropoffDistrict": "Yenimahalle",
+    "status": 0,
+    "proofOfDeliveryUrl": null
+}
+
+###
+
+### Teslimat Siparişi Güncelle
+# Mevcut teslimat siparişini günceller.
+POST {{baseUrl}}/DeliveryOrders/Update
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "carrierId": "00000000-0000-0000-0000-000000000000",
+    "pickupCity": "Konya",
+    "pickupDistrict": "Selçuklu",
+    "dropoffCity": "Ankara",
+    "dropoffDistrict": "Yenimahalle",
+    "status": 1,
+    "proofOfDeliveryUrl": null
+}
+
+###
+
+### Teslimat Siparişi Sil
+# Teslimat siparişini soft-delete ile siler.
+POST {{baseUrl}}/DeliveryOrders/Delete
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "isDeleted": true
+}
+
+###
+
+### Nakliyeci Ata (Admin)
+# Admin olarak teslimat siparişine nakliyeci atar.
+# Nakliyeci taleplerinden (DeliveryRequests) birini seçerek atama yapılır.
+POST {{baseUrl}}/DeliveryOrders/AssignCarrier
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "deliveryOrderId": "00000000-0000-0000-0000-000000000000",
+    "carrierId": "00000000-0000-0000-0000-000000000000",
+    "adminNotes": "En uygun teklifi veren nakliyeci seçildi"
+}
+
+###
+
+### Teslimatı Başlat (Nakliyeci)
+# Nakliyeci olarak teslimatı başlatır.
+# Araç plakası ve tahmini teslim tarihi girilir.
+POST {{baseUrl}}/DeliveryOrders/StartDelivery
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "deliveryOrderId": "f3a65de2-1757-4da2-9233-c63f58d31d98",
+  "vehiclePlate": "34D1315",
+  "estimatedDeliveryDate": "2026-02-13T23:13:00.000Z"
+}
+
+###
+
+### Teslimatı Tamamla (Nakliyeci)
+# Nakliyeci olarak teslimatı tamamlar.
+# Teslimat kanıtı (fotoğraf) ve notlar eklenir.
+POST {{baseUrl}}/DeliveryOrders/CompleteDelivery
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "deliveryOrderId": "00000000-0000-0000-0000-000000000000",
+    "deliveryProof": "https://storage.example.com/proof.jpg",
+    "deliveryNotes": "Teslimat başarıyla tamamlandı. Alıcı teslim aldı."
+}
+
+###
+
+### Konum Güncelle (Nakliyeci)
+# Nakliyeci olarak anlık GPS konumu gönderir.
+# Mobil uygulama periyodik olarak bu endpoint'i çağırır.
+POST {{baseUrl}}/DeliveryOrders/UpdateLocation
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "deliveryOrderId": "00000000-0000-0000-0000-000000000000",
+    "latitude": 39.9334,
+    "longitude": 32.8597,
+    "timestamp": "2025-11-29T14:30:00Z"
+}
+
+###
+
+### Teslimat Kanıtı Yükle
+# Teslimat kanıtı (fotoğraf, imza vb.) yükler.
+POST {{baseUrl}}/DeliveryOrders/UploadProof
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "deliveryOrderId": "00000000-0000-0000-0000-000000000000",
+    "carrierId": "00000000-0000-0000-0000-000000000000",
+    "proofOfDeliveryUrl": "https://storage.example.com/proof.jpg",
+    "notes": "Teslim anı fotoğrafı"
+}
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              QUERIES
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Tüm Teslimat Siparişlerini Listele
+# Filtreleme ve sayfalama ile tüm teslimat siparişlerini listeler.
+POST {{baseUrl}}/DeliveryOrders/All
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "sorting": {
+        "field": "createdAt",
+        "order": "desc"
+    },
+    "filters": {},
+    "pageRequest": {
+        "page": 1,
+        "pageSize": 20
+    }
+}
+
+###
+
+### Teslimat Siparişi Detayı
+# Belirli bir teslimat siparişinin detaylı bilgilerini getirir.
+POST {{baseUrl}}/DeliveryOrders/Detail
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+###
+
+### Teslimat Siparişi Seç (Pick)
+# Dropdown/autocomplete için teslimat siparişi listesi.
+POST {{baseUrl}}/DeliveryOrders/Pick
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+###
+
+### Müsait Teslimatları Listele (Nakliyeci İçin)
+# Nakliyeciler için henüz atanmamış (CarrierId = null) teslimatları listeler.
+# Nakliyeci bu listeden ilgilendiği teslimatlar için talep oluşturabilir.
+POST {{baseUrl}}/DeliveryOrders/GetAvailable
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "city": "Konya",
+    "animalType": null,
+    "page": 1,
+    "pageSize": 20
+}
+
+###
+
+### Bekleyen Teslimatları Listele (Admin İçin)
+# Admin için tüm bekleyen teslimatları ve gelen talepleri listeler.
+# Her teslimat için nakliyeci talepleri, satıcı/alıcı bilgileri gösterilir.
+POST {{baseUrl}}/DeliveryOrders/GetPendingForAdmin
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "page": 1,
+    "pageSize": 20,
+    "city": null,
+    "animalType": null
+}
+
+###
+
+### Teslimat Takibi
+# Teslimatın anlık konum ve durum bilgisini getirir.
+# Alıcı, satıcı ve nakliyeci bu endpoint ile canlı takip yapabilir.
+POST {{baseUrl}}/DeliveryOrders/GetTracking
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "deliveryOrderId": "00000000-0000-0000-0000-000000000000"
+}

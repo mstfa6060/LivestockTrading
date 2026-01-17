@@ -1,0 +1,144 @@
+###############################################################################
+#                   VETERINARY APPROVALS (Veteriner Onayları)                  #
+#                                                                              #
+#  Hayvan satışı için veteriner sağlık onayı süreci                           #
+#  Onay alınmadan teslimat başlatılamaz                                       #
+###############################################################################
+
+@baseUrl = http://localhost:22321
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI5ZmM3NzQ4OS0wNTViLTQ2MGYtODU5NC00NGQ1MjI3MmVmYTQiLCJnaXZlbl9uYW1lIjoiMjkzNDUzOTQ4OTYiLCJ1bmlxdWVfbmFtZSI6Ik11c3RhZmEgT0NBSyIsImVtYWlsIjoibXVzdGFmYW9jYWs4OUBob3RtYWlsLmNvbSIsImJ1Y2tldElkIjoiIiwidGVuYW50SWQiOiI5ZGFlOWNiZC04MmIxLTRlYWQtYmQyYi05YzVmZTUxNDZhMmEiLCJwbGF0Zm9ybSI6IjAiLCJ1c2VyU291cmNlIjoiMCIsInJlZnJlc2hUb2tlbklkIjoiNzE4OTExOTAtNDIwYy00YmNhLTllOWMtMTdkYjA2ODIyY2FjIiwiY29tcGFueUlkIjoiOWRhZTljYmQtODJiMS00ZWFkLWJkMmItOWM1ZmU1MTQ2YTJhIiwicm9sZSI6IkFuaW1hbE1hcmtldC5WZXRlcmluYXJpYW4iLCJuYmYiOjE3NjY5MjkzMTcsImV4cCI6MTc2NzUzNDExNywiaWF0IjoxNzY2OTI5MzE3LCJhdWQiOiJhcGkuaGlyb3ZvLmNvbSJ9.w-2XDW87ge38nVFYCU5USL9A63FH1bjRi9MOsMC4yTc
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              COMMANDS
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Veteriner Onayı Oluştur
+# Hayvan için veteriner onay kaydı oluşturur.
+# status: 0=Bekliyor, 1=Onaylandı, 2=Reddedildi
+# approvalType: 0=Satış Öncesi, 1=Nakil Öncesi
+POST {{baseUrl}}/VeterinaryApprovals/Create
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "animalId": "00000000-0000-0000-0000-000000000000",
+    "veterinarianId": "00000000-0000-0000-0000-000000000000",
+    "status": 0,
+    "approvalType": 0,
+    "notes": "Muayene için bekleniyor",
+    "approvedAt": null,
+    "rejectedAt": null,
+    "healthScore": null,
+    "nextCheckDate": null,
+    "documentBucketId": null
+}
+
+###
+
+### Veteriner Onayı Güncelle
+# Mevcut veteriner onayını günceller.
+POST {{baseUrl}}/VeterinaryApprovals/Update
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "status": 1,
+    "approvalType": 0,
+    "notes": "Hayvan sağlıklı, satışa uygun",
+    "healthScore": 95,
+    "nextCheckDate": "2026-05-29",
+    "documentBucketId": null,
+    "approvedAt": "2025-11-29T14:00:00",
+    "rejectedAt": null
+}
+
+###
+
+### Veteriner Onayı Ver (Approve)
+# Veteriner olarak hayvanı onaylar.
+# Onay verilince teslimat süreci başlayabilir.
+POST {{baseUrl}}/VeterinaryApprovals/Approve
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "approvalId": "00000000-0000-0000-0000-000000000000",
+    "veterinarianId": "00000000-0000-0000-0000-000000000000",
+    "notes": "Hayvan sağlıklı, nakil için uygundur",
+    "healthScore": 92
+}
+
+###
+
+### Veteriner Onayı Sil
+# Veteriner onayını siler.
+POST {{baseUrl}}/VeterinaryApprovals/Delete
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "isDeleted": true
+}
+
+### ═══════════════════════════════════════════════════════════════════════════
+###                              QUERIES
+### ═══════════════════════════════════════════════════════════════════════════
+
+### Tüm Veteriner Onaylarını Listele
+# Tüm veteriner onaylarını listeler.
+POST {{baseUrl}}/VeterinaryApprovals/All
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "sorting": {
+    "key": "createdAt",
+    "direction": 1
+  },
+  "filters": [
+    {
+      "key": "veterinarianId",
+      "type": "guid",
+      "isUsed": true,
+      "values": [
+        "9fc77489-055b-460f-8594-44d52272efa4"
+      ],
+      "min": {},
+      "max": {},
+      "conditionType": "Equals"
+    }
+  ],
+  "pageRequest": {
+    "currentPage": 1,
+    "perPageCount": 50,
+    "listAll": false
+  }
+}
+###
+
+### Veteriner Onayı Detayı
+# Belirli bir veteriner onayının detayını getirir.
+POST {{baseUrl}}/VeterinaryApprovals/Detail
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "veterinaryApprovalId": "00000000-0000-0000-0000-000000000000",
+    "languageCode": "tr"
+}
+
+###
+
+### Veteriner Onayı Seç (Pick)
+# Dropdown için veteriner onayı listesi.
+POST {{baseUrl}}/VeterinaryApprovals/Pick
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
