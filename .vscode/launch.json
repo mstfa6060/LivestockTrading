@@ -19,39 +19,7 @@
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
             }
-        },
-        {
-            "name": "Hirovo API",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build",
-            "program": "${workspaceFolder}/BusinessModules/Hirovo/BusinessModules.Hirovo.Api/bin/Debug/net8.0/BusinessModules.Hirovo.Api.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/BusinessModules/Hirovo/BusinessModules.Hirovo.Api",
-            "stopAtEntry": false,
-            "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-            },
-            "sourceFileMap": {
-                "/Views": "${workspaceFolder}/Views"
-            }
-        },
-        {
-            "name": "Animal Market API",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build",
-            "program": "${workspaceFolder}/BusinessModules/AnimalMarket/BusinessModules.AnimalMarket.Api/bin/Debug/net8.0/BusinessModules.AnimalMarket.Api.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/BusinessModules/AnimalMarket/BusinessModules.AnimalMarket.Api",
-            "stopAtEntry": false,
-            "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-            },
-            "sourceFileMap": {
-                "/Views": "${workspaceFolder}/Views"
-            }
-        },
+        }, 
         {
             "name": "File Provider",
             "type": "coreclr",
@@ -67,23 +35,7 @@
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
             },
-        },
-        {
-            "name": "Keepzo Api",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build",
-            "program": "${workspaceFolder}/BusinessModules/Keepzo/BusinessModules.Keepzo.Api/bin/Debug/net8.0/BusinessModules.Keepzo.Api.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/BusinessModules/Keepzo/BusinessModules.Keepzo.Api",
-            "stopAtEntry": false,
-            "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-            },
-            "sourceFileMap": {
-                "/Views": "${workspaceFolder}/Views"
-            },
-        },
+        }, 
         {
             "name": "Resource Seeder",
             "type": "coreclr",

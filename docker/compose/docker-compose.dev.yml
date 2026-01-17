@@ -1,0 +1,38 @@
+# GlobalLivestock - Development Override
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+
+services:
+  globallivestock-api:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    build:
+      context: ../..
+      dockerfile: docker/Dockerfile.globallivestock-api
+
+  iam-api:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    build:
+      context: ../..
+      dockerfile: docker/Dockerfile.iam-api
+
+  fileprovider-api:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    build:
+      context: ../..
+      dockerfile: docker/Dockerfile.fileprovider-api
+
+  iam-mail-worker:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    build:
+      context: ../..
+      dockerfile: docker/Dockerfile.iam-mail-worker
+
+  iam-sms-worker:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    build:
+      context: ../..
+      dockerfile: docker/Dockerfile.iam-sms-worker
