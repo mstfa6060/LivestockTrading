@@ -29,8 +29,10 @@ firebase-adminsdk-*.json
 
 
 # Environment files with sensitive data
-# env/*.env  # Commented out - env files are now tracked
-!env/*.env.example
+docker/env/.env.dev
+docker/env/.env.prod
+*.env
+!*.env.example
 
 # Docker secrets
 secrets/
