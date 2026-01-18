@@ -9,6 +9,12 @@ x-common-env: &common-env
   RabbitMq__User: ${RABBITMQ_USER:-guest}
   RabbitMq__Pass: ${RABBITMQ_PASS:-guest}
   Caching__Redis__ConnectionString: "redis:6379"
+  Caching__Redis__InstanceName: "livestocktrading:"
+  MinIO__Endpoint: "minio:9000"
+  MinIO__AccessKey: ${MINIO_ROOT_USER:-minioadmin}
+  MinIO__SecretKey: ${MINIO_ROOT_PASSWORD:-minioadmin}
+  MinIO__UseSSL: "false"
+  MinIO__BucketName: ${MINIO_BUCKET_NAME:-livestocktrading}
 
 networks:
   livestocktrading-network:
@@ -17,12 +23,14 @@ networks:
 volumes:
   sqlserver-data:
   redis-data:
+  minio-data:
   file-storage:
 
 services:
   # Infrastructure Services
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: livestocktrading-sqlserver
     environment:
       SA_PASSWORD: ${SA_PASSWORD:-YourStrong@Passw0rd}
       ACCEPT_EULA: "Y"
@@ -33,7 +41,11 @@ services:
     networks:
       - livestocktrading-network
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD:-YourStrong@Passw0rd} -C -Q 'SELECT 1' || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD:-YourStrong@Passw0rd} -C -Q 'SELECT 1' || exit 1",
+        ]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -41,6 +53,7 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
+    container_name: livestocktrading-rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
@@ -58,6 +71,7 @@ services:
 
   redis:
     image: redis:7-alpine
+    container_name: livestocktrading-redis
     ports:
       - "${REDIS_PORT:-6379}:6379"
     volumes:
@@ -72,9 +86,31 @@ services:
       retries: 5
     restart: unless-stopped
 
+  minio:
+    image: minio/minio:latest
+    container_name: livestocktrading-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - livestocktrading-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    restart: unless-stopped
+
   # Application Services
   livestocktrading-api:
     image: ${DOCKER_REGISTRY:-docker.io}/${DOCKER_USERNAME}/livestocktrading-api:${TAG:-latest}
+    container_name: livestocktrading-api
     environment:
       <<: *common-env
     ports:
@@ -86,12 +122,15 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      minio:
+        condition: service_healthy
     networks:
       - livestocktrading-network
     restart: unless-stopped
 
   iam-api:
     image: ${DOCKER_REGISTRY:-docker.io}/${DOCKER_USERNAME}/livestocktrading-iam-api:${TAG:-latest}
+    container_name: livestocktrading-iam-api
     environment:
       <<: *common-env
     ports:
@@ -107,6 +146,7 @@ services:
 
   fileprovider-api:
     image: ${DOCKER_REGISTRY:-docker.io}/${DOCKER_USERNAME}/livestocktrading-fileprovider-api:${TAG:-latest}
+    container_name: livestocktrading-fileprovider-api
     environment:
       <<: *common-env
     ports:
@@ -116,6 +156,8 @@ services:
     depends_on:
       sqlserver:
         condition: service_healthy
+      minio:
+        condition: service_healthy
     networks:
       - livestocktrading-network
     restart: unless-stopped
@@ -123,8 +165,15 @@ services:
   # Workers
   iam-mail-worker:
     image: ${DOCKER_REGISTRY:-docker.io}/${DOCKER_USERNAME}/livestocktrading-iam-mail-worker:${TAG:-latest}
+    container_name: livestocktrading-iam-mail-worker
     environment:
       <<: *common-env
+      BREVO_SMTP_HOST: ${BREVO_SMTP_HOST}
+      BREVO_SMTP_PORT: ${BREVO_SMTP_PORT}
+      BREVO_SMTP_USER: ${BREVO_SMTP_USER}
+      BREVO_SMTP_PASS: ${BREVO_SMTP_PASS}
+      BREVO_FROM_EMAIL: ${BREVO_FROM_EMAIL}
+      BREVO_FROM_NAME: ${BREVO_FROM_NAME}
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -134,8 +183,11 @@ services:
 
   iam-sms-worker:
     image: ${DOCKER_REGISTRY:-docker.io}/${DOCKER_USERNAME}/livestocktrading-iam-sms-worker:${TAG:-latest}
+    container_name: livestocktrading-iam-sms-worker
     environment:
       <<: *common-env
+      NETGSM_USERNAME: ${NETGSM_USERNAME}
+      NETGSM_PASSWORD: ${NETGSM_PASSWORD}
     depends_on:
       rabbitmq:
         condition: service_healthy
