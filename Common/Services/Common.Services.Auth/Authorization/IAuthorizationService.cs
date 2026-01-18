@@ -41,7 +41,7 @@ public interface IAuthorizationService
     /// <summary>
     /// Kullanıcının belirli bir modülde belirli bir role sahip olup olmadığını kontrol eder.
     /// </summary>
-    /// <param name="moduleName">Modül adı (örn: "AnimalMarket")</param>
+    /// <param name="moduleName">Modül adı (örn: "LivestockTrading")</param>
     /// <param name="roleName">Rol adı (örn: "Admin")</param>
     /// <returns>True: Yetkili, False: Yetkisiz</returns>
     bool HasRoleInModule(string moduleName, string roleName);
@@ -50,7 +50,7 @@ public interface IAuthorizationService
     /// <summary>
     /// Kullanıcının belirli bir modüldeki tüm rollerini getirir.
     /// </summary>
-    /// <param name="moduleName">Modül adı (örn: "AnimalMarket")</param>
+    /// <param name="moduleName">Modül adı (örn: "LivestockTrading")</param>
     /// <returns>Rol listesi (örn: ["Admin", "Veterinarian"])</returns>
     List<string> GetUserRolesInModule(string moduleName);
 }

@@ -27,8 +27,7 @@ public enum ModuleCategories
 
 public enum ModuleTypes
 {
-    Hirovo = 0,
-    IAM = 1,
-    FileProvider = 2,
-    AnimalMarket = 3
+    IAM = 0,
+    FileProvider = 1,
+    LivestockTrading = 2
 }

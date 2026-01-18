@@ -16,21 +16,21 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: globallivestock-api
-            dockerfile: docker/Dockerfile.globallivestock-api
-            image: ${{ secrets.DOCKER_USERNAME }}/globallivestock-api
+          - name: livestocktrading-api
+            dockerfile: docker/Dockerfile.livestocktrading-api
+            image: ${{ secrets.DOCKER_USERNAME }}/livestocktrading-api
           - name: iam-api
             dockerfile: docker/Dockerfile.iam-api
-            image: ${{ secrets.DOCKER_USERNAME }}/globallivestock-iam-api
+            image: ${{ secrets.DOCKER_USERNAME }}/livestocktrading-iam-api
           - name: fileprovider-api
             dockerfile: docker/Dockerfile.fileprovider-api
-            image: ${{ secrets.DOCKER_USERNAME }}/globallivestock-fileprovider-api
+            image: ${{ secrets.DOCKER_USERNAME }}/livestocktrading-fileprovider-api
           - name: iam-mail-worker
             dockerfile: docker/Dockerfile.iam-mail-worker
-            image: ${{ secrets.DOCKER_USERNAME }}/globallivestock-iam-mail-worker
+            image: ${{ secrets.DOCKER_USERNAME }}/livestocktrading-iam-mail-worker
           - name: iam-sms-worker
             dockerfile: docker/Dockerfile.iam-sms-worker
-            image: ${{ secrets.DOCKER_USERNAME }}/globallivestock-iam-sms-worker
+            image: ${{ secrets.DOCKER_USERNAME }}/livestocktrading-iam-sms-worker
 
     steps:
       - name: Checkout
@@ -68,7 +68,7 @@ jobs:
           username: ${{ secrets.DEV_SERVER_USER }}
           key: ${{ secrets.DEV_SERVER_KEY }}
           script: |
-            cd /opt/globallivestock
+            cd /opt/livestocktrading
             docker compose -f docker-compose.dev.yml pull
             docker compose -f docker-compose.dev.yml up -d
             docker image prune -f

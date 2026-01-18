@@ -1,4 +1,4 @@
-﻿using Common.Definitions.Domain.Entities;
+using Common.Definitions.Domain.Entities;
 
 namespace Jobs.SpecialPurpose.ResourceSeeder;
 
@@ -19,7 +19,7 @@ class Program
         // 1) Modüller
         await Seeder.SeedAppModules(args);
 
-        // 2) Endpoint Resource’ları
+        // 2) Endpoint Resource'ları
         await Seeder.SeedResources(args);
 
         // 3) Şirket & Roller (UPsert)
@@ -29,16 +29,14 @@ class Program
         await Seeder.SeedSystemAdmins(args);
 
         // 5) Rol -> Modül yetkileri (ID ile)
-        var hirovoUserRoleId = Guid.Parse("B3F8A7D1-4E2C-4A3E-8B5A-D3E7B9C5E2F1");
-        var animalUserRoleId = Guid.Parse("DAFAC2D9-23E8-434F-BFDE-10B469EF0501");
+        var livestockTradingUserRoleId = Guid.Parse("B3F8A7D1-4E2C-4A3E-8B5A-D3E7B9C5E2F1");
 
         using (var db = Seeder.BuildRelationalDbContext(args))
         {
-            await Seeder.AssignRolePermissionsToModule(db, hirovoUserRoleId, ModuleTypes.Hirovo);
-            await Seeder.AssignRolePermissionsToModule(db, animalUserRoleId, ModuleTypes.AnimalMarket);
+            await Seeder.AssignRolePermissionsToModule(db, livestockTradingUserRoleId, ModuleTypes.LivestockTrading);
         }
 
-        Console.WriteLine(" Seeding completed.");
+        Console.WriteLine("Seeding completed.");
         await Task.CompletedTask;
     }
 }

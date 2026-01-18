@@ -2,7 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\BaseModules\IAM\BaseModules.IAM.Domain\BaseModules.IAM.Domain.csproj" />
-    <ProjectReference Include="..\..\..\..\BusinessModules\GlobalLivestock\GlobalLivestock.Domain\GlobalLivestock.Domain.csproj" />
+    <ProjectReference Include="..\..\..\..\BusinessModules\LivestockTrading\LivestockTrading.Domain\LivestockTrading.Domain.csproj" />
     <ProjectReference Include="..\..\..\..\Common\Services\Common.Services.ErrorCodeGenerator\Common.Services.ErrorCodeGenerator.csproj" />
   </ItemGroup>
 

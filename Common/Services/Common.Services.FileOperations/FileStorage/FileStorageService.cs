@@ -15,31 +15,23 @@ public class FileStorageService : IFileStorageService
 		return Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
 	}
 
-	//  YENİ - Modül bazlı path döndürür
+	// Modül bazlı path döndürür
 	private string GetModuleBasePath(string moduleName)
 	{
 		switch (moduleName.ToLower())
 		{
-			case "hirovo":
-				var hirovoPath = "/app/wwwroot/hirovo-storage";
-				if (Directory.Exists(hirovoPath))
+			case "livestocktrading":
+				var livestockTradingPath = "/app/wwwroot/livestocktrading-storage";
+				if (Directory.Exists(livestockTradingPath))
 				{
-					Console.WriteLine($" Using hirovo storage: {hirovoPath}");
-					return hirovoPath;
-				}
-				break;
-			case "animalmarket":
-				var animalMarketPath = "/app/wwwroot/animalmarket-storage";
-				if (Directory.Exists(animalMarketPath))
-				{
-					Console.WriteLine($" Using animalmarket storage: {animalMarketPath}");
-					return animalMarketPath;
+					Console.WriteLine($"Using livestocktrading storage: {livestockTradingPath}");
+					return livestockTradingPath;
 				}
 				break;
 		}
 
 		// Fallback: default wwwroot
-		Console.WriteLine($"⚠️ Module storage not found for '{moduleName}', using default wwwroot");
+		Console.WriteLine($"Module storage not found for '{moduleName}', using default wwwroot");
 		return this.GetBasePath();
 	}
 	public async Task<bool> DeleteFile(string filePath)
@@ -141,14 +133,12 @@ public class FileStorageService : IFileStorageService
 
 		switch (moduleName.ToLower())
 		{
-			case "hirovo":
-				moduleStorage = new HirovoModuleStorage();
-				break;
-			case "animalmarket":
-				moduleStorage = new AnimalMarketModuleStorage();
+			case "livestocktrading":
+				moduleStorage = new DefinitionModuleStorage();
 				break;
 			default:
-				throw new Exception("Unknown Module Name");
+				moduleStorage = new DefinitionModuleStorage();
+				break;
 		}
 
 

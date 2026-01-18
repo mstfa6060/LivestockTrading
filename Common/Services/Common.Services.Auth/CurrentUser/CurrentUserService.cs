@@ -136,7 +136,7 @@ public class CurrentUserService
 
         return _currentUser.Roles
             .Where(r => r.StartsWith($"{moduleName}.", StringComparison.OrdinalIgnoreCase))
-            .Select(r => r.Substring(moduleName.Length + 1)) // "AnimalMarket.Admin" -> "Admin"
+            .Select(r => r.Substring(moduleName.Length + 1)) // "LivestockTrading.Admin" -> "Admin"
             .ToList();
     }
 

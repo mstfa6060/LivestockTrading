@@ -1,8 +1,8 @@
-# GlobalLivestock - Production Override
+# LivestockTrading - Production Override
 # Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 services:
-  globallivestock-api:
+  livestocktrading-api:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
     deploy:

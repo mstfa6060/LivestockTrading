@@ -109,11 +109,11 @@
 			"DownstreamScheme": "http",
 			"DownstreamHostAndPorts": [
 				{
-					"Host": "hirovo-api-container",
+					"Host": "livestocktrading-api-container",
 					"Port": 8080
 				}
 			],
-			"UpstreamPathTemplate": "/hirovo/{everything}",
+			"UpstreamPathTemplate": "/livestocktrading/{everything}",
 			"UpstreamHttpMethod": [
 				"POST"
 			],
@@ -126,7 +126,7 @@
 			"DownstreamScheme": "http",
 			"DownstreamHostAndPorts": [
 				{
-					"Host": "hirovo-api-container",
+					"Host": "livestocktrading-api-container",
 					"Port": 8080
 				}
 			],
@@ -137,152 +137,6 @@
 				"PUT",
 				"DELETE",
 				"PROPFIND"
-			]
-		},
-		{
-			"DownstreamPathTemplate": "/Animals/Filter",
-			"DownstreamScheme": "http",
-			"DownstreamHostAndPorts": [
-				{
-					"Host": "animalmarket-api-container",
-					"Port": 8080
-				}
-			],
-			"UpstreamPathTemplate": "/animalmarket/Animals/Filter",
-			"UpstreamHttpMethod": [
-				"POST"
-			]
-		},
-		{
-			"DownstreamPathTemplate": "/Animals/Detail",
-			"DownstreamScheme": "http",
-			"DownstreamHostAndPorts": [
-				{
-					"Host": "animalmarket-api-container",
-					"Port": 8080
-				}
-			],
-			"UpstreamPathTemplate": "/animalmarket/Animals/Detail",
-			"UpstreamHttpMethod": [
-				"POST"
-			]
-		},
-		{
-			"DownstreamPathTemplate": "/Animals/All",
-			"DownstreamScheme": "http",
-			"DownstreamHostAndPorts": [
-				{
-					"Host": "animalmarket-api-container",
-					"Port": 8080
-				}
-			],
-			"UpstreamPathTemplate": "/animalmarket/Animals/All",
-			"UpstreamHttpMethod": [
-				"POST"
-			]
-		},
-		{
-			"DownstreamPathTemplate": "/Animals/Pick",
-			"DownstreamScheme": "http",
-			"DownstreamHostAndPorts": [
-				{
-					"Host": "animalmarket-api-container",
-					"Port": 8080
-				}
-			],
-			"UpstreamPathTemplate": "/animalmarket/Animals/Pick",
-			"UpstreamHttpMethod": [
-				"POST"
-			]
-		},
-		{
-			"DownstreamPathTemplate": "/Animals/MediaDetail",
-			"DownstreamScheme": "http",
-			"DownstreamHostAndPorts": [
-				{
-					"Host": "animalmarket-api-container",
-					"Port": 8080
-				}
-			],
-			"UpstreamPathTemplate": "/animalmarket/Animals/MediaDetail",
-			"UpstreamHttpMethod": [
-				"POST"
-			]
-		},
-		{
-			"DownstreamPathTemplate": "/AnimalBids/All",
-			"DownstreamScheme": "http",
-			"DownstreamHostAndPorts": [
-				{
-					"Host": "animalmarket-api-container",
-					"Port": 8080
-				}
-			],
-			"UpstreamPathTemplate": "/animalmarket/AnimalBids/All",
-			"UpstreamHttpMethod": [
-				"POST"
-			]
-		},
-		{
-			"DownstreamPathTemplate": "/AnimalBids/Detail",
-			"DownstreamScheme": "http",
-			"DownstreamHostAndPorts": [
-				{
-					"Host": "animalmarket-api-container",
-					"Port": 8080
-				}
-			],
-			"UpstreamPathTemplate": "/animalmarket/AnimalBids/Detail",
-			"UpstreamHttpMethod": [
-				"POST"
-			]
-		},
-		{
-			"DownstreamPathTemplate": "/AnimalOffers/Detail",
-			"DownstreamScheme": "http",
-			"DownstreamHostAndPorts": [
-				{
-					"Host": "animalmarket-api-container",
-					"Port": 8080
-				}
-			],
-			"UpstreamPathTemplate": "/animalmarket/AnimalOffers/Detail",
-			"UpstreamHttpMethod": [
-				"POST"
-			]
-		},
-		{
-			"DownstreamPathTemplate": "/{everything}",
-			"DownstreamScheme": "http",
-			"DownstreamHostAndPorts": [
-				{
-					"Host": "animalmarket-api-container",
-					"Port": 8080
-				}
-			],
-			"UpstreamPathTemplate": "/animalmarket/{everything}",
-			"UpstreamHttpMethod": [
-				"POST"
-			],
-			"AuthenticationOptions": {
-				"AuthenticationProviderKey": "Rj!7dXrQ*5z9@Lb^PqKf!M2&gUw#AeZx7Vp$ChN+36YT@tW%"
-			}
-		},
-		{
-			"DownstreamPathTemplate": "/{everything}",
-			"DownstreamScheme": "http",
-			"DownstreamHostAndPorts": [
-				{
-					"Host": "keepzo-api-container",
-					"Port": 8080
-				}
-			],
-			"UpstreamPathTemplate": "/keepzo/{everything}",
-			"UpstreamHttpMethod": [
-				"GET",
-				"POST",
-				"PUT",
-				"DELETE"
 			]
 		}
 	],

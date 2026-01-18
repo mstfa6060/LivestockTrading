@@ -11,7 +11,7 @@ public static class SerilogConfiguration
     /// <summary>
     /// Serilog yapılandırmasını oluşturur
     /// </summary>
-    /// <param name="serviceName">Servis adı (örn: AnimalMarket.Api)</param>
+    /// <param name="serviceName">Servis adı (örn: LivestockTrading.Api)</param>
     /// <param name="environment">Ortam adı (Development, Production)</param>
     /// <param name="logPath">Log dosya yolu (varsayılan: /app/logs/{serviceName})</param>
     public static LoggerConfiguration CreateConfiguration(

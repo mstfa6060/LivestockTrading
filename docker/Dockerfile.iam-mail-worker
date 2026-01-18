@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy solution and project files
-COPY ["GlobalLivestock.sln", "./"]
+COPY ["LivestockTrading.sln", "./"]
 COPY ["BusinessModules/", "BusinessModules/"]
 COPY ["BaseModules/", "BaseModules/"]
 COPY ["Common/", "Common/"]
@@ -11,7 +11,7 @@ COPY ["Gateways/", "Gateways/"]
 COPY ["Jobs/", "Jobs/"]
 
 # Restore and publish
-RUN dotnet restore "GlobalLivestock.sln"
+RUN dotnet restore "LivestockTrading.sln"
 RUN dotnet publish "BaseModules/IAM/BaseModules.IAM.Workers/MailSender/BaseModules.IAM.Workers.MailSender.csproj" \
     -c Release -o /app/publish --no-restore \
     /p:DebugType=None /p:DebugSymbols=false

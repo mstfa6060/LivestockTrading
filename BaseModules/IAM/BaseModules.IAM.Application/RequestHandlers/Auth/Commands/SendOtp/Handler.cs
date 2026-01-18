@@ -18,6 +18,9 @@ public class Handler : IRequestHandler
 	private readonly IHttpContextAccessor _httpAccessor;
 	private readonly IRabbitMqPublisher _publisher;
 
+	// LivestockTrading Company ID
+	private static readonly Guid LivestockTradingCompanyId = Guid.Parse("C9D8C846-10FC-466D-8F45-A4FA4E856ABD");
+
 	public Handler(ArfBlocksDependencyProvider dp, object dataAccess)
 	{
 		_dataAccess = (DataAccess)dataAccess;
@@ -65,20 +68,20 @@ public class Handler : IRequestHandler
 	}
 	private string GenerateLocalizedOtpMessage(string otpCode, string language, Guid companyId)
 	{
-		var isHirovo = companyId == Guid.Parse("C9D8C846-10FC-466D-8F45-A4FA4E856ABD"); // gerçek ID'yi kullan
+		var isLivestockTrading = companyId == LivestockTradingCompanyId;
 
-		var hirovoMessages = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+		var livestockTradingMessages = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
 		{
-			["tr"] = $"[Hirovo] Giriş kodunuz: {otpCode}",
-			["en"] = $"[Hirovo] Your login code: {otpCode}",
-			["ar"] = $"[Hirovo] رمز الدخول الخاص بك هو: {otpCode}",
-			["fr"] = $"[Hirovo] Votre code de connexion est : {otpCode}",
-			["de"] = $"[Hirovo] Ihr Anmeldecode lautet: {otpCode}",
-			["es"] = $"[Hirovo] Su código de acceso es: {otpCode}",
-			["ru"] = $"[Hirovo] Ваш код входа: {otpCode}",
-			["pt"] = $"[Hirovo] Seu código de login é: {otpCode}",
-			["hi"] = $"[Hirovo] आपका लॉगिन कोड है: {otpCode}",
-			["zh"] = $"[Hirovo] 您的登录验证码是：{otpCode}"
+			["tr"] = $"[LivestockTrading] Giriş kodunuz: {otpCode}",
+			["en"] = $"[LivestockTrading] Your login code: {otpCode}",
+			["ar"] = $"[LivestockTrading] رمز الدخول الخاص بك هو: {otpCode}",
+			["fr"] = $"[LivestockTrading] Votre code de connexion est : {otpCode}",
+			["de"] = $"[LivestockTrading] Ihr Anmeldecode lautet: {otpCode}",
+			["es"] = $"[LivestockTrading] Su código de acceso es: {otpCode}",
+			["ru"] = $"[LivestockTrading] Ваш код входа: {otpCode}",
+			["pt"] = $"[LivestockTrading] Seu código de login é: {otpCode}",
+			["hi"] = $"[LivestockTrading] आपका लॉगिन कोड है: {otpCode}",
+			["zh"] = $"[LivestockTrading] 您的登录验证码是：{otpCode}"
 		};
 
 		var defaultMessages = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -95,8 +98,8 @@ public class Handler : IRequestHandler
 			["zh"] = $"您的验证码是：{otpCode}"
 		};
 
-		if (isHirovo && hirovoMessages.TryGetValue(language, out var hirovoMessage))
-			return hirovoMessage;
+		if (isLivestockTrading && livestockTradingMessages.TryGetValue(language, out var livestockMessage))
+			return livestockMessage;
 
 		return defaultMessages.TryGetValue(language, out var defaultMessage)
 			? defaultMessage

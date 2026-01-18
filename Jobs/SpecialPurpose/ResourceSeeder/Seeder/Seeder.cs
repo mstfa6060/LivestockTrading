@@ -22,25 +22,16 @@ public class Seeder
     public static class FixedIds
     {
         // Modules
-        public static readonly Guid HirovoModuleId = Guid.Parse("DFD018C9-FC32-42C4-AEFD-70A5942A295E");
+        public static readonly Guid LivestockTradingModuleId = Guid.Parse("DFD018C9-FC32-42C4-AEFD-70A5942A295E");
         public static readonly Guid IamModuleId = Guid.Parse("BA8A94D0-5C54-4E57-9F15-34797E3171F4");
         public static readonly Guid FileProviderModuleId = Guid.Parse("72A51A33-9CE1-49CE-87FA-54863A57B977");
-        public static readonly Guid AnimalMarketModuleId = Guid.Parse("70B6430F-CEB8-4854-85C7-B69B0CE74495");
 
         // Companies
-        public static readonly Guid HirovoCompanyId = Guid.Parse("C9D8C846-10FC-466D-8F45-A4FA4E856ABD");
-        public static readonly Guid AnimalMarketCompanyId = Guid.Parse("9DAE9CBD-82B1-4EAD-BD2B-9C5FE5146A2A");
+        public static readonly Guid LivestockTradingCompanyId = Guid.Parse("C9D8C846-10FC-466D-8F45-A4FA4E856ABD");
 
-        // Roles - Hirovo
-        public static readonly Guid HirovoUserRoleId = Guid.Parse("B3F8A7D1-4E2C-4A3E-8B5A-D3E7B9C5E2F1");
-
-        // Roles - AnimalMarket
-        public static readonly Guid AnimalMarketUserRoleId = Guid.Parse("DAFAC2D9-23E8-434F-BFDE-10B469EF0501");
-        public static readonly Guid FarmerRoleId = Guid.Parse("10000000-0000-0000-0000-000000000004");
-        public static readonly Guid VeterinarianRoleId = Guid.Parse("10000000-0000-0000-0000-000000000003");
-        public static readonly Guid TransporterRoleId = Guid.Parse("10000000-0000-0000-0000-000000000005");
-        public static readonly Guid AdministratorRoleId = Guid.Parse("10000000-0000-0000-0000-000000000100");
-        public static readonly Guid AdminRoleId = Guid.Parse("10000000-0000-0000-0000-000000000101");
+        // Roles - LivestockTrading
+        public static readonly Guid LivestockTradingAdminRoleId = Guid.Parse("10000000-0000-0000-0000-000000000101");
+        public static readonly Guid LivestockTradingUserRoleId = Guid.Parse("B3F8A7D1-4E2C-4A3E-8B5A-D3E7B9C5E2F1");
     }
 
     // ------------------------------------------------------------------------
@@ -72,11 +63,11 @@ public class Seeder
         {
             new()
             {
-                Id = FixedIds.HirovoModuleId,
-                Key = "hirovo",
-                DisplayName = "Hirovo İş Platformu",
-                Name = "Hirovo",
-                ModuleType = ModuleTypes.Hirovo,
+                Id = FixedIds.LivestockTradingModuleId,
+                Key = "livestocktrading",
+                DisplayName = "LivestockTrading Platform",
+                Name = "LivestockTrading",
+                ModuleType = ModuleTypes.LivestockTrading,
                 ModuleCategory = ModuleCategories.BusinessModule,
                 IsDefault = true
             },
@@ -98,16 +89,6 @@ public class Seeder
                 Name = "FileProvider",
                 ModuleType = ModuleTypes.FileProvider,
                 ModuleCategory = ModuleCategories.BaseModule,
-                IsDefault = true
-            },
-            new()
-            {
-                Id = FixedIds.AnimalMarketModuleId,
-                Key = "animalmarket",
-                DisplayName = "Hayvan Pazarı",
-                Name = "AnimalMarket",
-                ModuleType = ModuleTypes.AnimalMarket,
-                ModuleCategory = ModuleCategories.BusinessModule,
                 IsDefault = true
             }
         };
@@ -247,66 +228,25 @@ public class Seeder
         using var db = BuildRelationalDbContext(args);
 
         // Companies (ensure)
-        var hirovoCompany = await db.AppCompanies.FirstOrDefaultAsync(c => c.Id == FixedIds.HirovoCompanyId);
-        if (hirovoCompany == null)
+        var livestockTradingCompany = await db.AppCompanies.FirstOrDefaultAsync(c => c.Id == FixedIds.LivestockTradingCompanyId);
+        if (livestockTradingCompany == null)
         {
-            hirovoCompany = new Company
+            livestockTradingCompany = new Company
             {
-                Id = FixedIds.HirovoCompanyId,
-                Name = "Hirovo",
+                Id = FixedIds.LivestockTradingCompanyId,
+                Name = "LivestockTrading",
                 IsDeleted = false,
                 CreatedAt = DateTime.UtcNow
             };
-            db.AppCompanies.Add(hirovoCompany);
-            Console.WriteLine("📌 Hirovo Company eklendi.");
-        }
-
-        var animalCompany = await db.AppCompanies.FirstOrDefaultAsync(c => c.Id == FixedIds.AnimalMarketCompanyId);
-        if (animalCompany == null)
-        {
-            animalCompany = new Company
-            {
-                Id = FixedIds.AnimalMarketCompanyId,
-                Name = "Animal Market",
-                IsDeleted = false,
-                CreatedAt = DateTime.UtcNow
-            };
-            db.AppCompanies.Add(animalCompany);
-            Console.WriteLine("📌 Animal Market Company eklendi.");
+            db.AppCompanies.Add(livestockTradingCompany);
+            Console.WriteLine("LivestockTrading Company eklendi.");
         }
 
         await db.SaveChangesAsync();
 
-        // Admin (Hirovo) — ensure
-        var adminExists = await db.AppRoles.AnyAsync(r => r.CompanyId == FixedIds.HirovoCompanyId && r.Name == "Admin");
-        if (!adminExists)
-        {
-            db.AppRoles.Add(new Role
-            {
-                Id = Guid.NewGuid(),
-                Name = "Admin",
-                CompanyId = FixedIds.HirovoCompanyId,
-                IsSystemRole = true,
-                IsDeleted = false,
-                CreatedAt = DateTime.UtcNow
-            });
-            Console.WriteLine(" Admin rolü eklendi.");
-        }
-
-        // Hirovo User — UPSERT by fixed Id
-        await UpsertRole(db, FixedIds.HirovoUserRoleId, "Hirovo User", FixedIds.HirovoCompanyId, false);
-
-        // Animal Market User — UPSERT by fixed Id
-        await UpsertRole(db, FixedIds.AnimalMarketUserRoleId, "Animal Market User", FixedIds.AnimalMarketCompanyId, false);
-
-        // AnimalMarket Roller (Farmer, Veterinarian, Transporter)
-        await UpsertRole(db, FixedIds.FarmerRoleId, "Farmer", FixedIds.AnimalMarketCompanyId, false);
-        await UpsertRole(db, FixedIds.VeterinarianRoleId, "Veterinarian", FixedIds.AnimalMarketCompanyId, false);
-        await UpsertRole(db, FixedIds.TransporterRoleId, "Transporter", FixedIds.AnimalMarketCompanyId, false);
-
-        // AnimalMarket Admin Rolleri
-        await UpsertRole(db, FixedIds.AdministratorRoleId, "Administrator", FixedIds.AnimalMarketCompanyId, true);
-        await UpsertRole(db, FixedIds.AdminRoleId, "Admin", FixedIds.AnimalMarketCompanyId, true);
+        // LivestockTrading Roles
+        await UpsertRole(db, FixedIds.LivestockTradingAdminRoleId, "Admin", FixedIds.LivestockTradingCompanyId, true);
+        await UpsertRole(db, FixedIds.LivestockTradingUserRoleId, "User", FixedIds.LivestockTradingCompanyId, false);
 
         await db.SaveChangesAsync();
     }

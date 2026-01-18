@@ -1,4 +1,4 @@
-# IAM API Dockerfile
+# LivestockTrading API Dockerfile
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
@@ -12,7 +12,7 @@ COPY ["Jobs/", "Jobs/"]
 
 # Restore and publish
 RUN dotnet restore "LivestockTrading.sln"
-RUN dotnet publish "BaseModules/IAM/BaseModules.IAM.Api/BaseModules.IAM.Api.csproj" \
+RUN dotnet publish "BusinessModules/LivestockTrading/LivestockTrading.Api/LivestockTrading.Api.csproj" \
     -c Release -o /app/publish --no-restore \
     /p:DebugType=None /p:DebugSymbols=false
 
@@ -26,4 +26,4 @@ RUN groupadd -r appuser && useradd -r -g appuser appuser
 USER appuser
 
 COPY --from=build /app/publish .
-ENTRYPOINT ["dotnet", "BaseModules.IAM.Api.dll"]
+ENTRYPOINT ["dotnet", "LivestockTrading.Api.dll"]

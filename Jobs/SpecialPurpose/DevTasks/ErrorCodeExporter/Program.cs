@@ -3,10 +3,10 @@ using Common.Services.ErrorCodeGenerator;
 
 // Domain Errors
 using CommonDomainErrors = Common.Definitions.Domain.Errors.DomainErrors;
-using GlobalLivestockDomainErrors = GlobalLivestock.Domain.Errors.GlobalLivestockDomainErrors;
+using LivestockTradingDomainErrors = LivestockTrading.Domain.Errors.LivestockTradingDomainErrors;
 
 // =====================
-// GlobalLivestock kökünü bul
+// LivestockTrading kökünü bul
 // =====================
 static string GetProjectRoot()
 {
@@ -45,10 +45,10 @@ static Dictionary<string, Type> GetPathsAndTypes()
             Path.Combine(projectRoot, "frontend", "common", "globallivestock-api", "src", "errors", "locales", "modules", "backend", "common", $"{lang}.ts"),
             typeof(CommonDomainErrors));
 
-        // --- GlobalLivestock modülü ---
+        // --- LivestockTrading modülü ---
         pathsAndTypes.Add(
             Path.Combine(projectRoot, "frontend", "common", "globallivestock-api", "src", "errors", "locales", "modules", "backend", "globallivestock", $"{lang}.ts"),
-            typeof(GlobalLivestockDomainErrors));
+            typeof(LivestockTradingDomainErrors));
     }
 
     return pathsAndTypes;

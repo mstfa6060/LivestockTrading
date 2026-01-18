@@ -51,7 +51,7 @@ public class Handler : IRequestHandler
 			};
 		}
 
-		// Create File as Physical 
+		// Create File as Physical
 		var uploadedFileProperties = await _fileStorageService.CreateFileByFormFile(companyId, requestPayload.FormFile, requestPayload.ModuleName, requestPayload.FolderName, requestPayload.EntityId, requestPayload.VersionName);
 		// Create FileEntry Entity
 		var fileEntry = new FileEntry()
@@ -90,12 +90,10 @@ public class Handler : IRequestHandler
 
 	public async Task<bool> IsCurrentUserAuthorizedOnModule(string module)
 	{
-		switch (module)
+		switch (module.ToLower())
 		{
-			case "hirovo":
-				return await _authorizationService.IsSystemAdmin(Common.Definitions.Domain.Entities.ModuleTypes.Hirovo);
-			case "animalmarket":
-				return await _authorizationService.IsSystemAdmin(Common.Definitions.Domain.Entities.ModuleTypes.AnimalMarket);
+			case "livestocktrading":
+				return await _authorizationService.IsSystemAdmin(Common.Definitions.Domain.Entities.ModuleTypes.LivestockTrading);
 			default:
 				System.Console.WriteLine($"Module not handled: {module}");
 				return false;

@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LivestockTrading.Domain\LivestockTrading.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Common\Definitions\Common.Definitions.Infrastructure\Common.Definitions.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\Common\Services\Common.Services.Environment\Common.Services.Environment.csproj" />
+    <ProjectReference Include="..\..\..\Common\Services\Common.Services.Auth\Common.Services.Auth.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.4" />
+  </ItemGroup>
+
+</Project>

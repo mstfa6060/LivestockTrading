@@ -142,8 +142,8 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext
             foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
         }
 
-        // Prefix AnimalMarket tables to avoid name collisions across modules
-        var animalMarketPrefix = "AnimalMarket_";
+        // Prefix LivestockTrading tables to avoid name collisions across modules
+        var livestockTradingPrefix = "LivestockTrading_";
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
             var clrType = entityType.ClrType;
@@ -151,7 +151,7 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext
                 continue;
 
             var ns = clrType.Namespace ?? string.Empty;
-            if (!ns.StartsWith("BusinessModules.AnimalMarket.Domain"))
+            if (!ns.StartsWith("BusinessModules.LivestockTrading.Domain"))
                 continue;
 
             // Skip entities that have explicit [Table] attribute
@@ -163,31 +163,9 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext
             if (string.IsNullOrWhiteSpace(currentName))
                 continue;
 
-            if (!currentName.StartsWith(animalMarketPrefix, StringComparison.Ordinal))
+            if (!currentName.StartsWith(livestockTradingPrefix, StringComparison.Ordinal))
             {
-                entityType.SetTableName(animalMarketPrefix + currentName);
-            }
-        }
-
-        // Prefix Keepzo tables to avoid name collisions across modules
-        var keepzoPrefix = "Keepzo_";
-        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-        {
-            var clrType = entityType.ClrType;
-            if (clrType == null)
-                continue;
-
-            var ns = clrType.Namespace ?? string.Empty;
-            if (!ns.StartsWith("BusinessModules.Keepzo.Domain"))
-                continue;
-
-            var currentName = entityType.GetTableName();
-            if (string.IsNullOrWhiteSpace(currentName))
-                continue;
-
-            if (!currentName.StartsWith(keepzoPrefix, StringComparison.Ordinal))
-            {
-                entityType.SetTableName(keepzoPrefix + currentName);
+                entityType.SetTableName(livestockTradingPrefix + currentName);
             }
         }
 

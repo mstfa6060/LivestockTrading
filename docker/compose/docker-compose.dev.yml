@@ -1,13 +1,13 @@
-# GlobalLivestock - Development Override
+# LivestockTrading - Development Override
 # Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
 services:
-  globallivestock-api:
+  livestocktrading-api:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
     build:
       context: ../..
-      dockerfile: docker/Dockerfile.globallivestock-api
+      dockerfile: docker/Dockerfile.livestocktrading-api
 
   iam-api:
     environment:
