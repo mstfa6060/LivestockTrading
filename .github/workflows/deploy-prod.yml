@@ -70,6 +70,28 @@ jobs:
           key: ${{ secrets.PROD_SERVER_KEY }}
           script: |
             cd /opt/livestocktrading
-            docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod pull
-            docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod up -d
+
+            echo "📥 Git repository güncelleniyor..."
+            git fetch origin main
+            git reset --hard origin/main
+            git submodule update --init --recursive
+
+            echo "🐳 Docker image'ları pull ediliyor..."
+            docker compose -p livestock_prod \
+              -f docker-compose.yml \
+              -f docker-compose.prod.yml \
+              --env-file .env.prod pull
+
+            echo "🚀 Servisler başlatılıyor..."
+            docker compose -p livestock_prod \
+              -f docker-compose.yml \
+              -f docker-compose.prod.yml \
+              --env-file .env.prod up -d
+
+            echo "🧹 Temizlik yapılıyor..."
             docker image prune -f
+
+            echo "✅ PROD deployment tamamlandı!"
+
+            echo "📊 Container durumu:"
+            docker compose -p livestock_prod ps

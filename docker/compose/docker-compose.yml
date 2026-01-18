@@ -30,7 +30,6 @@ services:
   # Infrastructure Services
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: livestocktrading-sqlserver
     environment:
       SA_PASSWORD: ${SA_PASSWORD:-YourStrong@Passw0rd}
       ACCEPT_EULA: "Y"
@@ -53,7 +52,6 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    container_name: livestocktrading-rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
@@ -71,7 +69,6 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: livestocktrading-redis
     ports:
       - "${REDIS_PORT:-6379}:6379"
     volumes:
@@ -88,7 +85,6 @@ services:
 
   minio:
     image: minio/minio:latest
-    container_name: livestocktrading-minio
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
@@ -110,7 +106,6 @@ services:
   # Application Services
   livestocktrading-api:
     image: ${DOCKER_REGISTRY:-docker.io}/${DOCKER_USERNAME}/livestocktrading-api:${TAG:-latest}
-    container_name: livestocktrading-api
     environment:
       <<: *common-env
     ports:
@@ -130,7 +125,6 @@ services:
 
   iam-api:
     image: ${DOCKER_REGISTRY:-docker.io}/${DOCKER_USERNAME}/livestocktrading-iam-api:${TAG:-latest}
-    container_name: livestocktrading-iam-api
     environment:
       <<: *common-env
     ports:
@@ -146,7 +140,6 @@ services:
 
   fileprovider-api:
     image: ${DOCKER_REGISTRY:-docker.io}/${DOCKER_USERNAME}/livestocktrading-fileprovider-api:${TAG:-latest}
-    container_name: livestocktrading-fileprovider-api
     environment:
       <<: *common-env
     ports:
@@ -165,7 +158,6 @@ services:
   # Workers
   iam-mail-worker:
     image: ${DOCKER_REGISTRY:-docker.io}/${DOCKER_USERNAME}/livestocktrading-iam-mail-worker:${TAG:-latest}
-    container_name: livestocktrading-iam-mail-worker
     environment:
       <<: *common-env
       BREVO_SMTP_HOST: ${BREVO_SMTP_HOST}
@@ -183,7 +175,6 @@ services:
 
   iam-sms-worker:
     image: ${DOCKER_REGISTRY:-docker.io}/${DOCKER_USERNAME}/livestocktrading-iam-sms-worker:${TAG:-latest}
-    container_name: livestocktrading-iam-sms-worker
     environment:
       <<: *common-env
       NETGSM_USERNAME: ${NETGSM_USERNAME}
