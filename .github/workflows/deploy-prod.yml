@@ -69,15 +69,6 @@ jobs:
           key: ${{ secrets.PROD_SERVER_KEY }}
           script: |
             cd /opt/livestocktrading
-
-            # Pull latest images
-            docker compose -f docker-compose.prod.yml pull
-
-            # Deploy
-            docker compose -f docker-compose.prod.yml up -d
-
-            # Run migrations
-            docker compose -f docker-compose.prod.yml exec -T livestocktrading-api dotnet ef database update || true
-
-            # Cleanup
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod pull
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod up -d
             docker image prune -f
