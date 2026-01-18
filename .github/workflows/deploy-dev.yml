@@ -8,6 +8,7 @@ on:
 env:
   REGISTRY: docker.io
   TAG: dev-latest
+  DOCKER_USERNAME: mstfaock
 
 jobs:
   build-and-push:
