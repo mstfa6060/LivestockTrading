@@ -8,7 +8,6 @@ on:
 env:
   REGISTRY: docker.io
   TAG: dev-latest
-  DOCKER_USERNAME: mstfa6060
 
 jobs:
   build-and-push:
@@ -19,14 +18,19 @@ jobs:
         include:
           - name: livestocktrading-api
             dockerfile: docker/Dockerfile.livestocktrading-api
+            image: ${{ secrets.DOCKER_USERNAME }}/livestocktrading-api
           - name: iam-api
             dockerfile: docker/Dockerfile.iam-api
+            image: ${{ secrets.DOCKER_USERNAME }}/livestocktrading-iam-api
           - name: fileprovider-api
             dockerfile: docker/Dockerfile.fileprovider-api
+            image: ${{ secrets.DOCKER_USERNAME }}/livestocktrading-fileprovider-api
           - name: iam-mail-worker
             dockerfile: docker/Dockerfile.iam-mail-worker
+            image: ${{ secrets.DOCKER_USERNAME }}/livestocktrading-iam-mail-worker
           - name: iam-sms-worker
             dockerfile: docker/Dockerfile.iam-sms-worker
+            image: ${{ secrets.DOCKER_USERNAME }}/livestocktrading-iam-sms-worker
 
     steps:
       - name: Checkout
@@ -48,10 +52,10 @@ jobs:
           file: ${{ matrix.dockerfile }}
           push: true
           tags: |
-            ${{ env.DOCKER_USERNAME }}/livestocktrading-${{ matrix.name }}:${{ env.TAG }}
-            ${{ env.DOCKER_USERNAME }}/livestocktrading-${{ matrix.name }}:dev-${{ github.sha }}
-          cache-from: type=registry,ref=${{ env.DOCKER_USERNAME }}/livestocktrading-${{ matrix.name }}:cache
-          cache-to: type=registry,ref=${{ env.DOCKER_USERNAME }}/livestocktrading-${{ matrix.name }}:cache,mode=max
+            ${{ matrix.image }}:${{ env.TAG }}
+            ${{ matrix.image }}:dev-${{ github.sha }}
+          cache-from: type=registry,ref=${{ matrix.image }}:cache
+          cache-to: type=registry,ref=${{ matrix.image }}:cache,mode=max
 
   deploy:
     runs-on: ubuntu-latest
