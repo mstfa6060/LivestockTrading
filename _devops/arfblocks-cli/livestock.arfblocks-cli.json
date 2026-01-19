@@ -1,0 +1,90 @@
+{
+    "minCliVersion": "2.0.0",
+    "project": "LivestockTrading",
+    "description": "Livestock Trading modülüne ait API dokümantasyonu",
+    "company": "globallivestock",
+    "commands": [
+        {
+            "name": "generate-docs",
+            "parameters": [
+                {
+                    "key": "targetProject",
+                    "value": "BusinessModules/LivestockTrading/LivestockTrading.Application/LivestockTrading.Application.csproj"
+                },
+                {
+                    "key": "output",
+                    "value": "../web/common/livestock-api/src/api/business_modules/livestocktrading"
+                },
+                {
+                    "key": "endpointBaseRoute",
+                    "value": "/livestocktrading"
+                },
+                {
+                    "key": "docLanguage",
+                    "value": "tr"
+                },
+                {
+                    "key": "outputImports",
+                    "value": "// Imports \nimport { AppConfig, api as axios } from '@/config/livestock-config'; \nimport { ApiService } from '@/services/ApiService';"
+                },
+                {
+                    "key": "outputTypes",
+                    "value": "// Custom Types \ntype Guid = string; \ntype Double = number;\ntype Decimal = number;\ntype Int64 = number;\ntype Int32 = number;\ntype int = number;\ntype long = number;\ntype __ERROR_TYPE_NOT_HANDLED__ = number;"
+                },
+                {
+                    "key": "outputSettings",
+                    "value": "// Settings..."
+                },
+                {
+                    "key": "nameSpace",
+                    "value": "LivestockTradingAPI"
+                },
+                {
+                    "key": "requestUrl",
+                    "value": "AppConfig.LivestockTradingUrl"
+                }
+            ]
+        },
+        {
+            "name": "generate-docs",
+            "parameters": [
+                {
+                    "key": "targetProject",
+                    "value": "BusinessModules/LivestockTrading/LivestockTrading.Application/LivestockTrading.Application.csproj"
+                },
+                {
+                    "key": "output",
+                    "value": "../mobil/common/livestock-api/src/api/business_modules/livestocktrading"
+                },
+                {
+                    "key": "endpointBaseRoute",
+                    "value": "/livestocktrading"
+                },
+                {
+                    "key": "docLanguage",
+                    "value": "tr"
+                },
+                {
+                    "key": "outputImports",
+                    "value": "// Imports \nimport { AppConfig, api as axios } from '@/config/livestock-config'; \nimport { ApiService } from '@/services/ApiService';"
+                },
+                {
+                    "key": "outputTypes",
+                    "value": "// Custom Types \ntype Guid = string; \ntype Double = number;\ntype Decimal = number;\ntype Int64 = number;\ntype Int32 = number;\ntype int = number;\ntype long = number;\ntype __ERROR_TYPE_NOT_HANDLED__ = number;"
+                },
+                {
+                    "key": "outputSettings",
+                    "value": "// Settings..."
+                },
+                {
+                    "key": "nameSpace",
+                    "value": "LivestockTradingAPI"
+                },
+                {
+                    "key": "requestUrl",
+                    "value": "AppConfig.LivestockTradingUrl"
+                }
+            ]
+        }
+    ]
+}
