@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-LivestockTrading.Workers.NotificationSender</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+    <PackageReference Include="RabbitMQ.Client" Version="6.5.0" />
+    <PackageReference Include="FirebaseAdmin" Version="2.4.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\LivestockTrading.Domain\LivestockTrading.Domain.csproj" />
+    <ProjectReference Include="..\..\LivestockTrading.Infrastructure\LivestockTrading.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\LivestockTrading.Application\LivestockTrading.Application.csproj" />
+    <ProjectReference Include="..\..\..\..\Common\Services\Common.Services.Logging\Common.Services.Logging.csproj" />
+  </ItemGroup>
+
+</Project>

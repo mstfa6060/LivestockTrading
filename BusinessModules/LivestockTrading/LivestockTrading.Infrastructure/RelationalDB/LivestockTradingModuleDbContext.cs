@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Common.Definitions.Infrastructure.RelationalDB;
 using Common.Services.Environment;
+using LivestockTrading.Domain.Entities;
 
 namespace LivestockTrading.Infrastructure.RelationalDB;
 
@@ -10,9 +11,8 @@ public class LivestockTradingModuleDbContext : DefinitionDbContext, ILivestockTr
         : base(customDbContextOptions.DefinitionDbContextOptions)
     { }
 
-    // Entity Sets - Buraya entity'ler eklenecek
-    // Ornek:
-    // public DbSet<Animal> Animals { get; set; }
+    // Entity Sets
+    public DbSet<Student> Students { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

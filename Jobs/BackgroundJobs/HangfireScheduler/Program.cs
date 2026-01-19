@@ -4,6 +4,7 @@ using Hangfire;
 using Hangfire.SqlServer;
 using Jobs.BackgroundJobs.HangfireScheduler.Models;
 using Jobs.BackgroundJobs.HangfireScheduler.Authorization;
+using Jobs.BackgroundJobs.HangfireScheduler.Jobs.LivestockTrading;
 using Microsoft.Extensions.Options;
 using Common.Services.Logging;
 using Serilog;
@@ -71,17 +72,19 @@ var recurringOptions = new RecurringJobOptions
     TimeZone = TimeZoneInfo.Local
 };
 
-// TODO: Add LivestockTrading background jobs here
-// Example:
-// RecurringJob.AddOrUpdate<YourJob>(
-//     nameof(YourJob),
-//     job => job.Process(),
-//     "*/5 * * * *",  // Every 5 minutes
-//     recurringOptions
-// );
+// LIVESTOCKTRADING JOBS
+
+// Öğrenci aktivitelerini logla - Günde 2 kere (09:00 ve 18:00)
+RecurringJob.AddOrUpdate<LogStudentActivityJob>(
+    nameof(LogStudentActivityJob),
+    job => job.Process(),
+    "0 9,18 * * *",  // Her gün saat 09:00 ve 18:00'de
+    recurringOptions
+);
 
 Log.Information("Hangfire Scheduler started!");
-Log.Information("No recurring jobs configured yet. Add jobs as needed.");
+Log.Information("Active Jobs:");
+Log.Information("  - LogStudentActivityJob (Daily at 09:00 and 18:00)");
 
 try
 {

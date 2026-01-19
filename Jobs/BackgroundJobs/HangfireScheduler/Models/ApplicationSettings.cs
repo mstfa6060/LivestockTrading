@@ -6,9 +6,9 @@ public class ApplicationSettings
 
     public class UrlModel
     {
+        /// <summary>
+        /// LivestockTrading API base URL
+        /// </summary>
         public string LivestockTradingApi { get; set; }
-
-        // TODO: Add LivestockTrading module endpoints here
-        // public LivestockTradingModule LivestockTrading { get; set; }
     }
 }

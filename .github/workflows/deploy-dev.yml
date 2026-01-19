@@ -18,19 +18,19 @@ jobs:
       matrix:
         include:
           - name: livestocktrading-api
-            dockerfile: docker/Dockerfile.livestocktrading-api
+            dockerfile: _devops/docker/Dockerfile.livestocktrading-api
             image: livestocktrading-api
           - name: iam-api
-            dockerfile: docker/Dockerfile.iam-api
+            dockerfile: _devops/docker/Dockerfile.iam-api
             image: livestocktrading-iam-api
           - name: fileprovider-api
-            dockerfile: docker/Dockerfile.fileprovider-api
+            dockerfile: _devops/docker/Dockerfile.fileprovider-api
             image: livestocktrading-fileprovider-api
           - name: iam-mail-worker
-            dockerfile: docker/Dockerfile.iam-mail-worker
+            dockerfile: _devops/docker/Dockerfile.iam-mail-worker
             image: livestocktrading-iam-mail-worker
           - name: iam-sms-worker
-            dockerfile: docker/Dockerfile.iam-sms-worker
+            dockerfile: _devops/docker/Dockerfile.iam-sms-worker
             image: livestocktrading-iam-sms-worker
 
     steps:
