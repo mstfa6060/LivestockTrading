@@ -20,9 +20,9 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext
 
     public DbSet<SystemAdmin> AppSystemAdmins { get; set; }
     public DbSet<RelSystemUserModule> AppRelSystemUserModules { get; set; }
-    public DbSet<RolePermission> RolePermissions { get; set; } 
+    public DbSet<RolePermission> RolePermissions { get; set; }
     public DbSet<UserLocation> AppUserLocations { get; set; }
-    public DbSet<UserPushToken> AppUserPushTokens { get; set; } 
+    public DbSet<UserPushToken> AppUserPushTokens { get; set; }
 
 
     //AuditLog
@@ -35,15 +35,15 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext
     public DbSet<Province> Provinces { get; set; }
     public DbSet<District> Districts { get; set; }
     public DbSet<Neighborhood> Neighborhoods { get; set; }
-
+    public DbSet<Country> Countries { get; set; }
     /// <summary>
     /// IAM
     /// </summary>
     public DbSet<AppRefreshToken> AppRefreshTokens { get; set; }
- 
+
 
     // Platform Settings
-    public DbSet<PlatformSetting> PlatformSettings { get; set; } 
+    public DbSet<PlatformSetting> PlatformSettings { get; set; }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     { }
@@ -52,7 +52,7 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         CommonModelBuilder.Build(modelBuilder);
- 
+
 
         modelBuilder.Entity<UserLocation>()
             .Property(x => x.Latitude)
@@ -135,7 +135,7 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext
             entity.HasIndex(e => e.Key).IsUnique();
             entity.HasIndex(e => e.Category);
         });
- 
+
         foreach (var foreignKey in modelBuilder.Model.GetEntityTypes()
             .SelectMany(e => e.GetForeignKeys()))
         {

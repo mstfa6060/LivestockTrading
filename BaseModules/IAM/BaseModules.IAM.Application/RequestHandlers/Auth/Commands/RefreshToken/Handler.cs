@@ -43,20 +43,18 @@ public class Handler : IRequestHandler
 		// Kullanıcıyı güncelle
 		await _dataAccessLayer.SaveChangesAsync();
 
-		// 🆕 ADIM 9: Kullanıcının rollerini ModuleId ile birlikte çek
-		var userRoles = await _dataAccessLayer.GetUserRolesWithModule(user.Id, user.CompanyId);
+		// Kullanıcının rollerini ModuleId ile birlikte çek
+		var userRoles = await _dataAccessLayer.GetUserRolesWithModule(user.Id);
 
 		// Rolleri "ModuleName.RoleName" formatında hazırla
 		var roleStrings = userRoles
 			.Select(ur => $"{ur.ModuleName}.{ur.RoleName}")
 			.ToList();
 
-		Console.WriteLine($"RefreshToken Debug - User Roles: {string.Join(", ", roleStrings)}");
-
-		//  ADIM 9: Rolleri JWT'ye ekle
+		// Rolleri JWT'ye ekle
 		var jwt = _jwtService.GenerateJwt(
 			user.Id,
-			user.CompanyId,
+			Guid.Empty,
 			user.UserName,
 			$"{user.FirstName} {user.Surname}",
 			user.Email,
@@ -65,7 +63,7 @@ public class Handler : IRequestHandler
 			expiresAt,
 			user.UserSource,
 			newRefreshTokenId,
-			roleStrings  //  Roller JWT'ye eklendi!
+			roleStrings
 		);
 
 		var response = mapper.Map(jwt, expiresAt, newRefreshToken); // yeni refreshToken da dön

@@ -9,9 +9,9 @@ public class DataAccess : IDataAccess
 		_dbContext = dependencyProvider.GetInstance<IamDbContext>();
 	}
 
-	public async Task<Common.Definitions.Domain.Entities.User> GetUser(Guid userId, Guid companyId)
+	public async Task<Common.Definitions.Domain.Entities.User> GetUser(Guid userId)
 	{
 		return await _dbContext.AppUsers
-			.FirstOrDefaultAsync(x => x.Id == userId && x.CompanyId == companyId);
+			.FirstOrDefaultAsync(x => x.Id == userId);
 	}
 }

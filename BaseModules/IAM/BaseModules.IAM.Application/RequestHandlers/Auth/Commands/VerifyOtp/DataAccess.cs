@@ -9,9 +9,9 @@ public class DataAccess : IDataAccess
 		_dbContext = provider.GetInstance<IamDbContext>();
 	}
 
-	public async Task<Common.Definitions.Domain.Entities.User> GetUserByPhoneAsync(string phone, Guid companyId)
+	public async Task<Common.Definitions.Domain.Entities.User> GetUserByPhoneAsync(string phone)
 	{
-		return await _dbContext.AppUsers.FirstOrDefaultAsync(x => x.PhoneNumber == phone && x.CompanyId == companyId);
+		return await _dbContext.AppUsers.FirstOrDefaultAsync(x => x.PhoneNumber == phone);
 	}
 
 	public async Task UpdateUserAsync(Common.Definitions.Domain.Entities.User user)

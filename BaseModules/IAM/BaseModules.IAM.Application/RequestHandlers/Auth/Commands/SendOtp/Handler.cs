@@ -18,9 +18,6 @@ public class Handler : IRequestHandler
 	private readonly IHttpContextAccessor _httpAccessor;
 	private readonly IRabbitMqPublisher _publisher;
 
-	// LivestockTrading Company ID
-	private static readonly Guid LivestockTradingCompanyId = Guid.Parse("C9D8C846-10FC-466D-8F45-A4FA4E856ABD");
-
 	public Handler(ArfBlocksDependencyProvider dp, object dataAccess)
 	{
 		_dataAccess = (DataAccess)dataAccess;
@@ -43,7 +40,7 @@ public class Handler : IRequestHandler
 
 		var otpCode = new Random().Next(100000, 999999).ToString();
 
-		var message = GenerateLocalizedOtpMessage(otpCode, request.Language, request.CompanyId);
+		var message = GenerateLocalizedOtpMessage(otpCode, request.Language);
 
 
 		await _publisher.PublishFanout("iam.notification.sms", new SmsModelContract
@@ -66,11 +63,9 @@ public class Handler : IRequestHandler
 			OtpCode = otpCode
 		});
 	}
-	private string GenerateLocalizedOtpMessage(string otpCode, string language, Guid companyId)
+	private string GenerateLocalizedOtpMessage(string otpCode, string language)
 	{
-		var isLivestockTrading = companyId == LivestockTradingCompanyId;
-
-		var livestockTradingMessages = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+		var messages = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
 		{
 			["tr"] = $"[LivestockTrading] Giriş kodunuz: {otpCode}",
 			["en"] = $"[LivestockTrading] Your login code: {otpCode}",
@@ -84,26 +79,9 @@ public class Handler : IRequestHandler
 			["zh"] = $"[LivestockTrading] 您的登录验证码是：{otpCode}"
 		};
 
-		var defaultMessages = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-		{
-			["tr"] = $"Doğrulama kodunuz: {otpCode}",
-			["en"] = $"Your verification code is: {otpCode}",
-			["ar"] = $"رمز التحقق الخاص بك هو: {otpCode}",
-			["fr"] = $"Votre code de vérification est : {otpCode}",
-			["de"] = $"Ihr Bestätigungscode lautet: {otpCode}",
-			["es"] = $"Su código de verificación es: {otpCode}",
-			["ru"] = $"Ваш код подтверждения: {otpCode}",
-			["pt"] = $"Seu código de verificação é: {otpCode}",
-			["hi"] = $"आपका सत्यापन कोड है: {otpCode}",
-			["zh"] = $"您的验证码是：{otpCode}"
-		};
-
-		if (isLivestockTrading && livestockTradingMessages.TryGetValue(language, out var livestockMessage))
-			return livestockMessage;
-
-		return defaultMessages.TryGetValue(language, out var defaultMessage)
-			? defaultMessage
-			: defaultMessages["tr"];
+		return messages.TryGetValue(language, out var message)
+			? message
+			: messages["tr"];
 	}
 
 

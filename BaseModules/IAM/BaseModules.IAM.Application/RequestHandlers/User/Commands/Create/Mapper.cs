@@ -15,8 +15,6 @@ public class Mapper
 			PasswordSalt = salt,
 			IsActive = true,
 			EmailConfirmed = false,
-			CompanyId = payload.CompanyId,
-			Company = null, //  Bunu zorla (EF kafası karışmasın)
 			ProviderKey = payload.ProviderId, // Google veya Apple ID'si
 			AuthProvider = payload.UserSource == UserSources.Google ? "Google" :
 						   payload.UserSource == UserSources.Apple ? "Apple" : "Manual",

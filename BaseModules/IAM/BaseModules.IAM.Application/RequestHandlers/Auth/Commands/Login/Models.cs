@@ -13,9 +13,6 @@ public class ResponseModel : IResponseModel
 		public string Username { get; set; }
 		public string DisplayName { get; set; }
 		public string Email { get; set; }
-		public Guid CompanyId { get; set; }
-		public bool IsCompanyHolding { get; set; }
-		public string CompanyName { get; set; }
 		public bool IsPhoneVerified { get; set; }
 	}
 }
@@ -27,8 +24,6 @@ public class RequestModel : IRequestModel
 	public string Password { get; set; }
 	public string Token { get; set; }
 	public ClientPlatforms Platform { get; set; }
-	public bool IsCompanyHolding { get; set; }
-	public Guid CompanyId { get; set; }
 
 	// Google ile login başarısızsa oluşturulacak user için:
 	public string FirstName { get; set; }

@@ -19,7 +19,7 @@ public class Handler : IRequestHandler
 	public async Task<ArfBlocksRequestResult> Handle(IRequestModel model, EndpointContext ctx, CancellationToken ct)
 	{
 		var request = (RequestModel)model;
-		var user = await _dataAccess.GetUserByPhoneAsync(request.PhoneNumber, request.CompanyId);
+		var user = await _dataAccess.GetUserByPhoneAsync(request.PhoneNumber);
 
 		user.IsPhoneVerified = true;
 		user.LastOtpVerifiedAt = DateTime.UtcNow;

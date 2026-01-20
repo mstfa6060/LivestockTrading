@@ -28,9 +28,6 @@ public class Validator : IRequestValidator
 		// Get Request Payload
 		var requestModel = (RequestModel)payload;
 
-		//Document
-		await _dbValidator.ValidateCompanyExist(requestModel.CompanyId);
-
 		await _dbValidator.GetUserById(requestModel.UserId);
 
 		// Phone Number
@@ -57,10 +54,6 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
 			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => DomainErrors.UserErrors.PhoneNumberRequired))
 			.Matches(@"^\+?[0-9]{10,15}$")
 			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => DomainErrors.UserErrors.PhoneNumberInvalid));
-
-		RuleFor(x => x.CompanyId)
-			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => DomainErrors.CompanyErrors.CompanyIdRequired));
 
 		RuleFor(x => x.Language)
 			.NotEmpty()

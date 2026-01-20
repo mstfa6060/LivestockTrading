@@ -9,13 +9,13 @@ public class DataAccess : IDataAccess
 		_dbContext = dependencyProvider.GetInstance<IamDbContext>();
 	}
 
-	public async Task<Common.Definitions.Domain.Entities.User> GetUserByEmail(string email, Guid companyId)
+	public async Task<Common.Definitions.Domain.Entities.User> GetUserByEmail(string email)
 	{
 		if (string.IsNullOrEmpty(email))
 			return null;
 
 		return await _dbContext.AppUsers
-			.FirstOrDefaultAsync(x => x.Email == email && x.CompanyId == companyId);
+			.FirstOrDefaultAsync(x => x.Email == email);
 	}
 
 	public async Task UpdateUser(Common.Definitions.Domain.Entities.User user)

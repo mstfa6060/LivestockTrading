@@ -19,9 +19,7 @@ public class Mapper
 			BirthDate = user.BirthDate,
 			City = user.City,
 			District = user.District,
-			IsPhoneVerified = user.IsPhoneVerified,
-
-			CompanyName = user.Company?.Name
+			IsPhoneVerified = user.IsPhoneVerified
 		};
 	}
 }

@@ -6,12 +6,8 @@ using Common.Definitions.Base.Entity;
 
 namespace Common.Definitions.Domain.Entities;
 
-public class User : BaseEntity, ITenantEntity
+public class User : BaseEntity
 {
-    public Guid GetTenantId() => this.CompanyId;
-    public string GetTenantPropertyName() => "CompanyId";
-    public object GetTenantEntity() => null;
-
     public string UserName { get; set; }
     public string FirstName { get; set; }
     public string Surname { get; set; }
@@ -20,8 +16,6 @@ public class User : BaseEntity, ITenantEntity
     public string Email { get; set; }
 
     public bool IsActive { get; set; }
-    public Guid CompanyId { get; set; }
-    public Company Company { get; set; }
 
     // Kimlik doğrulama için eklenen alanlar
     public string PasswordHash { get; set; }

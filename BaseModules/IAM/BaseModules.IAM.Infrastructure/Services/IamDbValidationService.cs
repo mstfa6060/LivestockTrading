@@ -20,21 +20,6 @@ public class IamDbValidationService : DefinitionDbValidationService
     }
 
 
-    public async Task ValidateCompanyByTaxNumberNotExist(string taxNumber)
-    {
-        var exists = await _dbContext.AppCompanies.AnyAsync(x => x.TaxNumber == taxNumber);
-        if (exists)
-            throw new ArfBlocksValidationException(
-                ErrorCodeGenerator.GetErrorCode(() => DomainErrors.CompanyErrors.TaxNumberAlreadyExists));
-    }
-
-    public async Task ValidateCompanyExist(Guid companyId)
-    {
-        var exists = await _dbContext.AppCompanies.AnyAsync(x => x.Id == companyId);
-        if (!exists)
-            throw new ArfBlocksValidationException(
-                ErrorCodeGenerator.GetErrorCode(() => DomainErrors.CompanyErrors.NotFound));
-    }
     public async Task ValidateUserByIdExist(Guid userId)
     {
         var exists = await _dbContext.AppUsers.AnyAsync(x => x.Id == userId);
@@ -86,9 +71,9 @@ public class IamDbValidationService : DefinitionDbValidationService
                 ErrorCodeGenerator.GetErrorCode(() => DomainErrors.UserErrors.UserNotFound));
     }
 
-    public async Task ValidateUserOtpVerification(Guid userId, string phoneNumber, Guid companyId, string otpCode)
+    public async Task ValidateUserOtpVerification(Guid userId, string phoneNumber, string otpCode)
     {
-        var user = await _dbContext.AppUsers.FirstOrDefaultAsync(x => x.Id == userId && x.PhoneNumber == phoneNumber && x.CompanyId == companyId);
+        var user = await _dbContext.AppUsers.FirstOrDefaultAsync(x => x.Id == userId && x.PhoneNumber == phoneNumber);
         if (user == null)
             throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => DomainErrors.AuthErrors.UserNotExist));
 

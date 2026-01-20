@@ -3,7 +3,6 @@ namespace BaseModules.IAM.Application.RequestHandlers.Users.Commands.ForgotPassw
 public class RequestModel : IRequestModel
 {
 	public string Email { get; set; }
-	public Guid CompanyId { get; set; }
 }
 
 public class ResponseModel : IResponseModel

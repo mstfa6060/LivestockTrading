@@ -20,12 +20,9 @@ public class RequestModel : IRequestModel
 	public string Email { get; set; }
 	public string Password { get; set; } // Sadece Manual kayıtlar için zorunlu
 	public string ProviderId { get; set; } // Google veya Apple ID'si
-	public Guid CompanyId { get; set; }
 	public UserSources UserSource { get; set; } // RegistrationType yerine geçiyor
-	public string Description { get; set; } // 🆕 Ek örnek alan
-											// Mevcut alanlara ekle:
+	public string Description { get; set; }
 	public string PhoneNumber { get; set; }
-
 }
 
 

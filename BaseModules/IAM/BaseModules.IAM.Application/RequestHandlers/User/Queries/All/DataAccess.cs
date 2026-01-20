@@ -10,21 +10,18 @@ public class DataAccess : IDataAccess
 		_dbContext = dependencyProvider.GetInstance<IamDbContext>();
 	}
 
-	public async Task<(List<Common.Definitions.Domain.Entities.User> users, Dictionary<Guid, List<string>> userRoles, XPageResponse page)> All(Guid companyId, XSorting sorting, List<XFilterItem> filters, XPageRequest pageRequest)
+	public async Task<(List<Common.Definitions.Domain.Entities.User> users, Dictionary<Guid, List<string>> userRoles, XPageResponse page)> All(XSorting sorting, List<XFilterItem> filters, XPageRequest pageRequest)
 	{
-		//  GUID FILTER FIX: Prevent ToLower() on Guid fields
-		// Guid fields in User: Id, CompanyId
+		// GUID FILTER FIX: Prevent ToLower() on Guid fields
 		if (filters != null && filters.Any())
 		{
-			var guidFields = new[] { "id", "companyid" };
+			var guidFields = new[] { "id" };
 
 			foreach (var filter in filters.Where(f => f.IsUsed))
 			{
 				var normalizedKey = filter.Key?.ToLower();
 				if (guidFields.Contains(normalizedKey))
 				{
-					// Force Guid fields to use "equals" or "in" condition types
-					// to prevent string operations like "contains" that call ToLower()
 					if (filter.ConditionType?.ToLower() == "contains" ||
 						string.IsNullOrEmpty(filter.ConditionType))
 					{
@@ -36,7 +33,7 @@ public class DataAccess : IDataAccess
 		}
 
 		var query = _dbContext.AppUsers
-			.Where(u => u.CompanyId == companyId && !u.IsDeleted)
+			.Where(u => !u.IsDeleted)
 			.Sort(sorting)
 			.Filter(filters);
 

@@ -2,7 +2,6 @@ namespace BaseModules.IAM.Application.RequestHandlers.Users.Queries.All;
 
 public class RequestModel : IRequestModel
 {
-	public Guid CompanyId { get; set; }
 	public XSorting Sorting { get; set; }
 	public List<XFilterItem> Filters { get; set; }
 	public XPageRequest PageRequest { get; set; }

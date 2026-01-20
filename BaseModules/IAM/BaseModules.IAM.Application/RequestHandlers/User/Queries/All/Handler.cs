@@ -20,7 +20,6 @@ public class Handler : IRequestHandler
 		var requestPayload = (RequestModel)payload;
 
 		var (users, userRoles, page) = await _dataAccessLayer.All(
-			requestPayload.CompanyId,
 			requestPayload.Sorting,
 			requestPayload.Filters,
 			requestPayload.PageRequest);

@@ -9,7 +9,6 @@ public class Mapper
 		{
 			Id = payload.Id,
 			Name = payload.Name,
-			CompanyId = payload.CompanyId,
 		};
 	}
 

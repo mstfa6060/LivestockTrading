@@ -20,7 +20,6 @@ public class DefinitionDbContext : DbContext, IDefinitionDbContext
     public DbSet<RelSystemUserModule> AppRelSystemUserModules { get; set; }
     public DbSet<RolePermission> RolePermissions { get; set; }
     public DbSet<RelRoleResource> AppRelRoleResources { get; set; }
-    public DbSet<Company> AppCompanies { get; set; }
     public DbSet<UserLocation> AppUserLocations { get; set; }
     public DbSet<Module> AppModules { get; set; }
     public DbSet<UserPushToken> AppUserPushTokens { get; set; }
@@ -67,13 +66,13 @@ public class DefinitionDbContext : DbContext, IDefinitionDbContext
       .OnDelete(DeleteBehavior.Restrict);
 
 
-        //  UserId + CompanyId unique constraint
+        // UserId unique constraint
         modelBuilder.Entity<UserLocation>()
-            .HasIndex(x => new { x.UserId, x.CompanyId })
+            .HasIndex(x => x.UserId)
             .IsUnique();
 
         modelBuilder.Entity<User>()
-            .HasIndex(x => new { x.Email, x.PhoneNumber, x.CompanyId })
+            .HasIndex(x => new { x.Email, x.PhoneNumber })
             .IsUnique();
 
 

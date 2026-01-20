@@ -17,18 +17,17 @@ public class DataAccess : IDataAccess
         return await _dbContext.AppUsers.SingleAsync(u => u.Id == userId);
     }
 
-    public async Task<Common.Definitions.Domain.Entities.User> GetUser(string identifier, Guid companyId)
+    public async Task<Common.Definitions.Domain.Entities.User> GetUser(string identifier)
     {
         return await _dbContext.AppUsers
             .FirstOrDefaultAsync(u =>
-                (u.UserName.ToLower() == identifier.ToLower() || u.Email.ToLower() == identifier.ToLower()) &&
-                u.CompanyId == companyId);
+                u.UserName.ToLower() == identifier.ToLower() || u.Email.ToLower() == identifier.ToLower());
     }
 
-    public async Task<Common.Definitions.Domain.Entities.User> GetUserByExternalId(string provider, string externalId, Guid companyId)
+    public async Task<Common.Definitions.Domain.Entities.User> GetUserByExternalId(string provider, string externalId)
     {
         return await _dbContext.AppUsers.FirstOrDefaultAsync(u =>
-            u.AuthProvider == provider && u.ProviderKey == externalId && u.CompanyId == companyId);
+            u.AuthProvider == provider && u.ProviderKey == externalId);
     }
 
     public void AddUser(Common.Definitions.Domain.Entities.User user)
@@ -72,12 +71,11 @@ public class DataAccess : IDataAccess
         return refreshTokenEntry.Id;
     }
 
-    // 🆕 ADIM 5: Kullanıcının rollerini ModuleId ile birlikte getir
-    // Not: Bu metod IDataAccess'e eklenmez, sadece DataAccess'te bulunur
-    public async Task<List<UserRoleWithModuleDto>> GetUserRolesWithModule(Guid userId, Guid companyId)
+    // Kullanıcının rollerini ModuleId ile birlikte getir
+    public async Task<List<UserRoleWithModuleDto>> GetUserRolesWithModule(Guid userId)
     {
         return await _dbContext.UserRoles
-            .Where(ur => ur.UserId == userId && ur.CompanyId == companyId && !ur.IsDeleted)
+            .Where(ur => ur.UserId == userId && !ur.IsDeleted)
             .Include(ur => ur.Role)      // Role bilgisini include et
             .Include(ur => ur.Module)    // Module bilgisini include et
             .Select(ur => new UserRoleWithModuleDto

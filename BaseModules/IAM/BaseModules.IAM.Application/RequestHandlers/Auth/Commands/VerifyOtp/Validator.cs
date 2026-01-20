@@ -26,14 +26,10 @@ public class Validator : IRequestValidator
 	{
 		var request = (RequestModel)payload;
 
-		// Şirket doğrulaması
-		await _dbValidator.ValidateCompanyExist(request.CompanyId);
-
 		// Kullanıcı + OTP doğrulama
 		await _dbValidator.ValidateUserOtpVerification(
 			userId: request.UserId,
 			phoneNumber: request.PhoneNumber,
-			companyId: request.CompanyId,
 			otpCode: request.OtpCode
 		);
 	}
@@ -46,9 +42,6 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
 		RuleFor(x => x.PhoneNumber)
 			.NotEmpty().WithMessage("PhoneNumber.Required")
 			.Matches(@"^\+?[0-9]{10,15}$").WithMessage("PhoneNumber.Invalid");
-
-		RuleFor(x => x.CompanyId)
-			.NotEmpty().WithMessage("CompanyId.Required");
 
 		RuleFor(x => x.OtpCode)
 			.NotEmpty().WithMessage("OtpCode.Required")

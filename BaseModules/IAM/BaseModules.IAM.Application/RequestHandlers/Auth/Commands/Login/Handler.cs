@@ -17,7 +17,6 @@ public class Handler : IRequestHandler
 	private readonly IHttpContextAccessor _httpContextAccessor;
 
 	// LivestockTrading sabitleri
-	private static readonly Guid LivestockTradingCompanyId = Guid.Parse("C9D8C846-10FC-466D-8F45-A4FA4E856ABD");
 	private static readonly Guid LivestockTradingModuleId = Guid.Parse("DFD018C9-FC32-42C4-AEFD-70A5942A295E");
 	private static readonly Guid LivestockTradingDefaultUserRoleId = Guid.Parse("B3F8A7D1-4E2C-4A3E-8B5A-D3E7B9C5E2F1");
 
@@ -38,12 +37,12 @@ public class Handler : IRequestHandler
 		switch (request.Provider?.ToLower())
 		{
 			case "native":
-				user = await _dataAccessLayer.GetUser(request.UserName, request.CompanyId);
+				user = await _dataAccessLayer.GetUser(request.UserName);
 				break;
 
 			case "google":
 				var googleUserId = request.ExternalProviderUserId;
-				user = await _dataAccessLayer.GetUserByExternalId("google", googleUserId, request.CompanyId);
+				user = await _dataAccessLayer.GetUserByExternalId("google", googleUserId);
 
 				if (user == null)
 				{
@@ -57,7 +56,6 @@ public class Handler : IRequestHandler
 						AuthProvider = "google",
 						ProviderKey = googleUserId,
 						UserSource = UserSources.Google,
-						CompanyId = request.CompanyId,
 						IsActive = true,
 						PhoneNumber = request.PhoneNumber,
 						BirthDate = request.BirthDate ?? DateTime.UtcNow.AddYears(-18),
@@ -67,23 +65,18 @@ public class Handler : IRequestHandler
 						Description = "",
 					};
 
-					// LivestockTrading için varsayılan rol ataması
-					if (request.CompanyId == LivestockTradingCompanyId)
+					// Varsayılan rol ataması
+					var googleRole = await _dataAccessLayer.GetRoleById(LivestockTradingDefaultUserRoleId);
+					_dataAccessLayer.AddUserRoleWithModule(new UserRole
 					{
-						var role = await _dataAccessLayer.GetRoleById(LivestockTradingDefaultUserRoleId);
-
-						_dataAccessLayer.AddUserRoleWithModule(new UserRole
-						{
-							Id = Guid.NewGuid(),
-							UserId = user.Id,
-							CompanyId = LivestockTradingCompanyId,
-							RoleId = role.Id,
-							ModuleId = LivestockTradingModuleId,
-							CreatedAt = DateTime.UtcNow,
-							UpdatedAt = DateTime.UtcNow,
-							IsDeleted = false
-						});
-					}
+						Id = Guid.NewGuid(),
+						UserId = user.Id,
+						RoleId = googleRole.Id,
+						ModuleId = LivestockTradingModuleId,
+						CreatedAt = DateTime.UtcNow,
+						UpdatedAt = DateTime.UtcNow,
+						IsDeleted = false
+					});
 
 					_dataAccessLayer.AddUser(user);
 					await _dataAccessLayer.SaveChanges();
@@ -102,7 +95,7 @@ public class Handler : IRequestHandler
 			case "apple":
 			case "itunes":
 				var appleUserId = request.ExternalProviderUserId;
-				user = await _dataAccessLayer.GetUserByExternalId("apple", appleUserId, request.CompanyId);
+				user = await _dataAccessLayer.GetUserByExternalId("apple", appleUserId);
 
 				if (user == null)
 				{
@@ -116,7 +109,6 @@ public class Handler : IRequestHandler
 						AuthProvider = "apple",
 						ProviderKey = appleUserId,
 						UserSource = UserSources.Apple,
-						CompanyId = request.CompanyId,
 						IsActive = true,
 						PhoneNumber = request.PhoneNumber,
 						BirthDate = request.BirthDate ?? DateTime.UtcNow.AddYears(-18),
@@ -126,23 +118,18 @@ public class Handler : IRequestHandler
 						Description = "",
 					};
 
-					// LivestockTrading için varsayılan rol ataması
-					if (request.CompanyId == LivestockTradingCompanyId)
+					// Varsayılan rol ataması
+					var appleRole = await _dataAccessLayer.GetRoleById(LivestockTradingDefaultUserRoleId);
+					_dataAccessLayer.AddUserRoleWithModule(new UserRole
 					{
-						var role = await _dataAccessLayer.GetRoleById(LivestockTradingDefaultUserRoleId);
-
-						_dataAccessLayer.AddUserRoleWithModule(new UserRole
-						{
-							Id = Guid.NewGuid(),
-							UserId = user.Id,
-							CompanyId = LivestockTradingCompanyId,
-							RoleId = role.Id,
-							ModuleId = LivestockTradingModuleId,
-							CreatedAt = DateTime.UtcNow,
-							UpdatedAt = DateTime.UtcNow,
-							IsDeleted = false
-						});
-					}
+						Id = Guid.NewGuid(),
+						UserId = user.Id,
+						RoleId = appleRole.Id,
+						ModuleId = LivestockTradingModuleId,
+						CreatedAt = DateTime.UtcNow,
+						UpdatedAt = DateTime.UtcNow,
+						IsDeleted = false
+					});
 
 					_dataAccessLayer.AddUser(user);
 					await _dataAccessLayer.SaveChanges();
@@ -177,7 +164,7 @@ public class Handler : IRequestHandler
 		}
 
 		// Kullanıcının rollerini ModuleId ile birlikte çek
-		var userRoles = await _dataAccessLayer.GetUserRolesWithModule(user.Id, user.CompanyId);
+		var userRoles = await _dataAccessLayer.GetUserRolesWithModule(user.Id);
 
 		// Rolleri "ModuleName.RoleName" formatında hazırla
 		var roleStrings = userRoles
@@ -197,7 +184,7 @@ public class Handler : IRequestHandler
 
 		var token = _jwtService.GenerateJwt(
 			user.Id,
-			user.CompanyId,
+			Guid.Empty,
 			user.UserName,
 			$"{user.FirstName} {user.Surname}",
 			user.Email,

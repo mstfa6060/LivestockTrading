@@ -18,7 +18,7 @@ public class Handler : IRequestHandler
 		var request = (RequestModel)payload;
 		var mapper = new Mapper();
 
-		var user = await _dataAccessLayer.GetUser(request.UserId, request.CompanyId);
+		var user = await _dataAccessLayer.GetUser(request.UserId);
 
 		if (user == null)
 			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => DomainErrors.UserErrors.UserNotFound));

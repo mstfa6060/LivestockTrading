@@ -25,7 +25,7 @@ public class Handler : IRequestHandler
 		var request = (RequestModel)model;
 		var mapper = new Mapper();
 
-		var user = await _dataAccess.GetUserByEmail(request.Email, request.CompanyId);
+		var user = await _dataAccess.GetUserByEmail(request.Email);
 		if (user == null)
 			throw new ArfBlocksValidationException(DomainErrors.UserErrors.UserNotFound);
 

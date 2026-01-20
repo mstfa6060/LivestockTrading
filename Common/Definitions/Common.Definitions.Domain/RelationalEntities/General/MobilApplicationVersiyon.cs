@@ -43,13 +43,4 @@ public class MobilApplicationVersiyon : BaseEntity, ITenantEntity
     /// Aktif mi?
     /// </summary>
     public bool IsActive { get; set; }
-
-
-    public Guid CompanyId { get; set; }
-    public Company Company { get; set; }
-
-
-    public Guid GetTenantId() => this.CompanyId;
-    public string GetTenantPropertyName() => "CompanyId";
-    public object GetTenantEntity() => null;
 }

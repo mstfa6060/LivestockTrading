@@ -53,13 +53,13 @@ public class DataAccess : IDataAccess
         await _dbContext.SaveChangesAsync();
     }
 
-    // 🆕 ADIM 9: Kullanıcının rollerini ModuleId ile birlikte getir
-    public async Task<List<UserRoleWithModuleDto>> GetUserRolesWithModule(Guid userId, Guid companyId)
+    // Kullanıcının rollerini ModuleId ile birlikte getir
+    public async Task<List<UserRoleWithModuleDto>> GetUserRolesWithModule(Guid userId)
     {
         return await _dbContext.UserRoles
-            .Where(ur => ur.UserId == userId && ur.CompanyId == companyId && !ur.IsDeleted)
-            .Include(ur => ur.Role)      // Role bilgisini include et
-            .Include(ur => ur.Module)    // Module bilgisini include et
+            .Where(ur => ur.UserId == userId && !ur.IsDeleted)
+            .Include(ur => ur.Role)
+            .Include(ur => ur.Module)
             .Select(ur => new UserRoleWithModuleDto
             {
                 RoleId = ur.RoleId,

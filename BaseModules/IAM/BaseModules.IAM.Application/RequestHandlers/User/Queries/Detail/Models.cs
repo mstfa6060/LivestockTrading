@@ -3,7 +3,6 @@ namespace BaseModules.IAM.Application.RequestHandlers.Users.Queries.Detail;
 public class RequestModel : IRequestModel
 {
 	public Guid UserId { get; set; }
-	public Guid CompanyId { get; set; }
 }
 
 public class ResponseModel : IResponseModel
@@ -22,5 +21,4 @@ public class ResponseModel : IResponseModel
 	public string District { get; set; }
 	public bool IsPhoneVerified { get; set; }
 
-	public string CompanyName { get; set; }
 }

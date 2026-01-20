@@ -6,20 +6,6 @@ public static class RoleRelations
 {
     public static void Build(Microsoft.EntityFrameworkCore.ModelBuilder modelBuilder)
     {
-        var defaultCompanyId = Guid.Parse("C9D8C846-10FC-466D-8F45-A4FA4E856ABD");
-
-        // ════════════════════════════════════════════════════════
-        // COMPANY
-        // ════════════════════════════════════════════════════════
-        modelBuilder.Entity<Company>().HasData(
-          new Company()
-          {
-              Id = defaultCompanyId,
-              Name = "LivestockTrading",
-              IsDeleted = false,
-              CreatedAt = DateTime.UtcNow
-          });
-
         // ════════════════════════════════════════════════════════
         // ROLES
         // ════════════════════════════════════════════════════════
@@ -30,8 +16,7 @@ public static class RoleRelations
                 Name = "Admin",
                 IsSystemRole = true,
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                CompanyId = defaultCompanyId
+                UpdatedAt = DateTime.UtcNow
             },
             new Role()
             {
@@ -39,8 +24,7 @@ public static class RoleRelations
                 Name = "User",
                 IsSystemRole = true,
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                CompanyId = defaultCompanyId
+                UpdatedAt = DateTime.UtcNow
             }
         );
 

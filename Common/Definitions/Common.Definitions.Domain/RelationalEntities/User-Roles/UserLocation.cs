@@ -5,7 +5,7 @@ using NetTopologySuite.Geometries;
 
 
 namespace Common.Definitions.Domain.Entities;
-public class UserLocation : BaseEntity, ITenantEntity
+public class UserLocation : BaseEntity
 {
     public Guid UserId { get; set; }
     public double Latitude { get; set; }
@@ -15,16 +15,4 @@ public class UserLocation : BaseEntity, ITenantEntity
 
     [ForeignKey("UserId")]
     public User User { get; set; }
-
-
-    public Guid CompanyId { get; set; }
-    public Company Company { get; set; }
-
-    public Guid GetTenantId() => this.CompanyId;
-    public string GetTenantPropertyName() => "";
-    public object GetTenantEntity()
-    {
-        return null;
-    }
-
 }

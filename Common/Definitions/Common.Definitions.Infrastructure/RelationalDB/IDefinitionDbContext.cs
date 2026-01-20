@@ -24,7 +24,6 @@ public interface IDefinitionDbContext
 
 
 
-    DbSet<Company> AppCompanies { get; set; }
     DbSet<Module> AppModules { get; set; }
 
     //AuditLog

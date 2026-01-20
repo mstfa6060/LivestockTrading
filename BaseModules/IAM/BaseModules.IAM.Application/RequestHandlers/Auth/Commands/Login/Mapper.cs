@@ -15,9 +15,6 @@ public class Mapper
 				Username = user.UserName,
 				DisplayName = $"{user.FirstName} {user.Surname}",
 				Email = user.Email,
-				CompanyId = user.CompanyId,
-				IsCompanyHolding = false,
-				CompanyName = "",
 				IsPhoneVerified = user.IsPhoneVerified
 			}
 		};
