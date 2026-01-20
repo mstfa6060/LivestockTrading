@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MigrationJob.SeedData;
 
 namespace Jobs.RelationalDB.MigrationJob;
 
@@ -34,8 +35,22 @@ class Program
         await dbContext.Database.MigrateAsync();
         Console.WriteLine("Migration completed successfully.");
 
-        // TODO: Seed Data implementasyonu eklenecek
-        // LocationSeeder, VeterinarianCertificationSeeder, PlatformSettingsSeeder, AnimalBreedSeeder
+        // Seed Data - Ulkeler
+        // --force-country-reseed argümani ile mevcut veriler silinip yeniden seed edilir
+        try
+        {
+            var forceReseed = args.Contains("--force-country-reseed");
+            var countrySeeder = new CountrySeeder(dbContext);
+            await countrySeeder.SeedAsync(forceReseed);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Country seed FAILED: {ex.Message}");
+            throw;
+        }
+
+        // TODO: Diger Seed Data implementasyonlari eklenecek
+        // LocationSeeder, PlatformSettingsSeeder, vb.
 
         Console.WriteLine("All operations completed successfully.");
     }

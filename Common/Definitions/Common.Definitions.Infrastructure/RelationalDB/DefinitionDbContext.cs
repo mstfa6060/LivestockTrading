@@ -1,6 +1,5 @@
 ﻿using Common.Definitions.Base.Entity;
 using Common.Definitions.Domain.Entities;
-using Common.Definitions.Infrastructure.RelationalDB.SeedData;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -165,7 +164,7 @@ public class DefinitionDbContext : DbContext, IDefinitionDbContext
             entity.HasIndex(e => e.Name);
         });
 
-        CountrySeedData.Seed(modelBuilder); 
+        // Seed data migration script ile ekleniyor (bkz: Migrations/Scripts/SeedCountries.sql)
         base.OnModelCreating(modelBuilder);
 
     }
