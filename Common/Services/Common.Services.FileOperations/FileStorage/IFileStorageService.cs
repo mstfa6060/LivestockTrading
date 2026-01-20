@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Common.Services.FileOperations.ImageProcessing;
 
 namespace Common.Services.FileOperations.FileStorage;
 
@@ -17,4 +18,15 @@ public interface IFileStorageService
 	string GetBasePath();
 	Stream GetFileStream(string filePath);
 	(FileProperties Properties, string PhysicalFilePath) BuildFileProperties(Guid tenantId, string _fileName, string contentType, string moduleName, string folderName, Guid? entityId, string versionName);
+
+	/// <summary>
+	/// Resim dosyasi yukle (otomatik isleme ile)
+	/// </summary>
+	Task<ImageUploadResult> CreateImageFileAsync(
+		Guid tenantId,
+		IFormFile file,
+		string moduleName,
+		string folderName,
+		Guid? entityId,
+		ImageProcessingOptions options = null);
 }

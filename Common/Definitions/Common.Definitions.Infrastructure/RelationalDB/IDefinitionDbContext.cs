@@ -34,6 +34,7 @@ public interface IDefinitionDbContext
     DbSet<MobilApplicationVersiyon> MobilApplicationVersiyons { get; set; }
 
     // Location (İl/İlçe/Mahalle)
+    DbSet<Country> Countries { get; set; }
     DbSet<Province> Provinces { get; set; }
     DbSet<District> Districts { get; set; }
     DbSet<Neighborhood> Neighborhoods { get; set; }

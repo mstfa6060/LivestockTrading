@@ -63,6 +63,17 @@ public class User : BaseEntity, ITenantEntity
     public DateTime? LastOtpVerifiedAt { get; set; }
     public bool IsPhoneVerified { get; set; } = false;
 
+    /// <summary>
+    /// Kullanıcının ülkesi (FK -> Countries)
+    /// </summary>
+    public int CountryId { get; set; }
+
+    /// <summary>
+    /// Navigation property - Ülke
+    /// </summary>
+    [ForeignKey("CountryId")]
+    public Country Country { get; set; }
+
 }
 
 public enum UserSources

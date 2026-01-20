@@ -17,6 +17,12 @@ public class ResponseModel : IResponseModel
 		public string ContentType { get; set; }
 		public bool IsDefault { get; set; }
 		public int Index { get; set; }
+
+		// Resim varyantlari
+		public Dictionary<string, string> Variants { get; set; }
+		public int? Width { get; set; }
+		public int? Height { get; set; }
+		public long? SizeBytes { get; set; }
 	}
 }
 

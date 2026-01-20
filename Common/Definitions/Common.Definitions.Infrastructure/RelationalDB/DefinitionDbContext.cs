@@ -1,5 +1,6 @@
 ﻿using Common.Definitions.Base.Entity;
 using Common.Definitions.Domain.Entities;
+using Common.Definitions.Infrastructure.RelationalDB.SeedData;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,7 @@ public class DefinitionDbContext : DbContext, IDefinitionDbContext
     public DbSet<Province> Provinces { get; set; }
     public DbSet<District> Districts { get; set; }
     public DbSet<Neighborhood> Neighborhoods { get; set; }
+    public DbSet<Country> Countries { get; set; }
 
     public DefinitionDbContext(DefinitionDbContextOptions customDbContextOptions) : base(customDbContextOptions.DbContextOptions)
     {
@@ -60,10 +62,11 @@ public class DefinitionDbContext : DbContext, IDefinitionDbContext
 
         // 👇 İlişki tanımı
         modelBuilder.Entity<User>()
-        .HasOne(u => u.Company)
-        .WithMany(c => c.Users) // <-- BUNU EKLE
-        .HasForeignKey(u => u.CompanyId)
-        .OnDelete(DeleteBehavior.Restrict);
+      .HasOne(u => u.Country)
+      .WithMany(c => c.Users)
+      .HasForeignKey(u => u.CountryId)
+      .OnDelete(DeleteBehavior.Restrict);
+
 
         //  UserId + CompanyId unique constraint
         modelBuilder.Entity<UserLocation>()
@@ -74,10 +77,50 @@ public class DefinitionDbContext : DbContext, IDefinitionDbContext
             .HasIndex(x => new { x.Email, x.PhoneNumber, x.CompanyId })
             .IsUnique();
 
+
         // ═══════════════════════════════════════════════════════════════
         // LOCATION TABLES (İl/İlçe/Mahalle)
         // ═══════════════════════════════════════════════════════════════
+        modelBuilder.Entity<Country>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedNever(); // Seed data için
 
+            // Code - ISO 3166-1 alpha-2 (unique)
+            entity.Property(e => e.Code).IsRequired().HasMaxLength(2);
+            entity.HasIndex(e => e.Code).IsUnique();
+
+            // Code3 - ISO 3166-1 alpha-3 (unique)
+            entity.Property(e => e.Code3).IsRequired().HasMaxLength(3);
+            entity.HasIndex(e => e.Code3).IsUnique();
+
+            // NumericCode
+            entity.Property(e => e.NumericCode);
+
+            // Name (unique, indexed)
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.HasIndex(e => e.Name).IsUnique();
+
+            // NativeName
+            entity.Property(e => e.NativeName).HasMaxLength(100);
+
+            // PhoneCode
+            entity.Property(e => e.PhoneCode).HasMaxLength(10);
+
+            // Capital
+            entity.Property(e => e.Capital).HasMaxLength(100);
+
+            // Continent (indexed for filtering)
+            entity.Property(e => e.Continent).HasMaxLength(50);
+            entity.HasIndex(e => e.Continent);
+
+            // Region
+            entity.Property(e => e.Region).HasMaxLength(100);
+
+            // IsActive (indexed)
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.HasIndex(e => e.IsActive);
+        });
         // Province (İl)
         modelBuilder.Entity<Province>(entity =>
         {
@@ -122,7 +165,9 @@ public class DefinitionDbContext : DbContext, IDefinitionDbContext
             entity.HasIndex(e => e.Name);
         });
 
+        CountrySeedData.Seed(modelBuilder); 
         base.OnModelCreating(modelBuilder);
+
     }
 
 

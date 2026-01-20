@@ -24,4 +24,25 @@ public class FileEntry
 	public string Name { get; set; }
 	public string Path { get; set; }
 	public string ContentType { get; set; }
+
+	// Resim varyantlari icin
+	/// <summary>
+	/// Resim varyant path'leri: { "thumb": "path/thumb.webp", "medium": "...", "large": "..." }
+	/// </summary>
+	public Dictionary<string, string> Variants { get; set; }
+
+	/// <summary>
+	/// Resim genisligi (px)
+	/// </summary>
+	public int? Width { get; set; }
+
+	/// <summary>
+	/// Resim yuksekligi (px)
+	/// </summary>
+	public int? Height { get; set; }
+
+	/// <summary>
+	/// Dosya boyutu (bytes)
+	/// </summary>
+	public long? SizeBytes { get; set; }
 }

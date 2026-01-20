@@ -18,6 +18,10 @@ public class Mapper
 								ContentType = fileEntry.ContentType,
 								IsDefault = fileEntry.IsDefault,
 								Index = fileEntry.Index,
+								Variants = fileEntry.Variants,
+								Width = fileEntry.Width,
+								Height = fileEntry.Height,
+								SizeBytes = fileEntry.SizeBytes,
 							}
 					);
 		});

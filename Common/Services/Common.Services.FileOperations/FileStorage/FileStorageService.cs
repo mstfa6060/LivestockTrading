@@ -2,13 +2,23 @@
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Common.Services.FileOperations.ImageProcessing;
 
 namespace Common.Services.FileOperations.FileStorage;
 
 public class FileStorageService : IFileStorageService
 {
+	private readonly IImageProcessingService _imageProcessor;
+
 	public FileStorageService()
-	{ }
+	{
+		_imageProcessor = new ImageProcessingService();
+	}
+
+	public FileStorageService(IImageProcessingService imageProcessor)
+	{
+		_imageProcessor = imageProcessor ?? new ImageProcessingService();
+	}
 
 	public string GetBasePath()
 	{
@@ -349,4 +359,60 @@ public class FileStorageService : IFileStorageService
 		return sourceFileStream;
 	}
 
+	public async Task<ImageUploadResult> CreateImageFileAsync(
+		Guid tenantId,
+		IFormFile file,
+		string moduleName,
+		string folderName,
+		Guid? entityId,
+		ImageProcessingOptions options = null)
+	{
+		options ??= new ImageProcessingOptions();
+
+		using var stream = file.OpenReadStream();
+		var processed = await _imageProcessor.ProcessImageAsync(stream, file.FileName, options);
+
+		if (!processed.IsSuccess)
+			throw new Exception($"Resim isleme hatasi: {processed.ErrorMessage}");
+
+		var result = new ImageUploadResult
+		{
+			Variants = new Dictionary<string, FileProperties>(),
+			OriginalSizeBytes = processed.OriginalSizeBytes,
+			ProcessedSizeBytes = processed.ProcessedTotalSizeBytes,
+			SavingsPercent = processed.SavingsPercent
+		};
+
+		// Orijinali kaydet
+		var originalProps = await SaveVariantAsync(tenantId, processed.Original, file.FileName, moduleName, folderName, entityId);
+		result.Variants["original"] = originalProps;
+		result.Width = processed.Original.Width;
+		result.Height = processed.Original.Height;
+
+		// Thumbnail'lari kaydet
+		foreach (var thumb in processed.Thumbnails)
+		{
+			var thumbProps = await SaveVariantAsync(tenantId, thumb, file.FileName, moduleName, folderName, entityId);
+			result.Variants[thumb.Name] = thumbProps;
+		}
+
+		return result;
+	}
+
+	private async Task<FileProperties> SaveVariantAsync(
+		Guid tenantId,
+		ImageVariant variant,
+		string originalFileName,
+		string moduleName,
+		string folderName,
+		Guid? entityId)
+	{
+		var baseName = Path.GetFileNameWithoutExtension(originalFileName);
+		var newFileName = variant.Name == "original"
+			? $"{baseName}{variant.Extension}"
+			: $"{baseName}_{variant.Name}{variant.Extension}";
+
+		using var ms = new MemoryStream(variant.Data);
+		return await CreateFileByStream(tenantId, ms, newFileName, variant.ContentType, moduleName, folderName, entityId, variant.Name);
+	}
 }

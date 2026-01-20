@@ -1,5 +1,6 @@
 using Common.Services.Auth.Authorization;
 using Common.Services.Auth.CurrentUser;
+using Common.Services.FileOperations.ImageProcessing;
 
 namespace BaseModules.FileProvider.Application.RequestHandlers.Files.Commands.Upload;
 
@@ -52,7 +53,46 @@ public class Handler : IRequestHandler
 		}
 
 		// Create File as Physical
-		var uploadedFileProperties = await _fileStorageService.CreateFileByFormFile(companyId, requestPayload.FormFile, requestPayload.ModuleName, requestPayload.FolderName, requestPayload.EntityId, requestPayload.VersionName);
+		FileProperties uploadedFileProperties;
+		Dictionary<string, string> variantPaths = null;
+		int? imageWidth = null;
+		int? imageHeight = null;
+		long? fileSizeBytes = null;
+
+		var isImage = requestPayload.FormFile.ContentType?.StartsWith("image/") == true;
+
+		if (isImage)
+		{
+			// Resim isleme servisi ile yukle
+			var imageResult = await _fileStorageService.CreateImageFileAsync(
+				companyId,
+				requestPayload.FormFile,
+				requestPayload.ModuleName,
+				requestPayload.FolderName,
+				requestPayload.EntityId,
+				new ImageProcessingOptions
+				{
+					Quality = 85,
+					ConvertToWebP = true,
+					StripMetadata = true,
+					GenerateThumbnails = true
+				});
+
+			uploadedFileProperties = imageResult.Variants["original"];
+			variantPaths = imageResult.Variants.ToDictionary(v => v.Key, v => v.Value.Path);
+			imageWidth = imageResult.Width;
+			imageHeight = imageResult.Height;
+			fileSizeBytes = imageResult.ProcessedSizeBytes;
+
+			Console.WriteLine($"[Upload] Resim islendi: {imageResult.SavingsPercent}% tasarruf");
+		}
+		else
+		{
+			// Normal dosya yukleme
+			uploadedFileProperties = await _fileStorageService.CreateFileByFormFile(companyId, requestPayload.FormFile, requestPayload.ModuleName, requestPayload.FolderName, requestPayload.EntityId, requestPayload.VersionName);
+			fileSizeBytes = requestPayload.FormFile.Length;
+		}
+
 		// Create FileEntry Entity
 		var fileEntry = new FileEntry()
 		{
@@ -70,6 +110,12 @@ public class Handler : IRequestHandler
 
 			UserDisplayName = _currentUserService.GetCurrentUserDisplayName(),
 			UserId = currentClientId,
+
+			// Resim varyantlari
+			Variants = variantPaths,
+			Width = imageWidth,
+			Height = imageHeight,
+			SizeBytes = fileSizeBytes
 		};
 
 		// Add to Bucket

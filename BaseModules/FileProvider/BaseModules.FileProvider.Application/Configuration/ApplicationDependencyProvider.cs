@@ -2,6 +2,7 @@ using BaseModules.FileProvider.Infrastructure.RelationalDB;
 using Common.Definitions.Domain.Models;
 using Common.Services.Auth.Authorization;
 using Common.Services.Caching;
+using Common.Services.FileOperations.ImageProcessing;
 using Microsoft.Extensions.Configuration;
 
 namespace BaseModules.FileProvider.Application.Configuration;
