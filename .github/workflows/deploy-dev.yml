@@ -32,6 +32,9 @@ jobs:
           - name: iam-sms-worker
             dockerfile: _devops/docker/Dockerfile.iam-sms-worker
             image: livestocktrading-iam-sms-worker
+          - name: resource-seeder
+            dockerfile: _devops/docker/Dockerfile.resource-seeder
+            image: livestocktrading-resource-seeder
 
     steps:
       - name: Checkout
@@ -81,6 +84,13 @@ jobs:
               -f docker-compose.yml \
               -f docker-compose.dev.yml \
               --env-file .env.dev pull
+
+            echo "🌱 ResourceSeeder çalıştırılıyor..."
+            docker run --rm \
+              --network livestock_dev_default \
+              --env-file .env.dev \
+              mstfaock/livestocktrading-resource-seeder:dev-latest \
+              development || echo "⚠️ ResourceSeeder failed but continuing..."
 
             echo "🚀 Servisler başlatılıyor..."
             docker compose -p livestock_dev \
