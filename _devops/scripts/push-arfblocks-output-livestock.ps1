@@ -64,6 +64,23 @@ function Ensure-GitRepo([string]$path) {
     return $true
 }
 
+# === 0. Ensure output directories exist ===
+Write-Host ""
+Write-Host "[INFO] Ensuring output directories exist..." -ForegroundColor Yellow
+
+$webApiPath = "$projectRoot\web\common\livestock-api\src\api\business_modules\livestocktrading"
+$mobileApiPath = "$projectRoot\mobil\common\livestock-api\src\api\business_modules\livestocktrading"
+
+if (-not (Test-Path $webApiPath)) {
+    New-Item -ItemType Directory -Path $webApiPath -Force | Out-Null
+    Write-Host "[OK] Created web API directory: $webApiPath" -ForegroundColor Green
+}
+
+if (-not (Test-Path $mobileApiPath)) {
+    New-Item -ItemType Directory -Path $mobileApiPath -Force | Out-Null
+    Write-Host "[OK] Created mobile API directory: $mobileApiPath" -ForegroundColor Green
+}
+
 # === 1. ArfBlocks CLI output ===
 Write-Host ""
 Write-Host "[INFO] ArfBlocks CLI output is being generated..." -ForegroundColor Yellow
