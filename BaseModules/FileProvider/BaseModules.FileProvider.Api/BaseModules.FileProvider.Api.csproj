@@ -8,12 +8,10 @@
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
-	<PackageReference Include="Confluent.Kafka" Version="1.7.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\BaseModules.FileProvider.Application\BaseModules.FileProvider.Application.csproj" />
-    <ProjectReference Include="..\..\..\Common\Contracts\Common.Contracts.Queue\Common.Contracts.Queue.csproj" />
     <ProjectReference Include="..\..\..\Common\Services\Common.Services.Caching\Common.Services.Caching.csproj" />
   </ItemGroup>
 

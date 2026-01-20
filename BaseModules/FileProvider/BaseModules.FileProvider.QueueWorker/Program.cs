@@ -2,19 +2,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 using Microsoft.Extensions.FileProviders;
-using BaseModules.FileProvider.QueueWorker.Workers;
-using BaseModules.FileProvider.QueueWorker.Models;
 using Arfware.ArfBlocks.Core.Extentions;
 using Arfware.ArfBlocks.Core;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Worker as Background Service
-builder.Services.Configure<FileCreateQueueKafkaOptions>(builder.Configuration.GetSection("FileCreateQueueKafkaOptions"));
-builder.Services.Configure<FileApproveQueueKafkaOptions>(builder.Configuration.GetSection("FileApproveQueueKafkaOptions"));
-builder.Services.AddHostedService<FileCreateQueueWorker>();
-builder.Services.AddHostedService<FileApproveQueueWorker>();
-
 
 string DefaultCorsPolicy = "DefaultCorsPolicy";
 builder.Services.AddCors(options =>

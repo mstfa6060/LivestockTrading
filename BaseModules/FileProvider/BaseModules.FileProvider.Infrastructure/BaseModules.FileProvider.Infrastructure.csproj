@@ -21,9 +21,7 @@
 			Include="..\..\..\Common\Services\Common.Services.Environment\Common.Services.Environment.csproj" />
 		<ProjectReference
 			Include="..\BaseModules.FileProvider.Domain\BaseModules.FileProvider.Domain.csproj" />
-		<ProjectReference
-			Include="..\..\..\Common\Connectors\Common.Connectors.File\Common.Connectors.File.csproj" />
-		<ProjectReference
+				<ProjectReference
 			Include="..\..\..\Common\Contracts\Common.Contracts.Event\Common.Contracts.Event.csproj" />
 		<ProjectReference
 			Include="..\..\..\Common\Services\Common.Services.FileOperations\Common.Services.FileOperations.csproj" />
