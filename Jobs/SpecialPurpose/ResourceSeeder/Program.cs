@@ -22,8 +22,8 @@ class Program
         // 2) Endpoint Resource'ları
         await Seeder.SeedResources(args);
 
-        // 3) Şirket & Roller (UPsert)
-        await Seeder.SeedCompanyRoles(args);
+        // 3) Roller (UPsert)
+        await Seeder.SeedRoles(args);
 
         // 4) SystemAdmin'ler (Push notification için)
         await Seeder.SeedSystemAdmins(args);

@@ -13,11 +13,10 @@ public class DataAccess : IDataAccess
         _dbContext = dependencyProvider.GetInstance<DefinitionDbContext>();
     }
 
-    public async Task<Common.Definitions.Domain.Entities.MobilApplicationVersiyon> GetByPlatformAndCompany(string platform, Guid companyId)
+    public async Task<Common.Definitions.Domain.Entities.MobilApplicationVersiyon> GetByPlatform(string platform)
     {
         return await _dbContext.MobilApplicationVersiyons
             .Where(x => x.Platform.ToLower() == platform.ToLower()
-                     && x.CompanyId == companyId
                      && x.IsActive
                      && !x.IsDeleted)
             .FirstOrDefaultAsync();

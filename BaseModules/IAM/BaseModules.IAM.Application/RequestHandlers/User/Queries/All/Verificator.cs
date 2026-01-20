@@ -11,11 +11,8 @@ public class Verificator : IRequestVerificator
 
     public async Task VerificateActor(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
     {
-        var request = (RequestModel)payload;
-
         await _authorizationService
             .ForResource(typeof(Verificator).Namespace)
-            .VerifyTenant<Company>(request.CompanyId)
             .VerifyActor()
             .Assert();
     }

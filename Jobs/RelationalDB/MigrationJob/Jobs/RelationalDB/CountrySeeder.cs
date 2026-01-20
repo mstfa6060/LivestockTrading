@@ -95,18 +95,28 @@ public class CountrySeeder
             return;
         }
 
-        // IDENTITY_INSERT acik olmali cunku Id degerlerini manuel veriyoruz
-        await _db.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT [Countries] ON");
+        // ExecutionStrategy ile transaction kullan
+        var strategy = _db.Database.CreateExecutionStrategy();
+        await strategy.ExecuteAsync(async () =>
+        {
+            using var transaction = await _db.Database.BeginTransactionAsync();
+            try
+            {
+                await _db.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT [Countries] ON");
 
-        try
-        {
-            await _db.Set<Country>().AddRangeAsync(countries);
-            await _db.SaveChangesAsync();
-            Console.WriteLine($"  OK: {countries.Count} ulke eklendi.");
-        }
-        finally
-        {
-            await _db.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT [Countries] OFF");
-        }
+                await _db.Set<Country>().AddRangeAsync(countries);
+                await _db.SaveChangesAsync();
+
+                await _db.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT [Countries] OFF");
+
+                await transaction.CommitAsync();
+                Console.WriteLine($"  OK: {countries.Count} ulke eklendi.");
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        });
     }
 }

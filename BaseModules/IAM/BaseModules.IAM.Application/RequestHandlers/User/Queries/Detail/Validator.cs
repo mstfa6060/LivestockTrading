@@ -23,6 +23,5 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
 	public RequestModel_Validator()
 	{
 		RuleFor(x => x.UserId).NotEmpty();
-		RuleFor(x => x.CompanyId).NotEmpty();
 	}
 }

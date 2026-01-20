@@ -3,8 +3,6 @@ namespace BaseModules.Notification.Application.RequestHandlers.MobilApplicationV
 
 public class RequestModel : IRequestModel
 {
-    public Guid CompanyId { get; set; }
-
     public string Platform { get; set; }
 }
 

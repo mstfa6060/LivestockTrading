@@ -26,9 +26,6 @@ public class Seeder
         public static readonly Guid IamModuleId = Guid.Parse("BA8A94D0-5C54-4E57-9F15-34797E3171F4");
         public static readonly Guid FileProviderModuleId = Guid.Parse("72A51A33-9CE1-49CE-87FA-54863A57B977");
 
-        // Companies
-        public static readonly Guid LivestockTradingCompanyId = Guid.Parse("C9D8C846-10FC-466D-8F45-A4FA4E856ABD");
-
         // Roles - LivestockTrading
         public static readonly Guid LivestockTradingAdminRoleId = Guid.Parse("10000000-0000-0000-0000-000000000101");
         public static readonly Guid LivestockTradingUserRoleId = Guid.Parse("B3F8A7D1-4E2C-4A3E-8B5A-D3E7B9C5E2F1");
@@ -221,32 +218,15 @@ public class Seeder
     }
 
     // ------------------------------------------------------------------------
-    // Companies & Roles (Upsert)
+    // Roles (Upsert)
     // ------------------------------------------------------------------------
-    public static async Task SeedCompanyRoles(string[] args)
+    public static async Task SeedRoles(string[] args)
     {
         using var db = BuildRelationalDbContext(args);
 
-        // Companies (ensure)
-        var livestockTradingCompany = await db.AppCompanies.FirstOrDefaultAsync(c => c.Id == FixedIds.LivestockTradingCompanyId);
-        if (livestockTradingCompany == null)
-        {
-            livestockTradingCompany = new Company
-            {
-                Id = FixedIds.LivestockTradingCompanyId,
-                Name = "LivestockTrading",
-                IsDeleted = false,
-                CreatedAt = DateTime.UtcNow
-            };
-            db.AppCompanies.Add(livestockTradingCompany);
-            Console.WriteLine("LivestockTrading Company eklendi.");
-        }
-
-        await db.SaveChangesAsync();
-
         // LivestockTrading Roles
-        await UpsertRole(db, FixedIds.LivestockTradingAdminRoleId, "Admin", FixedIds.LivestockTradingCompanyId, true);
-        await UpsertRole(db, FixedIds.LivestockTradingUserRoleId, "User", FixedIds.LivestockTradingCompanyId, false);
+        await UpsertRole(db, FixedIds.LivestockTradingAdminRoleId, "Admin", true);
+        await UpsertRole(db, FixedIds.LivestockTradingUserRoleId, "User", false);
 
         await db.SaveChangesAsync();
     }
@@ -254,7 +234,7 @@ public class Seeder
     /// <summary>
     /// Rol upsert helper metodu
     /// </summary>
-    private static async Task UpsertRole(DefinitionDbContext db, Guid roleId, string roleName, Guid companyId, bool isSystemRole)
+    private static async Task UpsertRole(DefinitionDbContext db, Guid roleId, string roleName, bool isSystemRole)
     {
         var existingRole = await db.AppRoles.FirstOrDefaultAsync(r => r.Id == roleId);
         if (existingRole == null)
@@ -263,7 +243,6 @@ public class Seeder
             {
                 Id = roleId,
                 Name = roleName,
-                CompanyId = companyId,
                 IsSystemRole = isSystemRole,
                 IsDeleted = false,
                 CreatedAt = DateTime.UtcNow
@@ -274,7 +253,6 @@ public class Seeder
         {
             var dirty = false;
             if (existingRole.Name != roleName) { existingRole.Name = roleName; dirty = true; }
-            if (existingRole.CompanyId != companyId) { existingRole.CompanyId = companyId; dirty = true; }
             if (existingRole.IsDeleted) { existingRole.IsDeleted = false; dirty = true; }
             if (existingRole.IsSystemRole != isSystemRole) { existingRole.IsSystemRole = isSystemRole; dirty = true; }
             if (dirty) Console.WriteLine($"↻ {roleName} rolü güncellendi.");

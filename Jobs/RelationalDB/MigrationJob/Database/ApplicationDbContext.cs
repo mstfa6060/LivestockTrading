@@ -9,7 +9,6 @@ namespace Jobs.RelationalDB.MigrationJob;
 
 public class ApplicationDbContext : DbContext, IDefinitionDbContext
 {
-    public DbSet<Company> AppCompanies { get; set; }
     public DbSet<User> AppUsers { get; set; }
     public DbSet<Role> AppRoles { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
@@ -62,9 +61,9 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext
             .Property(x => x.Longitude)
             .HasColumnType("float");
 
-        //  UserId + CompanyId kombinasyonu benzersiz olmalı
+        //  UserId benzersiz olmalı
         modelBuilder.Entity<UserLocation>()
-            .HasIndex(x => new { x.UserId, x.CompanyId })
+            .HasIndex(x => x.UserId)
             .IsUnique();
 
         // ═══════════════════════════════════════════════════════════════

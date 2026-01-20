@@ -21,9 +21,8 @@ public class Handler : IRequestHandler
     {
         var request = (RequestModel)payload;
         var platform = request.Platform?.ToLower() ?? "android";
-        var companyId = request.CompanyId;
 
-        var appVersion = await _dataAccess.GetByPlatformAndCompany(platform, companyId);
+        var appVersion = await _dataAccess.GetByPlatform(platform);
 
         if (appVersion == null)
         {

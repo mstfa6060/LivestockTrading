@@ -7,7 +7,7 @@ namespace Common.Definitions.Domain.Entities;
 /// Mobil uygulama versiyon bilgilerini tutar
 /// </summary>
 [Table("MobilApplicationVersiyon")]
-public class MobilApplicationVersiyon : BaseEntity, ITenantEntity
+public class MobilApplicationVersiyon : BaseEntity
 {
     /// <summary>
     /// Platform: "ios" veya "android"
