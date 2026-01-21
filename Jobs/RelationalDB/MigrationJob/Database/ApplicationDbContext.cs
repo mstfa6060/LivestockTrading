@@ -207,6 +207,22 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext, ILivestockT
             entity.HasIndex(e => e.Category);
         });
 
+        // ═══════════════════════════════════════════════════════════════
+        // ORDER - LOCATION İLİŞKİLERİ (Birden fazla FK aynı tabloya)
+        // ═══════════════════════════════════════════════════════════════
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.HasOne(o => o.ShippingAddress)
+                .WithMany(l => l.OrderShippingAddresses)
+                .HasForeignKey(o => o.ShippingAddressId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(o => o.BillingAddress)
+                .WithMany(l => l.OrderBillingAddresses)
+                .HasForeignKey(o => o.BillingAddressId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
         foreach (var foreignKey in modelBuilder.Model.GetEntityTypes()
             .SelectMany(e => e.GetForeignKeys()))
         {
