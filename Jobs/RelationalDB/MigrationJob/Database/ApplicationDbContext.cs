@@ -199,6 +199,24 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext, ILivestockT
             entity.HasIndex(e => e.Category);
         });
 
+        // ═══════════════════════════════════════════════════════════════
+        // USER - COUNTRY İLİŞKİLERİ (Birden fazla FK aynı tabloya)
+        // ═══════════════════════════════════════════════════════════════
+        modelBuilder.Entity<User>(entity =>
+        {
+            // Ana ülke ilişkisi (Country.Users ile eşleşir)
+            entity.HasOne(u => u.Country)
+                .WithMany(c => c.Users)
+                .HasForeignKey(u => u.CountryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Son görüntülenen ülke ilişkisi (tek yönlü, collection yok)
+            entity.HasOne(u => u.LastViewingCountry)
+                .WithMany()
+                .HasForeignKey(u => u.LastViewingCountryId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
         foreach (var foreignKey in modelBuilder.Model.GetEntityTypes()
             .SelectMany(e => e.GetForeignKeys()))
         {
