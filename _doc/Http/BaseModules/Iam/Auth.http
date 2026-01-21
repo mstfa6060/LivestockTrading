@@ -7,9 +7,26 @@
 
 
 ###############################################################################
-# LOGIN - Email/Password (Native)
+# 1. KAYIT OL (Register)
 ###############################################################################
-### Login with Email and Password
+### Yeni Kullanici Olustur
+POST {{BaseUrl}}/Users/Create
+Accept: application/json
+Content-Type: application/json
+
+{
+    "userName": "test@example.com",
+    "firstName": "Ahmet",
+    "surname": "Yilmaz",
+    "email": "test@example.com",
+    "password": "Test123!"
+}
+
+
+###############################################################################
+# 2. GIRIS YAP (Login)
+###############################################################################
+### Email ve Sifre ile Giris
 POST {{BaseUrl}}/Auth/Login
 Accept: application/json
 Content-Type: application/json
@@ -19,180 +36,4 @@ Content-Type: application/json
     "userName": "test@example.com",
     "password": "Test123!",
     "platform": 0
-}
-
-
-###############################################################################
-# LOGIN - Google OAuth
-###############################################################################
-### Login with Google
-POST {{BaseUrl}}/Auth/Login
-Accept: application/json
-Content-Type: application/json
-
-{
-    "provider": "google",
-    "token": "GOOGLE_ID_TOKEN_HERE",
-    "platform": 1,
-    "firstName": "John",
-    "surname": "Doe",
-    "phoneNumber": "+905551234567",
-    "birthDate": "1990-01-15",
-    "externalProviderUserId": "google_sub_id_here"
-}
-
-
-###############################################################################
-# LOGIN - Apple OAuth
-###############################################################################
-### Login with Apple
-POST {{BaseUrl}}/Auth/Login
-Accept: application/json
-Content-Type: application/json
-
-{
-    "provider": "itunes",
-    "token": "APPLE_ID_TOKEN_HERE",
-    "platform": 2,
-    "firstName": "Jane",
-    "surname": "Doe",
-    "externalProviderUserId": "apple_sub_id_here"
-}
-
-
-###############################################################################
-# OTP (SMS) Authentication
-###############################################################################
-### Send OTP to Phone Number
-POST {{BaseUrl}}/Auth/SendOtp
-Accept: application/json
-Content-Type: application/json
-
-{
-    "phoneNumber": "+905551234567"
-}
-
-
-### Verify OTP Code
-POST {{BaseUrl}}/Auth/VerifyOtp
-Accept: application/json
-Content-Type: application/json
-
-{
-    "phoneNumber": "+905551234567",
-    "otpCode": "123456"
-}
-
-
-###############################################################################
-# TOKEN MANAGEMENT
-###############################################################################
-@Jwt = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.YOUR_TOKEN_HERE
-
-### Refresh Token
-POST {{BaseUrl}}/Auth/RefreshToken
-Accept: application/json
-Content-Type: application/json
-
-{
-    "refreshToken": "your-refresh-token-here"
-}
-
-
-### Revoke Refresh Token
-POST {{BaseUrl}}/Auth/RevokeRefreshToken
-Authorization: Bearer {{Jwt}}
-Accept: application/json
-Content-Type: application/json
-
-{
-    "refreshToken": "your-refresh-token-here"
-}
-
-
-### Logout
-POST {{BaseUrl}}/Auth/Logout
-Authorization: Bearer {{Jwt}}
-Accept: application/json
-Content-Type: application/json
-
-{
-}
-
-
-###############################################################################
-# USER REGISTRATION
-###############################################################################
-### Create New User (Manual Registration)
-POST {{BaseUrl}}/Users/Create
-Accept: application/json
-Content-Type: application/json
-
-{
-    "userName": "newuser@example.com",
-    "firstName": "Ahmet",
-    "surname": "Yilmaz",
-    "email": "newuser@example.com",
-    "password": "SecurePassword123!",
-    "userSource": 0,
-    "description": "Test user",
-    "phoneNumber": "+905551234567",
-    "countryId": 792,
-    "language": "tr-TR",
-    "preferredCurrencyCode": "TRY"
-}
-
-
-### Create User with Google
-POST {{BaseUrl}}/Users/Create
-Accept: application/json
-Content-Type: application/json
-
-{
-    "userName": "googleuser@gmail.com",
-    "firstName": "Google",
-    "surname": "User",
-    "email": "googleuser@gmail.com",
-    "providerId": "google_sub_id_here",
-    "userSource": 1,
-    "phoneNumber": "+905551234567",
-    "countryId": 792,
-    "language": "tr-TR",
-    "preferredCurrencyCode": "TRY"
-}
-
-
-###############################################################################
-# PASSWORD MANAGEMENT
-###############################################################################
-### Forgot Password (Send Reset Email)
-POST {{BaseUrl}}/Users/ForgotPassword
-Accept: application/json
-Content-Type: application/json
-
-{
-    "email": "test@example.com"
-}
-
-
-### Reset Password (With Token)
-POST {{BaseUrl}}/Users/ResetPassword
-Accept: application/json
-Content-Type: application/json
-
-{
-    "token": "reset-token-from-email",
-    "newPassword": "NewSecurePassword123!"
-}
-
-
-### Update Password (Authenticated)
-POST {{BaseUrl}}/Users/UpdatePassword
-Authorization: Bearer {{Jwt}}
-Accept: application/json
-Content-Type: application/json
-
-{
-    "currentPassword": "OldPassword123!",
-    "newPassword": "NewPassword123!"
 }
