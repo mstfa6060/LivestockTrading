@@ -20,7 +20,7 @@ Content-Type: application/json
     "surname": "Yilmaz",
     "email": "test@example.com",
     "password": "Test123!",
-    "countryId": 792
+    "countryId": 180
 }
 
 
