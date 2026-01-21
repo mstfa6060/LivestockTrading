@@ -68,6 +68,26 @@ public class User : BaseEntity
     [ForeignKey("CountryId")]
     public Country Country { get; set; }
 
+    /// <summary>
+    /// Kullanıcının tercih ettiği para birimi kodu (ISO 4217)
+    /// Null ise Country'nin default currency'si kullanılır
+    /// Örn: "TRY", "USD", "EUR"
+    /// </summary>
+    [MaxLength(3)]
+    public string PreferredCurrencyCode { get; set; }
+
+    /// <summary>
+    /// Kullanıcının son görüntülediği ülke ID'si
+    /// Null ise kendi ülkesi (CountryId) kullanılır
+    /// </summary>
+    public int? LastViewingCountryId { get; set; }
+
+    /// <summary>
+    /// Navigation property - Son görüntülenen ülke
+    /// </summary>
+    [ForeignKey("LastViewingCountryId")]
+    public Country LastViewingCountry { get; set; }
+
 }
 
 public enum UserSources
