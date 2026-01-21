@@ -130,7 +130,6 @@ public class Product : BaseEntity
         Reviews = new HashSet<ProductReview>();
         Variants = new HashSet<ProductVariant>();
         Favorites = new HashSet<FavoriteProduct>();
-        Currency = "USD";
         Status = ProductStatus.Draft;
         Condition = ProductCondition.New;
         IsInStock = true;
