@@ -44,6 +44,16 @@ public static class LivestockTradingModelBuilder
                 .WithMany(e => e.Products)
                 .HasForeignKey(e => e.SellerId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Brand)
+                .WithMany(e => e.Products)
+                .HasForeignKey(e => e.BrandId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Location)
+                .WithMany(e => e.Products)
+                .HasForeignKey(e => e.LocationId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         // ========================================
@@ -77,6 +87,25 @@ public static class LivestockTradingModelBuilder
         });
 
         // ========================================
+        // FARM
+        // ========================================
+        modelBuilder.Entity<Farm>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(300);
+
+            entity.HasOne(e => e.Seller)
+                .WithMany(e => e.Farms)
+                .HasForeignKey(e => e.SellerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Location)
+                .WithMany(e => e.Farms)
+                .HasForeignKey(e => e.LocationId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ========================================
         // ORDER
         // ========================================
         modelBuilder.Entity<Order>(entity =>
@@ -86,6 +115,11 @@ public static class LivestockTradingModelBuilder
             entity.HasIndex(e => e.OrderNumber).IsUnique();
             entity.Property(e => e.SubTotal).HasPrecision(18, 2);
             entity.Property(e => e.TotalAmount).HasPrecision(18, 2);
+
+            entity.HasOne(e => e.Seller)
+                .WithMany(e => e.Orders)
+                .HasForeignKey(e => e.SellerId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasOne(e => e.ShippingAddress)
                 .WithMany(e => e.OrderShippingAddresses)
@@ -99,6 +133,60 @@ public static class LivestockTradingModelBuilder
         });
 
         // ========================================
+        // ORDER ITEM
+        // ========================================
+        modelBuilder.Entity<OrderItem>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UnitPrice).HasPrecision(18, 2);
+            entity.Property(e => e.TotalPrice).HasPrecision(18, 2);
+            entity.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            entity.Property(e => e.TaxRate).HasPrecision(5, 2);
+
+            entity.HasOne(e => e.Order)
+                .WithMany(e => e.Items)
+                .HasForeignKey(e => e.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Product)
+                .WithMany(e => e.OrderItems)
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.ProductVariant)
+                .WithMany(e => e.OrderItems)
+                .HasForeignKey(e => e.ProductVariantId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ========================================
+        // ORDER STATUS HISTORY
+        // ========================================
+        modelBuilder.Entity<OrderStatusHistory>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.HasOne(e => e.Order)
+                .WithMany(e => e.StatusHistory)
+                .HasForeignKey(e => e.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ========================================
+        // ORDER PAYMENT
+        // ========================================
+        modelBuilder.Entity<OrderPayment>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Amount).HasPrecision(18, 2);
+
+            entity.HasOne(e => e.Order)
+                .WithMany(e => e.Payments)
+                .HasForeignKey(e => e.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ========================================
         // CART
         // ========================================
         modelBuilder.Entity<Cart>(entity =>
@@ -106,6 +194,33 @@ public static class LivestockTradingModelBuilder
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.SessionId);
+            entity.Property(e => e.SubTotal).HasPrecision(18, 2);
+            entity.Property(e => e.TotalAmount).HasPrecision(18, 2);
+        });
+
+        // ========================================
+        // CART ITEM
+        // ========================================
+        modelBuilder.Entity<CartItem>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UnitPrice).HasPrecision(18, 2);
+            entity.Property(e => e.TotalPrice).HasPrecision(18, 2);
+
+            entity.HasOne(e => e.Cart)
+                .WithMany(e => e.Items)
+                .HasForeignKey(e => e.CartId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Product)
+                .WithMany(e => e.CartItems)
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.ProductVariant)
+                .WithMany(e => e.CartItems)
+                .HasForeignKey(e => e.ProductVariantId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         // ========================================
@@ -127,6 +242,104 @@ public static class LivestockTradingModelBuilder
                 .WithMany(e => e.Videos)
                 .HasForeignKey(e => e.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<ProductDocument>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasOne(e => e.Product)
+                .WithMany(e => e.Documents)
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ========================================
+        // PRODUCT VARIANT
+        // ========================================
+        modelBuilder.Entity<ProductVariant>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Price).HasPrecision(18, 2);
+            entity.Property(e => e.DiscountedPrice).HasPrecision(18, 2);
+
+            entity.HasOne(e => e.Product)
+                .WithMany(e => e.Variants)
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ========================================
+        // PRODUCT REVIEW
+        // ========================================
+        modelBuilder.Entity<ProductReview>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.UserId);
+
+            entity.HasOne(e => e.Product)
+                .WithMany(e => e.Reviews)
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ========================================
+        // SELLER REVIEW
+        // ========================================
+        modelBuilder.Entity<SellerReview>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.UserId);
+
+            entity.HasOne(e => e.Seller)
+                .WithMany(e => e.Reviews)
+                .HasForeignKey(e => e.SellerId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ========================================
+        // FAVORITE PRODUCT
+        // ========================================
+        modelBuilder.Entity<FavoriteProduct>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.UserId);
+
+            entity.HasOne(e => e.Product)
+                .WithMany(e => e.Favorites)
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ========================================
+        // PRODUCT VIEW HISTORY
+        // ========================================
+        modelBuilder.Entity<ProductViewHistory>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.UserId);
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ========================================
+        // NOTIFICATION
+        // ========================================
+        modelBuilder.Entity<Notification>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.UserId);
+        });
+
+        // ========================================
+        // SEARCH HISTORY
+        // ========================================
+        modelBuilder.Entity<SearchHistory>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.UserId);
         });
 
         // ========================================
@@ -215,6 +428,385 @@ public static class LivestockTradingModelBuilder
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Code).IsRequired().HasMaxLength(3);
             entity.HasIndex(e => e.Code).IsUnique();
+        });
+
+        // ========================================
+        // SHIPPING CARRIER
+        // ========================================
+        modelBuilder.Entity<ShippingCarrier>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Code).HasMaxLength(50);
+            entity.HasIndex(e => e.Code);
+        });
+
+        // ========================================
+        // PAYMENT METHOD
+        // ========================================
+        modelBuilder.Entity<PaymentMethod>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Code).IsRequired().HasMaxLength(50);
+            entity.HasIndex(e => e.Code).IsUnique();
+            entity.Property(e => e.TransactionFeePercentage).HasPrecision(5, 2);
+            entity.Property(e => e.FixedTransactionFee).HasPrecision(18, 2);
+        });
+
+        // ========================================
+        // FAQ
+        // ========================================
+        modelBuilder.Entity<FAQ>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.HasOne(e => e.Category)
+                .WithMany()
+                .HasForeignKey(e => e.CategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ========================================
+        // BANNER
+        // ========================================
+        modelBuilder.Entity<Banner>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Title).HasMaxLength(200);
+        });
+
+        // ========================================
+        // DEAL (Alıcı-Satıcı Anlaşması)
+        // ========================================
+        modelBuilder.Entity<Deal>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.DealNumber).IsRequired().HasMaxLength(50);
+            entity.HasIndex(e => e.DealNumber).IsUnique();
+            entity.Property(e => e.AgreedPrice).HasPrecision(18, 2);
+            entity.Property(e => e.Currency).HasMaxLength(3);
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Seller)
+                .WithMany()
+                .HasForeignKey(e => e.SellerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.TransportRequest)
+                .WithMany()
+                .HasForeignKey(e => e.TransportRequestId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.BuyerId);
+            entity.HasIndex(e => e.Status);
+        });
+
+        // ========================================
+        // TRANSPORTER (Nakliyeci)
+        // ========================================
+        modelBuilder.Entity<Transporter>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.CompanyName).IsRequired().HasMaxLength(300);
+            entity.Property(e => e.Email).HasMaxLength(200);
+            entity.Property(e => e.Phone).HasMaxLength(20);
+            entity.Property(e => e.CountryCode).HasMaxLength(3);
+            entity.Property(e => e.AverageRating).HasPrecision(3, 2);
+
+            entity.HasIndex(e => e.UserId).IsUnique();
+            entity.HasIndex(e => e.IsVerified);
+            entity.HasIndex(e => e.IsActive);
+        });
+
+        // ========================================
+        // TRANSPORTER REVIEW
+        // ========================================
+        modelBuilder.Entity<TransporterReview>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.HasOne(e => e.Transporter)
+                .WithMany(e => e.Reviews)
+                .HasForeignKey(e => e.TransporterId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.TransportRequest)
+                .WithMany()
+                .HasForeignKey(e => e.TransportRequestId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.UserId);
+        });
+
+        // ========================================
+        // TRANSPORT REQUEST (Nakliye Talebi)
+        // ========================================
+        modelBuilder.Entity<TransportRequest>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.AgreedPrice).HasPrecision(18, 2);
+            entity.Property(e => e.Currency).HasMaxLength(3);
+            entity.Property(e => e.EstimatedDistanceKm).HasPrecision(10, 2);
+            entity.Property(e => e.WeightKg).HasPrecision(10, 2);
+            entity.Property(e => e.VolumeCubicMeters).HasPrecision(10, 3);
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Seller)
+                .WithMany()
+                .HasForeignKey(e => e.SellerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.PickupLocation)
+                .WithMany()
+                .HasForeignKey(e => e.PickupLocationId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.DeliveryLocation)
+                .WithMany()
+                .HasForeignKey(e => e.DeliveryLocationId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.AssignedTransporter)
+                .WithMany(e => e.AssignedTransports)
+                .HasForeignKey(e => e.AssignedTransporterId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.BuyerId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.IsInPool);
+        });
+
+        // ========================================
+        // TRANSPORT OFFER (Nakliyeci Teklifi)
+        // ========================================
+        modelBuilder.Entity<TransportOffer>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.OfferedPrice).HasPrecision(18, 2);
+            entity.Property(e => e.Currency).HasMaxLength(3);
+            entity.Property(e => e.InsuranceAmount).HasPrecision(18, 2);
+
+            entity.HasOne(e => e.TransportRequest)
+                .WithMany(e => e.TransportOffers)
+                .HasForeignKey(e => e.TransportRequestId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Transporter)
+                .WithMany(e => e.TransportOffers)
+                .HasForeignKey(e => e.TransporterId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.Status);
+        });
+
+        // ========================================
+        // TRANSPORT TRACKING (Nakliye Takip)
+        // ========================================
+        modelBuilder.Entity<TransportTracking>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Latitude).HasPrecision(10, 7);
+            entity.Property(e => e.Longitude).HasPrecision(10, 7);
+
+            entity.HasOne(e => e.TransportRequest)
+                .WithMany(e => e.TrackingHistory)
+                .HasForeignKey(e => e.TransportRequestId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.RecordedAt);
+        });
+
+        // ========================================
+        // ANIMAL INFO
+        // ========================================
+        modelBuilder.Entity<AnimalInfo>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.WeightKg).HasPrecision(10, 2);
+            entity.Property(e => e.HeightCm).HasPrecision(10, 2);
+            entity.Property(e => e.DailyMilkProductionLiters).HasPrecision(10, 2);
+            entity.Property(e => e.AverageDailyEggProduction).HasPrecision(10, 2);
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ========================================
+        // HEALTH RECORD
+        // ========================================
+        modelBuilder.Entity<HealthRecord>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.HasOne(e => e.AnimalInfo)
+                .WithMany(e => e.HealthRecords)
+                .HasForeignKey(e => e.AnimalInfoId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ========================================
+        // VACCINATION
+        // ========================================
+        modelBuilder.Entity<Vaccination>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.HasOne(e => e.AnimalInfo)
+                .WithMany(e => e.Vaccinations)
+                .HasForeignKey(e => e.AnimalInfoId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ========================================
+        // CHEMICAL INFO
+        // ========================================
+        modelBuilder.Entity<ChemicalInfo>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ========================================
+        // MACHINERY INFO
+        // ========================================
+        modelBuilder.Entity<MachineryInfo>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.PowerHp).HasPrecision(10, 2);
+            entity.Property(e => e.PowerKw).HasPrecision(10, 2);
+            entity.Property(e => e.LengthCm).HasPrecision(10, 2);
+            entity.Property(e => e.WidthCm).HasPrecision(10, 2);
+            entity.Property(e => e.HeightCm).HasPrecision(10, 2);
+            entity.Property(e => e.WeightKg).HasPrecision(10, 2);
+            entity.Property(e => e.WorkingWidthCm).HasPrecision(10, 2);
+            entity.Property(e => e.CapacityLiters).HasPrecision(10, 2);
+            entity.Property(e => e.LoadCapacityKg).HasPrecision(10, 2);
+            entity.Property(e => e.SpeedKmh).HasPrecision(10, 2);
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ========================================
+        // SEED INFO
+        // ========================================
+        modelBuilder.Entity<SeedInfo>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.GerminationRate).HasPrecision(5, 2);
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ========================================
+        // FEED INFO
+        // ========================================
+        modelBuilder.Entity<FeedInfo>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.ProteinPercentage).HasPrecision(5, 2);
+            entity.Property(e => e.FatPercentage).HasPrecision(5, 2);
+            entity.Property(e => e.FiberPercentage).HasPrecision(5, 2);
+            entity.Property(e => e.MoisturePercentage).HasPrecision(5, 2);
+            entity.Property(e => e.AshPercentage).HasPrecision(5, 2);
+            entity.Property(e => e.CalciumPercentage).HasPrecision(5, 2);
+            entity.Property(e => e.PhosphorusPercentage).HasPrecision(5, 2);
+            entity.Property(e => e.EnergyKcalPerKg).HasPrecision(10, 2);
+            entity.Property(e => e.MetabolizableEnergyMJPerKg).HasPrecision(10, 2);
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ========================================
+        // VETERINARY INFO
+        // ========================================
+        modelBuilder.Entity<VeterinaryInfo>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ========================================
+        // CONVERSATION
+        // ========================================
+        modelBuilder.Entity<Conversation>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.ParticipantUserId1);
+            entity.HasIndex(e => e.ParticipantUserId2);
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ========================================
+        // MESSAGE
+        // ========================================
+        modelBuilder.Entity<Message>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.SenderUserId);
+            entity.HasIndex(e => e.RecipientUserId);
+
+            entity.HasOne(e => e.Conversation)
+                .WithMany(e => e.Messages)
+                .HasForeignKey(e => e.ConversationId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ========================================
+        // OFFER
+        // ========================================
+        modelBuilder.Entity<Offer>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.OfferedPrice).HasPrecision(18, 2);
+            entity.HasIndex(e => e.BuyerUserId);
+            entity.HasIndex(e => e.SellerUserId);
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.CounterOfferTo)
+                .WithMany()
+                .HasForeignKey(e => e.CounterOfferToId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

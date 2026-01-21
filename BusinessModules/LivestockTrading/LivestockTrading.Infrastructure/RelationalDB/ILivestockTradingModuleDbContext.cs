@@ -63,5 +63,13 @@ public interface ILivestockTradingModuleDbContext
     DbSet<ShippingZone> ShippingZones { get; set; }
     DbSet<ShippingRate> ShippingRates { get; set; }
 
+    // Deals & Transport
+    DbSet<Deal> Deals { get; set; }
+    DbSet<Transporter> Transporters { get; set; }
+    DbSet<TransporterReview> TransporterReviews { get; set; }
+    DbSet<TransportRequest> TransportRequests { get; set; }
+    DbSet<TransportOffer> TransportOffers { get; set; }
+    DbSet<TransportTracking> TransportTrackings { get; set; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

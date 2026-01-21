@@ -36,6 +36,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common\Definitions\Common.Definitions.Infrastructure\Common.Definitions.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\BaseModules\IAM\BaseModules.IAM.Infrastructure\BaseModules.IAM.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\BusinessModules\LivestockTrading\LivestockTrading.Infrastructure\LivestockTrading.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

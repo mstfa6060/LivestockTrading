@@ -2,12 +2,14 @@ using BaseModules.IAM.Domain.Entities;
 using BaseModules.IAM.Infrastructure.RelationalDB;
 using Common.Definitions.Domain.Entities;
 using Common.Definitions.Infrastructure.RelationalDB;
+using LivestockTrading.Domain.Entities;
+using LivestockTrading.Infrastructure.RelationalDB;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 
 namespace Jobs.RelationalDB.MigrationJob;
 
-public class ApplicationDbContext : DbContext, IDefinitionDbContext
+public class ApplicationDbContext : DbContext, IDefinitionDbContext, ILivestockTradingModuleDbContext
 {
     public DbSet<User> AppUsers { get; set; }
     public DbSet<Role> AppRoles { get; set; }
@@ -34,7 +36,7 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext
     public DbSet<Province> Provinces { get; set; }
     public DbSet<District> Districts { get; set; }
     public DbSet<Neighborhood> Neighborhoods { get; set; }
-    public DbSet<Country> Countries { get; set; }
+    public DbSet<Common.Definitions.Domain.Entities.Country> Countries { get; set; }
     /// <summary>
     /// IAM
     /// </summary>
@@ -43,6 +45,76 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext
 
     // Platform Settings
     public DbSet<PlatformSetting> PlatformSettings { get; set; }
+
+    // ═══════════════════════════════════════════════════════════════
+    // LIVESTOCK TRADING MODULE (ILivestockTradingModuleDbContext)
+    // ═══════════════════════════════════════════════════════════════
+
+    // Categories & Products
+    public DbSet<Category> Categories { get; set; }
+    public DbSet<Product> Products { get; set; }
+    public DbSet<Brand> Brands { get; set; }
+    public DbSet<ProductImage> ProductImages { get; set; }
+    public DbSet<ProductVideo> ProductVideos { get; set; }
+    public DbSet<ProductDocument> ProductDocuments { get; set; }
+    public DbSet<ProductVariant> ProductVariants { get; set; }
+    public DbSet<ProductPrice> ProductPrices { get; set; }
+
+    // Location & Sellers
+    public DbSet<LivestockTrading.Domain.Entities.Location> Locations { get; set; }
+    public DbSet<Seller> Sellers { get; set; }
+    public DbSet<Farm> Farms { get; set; }
+
+    // Orders & Cart
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderItem> OrderItems { get; set; }
+    public DbSet<OrderStatusHistory> OrderStatusHistories { get; set; }
+    public DbSet<OrderPayment> OrderPayments { get; set; }
+    public DbSet<Cart> Carts { get; set; }
+    public DbSet<CartItem> CartItems { get; set; }
+
+    // Reviews & User Related
+    public DbSet<ProductReview> ProductReviews { get; set; }
+    public DbSet<SellerReview> SellerReviews { get; set; }
+    public DbSet<FavoriteProduct> FavoriteProducts { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
+    public DbSet<SearchHistory> SearchHistories { get; set; }
+    public DbSet<ProductViewHistory> ProductViewHistories { get; set; }
+    public DbSet<UserPreferences> UserPreferences { get; set; }
+
+    // Product Specific Info
+    public DbSet<AnimalInfo> AnimalInfos { get; set; }
+    public DbSet<HealthRecord> HealthRecords { get; set; }
+    public DbSet<Vaccination> Vaccinations { get; set; }
+    public DbSet<ChemicalInfo> ChemicalInfos { get; set; }
+    public DbSet<MachineryInfo> MachineryInfos { get; set; }
+    public DbSet<SeedInfo> SeedInfos { get; set; }
+    public DbSet<FeedInfo> FeedInfos { get; set; }
+    public DbSet<VeterinaryInfo> VeterinaryInfos { get; set; }
+
+    // Messaging
+    public DbSet<Conversation> Conversations { get; set; }
+    public DbSet<Message> Messages { get; set; }
+    public DbSet<Offer> Offers { get; set; }
+
+    // Helpers & Configuration
+    public DbSet<Currency> Currencies { get; set; }
+    public DbSet<PaymentMethod> PaymentMethods { get; set; }
+    public DbSet<ShippingCarrier> ShippingCarriers { get; set; }
+    public DbSet<FAQ> FAQs { get; set; }
+    public DbSet<Banner> Banners { get; set; }
+    public DbSet<Language> Languages { get; set; }
+    public DbSet<TaxRate> TaxRates { get; set; }
+    public DbSet<ShippingZone> ShippingZones { get; set; }
+    public DbSet<ShippingRate> ShippingRates { get; set; }
+
+    // Deals & Transport
+    public DbSet<Deal> Deals { get; set; }
+    public DbSet<Transporter> Transporters { get; set; }
+    public DbSet<TransporterReview> TransporterReviews { get; set; }
+    public DbSet<TransportRequest> TransportRequests { get; set; }
+    public DbSet<TransportOffer> TransportOffers { get; set; }
+    public DbSet<TransportTracking> TransportTrackings { get; set; }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     { }

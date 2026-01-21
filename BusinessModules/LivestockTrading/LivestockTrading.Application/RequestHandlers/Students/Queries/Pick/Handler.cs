@@ -1,27 +1,27 @@
-namespace LivestockTrading.Application.RequestHandlers.Students.Queries.Pick;
+// namespace LivestockTrading.Application.RequestHandlers.Students.Queries.Pick;
 
-public class Handler : IRequestHandler
-{
-    private readonly DataAccess _dataAccessLayer;
+// public class Handler : IRequestHandler
+// {
+//     private readonly DataAccess _dataAccessLayer;
 
-    public Handler(ArfBlocksDependencyProvider dependencyProvider, object dataAccess)
-    {
-        _dataAccessLayer = (DataAccess)dataAccess;
-    }
+//     public Handler(ArfBlocksDependencyProvider dependencyProvider, object dataAccess)
+//     {
+//         _dataAccessLayer = (DataAccess)dataAccess;
+//     }
 
-    public async Task<ArfBlocksRequestResult> Handle(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
-    {
-        var mapper = new Mapper();
-        var req = (RequestModel)payload;
+//     public async Task<ArfBlocksRequestResult> Handle(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
+//     {
+//         var mapper = new Mapper();
+//         var req = (RequestModel)payload;
 
-        var students = await _dataAccessLayer.Pick(
-            req.SelectedIds,
-            req.Keyword,
-            req.Limit,
-            cancellationToken);
+//         var students = await _dataAccessLayer.Pick(
+//             req.SelectedIds,
+//             req.Keyword,
+//             req.Limit,
+//             cancellationToken);
 
-        var response = mapper.MapToResponse(students);
+//         var response = mapper.MapToResponse(students);
 
-        return ArfBlocksResults.Success(response);
-    }
-}
+//         return ArfBlocksResults.Success(response);
+//     }
+// }

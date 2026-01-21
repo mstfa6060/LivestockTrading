@@ -77,6 +77,14 @@ public class LivestockTradingModuleDbContext : DefinitionDbContext, ILivestockTr
     public DbSet<ShippingZone> ShippingZones { get; set; }
     public DbSet<ShippingRate> ShippingRates { get; set; }
 
+    // Deals & Transport
+    public DbSet<Deal> Deals { get; set; }
+    public DbSet<Transporter> Transporters { get; set; }
+    public DbSet<TransporterReview> TransporterReviews { get; set; }
+    public DbSet<TransportRequest> TransportRequests { get; set; }
+    public DbSet<TransportOffer> TransportOffers { get; set; }
+    public DbSet<TransportTracking> TransportTrackings { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
