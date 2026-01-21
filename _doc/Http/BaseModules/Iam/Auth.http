@@ -1,66 +1,198 @@
+###############################################################################
+# AUTH ENDPOINTS - IAM Module
+# livestock-trading.com
+###############################################################################
 
- @Url= http://localhost:5000
-#  @Url=http://3.88.252.189:5000
-# @Url= https://api-test.toprak.tkholding.com.tr/koopposbackoffice
-
-  @Jwt =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJkOTJlMDJkYS02MDZiLTRmYzQtYTNhNC1kYmNiZTJlMDRhZjIiLCJnaXZlbl9uYW1lIjoibW9jYWsiLCJ1bmlxdWVfbmFtZSI6Ik11c3RhZmEgT2NhayIsInRlbmFudElkIjoiYzlkOGM4NDYtMTBmYy00NjZkLThmNDUtYTRmYTRlODU2YWJkIiwicGxhdGZvcm0iOiIwIiwidXNlclNvdXJjZSI6IjAiLCJuYmYiOjE3NDczNDEzNDIsImV4cCI6MTc0Nzk0NjE0MiwiaWF0IjoxNzQ3MzQxMzQyLCJhdWQiOiJhcGkuaGlyb3ZvLmNvbSJ9.x2NG1XRMMNmsqCTZXpBCMe-rVJrxALX8PqQ8piru-0Q"
+@BaseUrl = http://localhost:5000
 
 
-### Create
-POST {{Url}}/Roles/Create
+###############################################################################
+# LOGIN - Email/Password (Native)
+###############################################################################
+### Login with Email and Password
+POST {{BaseUrl}}/Auth/Login
+Accept: application/json
+Content-Type: application/json
+
+{
+    "provider": "native",
+    "userName": "test@example.com",
+    "password": "Test123!",
+    "platform": 0
+}
+
+
+###############################################################################
+# LOGIN - Google OAuth
+###############################################################################
+### Login with Google
+POST {{BaseUrl}}/Auth/Login
+Accept: application/json
+Content-Type: application/json
+
+{
+    "provider": "google",
+    "token": "GOOGLE_ID_TOKEN_HERE",
+    "platform": 1,
+    "firstName": "John",
+    "surname": "Doe",
+    "phoneNumber": "+905551234567",
+    "birthDate": "1990-01-15",
+    "externalProviderUserId": "google_sub_id_here"
+}
+
+
+###############################################################################
+# LOGIN - Apple OAuth
+###############################################################################
+### Login with Apple
+POST {{BaseUrl}}/Auth/Login
+Accept: application/json
+Content-Type: application/json
+
+{
+    "provider": "itunes",
+    "token": "APPLE_ID_TOKEN_HERE",
+    "platform": 2,
+    "firstName": "Jane",
+    "surname": "Doe",
+    "externalProviderUserId": "apple_sub_id_here"
+}
+
+
+###############################################################################
+# OTP (SMS) Authentication
+###############################################################################
+### Send OTP to Phone Number
+POST {{BaseUrl}}/Auth/SendOtp
+Accept: application/json
+Content-Type: application/json
+
+{
+    "phoneNumber": "+905551234567"
+}
+
+
+### Verify OTP Code
+POST {{BaseUrl}}/Auth/VerifyOtp
+Accept: application/json
+Content-Type: application/json
+
+{
+    "phoneNumber": "+905551234567",
+    "otpCode": "123456"
+}
+
+
+###############################################################################
+# TOKEN MANAGEMENT
+###############################################################################
+@Jwt = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.YOUR_TOKEN_HERE
+
+### Refresh Token
+POST {{BaseUrl}}/Auth/RefreshToken
+Accept: application/json
+Content-Type: application/json
+
+{
+    "refreshToken": "your-refresh-token-here"
+}
+
+
+### Revoke Refresh Token
+POST {{BaseUrl}}/Auth/RevokeRefreshToken
 Authorization: Bearer {{Jwt}}
 Accept: application/json
 Content-Type: application/json
 
 {
-  "id": "d290f1ee-6c54-4b01-90e6-d701748f0851",
-  "name": "Admin4",
-  "companyId": "C9D8C846-10FC-466D-8F45-A4FA4E856ABD"
-
+    "refreshToken": "your-refresh-token-here"
 }
 
 
-
-### Update
-POST {{Url}}/Roles/Update
+### Logout
+POST {{BaseUrl}}/Auth/Logout
 Authorization: Bearer {{Jwt}}
 Accept: application/json
 Content-Type: application/json
 
 {
-  "id": "A1D5B3E4-8E5A-4B3C-9EF5-D3E5A3B7C1F8",
-  "name": "Admin"
 }
 
 
+###############################################################################
+# USER REGISTRATION
+###############################################################################
+### Create New User (Manual Registration)
+POST {{BaseUrl}}/Users/Create
+Accept: application/json
+Content-Type: application/json
 
-### Delete
-POST {{Url}}/Roles/Delete
+{
+    "userName": "newuser@example.com",
+    "firstName": "Ahmet",
+    "surname": "Yilmaz",
+    "email": "newuser@example.com",
+    "password": "SecurePassword123!",
+    "userSource": 0,
+    "description": "Test user",
+    "phoneNumber": "+905551234567",
+    "countryId": 792,
+    "language": "tr-TR",
+    "preferredCurrencyCode": "TRY"
+}
+
+
+### Create User with Google
+POST {{BaseUrl}}/Users/Create
+Accept: application/json
+Content-Type: application/json
+
+{
+    "userName": "googleuser@gmail.com",
+    "firstName": "Google",
+    "surname": "User",
+    "email": "googleuser@gmail.com",
+    "providerId": "google_sub_id_here",
+    "userSource": 1,
+    "phoneNumber": "+905551234567",
+    "countryId": 792,
+    "language": "tr-TR",
+    "preferredCurrencyCode": "TRY"
+}
+
+
+###############################################################################
+# PASSWORD MANAGEMENT
+###############################################################################
+### Forgot Password (Send Reset Email)
+POST {{BaseUrl}}/Users/ForgotPassword
+Accept: application/json
+Content-Type: application/json
+
+{
+    "email": "test@example.com"
+}
+
+
+### Reset Password (With Token)
+POST {{BaseUrl}}/Users/ResetPassword
+Accept: application/json
+Content-Type: application/json
+
+{
+    "token": "reset-token-from-email",
+    "newPassword": "NewSecurePassword123!"
+}
+
+
+### Update Password (Authenticated)
+POST {{BaseUrl}}/Users/UpdatePassword
 Authorization: Bearer {{Jwt}}
 Accept: application/json
 Content-Type: application/json
 
 {
-  "id": "A1D5B3E4-8E5A-4B3C-9EF5-D3E5A3B7C1F8",
-  "isDeleted": false
+    "currentPassword": "OldPassword123!",
+    "newPassword": "NewPassword123!"
 }
-
-
-
-### Delete
-POST {{Url}}/Roles/All
-Authorization: Bearer {{Jwt}}
-Accept: application/json
-Content-Type: application/json
-
-{
-    "sorting": null,
-    "filters": [],
-    "pageRequest": {
-        "perPageCount": 20,
-        "currentPage": 1,
-        "listAll": false
-    }
-}
-
-
