@@ -21,6 +21,9 @@ public class Mapper
 			UserSource = payload.UserSource,
 			Description = payload.Description ?? string.Empty,
 			PhoneNumber = payload.PhoneNumber,
+			CountryId = payload.CountryId,
+			Language = payload.Language,
+			PreferredCurrencyCode = payload.PreferredCurrencyCode,
 		};
 	}
 
@@ -34,7 +37,13 @@ public class Mapper
 			Email = user.Email,
 			FirstName = user.FirstName,
 			Surname = user.Surname,
-			IsActive = user.IsActive
+			IsActive = user.IsActive,
+			CountryId = user.CountryId,
+			CountryCode = user.Country?.Code,
+			CountryName = user.Country?.Name,
+			Language = user.Language,
+			CurrencyCode = user.PreferredCurrencyCode,
+			CurrencySymbol = null, // TODO: Add CurrencySymbol to Country entity
 		};
 	}
 }
