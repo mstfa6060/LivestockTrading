@@ -14,6 +14,16 @@ public class ResponseModel : IResponseModel
 		public string DisplayName { get; set; }
 		public string Email { get; set; }
 		public bool IsPhoneVerified { get; set; }
+
+		// Ülke ve Dil Tercihleri
+		public int CountryId { get; set; }
+		public string CountryCode { get; set; }
+		public string CountryName { get; set; }
+		public string Language { get; set; }
+
+		// Para Birimi Tercihleri
+		public string CurrencyCode { get; set; }
+		public string CurrencySymbol { get; set; }
 	}
 }
 
