@@ -65,14 +65,6 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext, ILivestockT
     public DbSet<Seller> Sellers { get; set; }
     public DbSet<Farm> Farms { get; set; }
 
-    // Orders & Cart
-    public DbSet<Order> Orders { get; set; }
-    public DbSet<OrderItem> OrderItems { get; set; }
-    public DbSet<OrderStatusHistory> OrderStatusHistories { get; set; }
-    public DbSet<OrderPayment> OrderPayments { get; set; }
-    public DbSet<Cart> Carts { get; set; }
-    public DbSet<CartItem> CartItems { get; set; }
-
     // Reviews & User Related
     public DbSet<ProductReview> ProductReviews { get; set; }
     public DbSet<SellerReview> SellerReviews { get; set; }
@@ -205,22 +197,6 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext, ILivestockT
             // Key unique olmalı
             entity.HasIndex(e => e.Key).IsUnique();
             entity.HasIndex(e => e.Category);
-        });
-
-        // ═══════════════════════════════════════════════════════════════
-        // ORDER - LOCATION İLİŞKİLERİ (Birden fazla FK aynı tabloya)
-        // ═══════════════════════════════════════════════════════════════
-        modelBuilder.Entity<Order>(entity =>
-        {
-            entity.HasOne(o => o.ShippingAddress)
-                .WithMany(l => l.OrderShippingAddresses)
-                .HasForeignKey(o => o.ShippingAddressId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            entity.HasOne(o => o.BillingAddress)
-                .WithMany(l => l.OrderBillingAddresses)
-                .HasForeignKey(o => o.BillingAddressId)
-                .OnDelete(DeleteBehavior.Restrict);
         });
 
         foreach (var foreignKey in modelBuilder.Model.GetEntityTypes()

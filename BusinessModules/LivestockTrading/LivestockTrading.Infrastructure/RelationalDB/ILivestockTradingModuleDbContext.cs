@@ -20,14 +20,6 @@ public interface ILivestockTradingModuleDbContext
     DbSet<Seller> Sellers { get; set; }
     DbSet<Farm> Farms { get; set; }
 
-    // Orders & Cart
-    DbSet<Order> Orders { get; set; }
-    DbSet<OrderItem> OrderItems { get; set; }
-    DbSet<OrderStatusHistory> OrderStatusHistories { get; set; }
-    DbSet<OrderPayment> OrderPayments { get; set; }
-    DbSet<Cart> Carts { get; set; }
-    DbSet<CartItem> CartItems { get; set; }
-
     // Reviews & User Related
     DbSet<ProductReview> ProductReviews { get; set; }
     DbSet<SellerReview> SellerReviews { get; set; }

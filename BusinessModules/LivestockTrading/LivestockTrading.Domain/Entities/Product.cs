@@ -120,10 +120,8 @@ public class Product : BaseEntity
     public ICollection<ProductDocument> Documents { get; set; }
     public ICollection<ProductReview> Reviews { get; set; }
     public ICollection<ProductVariant> Variants { get; set; }
-    public ICollection<CartItem> CartItems { get; set; }
-    public ICollection<OrderItem> OrderItems { get; set; }
     public ICollection<FavoriteProduct> Favorites { get; set; }
-    
+
     public Product()
     {
         Images = new HashSet<ProductImage>();
@@ -131,8 +129,6 @@ public class Product : BaseEntity
         Documents = new HashSet<ProductDocument>();
         Reviews = new HashSet<ProductReview>();
         Variants = new HashSet<ProductVariant>();
-        CartItems = new HashSet<CartItem>();
-        OrderItems = new HashSet<OrderItem>();
         Favorites = new HashSet<FavoriteProduct>();
         Currency = "USD";
         Status = ProductStatus.Draft;

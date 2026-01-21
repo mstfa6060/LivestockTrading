@@ -33,13 +33,8 @@ public class ProductVariant : BaseEntity
     /// <summary>Sıralama</summary>
     public int SortOrder { get; set; }
     
-    public ICollection<CartItem> CartItems { get; set; }
-    public ICollection<OrderItem> OrderItems { get; set; }
-    
     public ProductVariant()
     {
-        CartItems = new HashSet<CartItem>();
-        OrderItems = new HashSet<OrderItem>();
         IsActive = true;
         IsInStock = true;
     }

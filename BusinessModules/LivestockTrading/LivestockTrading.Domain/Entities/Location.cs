@@ -40,15 +40,11 @@ public class Location : BaseEntity
     
     public ICollection<Product> Products { get; set; }
     public ICollection<Farm> Farms { get; set; }
-    public ICollection<Order> OrderShippingAddresses { get; set; }
-    public ICollection<Order> OrderBillingAddresses { get; set; }
-    
+
     public Location()
     {
         Products = new HashSet<Product>();
         Farms = new HashSet<Farm>();
-        OrderShippingAddresses = new HashSet<Order>();
-        OrderBillingAddresses = new HashSet<Order>();
         IsActive = true;
     }
 }

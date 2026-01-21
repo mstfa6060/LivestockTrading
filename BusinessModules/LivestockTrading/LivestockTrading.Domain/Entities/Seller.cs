@@ -60,14 +60,12 @@ public class Seller : BaseEntity
     
     public ICollection<Product> Products { get; set; }
     public ICollection<Farm> Farms { get; set; }
-    public ICollection<Order> Orders { get; set; }
     public ICollection<SellerReview> Reviews { get; set; }
-    
+
     public Seller()
     {
         Products = new HashSet<Product>();
         Farms = new HashSet<Farm>();
-        Orders = new HashSet<Order>();
         Reviews = new HashSet<SellerReview>();
         IsActive = true;
         Status = SellerStatus.PendingVerification;

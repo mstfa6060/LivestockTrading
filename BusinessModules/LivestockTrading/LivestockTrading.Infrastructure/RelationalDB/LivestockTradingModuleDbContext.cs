@@ -33,14 +33,6 @@ public class LivestockTradingModuleDbContext : DefinitionDbContext, ILivestockTr
     public DbSet<Seller> Sellers { get; set; }
     public DbSet<Farm> Farms { get; set; }
 
-    // Orders & Cart
-    public DbSet<Order> Orders { get; set; }
-    public DbSet<OrderItem> OrderItems { get; set; }
-    public DbSet<OrderStatusHistory> OrderStatusHistories { get; set; }
-    public DbSet<OrderPayment> OrderPayments { get; set; }
-    public DbSet<Cart> Carts { get; set; }
-    public DbSet<CartItem> CartItems { get; set; }
-
     // Reviews & User Related
     public DbSet<ProductReview> ProductReviews { get; set; }
     public DbSet<SellerReview> SellerReviews { get; set; }
