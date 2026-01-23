@@ -302,15 +302,8 @@ public static class LivestockTradingModelBuilder
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
-        // ========================================
-        // COUNTRY
-        // ========================================
-        modelBuilder.Entity<Country>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Code).IsRequired().HasMaxLength(3);
-            entity.HasIndex(e => e.Code).IsUnique();
-        });
+        // Country is managed by DefinitionDbContext (base class)
+        modelBuilder.Ignore<Country>();
 
         // ========================================
         // SHIPPING CARRIER

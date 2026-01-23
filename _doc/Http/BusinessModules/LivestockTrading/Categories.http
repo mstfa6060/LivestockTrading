@@ -1,0 +1,151 @@
+###############################################################################
+# CATEGORY ENDPOINTS - LivestockTrading Module
+###############################################################################
+
+@BaseUrl = http://localhost:5221
+
+
+###############################################################################
+# 1. KATEGORI OLUSTUR (Create)
+###############################################################################
+### Yeni Kategori Olustur
+POST {{BaseUrl}}/Categories/Create
+Accept: application/json
+Content-Type: application/json
+
+{
+    "name": "Hayvancilik",
+    "slug": "hayvancilik",
+    "description": "Buyukbas ve kucukbas hayvan kategorisi",
+    "iconUrl": "",
+    "sortOrder": 1,
+    "isActive": true,
+    "parentCategoryId": null,
+    "nameTranslations": "{\"tr\":\"Hayvancilik\",\"en\":\"Livestock\"}",
+    "descriptionTranslations": "{\"tr\":\"Buyukbas ve kucukbas hayvanlar\",\"en\":\"Livestock animals\"}",
+    "attributesTemplate": null
+}
+
+###############################################################################
+# 2. ALT KATEGORI OLUSTUR (Create Sub-Category)
+###############################################################################
+### Alt Kategori Olustur
+POST {{BaseUrl}}/Categories/Create
+Accept: application/json
+Content-Type: application/json
+
+{
+    "name": "Buyukbas",
+    "slug": "buyukbas",
+    "description": "Buyukbas hayvanlar",
+    "iconUrl": "",
+    "sortOrder": 1,
+    "isActive": true,
+    "parentCategoryId": "PARENT_CATEGORY_ID_BURAYA",
+    "nameTranslations": "{\"tr\":\"Buyukbas\",\"en\":\"Cattle\"}",
+    "descriptionTranslations": null,
+    "attributesTemplate": null
+}
+
+###############################################################################
+# 3. TUM KATEGORILERI LISTELE (All - Sayfalama, Siralama, Filtreleme)
+###############################################################################
+### Tum Kategorileri Getir (varsayilan sayfalama)
+POST {{BaseUrl}}/Categories/All
+Accept: application/json
+Content-Type: application/json
+
+{
+}
+
+### Sayfalama ile
+POST {{BaseUrl}}/Categories/All
+Accept: application/json
+Content-Type: application/json
+
+{
+    "pageRequest": {
+        "currentPage": 1,
+        "perPageCount": 10
+    }
+}
+
+### Siralama ile
+POST {{BaseUrl}}/Categories/All
+Accept: application/json
+Content-Type: application/json
+
+{
+    "sorting": {
+        "fieldName": "Name",
+        "isAscending": true
+    }
+}
+
+###############################################################################
+# 4. KATEGORI DETAYI (Detail)
+###############################################################################
+### Kategori Detayini Getir
+POST {{BaseUrl}}/Categories/Detail
+Accept: application/json
+Content-Type: application/json
+
+{
+    "id": "CATEGORY_ID_BURAYA"
+}
+
+###############################################################################
+# 5. KATEGORI SEC (Pick - Dropdown/Select icin)
+###############################################################################
+### Keyword ile Ara
+POST {{BaseUrl}}/Categories/Pick
+Accept: application/json
+Content-Type: application/json
+
+{
+    "keyword": "hayvan",
+    "limit": 10
+}
+
+### Secili ID'leri Getir
+POST {{BaseUrl}}/Categories/Pick
+Accept: application/json
+Content-Type: application/json
+
+{
+    "selectedIds": ["CATEGORY_ID_BURAYA"]
+}
+
+###############################################################################
+# 6. KATEGORI GUNCELLE (Update)
+###############################################################################
+### Kategori Bilgilerini Guncelle
+POST {{BaseUrl}}/Categories/Update
+Accept: application/json
+Content-Type: application/json
+
+{
+    "id": "CATEGORY_ID_BURAYA",
+    "name": "Hayvancilik (Guncellendi)",
+    "slug": "hayvancilik",
+    "description": "Buyukbas, kucukbas ve kumes hayvanlari",
+    "iconUrl": "",
+    "sortOrder": 1,
+    "isActive": true,
+    "parentCategoryId": null,
+    "nameTranslations": "{\"tr\":\"Hayvancilik\",\"en\":\"Livestock\",\"de\":\"Viehzucht\"}",
+    "descriptionTranslations": null,
+    "attributesTemplate": null
+}
+
+###############################################################################
+# 7. KATEGORI SIL (Delete - Soft Delete)
+###############################################################################
+### Kategoriyi Sil
+POST {{BaseUrl}}/Categories/Delete
+Accept: application/json
+Content-Type: application/json
+
+{
+    "id": "CATEGORY_ID_BURAYA"
+}

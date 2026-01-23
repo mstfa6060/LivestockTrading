@@ -23,6 +23,8 @@ public class ApplicationDependencyProvider : ArfBlocksDependencyProvider
         base.Add<EnvironmentService>();
 
         // Data
+        base.Add<DefinitionDbContextOptions>();
+        base.Add<LivestockTradingDbContextOptions>();
         base.Add<LivestockTradingModuleDbContext>();
         base.Add<DbContext, LivestockTradingModuleDbContext>();
 

@@ -59,7 +59,6 @@ public class LivestockTradingModuleDbContext : DefinitionDbContext, ILivestockTr
 
     // Helpers & Configuration
     public DbSet<Currency> Currencies { get; set; }
-    public new DbSet<Country> Countries { get; set; }
     public DbSet<PaymentMethod> PaymentMethods { get; set; }
     public DbSet<ShippingCarrier> ShippingCarriers { get; set; }
     public DbSet<FAQ> FAQs { get; set; }
@@ -82,28 +81,6 @@ public class LivestockTradingModuleDbContext : DefinitionDbContext, ILivestockTr
         base.OnModelCreating(modelBuilder);
 
         LivestockTradingModelBuilder.Build(modelBuilder);
-
-        // Prefix all LivestockTrading tables to avoid collisions with other modules
-        var prefix = "LivestockTrading_";
-        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-        {
-            var clrType = entityType.ClrType;
-            if (clrType == null)
-                continue;
-
-            var ns = clrType.Namespace ?? string.Empty;
-            if (!ns.StartsWith("LivestockTrading.Domain"))
-                continue;
-
-            var currentName = entityType.GetTableName();
-            if (string.IsNullOrWhiteSpace(currentName))
-                continue;
-
-            if (!currentName.StartsWith(prefix, StringComparison.Ordinal))
-            {
-                entityType.SetTableName(prefix + currentName);
-            }
-        }
     }
 }
 

@@ -57,7 +57,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AppRefreshTokens");
+                    b.ToTable("AppRefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("Common.Definitions.Domain.Entities.AuditLog", b =>
@@ -154,7 +154,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AppAuditLogs");
+                    b.ToTable("AppAuditLogs", (string)null);
                 });
 
             modelBuilder.Entity("Common.Definitions.Domain.Entities.Country", b =>
@@ -216,7 +216,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Countries");
+                    b.ToTable("Countries", (string)null);
                 });
 
             modelBuilder.Entity("Common.Definitions.Domain.Entities.District", b =>
@@ -241,7 +241,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("ProvinceId");
 
-                    b.ToTable("Districts");
+                    b.ToTable("Districts", (string)null);
                 });
 
             modelBuilder.Entity("Common.Definitions.Domain.Entities.MobilApplicationVersiyon", b =>
@@ -285,7 +285,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MobilApplicationVersiyon");
+                    b.ToTable("MobilApplicationVersiyon", (string)null);
                 });
 
             modelBuilder.Entity("Common.Definitions.Domain.Entities.Module", b =>
@@ -314,7 +314,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AppModules");
+                    b.ToTable("AppModules", (string)null);
                 });
 
             modelBuilder.Entity("Common.Definitions.Domain.Entities.Neighborhood", b =>
@@ -343,7 +343,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("Name");
 
-                    b.ToTable("Neighborhoods");
+                    b.ToTable("Neighborhoods", (string)null);
                 });
 
             modelBuilder.Entity("Common.Definitions.Domain.Entities.PlatformSetting", b =>
@@ -416,7 +416,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
                     b.HasIndex("Key")
                         .IsUnique();
 
-                    b.ToTable("PlatformSettings");
+                    b.ToTable("PlatformSettings", (string)null);
                 });
 
             modelBuilder.Entity("Common.Definitions.Domain.Entities.Province", b =>
@@ -444,7 +444,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("Name");
 
-                    b.ToTable("Provinces");
+                    b.ToTable("Provinces", (string)null);
                 });
 
             modelBuilder.Entity("Common.Definitions.Domain.Entities.RelRoleResource", b =>
@@ -465,7 +465,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AppRelRoleResources");
+                    b.ToTable("AppRelRoleResources", (string)null);
                 });
 
             modelBuilder.Entity("Common.Definitions.Domain.Entities.RelSystemUserModule", b =>
@@ -498,7 +498,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("SystemAdminId");
 
-                    b.ToTable("AppRelSystemUserModules");
+                    b.ToTable("AppRelSystemUserModules", (string)null);
                 });
 
             modelBuilder.Entity("Common.Definitions.Domain.Entities.Resource", b =>
@@ -553,7 +553,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("ModuleId");
 
-                    b.ToTable("AppResources");
+                    b.ToTable("AppResources", (string)null);
                 });
 
             modelBuilder.Entity("Common.Definitions.Domain.Entities.Role", b =>
@@ -582,7 +582,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AppRoles");
+                    b.ToTable("AppRoles", (string)null);
 
                     b.HasData(
                         new
@@ -633,7 +633,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("RolePermissions");
+                    b.ToTable("RolePermissions", (string)null);
 
                     b.HasData(
                         new
@@ -682,7 +682,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AppSystemAdmins");
+                    b.ToTable("AppSystemAdmins", (string)null);
                 });
 
             modelBuilder.Entity("Common.Definitions.Domain.Entities.User", b =>
@@ -814,7 +814,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("LastViewingCountryId");
 
-                    b.ToTable("AppUsers");
+                    b.ToTable("AppUsers", (string)null);
                 });
 
             modelBuilder.Entity("Common.Definitions.Domain.Entities.UserLocation", b =>
@@ -852,7 +852,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("AppUserLocations");
+                    b.ToTable("AppUserLocations", (string)null);
                 });
 
             modelBuilder.Entity("Common.Definitions.Domain.Entities.UserPushToken", b =>
@@ -895,7 +895,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AppUserPushTokens");
+                    b.ToTable("AppUserPushTokens", (string)null);
                 });
 
             modelBuilder.Entity("Common.Definitions.Domain.Entities.UserRole", b =>
@@ -933,7 +933,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserRoles");
+                    b.ToTable("UserRoles", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.AnimalInfo", b =>
@@ -1027,7 +1027,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("AnimalInfos");
+                    b.ToTable("AnimalInfos", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.Banner", b =>
@@ -1083,7 +1083,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Banners");
+                    b.ToTable("Banners", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.Brand", b =>
@@ -1136,7 +1136,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Brands");
+                    b.ToTable("Brands", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.Category", b =>
@@ -1191,7 +1191,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("ParentCategoryId");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.ChemicalInfo", b =>
@@ -1294,7 +1294,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ChemicalInfos");
+                    b.ToTable("ChemicalInfos", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.Conversation", b =>
@@ -1340,7 +1340,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Conversations");
+                    b.ToTable("Conversations", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.Currency", b =>
@@ -1381,7 +1381,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Currencies");
+                    b.ToTable("Currencies", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.Deal", b =>
@@ -1473,7 +1473,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("TransportRequestId");
 
-                    b.ToTable("Deals");
+                    b.ToTable("Deals", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.FAQ", b =>
@@ -1524,7 +1524,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("FAQs");
+                    b.ToTable("FAQs", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.Farm", b =>
@@ -1593,7 +1593,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.ToTable("Farms");
+                    b.ToTable("Farms", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.FavoriteProduct", b =>
@@ -1627,7 +1627,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("FavoriteProducts");
+                    b.ToTable("FavoriteProducts", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.FeedInfo", b =>
@@ -1751,7 +1751,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("FeedInfos");
+                    b.ToTable("FeedInfos", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.HealthRecord", b =>
@@ -1812,7 +1812,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("AnimalInfoId");
 
-                    b.ToTable("HealthRecords");
+                    b.ToTable("HealthRecords", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.Language", b =>
@@ -1859,7 +1859,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Languages");
+                    b.ToTable("Languages", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.Location", b =>
@@ -1924,7 +1924,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Locations");
+                    b.ToTable("Locations", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.MachineryInfo", b =>
@@ -2030,7 +2030,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("MachineryInfos");
+                    b.ToTable("MachineryInfos", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.Message", b =>
@@ -2079,7 +2079,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("ConversationId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Messages", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.Notification", b =>
@@ -2129,7 +2129,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notifications", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.Offer", b =>
@@ -2195,7 +2195,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Offers");
+                    b.ToTable("Offers", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.PaymentMethod", b =>
@@ -2248,7 +2248,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PaymentMethods");
+                    b.ToTable("PaymentMethods", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.Product", b =>
@@ -2386,7 +2386,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.ProductDocument", b =>
@@ -2435,7 +2435,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductDocuments");
+                    b.ToTable("ProductDocuments", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.ProductImage", b =>
@@ -2478,7 +2478,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductImages");
+                    b.ToTable("ProductImages", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.ProductPrice", b =>
@@ -2530,7 +2530,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductPrices");
+                    b.ToTable("ProductPrices", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.ProductReview", b =>
@@ -2603,7 +2603,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductReviews");
+                    b.ToTable("ProductReviews", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.ProductVariant", b =>
@@ -2661,7 +2661,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductVariants");
+                    b.ToTable("ProductVariants", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.ProductVideo", b =>
@@ -2707,7 +2707,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductVideos");
+                    b.ToTable("ProductVideos", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.ProductViewHistory", b =>
@@ -2744,7 +2744,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductViewHistories");
+                    b.ToTable("ProductViewHistories", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.SearchHistory", b =>
@@ -2782,7 +2782,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SearchHistories");
+                    b.ToTable("SearchHistories", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.SeedInfo", b =>
@@ -2924,7 +2924,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("SeedInfos");
+                    b.ToTable("SeedInfos", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.Seller", b =>
@@ -3019,7 +3019,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Sellers");
+                    b.ToTable("Sellers", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.SellerReview", b =>
@@ -3092,7 +3092,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.ToTable("SellerReviews");
+                    b.ToTable("SellerReviews", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.ShippingCarrier", b =>
@@ -3133,7 +3133,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ShippingCarriers");
+                    b.ToTable("ShippingCarriers", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.ShippingRate", b =>
@@ -3190,7 +3190,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("ShippingZoneId");
 
-                    b.ToTable("ShippingRates");
+                    b.ToTable("ShippingRates", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.ShippingZone", b =>
@@ -3227,7 +3227,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.ToTable("ShippingZones");
+                    b.ToTable("ShippingZones", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.TaxRate", b =>
@@ -3277,7 +3277,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TaxRates");
+                    b.ToTable("TaxRates", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.TransportOffer", b =>
@@ -3355,7 +3355,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("TransporterId");
 
-                    b.ToTable("TransportOffers");
+                    b.ToTable("TransportOffers", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.TransportRequest", b =>
@@ -3463,7 +3463,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.ToTable("TransportRequests");
+                    b.ToTable("TransportRequests", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.TransportTracking", b =>
@@ -3515,7 +3515,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("TransportRequestId");
 
-                    b.ToTable("TransportTrackings");
+                    b.ToTable("TransportTrackings", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.Transporter", b =>
@@ -3613,7 +3613,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Transporters");
+                    b.ToTable("Transporters", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.TransporterReview", b =>
@@ -3670,7 +3670,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("TransporterId");
 
-                    b.ToTable("TransporterReviews");
+                    b.ToTable("TransporterReviews", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.UserPreferences", b =>
@@ -3735,7 +3735,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserPreferences");
+                    b.ToTable("UserPreferences", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.Vaccination", b =>
@@ -3790,7 +3790,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("AnimalInfoId");
 
-                    b.ToTable("Vaccinations");
+                    b.ToTable("Vaccinations", (string)null);
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.VeterinaryInfo", b =>
@@ -3911,7 +3911,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("VeterinaryInfos");
+                    b.ToTable("VeterinaryInfos", (string)null);
                 });
 
             modelBuilder.Entity("Common.Definitions.Domain.Entities.AuditLog", b =>
