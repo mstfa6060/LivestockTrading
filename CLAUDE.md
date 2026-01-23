@@ -11,13 +11,24 @@ dotnet build LivestockTrading.sln
 # Run tests
 dotnet test LivestockTrading.sln
 
-# Run database migrations (from Jobs/RelationalDB/MigrationJob directory)
-dotnet run development
-
 # Run specific API locally
 dotnet run --project BaseModules/IAM/BaseModules.IAM.Api
 dotnet run --project BusinessModules/LivestockTrading/LivestockTrading.Api
 dotnet run --project BaseModules/FileProvider/BaseModules.FileProvider.Api
+```
+
+### Database Migrations
+
+```bash
+# Run migrations (from Jobs/RelationalDB/MigrationJob directory)
+cd Jobs/RelationalDB/MigrationJob
+dotnet run development
+
+# Force re-seed country data (updates existing records without deleting)
+dotnet run development --force-country-reseed
+
+# Add a new migration
+dotnet ef migrations add <MigrationName>
 ```
 
 ### Docker Local Development
@@ -42,30 +53,109 @@ BusinessModules/
   └── LivestockTrading/  # Core trading domain
 
 Common/               # Shared code
-  ├── Definitions/    # Base entities, DbContext
-  ├── Services/       # Auth, Caching, Logging, Messaging
-  └── Contracts/      # Event/Queue contracts
+  ├── Definitions/    # Base entities, DbContext, Seed data configurations
+  ├── Services/       # Auth, Caching, Logging, Messaging, Environment, Notification
+  ├── Contracts/      # Event/Queue/PubSub contracts
+  ├── Connectors/     # External service connectors
+  └── Helpers/        # Utility functions
 
 Gateways/
   └── Api/            # Ocelot API Gateway (routes /iam/*, /fileprovider/*, /livestocktrading/*)
 
 Jobs/
-  ├── RelationalDB/MigrationJob/  # EF Core migrations
-  └── SpecialPurpose/ResourceSeeder/  # Data seeding
+  ├── RelationalDB/MigrationJob/  # EF Core migrations & seed data
+  └── BackgroundJobs/HangfireScheduler/  # Scheduled tasks
+
+Workers/              # Background services (per module)
+  ├── BaseModules.IAM.Workers/          # MailSender, SmsSender
+  └── BusinessModules.LivestockTrading.Workers/  # MailSender, SmsSender, NotificationSender
 ```
 
 ### Request Handler Pattern (ArfBlocks Framework)
 
-Each feature uses a consistent folder structure under `Application/RequestHandlers/{Feature}/{Commands|Queries}/{OperationName}/`:
+Each feature uses a consistent 6-file folder structure under `Application/RequestHandlers/{Feature}/{Commands|Queries}/{OperationName}/`:
 
-- **Handler.cs** - Main request handler implementing `IRequestHandler`
-- **Models.cs** - Request/Response DTOs
-- **DataAccess.cs** - Database operations (DbContext usage)
-- **Mapper.cs** - Entity ↔ DTO mapping
-- **Validator.cs** - FluentValidation rules
-- **Verificator.cs** - Authorization checks
+- **Handler.cs** - Implements `IRequestHandler`, receives `IRequestModel payload`, returns `ArfBlocksRequestResult`
+- **Models.cs** - `RequestModel` (IRequestModel) and `ResponseModel` (IResponseModel) with nested DTOs
+- **DataAccess.cs** - Implements `IDataAccess`, receives `ArfBlocksDependencyProvider` to resolve DbContext
+- **Mapper.cs** - Entity to response DTO mapping
+- **Validator.cs** - FluentValidation rules for request validation
+- **Verificator.cs** - Authorization checks via `AuthorizationService`
 
-Example path: `BusinessModules/LivestockTrading/LivestockTrading.Application/RequestHandlers/Products/Commands/Create/Handler.cs`
+Handler code pattern:
+```csharp
+public class Handler : IRequestHandler
+{
+    public async Task<ArfBlocksRequestResult> Handle(IRequestModel payload, EndpointContext context, CancellationToken ct)
+    {
+        var request = (RequestModel)payload;
+        var dataAccess = new DataAccess(context.DependencyProvider);
+        // ... business logic ...
+        return ArfBlocksResults.Success(responseModel);
+    }
+}
+```
+
+DataAccess pattern:
+```csharp
+public class DataAccess : IDataAccess
+{
+    private readonly ModuleDbContext _dbContext;
+    public DataAccess(ArfBlocksDependencyProvider dependencyProvider)
+    {
+        _dbContext = dependencyProvider.GetInstance<ModuleDbContext>();
+    }
+}
+```
+
+### Handler Registration & Discovery
+
+Handlers are auto-discovered by ArfBlocks based on namespace convention. No manual route registration needed.
+
+```csharp
+// In Program.cs
+builder.Services.AddArfBlocks(options => {
+    options.ApplicationProjectNamespace = "BaseModules.IAM.Application";
+});
+
+// Middleware (must be last)
+app.UseArfBlocksRequestHandlers();
+```
+
+ArfBlocks maps HTTP paths to handlers: `POST /Auth/Login` → `RequestHandlers/Auth/Commands/Login/Handler.cs`
+
+### Program.cs Middleware Order
+
+```csharp
+builder.AddSerilogLogging("ModuleName.Api");
+builder.Services.AddMadenCaching(builder.Configuration);
+builder.Services.AddArfBlocks(options => { ... });
+
+app.UseCorrelationId();
+app.UseSerilogRequestLogging();
+app.UseArfBlocksRequestHandlers(); // Must be last
+```
+
+### DbContext Pattern (Multi-Module)
+
+```
+DefinitionDbContext (Common.Definitions.Infrastructure)  ← Base: User, Role, Module, Country, AuditLog
+    ├── IamDbContext (extends DefinitionDbContext)       ← AppRefreshToken, etc.
+    └── LivestockTradingModuleDbContext                  ← Business entities
+```
+
+- `ApplicationDbContext` in MigrationJob aggregates all module contexts for migration generation
+- `CommonModelBuilder.Build(ModelBuilder)` configures shared entity relationships
+- LivestockTrading tables are prefixed with `LivestockTrading_` to avoid collisions
+
+### Dependency Injection (ApplicationDependencyProvider)
+
+Each module has `ApplicationDependencyProvider` extending `ArfBlocksDependencyProvider`:
+
+```csharp
+// Located at {Module}.Application/Configuration/ApplicationDependencyProvider.cs
+// Registers: DbContext, IJwtService, ICacheService, AuthorizationService, RabbitMqPublisher
+```
 
 ### Key Technologies
 
@@ -73,21 +163,33 @@ Example path: `BusinessModules/LivestockTrading/LivestockTrading.Application/Req
 - **Ocelot** - API Gateway routing
 - **Entity Framework Core 8.0** - ORM with SQL Server
 - **Redis** - Distributed cache (L2), with in-memory L1 cache
-- **RabbitMQ** - Message queue for async operations
+- **RabbitMQ** - Message queue for async operations (workers consume via exchanges)
 - **FluentValidation** - Request validation
 - **Serilog** - Structured logging
+- **NetTopologySuite** - Spatial data support
 
-### Authentication
+### Authentication & JWT
 
-- JWT-based authentication with refresh tokens
-- Multi-provider support: Native (email/password), Google OAuth, Apple Sign-In
-- User management in IAM module, shared across all modules
-- Roles stored per module in `UserRole` entity
+- JWT-based with refresh tokens stored in `AppRefreshTokens` table
+- Multi-provider: Native (email/password), Google OAuth, Apple Sign-In
+- Roles stored per module in `UserRole` entity with `ModuleId`
+- JWT role claims format: `"ModuleName.RoleName"` (e.g., `"LivestockTrading.Seller"`)
+- Platform tracking: Web=0, Android=1, iOS=2
+
+### Error Handling
+
+```csharp
+// Throw validation errors
+throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => DomainErrors.UserErrors.InvalidCredentials));
+
+// Return success
+return ArfBlocksResults.Success(responseModel);
+```
 
 ### API Routing
 
 The Ocelot gateway (`Gateways/Api/ocelot.json`) routes requests:
-- `/iam/*` → IAM API
+- `/iam/*` → IAM API (port 5000 locally)
 - `/fileprovider/*` → FileProvider API
 - `/livestocktrading/*` → LivestockTrading API
 
@@ -99,18 +201,45 @@ Two-tier caching via `Common.Services.Caching`:
 1. L1 (Memory): Fast, in-process, short TTL (~5 min)
 2. L2 (Redis): Distributed, longer TTL (configurable)
 
+```csharp
+await _cacheService.GetOrCreateAsync(cacheKey, factoryFunc, timespan);
+await _cacheService.RemoveByPatternAsync("pattern:*");
+```
+
 Use `ICacheService` with `CacheKeys` class for standardized key management.
 
-### Workers
+### Workers (Background Services)
 
-Background services for async processing:
-- `Workers.MailSender` - Email dispatch
-- `Workers.SmsSender` - SMS dispatch
-- `Workers.NotificationSender` - Push notifications
-- `Jobs.BackgroundJobs.HangfireScheduler` - Scheduled tasks
+IHostedService pattern consuming RabbitMQ messages:
+- `BaseModules.IAM.Workers.MailSender` - Sends email via Brevo SMTP
+- `BaseModules.IAM.Workers.SmsSender` - Sends SMS via NetGSM
+- `LivestockTrading.Workers.NotificationSender` - Push notifications
+
+Workers consume from RabbitMQ exchanges (e.g., `iam.notification.sms`, `iam.notification.email`).
 
 ### Configuration
 
 - `appsettings.json` / `appsettings.Development.json` - Standard config
 - `appsettings.local.json` - Local overrides (gitignored)
 - Environment variables for Docker deployment (see `_devops/docker/env/.env.example`)
+
+Key config sections:
+```json
+{
+  "ProjectConfigurations": {
+    "RelationalDbConfiguration": { "SqlConnectionString": "..." },
+    "EnvironmentConfiguration": { "EnvironmentName": "...", "ApiUrl": "..." },
+    "ExternalAuth": { "Google": {...}, "Apple": {...} }
+  },
+  "Caching": {
+    "Redis": { "ConnectionString": "...", "InstanceName": "globallivestock:" },
+    "Memory": { "SizeLimitMB": 1024 }
+  }
+}
+```
+
+### Seed Data
+
+- Country data: `Jobs/RelationalDB/MigrationJob/SeedData/countries.json` (196 countries with currency info)
+- `CountrySeeder` handles insert (new DB) or update (existing data with `--force-country-reseed`)
+- Seed runs automatically after migrations in `Program.cs`

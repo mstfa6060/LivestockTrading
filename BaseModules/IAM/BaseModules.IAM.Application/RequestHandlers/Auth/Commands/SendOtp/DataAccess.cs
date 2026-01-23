@@ -14,6 +14,7 @@ public class DataAccess : IDataAccess
 	public async Task<Common.Definitions.Domain.Entities.User> GetUserById(Guid userId)
 	{
 		return await _dbContext.AppUsers
+			.Include(u => u.Country)
 			.FirstOrDefaultAsync(x => x.Id == userId);
 	}
 

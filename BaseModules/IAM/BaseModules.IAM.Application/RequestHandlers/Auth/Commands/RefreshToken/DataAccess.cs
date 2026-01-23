@@ -16,7 +16,9 @@ public class DataAccess : IDataAccess
         var token = await _dbContext.AppRefreshTokens
             .FirstOrDefaultAsync(x => x.Token == refreshToken);
 
-        var user = await _dbContext.AppUsers.FirstAsync(x => x.Id == token.UserId);
+        var user = await _dbContext.AppUsers
+            .Include(u => u.Country)
+            .FirstAsync(x => x.Id == token.UserId);
 
         return new RefreshTokenUserResult
         {

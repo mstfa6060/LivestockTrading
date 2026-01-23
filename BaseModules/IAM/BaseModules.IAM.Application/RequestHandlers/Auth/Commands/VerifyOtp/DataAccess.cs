@@ -11,7 +11,9 @@ public class DataAccess : IDataAccess
 
 	public async Task<Common.Definitions.Domain.Entities.User> GetUserByPhoneAsync(string phone)
 	{
-		return await _dbContext.AppUsers.FirstOrDefaultAsync(x => x.PhoneNumber == phone);
+		return await _dbContext.AppUsers
+			.Include(u => u.Country)
+			.FirstOrDefaultAsync(x => x.PhoneNumber == phone);
 	}
 
 	public async Task UpdateUserAsync(Common.Definitions.Domain.Entities.User user)

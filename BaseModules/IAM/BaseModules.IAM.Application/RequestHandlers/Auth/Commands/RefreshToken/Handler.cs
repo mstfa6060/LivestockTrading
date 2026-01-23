@@ -10,9 +10,9 @@ public class Handler : IRequestHandler
 	private readonly DataAccess _dataAccessLayer;
 	private readonly IJwtService _jwtService;
 
-	public Handler(ArfBlocksDependencyProvider dependencyProvider, object dataAccess)
+	public Handler(ArfBlocksDependencyProvider dependencyProvider, DataAccess dataAccess)
 	{
-		_dataAccessLayer = (DataAccess)dataAccess;
+		_dataAccessLayer = dataAccess;
 		_jwtService = dependencyProvider.GetInstance<IJwtService>();
 	}
 
@@ -66,7 +66,7 @@ public class Handler : IRequestHandler
 			roleStrings
 		);
 
-		var response = mapper.Map(jwt, expiresAt, newRefreshToken); // yeni refreshToken da dön
+		var response = mapper.Map(jwt, expiresAt, newRefreshToken, user);
 		return ArfBlocksResults.Success(response);
 	}
 }

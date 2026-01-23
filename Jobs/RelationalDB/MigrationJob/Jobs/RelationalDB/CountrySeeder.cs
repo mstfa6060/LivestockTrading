@@ -24,7 +24,6 @@ public class CountrySeeder
 
     public async Task SeedAsync(bool forceReseed = false)
     {
-        // Eğer veri varsa ve force değilse seed yapma
         if (await _db.Set<Country>().AnyAsync())
         {
             if (!forceReseed)
@@ -33,14 +32,60 @@ public class CountrySeeder
                 return;
             }
 
-            // Force reseed - mevcut verileri sil
-            Console.WriteLine("Deleting existing country data...");
-            await DeleteExistingDataAsync();
+            // Force reseed - mevcut verileri guncelle (FK constraint nedeniyle silmeden)
+            Console.WriteLine("Updating existing country data...");
+            await UpdateExistingCountriesAsync();
+            return;
         }
 
         Console.WriteLine("Seeding country data...");
         await SeedCountriesAsync();
         Console.WriteLine("Country seed completed!");
+    }
+
+    private async Task UpdateExistingCountriesAsync()
+    {
+        var filePath = Path.Combine("SeedData", "countries.json");
+        if (!File.Exists(filePath))
+        {
+            Console.WriteLine($"  WARN: {filePath} not found. Skipping update.");
+            return;
+        }
+
+        var json = await File.ReadAllTextAsync(filePath);
+        var countries = JsonSerializer.Deserialize<List<Country>>(json, _jsonOptions);
+
+        if (countries == null || countries.Count == 0)
+        {
+            Console.WriteLine("  WARN: No countries found in JSON.");
+            return;
+        }
+
+        var existingCountries = await _db.Set<Country>().ToListAsync();
+        var updated = 0;
+
+        foreach (var existing in existingCountries)
+        {
+            var source = countries.FirstOrDefault(c => c.Id == existing.Id);
+            if (source == null) continue;
+
+            existing.DefaultCurrencyCode = source.DefaultCurrencyCode;
+            existing.DefaultCurrencySymbol = source.DefaultCurrencySymbol;
+            existing.Code = source.Code;
+            existing.Code3 = source.Code3;
+            existing.NumericCode = source.NumericCode;
+            existing.Name = source.Name;
+            existing.NativeName = source.NativeName;
+            existing.PhoneCode = source.PhoneCode;
+            existing.Capital = source.Capital;
+            existing.Continent = source.Continent;
+            existing.Region = source.Region;
+            existing.IsActive = source.IsActive;
+            updated++;
+        }
+
+        await _db.SaveChangesAsync();
+        Console.WriteLine($"  OK: {updated} ulke guncellendi.");
     }
 
     private async Task DeleteExistingDataAsync()

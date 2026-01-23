@@ -27,7 +27,7 @@ Content-Type: application/json
 
 
 ###############################################################################
-# 2. GIRIS YAP (Login)
+# 2. GIRIS YAP (Login - Native)
 ###############################################################################
 ### Email ve Sifre ile Giris
 POST {{BaseUrl}}/Auth/Login
@@ -39,4 +39,63 @@ Content-Type: application/json
     "userName": "test@example.com",
     "password": "Test123!",
     "platform": 0
+}
+
+###############################################################################
+# 3. GIRIS YAP (Login - Google)
+###############################################################################
+### Google ile Giris
+POST {{BaseUrl}}/Auth/Login
+Accept: application/json
+Content-Type: application/json
+
+{
+    "provider": "google",
+    "userName": "google.user@gmail.com",
+    "firstName": "Google",
+    "surname": "User",
+    "phoneNumber": "+905551234567",
+    "externalProviderUserId": "google-sub-id-here",
+    "platform": 0
+}
+
+###############################################################################
+# 4. TOKEN YENILE (RefreshToken)
+###############################################################################
+### Refresh Token ile Yeni JWT Al
+POST {{BaseUrl}}/Auth/RefreshToken
+Accept: application/json
+Content-Type: application/json
+
+{
+    "refreshToken": "REFRESH_TOKEN_BURAYA",
+    "platform": 0
+}
+
+###############################################################################
+# 5. OTP GONDER (SendOtp)
+###############################################################################
+### Telefon Numarasina OTP Gonder
+POST {{BaseUrl}}/Auth/SendOtp
+Accept: application/json
+Content-Type: application/json
+
+{
+    "userId": "USER_ID_BURAYA",
+    "phoneNumber": "+905551234567",
+    "language": "tr-TR"
+}
+
+###############################################################################
+# 6. OTP DOGRULA (VerifyOtp)
+###############################################################################
+### OTP Kodunu Dogrula
+POST {{BaseUrl}}/Auth/VerifyOtp
+Accept: application/json
+Content-Type: application/json
+
+{
+    "userId": "USER_ID_BURAYA",
+    "phoneNumber": "+905551234567",
+    "otpCode": "123456"
 }
