@@ -20,9 +20,9 @@ public class Handler : IRequestHandler
 	private static readonly Guid LivestockTradingModuleId = Guid.Parse("DFD018C9-FC32-42C4-AEFD-70A5942A295E");
 	private static readonly Guid LivestockTradingDefaultUserRoleId = Guid.Parse("B3F8A7D1-4E2C-4A3E-8B5A-D3E7B9C5E2F1");
 
-	public Handler(ArfBlocksDependencyProvider dependencyProvider, object dataAccess)
+	public Handler(ArfBlocksDependencyProvider dependencyProvider, DataAccess dataAccess)
 	{
-		_dataAccessLayer = (DataAccess)dataAccess;
+		_dataAccessLayer = dataAccess;
 		_communicator = dependencyProvider.GetInstance<ArfBlocksCommunicator>();
 		_jwtService = dependencyProvider.GetInstance<IJwtService>();
 		_httpContextAccessor = dependencyProvider.GetInstance<IHttpContextAccessor>();

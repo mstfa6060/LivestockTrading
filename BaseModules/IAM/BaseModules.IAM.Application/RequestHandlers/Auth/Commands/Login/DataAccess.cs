@@ -20,14 +20,17 @@ public class DataAccess : IDataAccess
     public async Task<Common.Definitions.Domain.Entities.User> GetUser(string identifier)
     {
         return await _dbContext.AppUsers
+            .Include(u => u.Country)
             .FirstOrDefaultAsync(u =>
                 u.UserName.ToLower() == identifier.ToLower() || u.Email.ToLower() == identifier.ToLower());
     }
 
     public async Task<Common.Definitions.Domain.Entities.User> GetUserByExternalId(string provider, string externalId)
     {
-        return await _dbContext.AppUsers.FirstOrDefaultAsync(u =>
-            u.AuthProvider == provider && u.ProviderKey == externalId);
+        return await _dbContext.AppUsers
+            .Include(u => u.Country)
+            .FirstOrDefaultAsync(u =>
+                u.AuthProvider == provider && u.ProviderKey == externalId);
     }
 
     public void AddUser(Common.Definitions.Domain.Entities.User user)
