@@ -9,9 +9,9 @@ public class Handler : IRequestHandler
 {
 	private readonly DataAccess _dataAccessLayer;
 
-	public Handler(ArfBlocksDependencyProvider dependencyProvider, object dataAccess)
+	public Handler(ArfBlocksDependencyProvider dependencyProvider, DataAccess dataAccess)
 	{
-		_dataAccessLayer = (DataAccess)dataAccess;
+		_dataAccessLayer = dataAccess;
 	}
 
 	public async Task<ArfBlocksRequestResult> Handle(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)

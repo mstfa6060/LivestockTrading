@@ -73,6 +73,18 @@ public class Country
     /// </summary>
     public bool IsActive { get; set; } = true;
 
+    /// <summary>
+    /// Varsayılan para birimi kodu - ISO 4217 (örn: "TRY", "USD", "EUR")
+    /// </summary>
+    [MaxLength(3)]
+    public string DefaultCurrencyCode { get; set; }
+
+    /// <summary>
+    /// Varsayılan para birimi sembolü (örn: "₺", "$", "€")
+    /// </summary>
+    [MaxLength(5)]
+    public string DefaultCurrencySymbol { get; set; }
+
     // Navigation - Bu ülkedeki kullanıcılar
     public List<User> Users { get; set; } = new();
 }

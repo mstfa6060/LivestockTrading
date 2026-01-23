@@ -14,9 +14,9 @@ public class Handler : IRequestHandler
 	private readonly DataAccess _dataAccess;
 	private readonly ForgotPasswordEmailPublisher _emailPublisher;
 
-	public Handler(ArfBlocksDependencyProvider dependencyProvider, object dataAccess)
+	public Handler(ArfBlocksDependencyProvider dependencyProvider, DataAccess dataAccess)
 	{
-		_dataAccess = (DataAccess)dataAccess;
+		_dataAccess = dataAccess;
 		_emailPublisher = dependencyProvider.GetInstance<ForgotPasswordEmailPublisher>();
 	}
 

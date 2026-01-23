@@ -30,6 +30,10 @@ public class Mapper
 
 	public ResponseModel MapToResponse(Common.Definitions.Domain.Entities.User user)
 	{
+		// Kullanıcının tercih ettiği para birimi varsa onu kullan, yoksa ülkenin varsayılanını
+		var currencyCode = user.PreferredCurrencyCode ?? user.Country?.DefaultCurrencyCode;
+		var currencySymbol = user.Country?.DefaultCurrencySymbol;
+
 		return new ResponseModel()
 		{
 			Id = user.Id,
@@ -42,8 +46,8 @@ public class Mapper
 			CountryCode = user.Country?.Code,
 			CountryName = user.Country?.Name,
 			Language = user.Language,
-			CurrencyCode = user.PreferredCurrencyCode,
-			CurrencySymbol = null, // TODO: Add CurrencySymbol to Country entity
+			CurrencyCode = currencyCode,
+			CurrencySymbol = currencySymbol,
 		};
 	}
 }

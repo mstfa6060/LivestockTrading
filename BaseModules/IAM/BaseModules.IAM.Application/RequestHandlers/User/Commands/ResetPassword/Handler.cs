@@ -11,9 +11,9 @@ public class Handler : IRequestHandler
 {
 	private readonly DataAccess _dataAccess;
 
-	public Handler(ArfBlocksDependencyProvider dependencyProvider, object dataAccess)
+	public Handler(ArfBlocksDependencyProvider dependencyProvider, DataAccess dataAccess)
 	{
-		_dataAccess = (DataAccess)dataAccess;
+		_dataAccess = dataAccess;
 	}
 
 	public async Task<ArfBlocksRequestResult> Handle(IRequestModel model, EndpointContext context, CancellationToken cancellationToken)

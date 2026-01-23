@@ -1,4 +1,4 @@
-namespace BaseModules.IAM.Application.RequestHandlers.User.Commands.Delete;
+namespace BaseModules.IAM.Application.RequestHandlers.Users.Commands.Delete;
 
 public class RequestModel : IRequestModel
 {

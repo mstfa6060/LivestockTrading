@@ -28,4 +28,11 @@ public class DataAccess : IDataAccess
 	{
 		return await _dbContext.AppUsers.FirstOrDefaultAsync(u => u.Email == email);
 	}
+
+	public async Task<Common.Definitions.Domain.Entities.User> GetUserWithCountry(Guid userId)
+	{
+		return await _dbContext.AppUsers
+			.Include(u => u.Country)
+			.FirstOrDefaultAsync(u => u.Id == userId);
+	}
 }

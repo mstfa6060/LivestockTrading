@@ -39,7 +39,10 @@ public class Handler : IRequestHandler
 		// Veritabanına ekle
 		await _dataAccessLayer.AddUser(user);
 
-		var response = mapper.MapToResponse(user);
+		// Country bilgisi ile birlikte tekrar çek
+		var userWithCountry = await _dataAccessLayer.GetUserWithCountry(user.Id);
+
+		var response = mapper.MapToResponse(userWithCountry);
 		return ArfBlocksResults.Success(response);
 	}
 }
