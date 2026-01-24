@@ -14,4 +14,16 @@ public class LivestockTradingDomainErrors
         public static string InvalidNumber { get; set; } = "Sayisal deger gecersiz.";
         public static string ValueTooLong { get; set; } = "Deger cok uzun.";
     }
+
+    public static class CategoryErrors
+    {
+        public static string CategoryNotFound { get; set; } = "Kategori bulunamadi.";
+        public static string CategoryNotActive { get; set; } = "Kategori aktif degil.";
+        public static string ParentCategoryNotFound { get; set; } = "Ust kategori bulunamadi.";
+        public static string SlugAlreadyExists { get; set; } = "Bu slug zaten kullaniliyor.";
+        public static string NameAlreadyExists { get; set; } = "Bu isimde bir kategori zaten mevcut.";
+        public static string CategoryHasChildren { get; set; } = "Alt kategorileri olan bir kategori silinemez.";
+        public static string NameRequired { get; set; } = "Kategori adi zorunludur.";
+        public static string SlugRequired { get; set; } = "Kategori slug zorunludur.";
+    }
 }

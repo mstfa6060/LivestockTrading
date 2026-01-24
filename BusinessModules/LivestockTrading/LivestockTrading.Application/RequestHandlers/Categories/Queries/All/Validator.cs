@@ -12,5 +12,6 @@ public class Validator : IRequestValidator
 
 	public async Task ValidateDomain(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
 	{
+		await Task.CompletedTask;
 	}
 }

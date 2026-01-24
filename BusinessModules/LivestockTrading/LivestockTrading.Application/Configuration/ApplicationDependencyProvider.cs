@@ -1,4 +1,5 @@
 using LivestockTrading.Infrastructure.RelationalDB;
+using LivestockTrading.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 
 namespace LivestockTrading.Application.Configuration;
@@ -31,5 +32,9 @@ public class ApplicationDependencyProvider : ArfBlocksDependencyProvider
         // Communication
         base.Add<ArfBlocksCommunicator>();
         base.Add<AuthorizationService>();
+
+        // Services
+        base.Add<LivestockTradingModuleDbVerificationService>();
+        base.Add<LivestockTradingModuleDbValidationService>();
     }
 }

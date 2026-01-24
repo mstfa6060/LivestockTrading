@@ -73,13 +73,28 @@ Workers/              # Background services (per module)
 
 ### Request Handler Pattern (ArfBlocks Framework)
 
-Each feature uses a consistent 5-file folder structure under `Application/RequestHandlers/{Feature}/{Commands|Queries}/{OperationName}/`:
+**KURAL: Her endpoint MUTLAKA 6 dosya/class icerir. Eksik dosya OLAMAZ.**
 
+`Application/RequestHandlers/{Feature}/{Commands|Queries}/{OperationName}/` altinda:
+
+```
+Handler.cs       → Is mantigi (IRequestHandler)
+Models.cs        → Request/Response DTO'lari
+DataAccess.cs    → Veritabani islemleri (IDataAccess)
+Mapper.cs        → Entity ↔ DTO donusumleri
+Validator.cs     → FluentValidation + DbValidationService (IRequestValidator)
+Verificator.cs   → Yetkilendirme + DbVerificationService (IRequestVerificator)
+```
+
+Detaylar:
 - **Handler.cs** - Implements `IRequestHandler`, constructor takes `(ArfBlocksDependencyProvider, object dataAccess)`
 - **Models.cs** - `RequestModel` (IRequestModel) and `ResponseModel` (IResponseModel or IResponseModel<Array>)
 - **DataAccess.cs** - Implements `IDataAccess`, receives `ArfBlocksDependencyProvider` to resolve DbContext
 - **Mapper.cs** - Entity ↔ DTO mapping
-- **Validator.cs** - FluentValidation rules for request validation
+- **Validator.cs** - FluentValidation (ValidateRequestModel) + domain validation (ValidateDomain) using `LivestockTradingModuleDbValidationService`
+- **Verificator.cs** - Authorization (VerificateActor) + domain verification (VerificateDomain) using `LivestockTradingModuleDbVerificationService`
+
+> Yeni bir endpoint olusturulurken bu 6 dosyanin hepsi olusturulmalidir. Hicbiri atlanamaz.
 
 ### Standard CRUD Endpoint Patterns
 
@@ -235,6 +250,120 @@ entity.IsDeleted = true;
 entity.DeletedAt = DateTime.UtcNow;
 await _dataAccessLayer.SaveChanges();
 return ArfBlocksResults.Success(new ResponseModel { Success = true });
+```
+
+### Verificator & Validator Pattern
+
+Her endpoint'te Verificator.cs ve Validator.cs dosyalari bulunur:
+
+#### Verificator.cs - Yetkilendirme ve varlik kontrolu
+```csharp
+using {Module}.Infrastructure.Services;
+
+public class Verificator : IRequestVerificator
+{
+    private readonly AuthorizationService _authorizationService;
+    private readonly LivestockTradingModuleDbVerificationService _dbVerification;
+
+    public Verificator(ArfBlocksDependencyProvider dependencyProvider)
+    {
+        _authorizationService = dependencyProvider.GetInstance<AuthorizationService>();
+        _dbVerification = dependencyProvider.GetInstance<LivestockTradingModuleDbVerificationService>();
+    }
+
+    public async Task VerificateActor(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
+    {
+        await _authorizationService
+            .ForResource(typeof(Verificator).Namespace)
+            .VerifyActor()
+            .Assert();
+    }
+
+    public async Task VerificateDomain(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
+    {
+        var request = (RequestModel)payload;
+        // Varlik kontrolu (entity mevcut mu?)
+        await _dbVerification.ValidateCategoryExists(request.Id, cancellationToken);
+    }
+}
+```
+
+- **Commands (Create/Update/Delete)**: VerificateDomain icinde entity varlik kontrolu yapilir
+- **Queries (All/Detail/Pick)**: VerificateDomain genellikle `await Task.CompletedTask;` olarak birakilir
+
+#### Validator.cs - Is kurallari ve FluentValidation
+```csharp
+using FluentValidation;
+using {Module}.Domain.Errors;
+using {Module}.Infrastructure.Services;
+using Common.Services.ErrorCodeGenerator;
+
+public class Validator : IRequestValidator
+{
+    private readonly LivestockTradingModuleDbValidationService _dbValidator;
+
+    public Validator(ArfBlocksDependencyProvider dependencyProvider)
+    {
+        _dbValidator = dependencyProvider.GetInstance<LivestockTradingModuleDbValidationService>();
+    }
+
+    public void ValidateRequestModel(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
+    {
+        var request = (RequestModel)payload;
+        var result = new RequestModel_Validator().Validate(request);
+        if (!result.IsValid)
+            throw new ArfBlocksValidationException(result.ToString("~"));
+    }
+
+    public async Task ValidateDomain(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
+    {
+        var request = (RequestModel)payload;
+        await _dbValidator.ValidateCategoryExist(request.Id, cancellationToken);
+        await _dbValidator.ValidateCategorySlugUnique(request.Slug, request.Id, cancellationToken);
+    }
+}
+
+public class RequestModel_Validator : AbstractValidator<RequestModel>
+{
+    public RequestModel_Validator()
+    {
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.CategoryErrors.NameRequired));
+    }
+}
+```
+
+#### DbVerificationService vs DbValidationService
+
+| | DbVerificationService | DbValidationService |
+|---|---|---|
+| Kullanim yeri | Verificator.VerificateDomain | Validator.ValidateDomain |
+| Amac | Yetki + hizli varlik kontrolu | Is kurallari + state kontrolu |
+| Constructor | `(ModuleDbContext dbContext)` | `(ArfBlocksDependencyProvider dp)` |
+| Base class | `DefinitionDbValidationService` | `DefinitionDbValidationService` |
+| Konum | `Infrastructure/Services/` | `Infrastructure/Services/` |
+
+#### DomainErrors Pattern
+```csharp
+// Domain/Errors/DomainErrors.cs
+public class LivestockTradingDomainErrors
+{
+    public static class CommonErrors { ... }
+    public static class CategoryErrors
+    {
+        public static string CategoryNotFound { get; set; } = "Kategori bulunamadi.";
+        public static string SlugAlreadyExists { get; set; } = "Bu slug zaten kullaniliyor.";
+        // ...
+    }
+}
+```
+
+#### DI Kaydi (ApplicationDependencyProvider)
+```csharp
+// Services
+base.Add<LivestockTradingModuleDbVerificationService>();
+base.Add<LivestockTradingModuleDbValidationService>();
 ```
 
 ### .http Test Dosyasi Kurali

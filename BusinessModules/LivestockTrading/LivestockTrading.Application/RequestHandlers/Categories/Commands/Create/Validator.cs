@@ -1,34 +1,46 @@
 using FluentValidation;
+using LivestockTrading.Domain.Errors;
+using LivestockTrading.Infrastructure.Services;
+using Common.Services.ErrorCodeGenerator;
 
 namespace LivestockTrading.Application.RequestHandlers.Categories.Commands.Create;
 
 public class Validator : IRequestValidator
 {
+	private readonly LivestockTradingModuleDbValidationService _dbValidator;
+
 	public Validator(ArfBlocksDependencyProvider dependencyProvider)
 	{
+		_dbValidator = dependencyProvider.GetInstance<LivestockTradingModuleDbValidationService>();
 	}
 
 	public void ValidateRequestModel(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
 	{
 		var request = (RequestModel)payload;
-		var result = new RequestModelValidator().Validate(request);
+		var result = new RequestModel_Validator().Validate(request);
 		if (!result.IsValid)
 			throw new ArfBlocksValidationException(result.ToString("~"));
 	}
 
 	public async Task ValidateDomain(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
 	{
+		var request = (RequestModel)payload;
+		await _dbValidator.ValidateCategorySlugUnique(request.Slug, null, cancellationToken);
+		await _dbValidator.ValidateCategoryNameUnique(request.Name, request.ParentCategoryId, null, cancellationToken);
+		await _dbValidator.ValidateParentCategoryExist(request.ParentCategoryId, cancellationToken);
 	}
 }
 
-public class RequestModelValidator : AbstractValidator<RequestModel>
+public class RequestModel_Validator : AbstractValidator<RequestModel>
 {
-	public RequestModelValidator()
+	public RequestModel_Validator()
 	{
 		RuleFor(x => x.Name)
-			.NotEmpty().WithMessage("CATEGORY_NAME_REQUIRED");
+			.NotEmpty()
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.CategoryErrors.NameRequired));
 
 		RuleFor(x => x.Slug)
-			.NotEmpty().WithMessage("CATEGORY_SLUG_REQUIRED");
+			.NotEmpty()
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.CategoryErrors.SlugRequired));
 	}
 }

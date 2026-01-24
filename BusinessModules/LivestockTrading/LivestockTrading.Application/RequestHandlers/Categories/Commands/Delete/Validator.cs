@@ -1,31 +1,41 @@
 using FluentValidation;
+using LivestockTrading.Domain.Errors;
+using LivestockTrading.Infrastructure.Services;
+using Common.Services.ErrorCodeGenerator;
 
 namespace LivestockTrading.Application.RequestHandlers.Categories.Commands.Delete;
 
 public class Validator : IRequestValidator
 {
+	private readonly LivestockTradingModuleDbValidationService _dbValidator;
+
 	public Validator(ArfBlocksDependencyProvider dependencyProvider)
 	{
+		_dbValidator = dependencyProvider.GetInstance<LivestockTradingModuleDbValidationService>();
 	}
 
 	public void ValidateRequestModel(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
 	{
 		var request = (RequestModel)payload;
-		var result = new RequestModelValidator().Validate(request);
+		var result = new RequestModel_Validator().Validate(request);
 		if (!result.IsValid)
 			throw new ArfBlocksValidationException(result.ToString("~"));
 	}
 
 	public async Task ValidateDomain(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
 	{
+		var request = (RequestModel)payload;
+		await _dbValidator.ValidateCategoryExist(request.Id, cancellationToken);
+		await _dbValidator.ValidateCategoryHasNoChildren(request.Id, cancellationToken);
 	}
 }
 
-public class RequestModelValidator : AbstractValidator<RequestModel>
+public class RequestModel_Validator : AbstractValidator<RequestModel>
 {
-	public RequestModelValidator()
+	public RequestModel_Validator()
 	{
 		RuleFor(x => x.Id)
-			.NotEmpty().WithMessage("CATEGORY_ID_REQUIRED");
+			.NotEmpty()
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.CommonErrors.IdNotValid));
 	}
 }
