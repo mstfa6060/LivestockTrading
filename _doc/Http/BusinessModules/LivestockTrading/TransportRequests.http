@@ -1,0 +1,70 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/TransportRequests/Create
+Content-Type: application/json
+
+{
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "sellerId": "00000000-0000-0000-0000-000000000002",
+    "buyerId": "00000000-0000-0000-0000-000000000003",
+    "pickupLocationId": "00000000-0000-0000-0000-000000000004",
+    "deliveryLocationId": "00000000-0000-0000-0000-000000000005",
+    "transportType": 0,
+    "status": 0,
+    "isUrgent": false,
+    "notes": "2 Holstein dairy cows, handle with care. Estimated weight 1300kg total."
+}
+
+### All
+POST {{BaseUrl}}/TransportRequests/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/TransportRequests/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/TransportRequests/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/TransportRequests/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "sellerId": "00000000-0000-0000-0000-000000000002",
+    "buyerId": "00000000-0000-0000-0000-000000000003",
+    "pickupLocationId": "00000000-0000-0000-0000-000000000004",
+    "deliveryLocationId": "00000000-0000-0000-0000-000000000005",
+    "transportType": 0,
+    "status": 0,
+    "isUrgent": true,
+    "notes": "Urgent: delivery needed by Feb 15. 2 Holstein dairy cows."
+}
+
+### Delete
+POST {{BaseUrl}}/TransportRequests/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

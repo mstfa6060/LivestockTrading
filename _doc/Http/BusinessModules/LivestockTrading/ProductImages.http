@@ -1,0 +1,64 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/ProductImages/Create
+Content-Type: application/json
+
+{
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "imageUrl": "https://example.com/products/holstein-cow-01.jpg",
+    "thumbnailUrl": "https://example.com/products/thumbnails/holstein-cow-01.jpg",
+    "altText": "Holstein dairy cow front view",
+    "sortOrder": 1,
+    "isPrimary": true
+}
+
+### All
+POST {{BaseUrl}}/ProductImages/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/ProductImages/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/ProductImages/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/ProductImages/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "imageUrl": "https://example.com/products/holstein-cow-02.jpg",
+    "thumbnailUrl": "https://example.com/products/thumbnails/holstein-cow-02.jpg",
+    "altText": "Holstein dairy cow side view",
+    "sortOrder": 2,
+    "isPrimary": false
+}
+
+### Delete
+POST {{BaseUrl}}/ProductImages/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

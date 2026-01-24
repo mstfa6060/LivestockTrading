@@ -1,0 +1,64 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/Notifications/Create
+Content-Type: application/json
+
+{
+    "userId": "00000000-0000-0000-0000-000000000001",
+    "title": "New Offer Received",
+    "message": "You have received a new offer for your Holstein Dairy Cow listing.",
+    "type": 0,
+    "actionUrl": "/offers/00000000-0000-0000-0000-000000000002",
+    "actionData": "{\"offerId\": \"00000000-0000-0000-0000-000000000002\", \"productId\": \"00000000-0000-0000-0000-000000000003\"}"
+}
+
+### All
+POST {{BaseUrl}}/Notifications/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/Notifications/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/Notifications/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/Notifications/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "userId": "00000000-0000-0000-0000-000000000001",
+    "title": "Offer Updated",
+    "message": "The offer for your listing has been updated.",
+    "type": 0,
+    "actionUrl": "/offers/00000000-0000-0000-0000-000000000002",
+    "actionData": "{\"offerId\": \"00000000-0000-0000-0000-000000000002\"}"
+}
+
+### Delete
+POST {{BaseUrl}}/Notifications/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

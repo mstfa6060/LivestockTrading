@@ -1,0 +1,70 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/ProductPrices/Create
+Content-Type: application/json
+
+{
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "currencyCode": "EUR",
+    "price": 13500.00,
+    "discountedPrice": 13000.00,
+    "countryCodes": "[\"DE\", \"FR\", \"NL\", \"BE\"]",
+    "isActive": true,
+    "validFrom": "2025-01-01T00:00:00Z",
+    "validUntil": "2025-12-31T23:59:59Z",
+    "isAutomaticConversion": false
+}
+
+### All
+POST {{BaseUrl}}/ProductPrices/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/ProductPrices/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/ProductPrices/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/ProductPrices/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "currencyCode": "EUR",
+    "price": 14000.00,
+    "discountedPrice": 13500.00,
+    "countryCodes": "[\"DE\", \"FR\", \"NL\", \"BE\", \"AT\"]",
+    "isActive": true,
+    "validFrom": "2025-01-01T00:00:00Z",
+    "validUntil": "2026-06-30T23:59:59Z",
+    "isAutomaticConversion": false
+}
+
+### Delete
+POST {{BaseUrl}}/ProductPrices/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

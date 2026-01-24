@@ -1,0 +1,78 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/Farms/Create
+Content-Type: application/json
+
+{
+    "name": "Sunset Valley Farm",
+    "description": "A large-scale organic dairy and cattle farm",
+    "registrationNumber": "FARM-2024-0001",
+    "sellerId": "00000000-0000-0000-0000-000000000001",
+    "locationId": "00000000-0000-0000-0000-000000000002",
+    "type": 0,
+    "totalAreaHectares": 250.5,
+    "cultivatedAreaHectares": 180.0,
+    "certifications": "[\"ISO 22000\", \"Organic Certified\", \"GlobalGAP\"]",
+    "isOrganic": true,
+    "imageUrls": "[\"https://example.com/farms/sunset-1.jpg\", \"https://example.com/farms/sunset-2.jpg\"]",
+    "videoUrl": "https://example.com/videos/sunset-farm-tour.mp4",
+    "isActive": true
+}
+
+### All
+POST {{BaseUrl}}/Farms/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/Farms/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/Farms/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/Farms/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "name": "Sunset Valley Farm - Expanded",
+    "description": "Updated description for expanded farm operations",
+    "registrationNumber": "FARM-2024-0001",
+    "sellerId": "00000000-0000-0000-0000-000000000001",
+    "locationId": "00000000-0000-0000-0000-000000000002",
+    "type": 0,
+    "totalAreaHectares": 350.0,
+    "cultivatedAreaHectares": 280.0,
+    "certifications": "[\"ISO 22000\", \"Organic Certified\", \"GlobalGAP\", \"HACCP\"]",
+    "isOrganic": true,
+    "imageUrls": "[\"https://example.com/farms/sunset-new-1.jpg\"]",
+    "videoUrl": "https://example.com/videos/sunset-farm-tour-2024.mp4",
+    "isActive": true
+}
+
+### Delete
+POST {{BaseUrl}}/Farms/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

@@ -1,0 +1,68 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/ProductDocuments/Create
+Content-Type: application/json
+
+{
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "documentUrl": "https://example.com/documents/health-certificate.pdf",
+    "fileName": "health-certificate.pdf",
+    "title": "Health Certificate",
+    "type": 0,
+    "fileSizeBytes": 245760,
+    "mimeType": "application/pdf",
+    "sortOrder": 1
+}
+
+### All
+POST {{BaseUrl}}/ProductDocuments/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/ProductDocuments/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/ProductDocuments/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/ProductDocuments/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "documentUrl": "https://example.com/documents/vaccination-record.pdf",
+    "fileName": "vaccination-record.pdf",
+    "title": "Vaccination Record",
+    "type": 0,
+    "fileSizeBytes": 189440,
+    "mimeType": "application/pdf",
+    "sortOrder": 2
+}
+
+### Delete
+POST {{BaseUrl}}/ProductDocuments/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

@@ -1,0 +1,88 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/Sellers/Create
+Content-Type: application/json
+
+{
+    "userId": "00000000-0000-0000-0000-000000000001",
+    "businessName": "Green Valley Livestock",
+    "businessType": "Farm",
+    "taxNumber": "1234567890",
+    "registrationNumber": "REG-2024-001",
+    "description": "Premium livestock supplier specializing in dairy cattle",
+    "logoUrl": "https://example.com/logos/green-valley.png",
+    "bannerUrl": "https://example.com/banners/green-valley.jpg",
+    "email": "sales@greenvalley.com",
+    "phone": "+905551234567",
+    "website": "https://www.greenvalley.com",
+    "isActive": true,
+    "status": 0,
+    "businessHours": "{\"monday\": \"08:00-18:00\", \"tuesday\": \"08:00-18:00\", \"wednesday\": \"08:00-18:00\", \"thursday\": \"08:00-18:00\", \"friday\": \"08:00-17:00\"}",
+    "acceptedPaymentMethods": "[\"bank_transfer\", \"credit_card\", \"cash\"]",
+    "returnPolicy": "Returns accepted within 7 days with veterinary report",
+    "shippingPolicy": "Nationwide shipping available, buyer covers transport costs",
+    "socialMediaLinks": "{\"instagram\": \"@greenvalleyfarm\", \"facebook\": \"greenvalleylivestock\"}"
+}
+
+### All
+POST {{BaseUrl}}/Sellers/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/Sellers/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/Sellers/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/Sellers/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "userId": "00000000-0000-0000-0000-000000000001",
+    "businessName": "Green Valley Livestock - Updated",
+    "businessType": "Farm & Ranch",
+    "taxNumber": "1234567890",
+    "registrationNumber": "REG-2024-001",
+    "description": "Updated description - Premium livestock supplier",
+    "logoUrl": "https://example.com/logos/green-valley-new.png",
+    "bannerUrl": "https://example.com/banners/green-valley-new.jpg",
+    "email": "sales@greenvalley.com",
+    "phone": "+905559876543",
+    "website": "https://www.greenvalley.com",
+    "isActive": true,
+    "status": 0,
+    "businessHours": "{\"monday\": \"09:00-17:00\", \"tuesday\": \"09:00-17:00\"}",
+    "acceptedPaymentMethods": "[\"bank_transfer\", \"credit_card\"]",
+    "returnPolicy": "Updated return policy",
+    "shippingPolicy": "Updated shipping policy",
+    "socialMediaLinks": "{\"instagram\": \"@greenvalleyfarm\"}"
+}
+
+### Delete
+POST {{BaseUrl}}/Sellers/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

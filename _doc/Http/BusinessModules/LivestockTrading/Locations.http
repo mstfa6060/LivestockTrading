@@ -1,0 +1,80 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/Locations/Create
+Content-Type: application/json
+
+{
+    "name": "Main Farm Location",
+    "addressLine1": "123 Farm Road",
+    "addressLine2": "Building A",
+    "city": "Ankara",
+    "state": "Ankara",
+    "postalCode": "06100",
+    "countryCode": "TR",
+    "latitude": 39.9334,
+    "longitude": 32.8597,
+    "phone": "+905551234567",
+    "email": "farm@example.com",
+    "type": 0,
+    "isActive": true,
+    "userId": "00000000-0000-0000-0000-000000000001"
+}
+
+### All
+POST {{BaseUrl}}/Locations/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/Locations/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/Locations/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/Locations/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "name": "Updated Farm Location",
+    "addressLine1": "456 Farm Avenue",
+    "addressLine2": "Building B",
+    "city": "Istanbul",
+    "state": "Istanbul",
+    "postalCode": "34000",
+    "countryCode": "TR",
+    "latitude": 41.0082,
+    "longitude": 28.9784,
+    "phone": "+905559876543",
+    "email": "farm-updated@example.com",
+    "type": 0,
+    "isActive": true,
+    "userId": "00000000-0000-0000-0000-000000000001"
+}
+
+### Delete
+POST {{BaseUrl}}/Locations/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

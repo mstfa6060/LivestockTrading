@@ -1,0 +1,108 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/Products/Create
+Content-Type: application/json
+
+{
+    "title": "Holstein Dairy Cow",
+    "slug": "holstein-dairy-cow",
+    "description": "High-quality Holstein dairy cow, excellent milk production",
+    "shortDescription": "Premium Holstein dairy cow",
+    "categoryId": "00000000-0000-0000-0000-000000000001",
+    "brandId": "00000000-0000-0000-0000-000000000002",
+    "basePrice": 15000.00,
+    "currency": "USD",
+    "discountedPrice": 14500.00,
+    "priceUnit": "head",
+    "stockQuantity": 5,
+    "stockUnit": "head",
+    "minOrderQuantity": 1,
+    "maxOrderQuantity": 10,
+    "isInStock": true,
+    "sellerId": "00000000-0000-0000-0000-000000000003",
+    "locationId": "00000000-0000-0000-0000-000000000004",
+    "status": 0,
+    "condition": 0,
+    "isShippingAvailable": true,
+    "shippingCost": 500.00,
+    "isInternationalShipping": false,
+    "weight": 650.0,
+    "weightUnit": "kg",
+    "attributes": "{\"milkYield\": \"30L/day\", \"lactation\": 3}",
+    "metaTitle": "Holstein Dairy Cow for Sale",
+    "metaDescription": "Buy premium Holstein dairy cows with high milk production",
+    "metaKeywords": "holstein, dairy cow, milk cow, livestock"
+}
+
+### All
+POST {{BaseUrl}}/Products/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/Products/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/Products/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/Products/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "title": "Holstein Dairy Cow - Updated",
+    "slug": "holstein-dairy-cow-updated",
+    "description": "Updated description for Holstein dairy cow",
+    "shortDescription": "Updated premium Holstein dairy cow",
+    "categoryId": "00000000-0000-0000-0000-000000000001",
+    "brandId": "00000000-0000-0000-0000-000000000002",
+    "basePrice": 16000.00,
+    "currency": "USD",
+    "discountedPrice": 15000.00,
+    "priceUnit": "head",
+    "stockQuantity": 3,
+    "stockUnit": "head",
+    "minOrderQuantity": 1,
+    "maxOrderQuantity": 5,
+    "isInStock": true,
+    "sellerId": "00000000-0000-0000-0000-000000000003",
+    "locationId": "00000000-0000-0000-0000-000000000004",
+    "status": 0,
+    "condition": 0,
+    "isShippingAvailable": true,
+    "shippingCost": 600.00,
+    "isInternationalShipping": true,
+    "weight": 650.0,
+    "weightUnit": "kg",
+    "attributes": "{\"milkYield\": \"32L/day\", \"lactation\": 4}",
+    "metaTitle": "Holstein Dairy Cow for Sale - Updated",
+    "metaDescription": "Buy premium Holstein dairy cows - updated listing",
+    "metaKeywords": "holstein, dairy cow, milk cow, livestock, premium"
+}
+
+### Delete
+POST {{BaseUrl}}/Products/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

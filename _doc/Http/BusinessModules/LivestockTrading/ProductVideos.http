@@ -1,0 +1,66 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/ProductVideos/Create
+Content-Type: application/json
+
+{
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "videoUrl": "https://example.com/videos/holstein-cow-walkthrough.mp4",
+    "thumbnailUrl": "https://example.com/videos/thumbnails/holstein-cow-walkthrough.jpg",
+    "title": "Holstein Cow - Farm Walkthrough",
+    "durationSeconds": 120,
+    "sortOrder": 1,
+    "provider": 0
+}
+
+### All
+POST {{BaseUrl}}/ProductVideos/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/ProductVideos/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/ProductVideos/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/ProductVideos/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "videoUrl": "https://example.com/videos/holstein-cow-milking.mp4",
+    "thumbnailUrl": "https://example.com/videos/thumbnails/holstein-cow-milking.jpg",
+    "title": "Holstein Cow - Milking Session",
+    "durationSeconds": 180,
+    "sortOrder": 2,
+    "provider": 0
+}
+
+### Delete
+POST {{BaseUrl}}/ProductVideos/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

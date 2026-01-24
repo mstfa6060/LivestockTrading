@@ -1,0 +1,64 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/ProductReviews/Create
+Content-Type: application/json
+
+{
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "userId": "00000000-0000-0000-0000-000000000002",
+    "rating": 5,
+    "title": "Excellent quality livestock",
+    "comment": "The Holstein cow I purchased is in great health and produces excellent milk. Very satisfied with this seller.",
+    "isVerifiedPurchase": true
+}
+
+### All
+POST {{BaseUrl}}/ProductReviews/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/ProductReviews/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/ProductReviews/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/ProductReviews/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "userId": "00000000-0000-0000-0000-000000000002",
+    "rating": 4,
+    "title": "Good quality but delayed delivery",
+    "comment": "The animal is healthy but the delivery took longer than expected.",
+    "isVerifiedPurchase": true
+}
+
+### Delete
+POST {{BaseUrl}}/ProductReviews/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

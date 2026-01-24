@@ -1,0 +1,70 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/Banners/Create
+Content-Type: application/json
+
+{
+    "title": "Spring Sale - Premium Livestock",
+    "description": "Get up to 20% off on selected livestock this spring season",
+    "imageUrl": "https://example.com/banners/spring-sale-2025.jpg",
+    "targetUrl": "/products?filter=spring-sale",
+    "position": 0,
+    "startDate": "2025-03-01T00:00:00Z",
+    "endDate": "2025-05-31T23:59:59Z",
+    "isActive": true,
+    "displayOrder": 1
+}
+
+### All
+POST {{BaseUrl}}/Banners/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/Banners/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/Banners/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/Banners/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "title": "Extended Spring Sale - Premium Livestock",
+    "description": "Sale extended! Get up to 25% off on selected livestock",
+    "imageUrl": "https://example.com/banners/spring-sale-extended-2025.jpg",
+    "targetUrl": "/products?filter=spring-sale-extended",
+    "position": 0,
+    "startDate": "2025-03-01T00:00:00Z",
+    "endDate": "2025-06-30T23:59:59Z",
+    "isActive": true,
+    "displayOrder": 1
+}
+
+### Delete
+POST {{BaseUrl}}/Banners/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

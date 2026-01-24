@@ -1,0 +1,66 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/VeterinaryInfos/Create
+Content-Type: application/json
+
+{
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "type": 0,
+    "therapeuticCategory": "Antibiotic",
+    "targetSpecies": "[\"Cattle\", \"Sheep\", \"Goat\"]",
+    "route": 0,
+    "requiresPrescription": true,
+    "registrationNumber": "VET-MED-2024-0567"
+}
+
+### All
+POST {{BaseUrl}}/VeterinaryInfos/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/VeterinaryInfos/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/VeterinaryInfos/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/VeterinaryInfos/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "type": 0,
+    "therapeuticCategory": "Anti-inflammatory",
+    "targetSpecies": "[\"Cattle\", \"Horse\"]",
+    "route": 0,
+    "requiresPrescription": false,
+    "registrationNumber": "VET-MED-2024-0568"
+}
+
+### Delete
+POST {{BaseUrl}}/VeterinaryInfos/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

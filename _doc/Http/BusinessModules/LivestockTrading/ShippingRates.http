@@ -1,0 +1,72 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/ShippingRates/Create
+Content-Type: application/json
+
+{
+    "shippingZoneId": "00000000-0000-0000-0000-000000000001",
+    "shippingCarrierId": "00000000-0000-0000-0000-000000000002",
+    "minWeight": 0.0,
+    "maxWeight": 500.0,
+    "minOrderAmount": 0.0,
+    "shippingCost": 350.00,
+    "currency": "USD",
+    "estimatedDeliveryDays": 3,
+    "isFreeShipping": false,
+    "isActive": true
+}
+
+### All
+POST {{BaseUrl}}/ShippingRates/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/ShippingRates/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/ShippingRates/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/ShippingRates/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "shippingZoneId": "00000000-0000-0000-0000-000000000001",
+    "shippingCarrierId": "00000000-0000-0000-0000-000000000002",
+    "minWeight": 0.0,
+    "maxWeight": 1000.0,
+    "minOrderAmount": 5000.0,
+    "shippingCost": 0.0,
+    "currency": "USD",
+    "estimatedDeliveryDays": 5,
+    "isFreeShipping": true,
+    "isActive": true
+}
+
+### Delete
+POST {{BaseUrl}}/ShippingRates/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

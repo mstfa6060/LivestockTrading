@@ -1,0 +1,60 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/ShippingZones/Create
+Content-Type: application/json
+
+{
+    "sellerId": "00000000-0000-0000-0000-000000000001",
+    "name": "Europe Zone 1",
+    "countryCodes": "[\"DE\", \"FR\", \"NL\", \"BE\", \"AT\"]",
+    "isActive": true
+}
+
+### All
+POST {{BaseUrl}}/ShippingZones/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/ShippingZones/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/ShippingZones/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/ShippingZones/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "sellerId": "00000000-0000-0000-0000-000000000001",
+    "name": "Europe Zone 1 - Expanded",
+    "countryCodes": "[\"DE\", \"FR\", \"NL\", \"BE\", \"AT\", \"IT\", \"ES\", \"PT\"]",
+    "isActive": true
+}
+
+### Delete
+POST {{BaseUrl}}/ShippingZones/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

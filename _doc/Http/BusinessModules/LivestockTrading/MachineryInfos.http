@@ -1,0 +1,70 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/MachineryInfos/Create
+Content-Type: application/json
+
+{
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "type": 0,
+    "model": "John Deere 6120M",
+    "yearOfManufacture": 2022,
+    "serialNumber": "JD6120M-2022-78901",
+    "powerSource": "Diesel",
+    "powerHp": 120,
+    "hoursUsed": 1500,
+    "hasWarranty": true
+}
+
+### All
+POST {{BaseUrl}}/MachineryInfos/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/MachineryInfos/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/MachineryInfos/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/MachineryInfos/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "type": 0,
+    "model": "John Deere 6120M",
+    "yearOfManufacture": 2022,
+    "serialNumber": "JD6120M-2022-78901",
+    "powerSource": "Diesel",
+    "powerHp": 120,
+    "hoursUsed": 2000,
+    "hasWarranty": true
+}
+
+### Delete
+POST {{BaseUrl}}/MachineryInfos/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

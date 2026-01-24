@@ -1,0 +1,62 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/Conversations/Create
+Content-Type: application/json
+
+{
+    "participantUserId1": "00000000-0000-0000-0000-000000000001",
+    "participantUserId2": "00000000-0000-0000-0000-000000000002",
+    "productId": "00000000-0000-0000-0000-000000000003",
+    "subject": "Inquiry about Holstein Dairy Cow",
+    "status": 0
+}
+
+### All
+POST {{BaseUrl}}/Conversations/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/Conversations/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/Conversations/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/Conversations/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "participantUserId1": "00000000-0000-0000-0000-000000000001",
+    "participantUserId2": "00000000-0000-0000-0000-000000000002",
+    "productId": "00000000-0000-0000-0000-000000000003",
+    "subject": "Re: Inquiry about Holstein Dairy Cow",
+    "status": 0
+}
+
+### Delete
+POST {{BaseUrl}}/Conversations/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

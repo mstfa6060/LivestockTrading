@@ -1,0 +1,58 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/ProductViewHistories/Create
+Content-Type: application/json
+
+{
+    "userId": "00000000-0000-0000-0000-000000000001",
+    "productId": "00000000-0000-0000-0000-000000000002",
+    "viewSource": "search_results"
+}
+
+### All
+POST {{BaseUrl}}/ProductViewHistories/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/ProductViewHistories/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/ProductViewHistories/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/ProductViewHistories/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "userId": "00000000-0000-0000-0000-000000000001",
+    "productId": "00000000-0000-0000-0000-000000000002",
+    "viewSource": "recommendation"
+}
+
+### Delete
+POST {{BaseUrl}}/ProductViewHistories/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

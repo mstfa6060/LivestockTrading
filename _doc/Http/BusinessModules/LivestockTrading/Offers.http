@@ -1,0 +1,70 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/Offers/Create
+Content-Type: application/json
+
+{
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "buyerUserId": "00000000-0000-0000-0000-000000000002",
+    "sellerUserId": "00000000-0000-0000-0000-000000000003",
+    "offeredPrice": 14000.00,
+    "currency": "USD",
+    "quantity": 2,
+    "message": "I would like to purchase 2 Holstein cows. Can you offer a bulk discount?",
+    "status": 0,
+    "expiryDate": "2025-03-01T23:59:59Z"
+}
+
+### All
+POST {{BaseUrl}}/Offers/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/Offers/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/Offers/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/Offers/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "buyerUserId": "00000000-0000-0000-0000-000000000002",
+    "sellerUserId": "00000000-0000-0000-0000-000000000003",
+    "offeredPrice": 14500.00,
+    "currency": "USD",
+    "quantity": 2,
+    "message": "I can increase my offer slightly. Please consider.",
+    "status": 0,
+    "expiryDate": "2025-03-15T23:59:59Z"
+}
+
+### Delete
+POST {{BaseUrl}}/Offers/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

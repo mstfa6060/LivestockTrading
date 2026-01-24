@@ -1,0 +1,68 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/FAQs/Create
+Content-Type: application/json
+
+{
+    "question": "How do I place an order for livestock?",
+    "answer": "Browse our catalog, select the animal you want, and click 'Make Offer'. The seller will review and respond to your offer.",
+    "categoryId": "00000000-0000-0000-0000-000000000001",
+    "productId": null,
+    "sortOrder": 1,
+    "isActive": true,
+    "questionTranslations": "{\"tr\": \"Hayvan siparisi nasil verilir?\", \"de\": \"Wie bestelle ich Vieh?\"}",
+    "answerTranslations": "{\"tr\": \"Katalogumuza goz atin, istediginiz hayvani secin ve 'Teklif Ver' butonuna tiklayin.\", \"de\": \"Durchsuchen Sie unseren Katalog, wahlen Sie das gewunschte Tier aus und klicken Sie auf 'Angebot machen'.\"}"
+}
+
+### All
+POST {{BaseUrl}}/FAQs/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/FAQs/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/FAQs/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/FAQs/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "question": "How do I place an order for livestock? (Updated)",
+    "answer": "Updated answer: Browse our catalog, compare prices, and make an offer directly to the seller.",
+    "categoryId": "00000000-0000-0000-0000-000000000001",
+    "productId": null,
+    "sortOrder": 1,
+    "isActive": true,
+    "questionTranslations": "{\"tr\": \"Hayvan siparisi nasil verilir? (Guncellendi)\"}",
+    "answerTranslations": "{\"tr\": \"Guncel cevap: Katalogumuza goz atin, fiyatlari karsilastirin ve dogrudan saticiya teklif verin.\"}"
+}
+
+### Delete
+POST {{BaseUrl}}/FAQs/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

@@ -1,0 +1,70 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/Brands/Create
+Content-Type: application/json
+
+{
+    "name": "Test Brand",
+    "slug": "test-brand",
+    "description": "A test brand for livestock products",
+    "logoUrl": "https://example.com/logos/test-brand.png",
+    "website": "https://www.testbrand.com",
+    "email": "info@testbrand.com",
+    "phone": "+905551234567",
+    "countryCode": "TR",
+    "isActive": true
+}
+
+### All
+POST {{BaseUrl}}/Brands/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/Brands/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/Brands/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/Brands/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "name": "Updated Brand",
+    "slug": "updated-brand",
+    "description": "An updated brand description",
+    "logoUrl": "https://example.com/logos/updated-brand.png",
+    "website": "https://www.updatedbrand.com",
+    "email": "info@updatedbrand.com",
+    "phone": "+905559876543",
+    "countryCode": "TR",
+    "isActive": true
+}
+
+### Delete
+POST {{BaseUrl}}/Brands/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

@@ -1,0 +1,78 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/Deals/Create
+Content-Type: application/json
+
+{
+    "dealNumber": "DEAL-2025-00001",
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "sellerId": "00000000-0000-0000-0000-000000000002",
+    "buyerId": "00000000-0000-0000-0000-000000000003",
+    "agreedPrice": 14500.00,
+    "currency": "USD",
+    "quantity": 2,
+    "status": 0,
+    "dealDate": "2025-02-01T10:00:00Z",
+    "deliveryMethod": 0,
+    "deliveryDate": "2025-02-15T10:00:00Z",
+    "buyerNotes": "Please ensure all health certificates are included",
+    "sellerNotes": "Animals will be prepared for transport by Feb 14"
+}
+
+### All
+POST {{BaseUrl}}/Deals/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/Deals/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/Deals/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/Deals/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "dealNumber": "DEAL-2025-00001",
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "sellerId": "00000000-0000-0000-0000-000000000002",
+    "buyerId": "00000000-0000-0000-0000-000000000003",
+    "agreedPrice": 14500.00,
+    "currency": "USD",
+    "quantity": 2,
+    "status": 0,
+    "dealDate": "2025-02-01T10:00:00Z",
+    "deliveryMethod": 0,
+    "deliveryDate": "2025-02-20T10:00:00Z",
+    "buyerNotes": "Delivery date adjusted to Feb 20",
+    "sellerNotes": "Acknowledged new delivery date"
+}
+
+### Delete
+POST {{BaseUrl}}/Deals/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

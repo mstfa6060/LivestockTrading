@@ -1,0 +1,23 @@
+namespace LivestockTrading.Application.RequestHandlers.ShippingCarriers.Commands.Create;
+
+public class RequestModel : IRequestModel
+{
+	public string Name { get; set; }
+	public string Code { get; set; }
+	public string Website { get; set; }
+	public string TrackingUrlTemplate { get; set; }
+	public bool IsActive { get; set; } = true;
+	public string SupportedCountries { get; set; }
+}
+
+public class ResponseModel : IResponseModel
+{
+	public Guid Id { get; set; }
+	public string Name { get; set; }
+	public string Code { get; set; }
+	public string Website { get; set; }
+	public string TrackingUrlTemplate { get; set; }
+	public bool IsActive { get; set; }
+	public string SupportedCountries { get; set; }
+	public DateTime CreatedAt { get; set; }
+}

@@ -1,0 +1,60 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/SearchHistories/Create
+Content-Type: application/json
+
+{
+    "userId": "00000000-0000-0000-0000-000000000001",
+    "searchQuery": "Holstein dairy cow Ankara",
+    "filters": "{\"category\": \"cattle\", \"minPrice\": 10000, \"maxPrice\": 20000, \"location\": \"Ankara\"}",
+    "resultsCount": 15
+}
+
+### All
+POST {{BaseUrl}}/SearchHistories/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/SearchHistories/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/SearchHistories/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/SearchHistories/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "userId": "00000000-0000-0000-0000-000000000001",
+    "searchQuery": "Angus beef cattle Istanbul",
+    "filters": "{\"category\": \"cattle\", \"breed\": \"Angus\", \"location\": \"Istanbul\"}",
+    "resultsCount": 8
+}
+
+### Delete
+POST {{BaseUrl}}/SearchHistories/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

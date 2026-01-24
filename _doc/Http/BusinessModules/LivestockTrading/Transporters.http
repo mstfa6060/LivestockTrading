@@ -1,0 +1,72 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/Transporters/Create
+Content-Type: application/json
+
+{
+    "userId": "00000000-0000-0000-0000-000000000001",
+    "companyName": "Fast Livestock Transport",
+    "contactPerson": "Ahmet Demir",
+    "email": "info@fastlivestock.com",
+    "phone": "+905551234567",
+    "address": "Industrial Zone, Building 5",
+    "city": "Ankara",
+    "countryCode": "TR",
+    "licenseNumber": "LIC-TR-2024-0089",
+    "isActive": true
+}
+
+### All
+POST {{BaseUrl}}/Transporters/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/Transporters/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/Transporters/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/Transporters/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "userId": "00000000-0000-0000-0000-000000000001",
+    "companyName": "Fast Livestock Transport Ltd.",
+    "contactPerson": "Ahmet Demir",
+    "email": "contact@fastlivestock.com",
+    "phone": "+905559876543",
+    "address": "Industrial Zone, Building 10",
+    "city": "Istanbul",
+    "countryCode": "TR",
+    "licenseNumber": "LIC-TR-2024-0089",
+    "isActive": true
+}
+
+### Delete
+POST {{BaseUrl}}/Transporters/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

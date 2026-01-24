@@ -1,0 +1,64 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/ShippingCarriers/Create
+Content-Type: application/json
+
+{
+    "name": "National Livestock Carriers",
+    "code": "NLC",
+    "website": "https://www.nlcarriers.com",
+    "trackingUrlTemplate": "https://www.nlcarriers.com/track/{trackingNumber}",
+    "isActive": true,
+    "supportedCountries": "[\"TR\", \"DE\", \"FR\", \"NL\", \"BE\", \"AT\"]"
+}
+
+### All
+POST {{BaseUrl}}/ShippingCarriers/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/ShippingCarriers/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/ShippingCarriers/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/ShippingCarriers/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "name": "National Livestock Carriers - International",
+    "code": "NLC",
+    "website": "https://www.nlcarriers-intl.com",
+    "trackingUrlTemplate": "https://www.nlcarriers-intl.com/track/{trackingNumber}",
+    "isActive": true,
+    "supportedCountries": "[\"TR\", \"DE\", \"FR\", \"NL\", \"BE\", \"AT\", \"IT\", \"ES\"]"
+}
+
+### Delete
+POST {{BaseUrl}}/ShippingCarriers/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

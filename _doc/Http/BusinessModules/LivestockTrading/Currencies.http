@@ -1,0 +1,62 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/Currencies/Create
+Content-Type: application/json
+
+{
+    "code": "TRY",
+    "symbol": "₺",
+    "name": "Turkish Lira",
+    "exchangeRateToUSD": 0.031,
+    "isActive": true
+}
+
+### All
+POST {{BaseUrl}}/Currencies/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/Currencies/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/Currencies/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/Currencies/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "code": "TRY",
+    "symbol": "₺",
+    "name": "Turkish Lira",
+    "exchangeRateToUSD": 0.030,
+    "isActive": true
+}
+
+### Delete
+POST {{BaseUrl}}/Currencies/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

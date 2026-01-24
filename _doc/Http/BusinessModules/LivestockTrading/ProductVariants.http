@@ -1,0 +1,74 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/ProductVariants/Create
+Content-Type: application/json
+
+{
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "name": "2-Year-Old Female",
+    "sku": "HOL-F-2Y-001",
+    "price": 15000.00,
+    "discountedPrice": 14500.00,
+    "stockQuantity": 3,
+    "isInStock": true,
+    "attributes": "{\"age\": \"2 years\", \"gender\": \"Female\", \"weight\": \"450kg\"}",
+    "imageUrl": "https://example.com/products/variant-1.jpg",
+    "isActive": true,
+    "sortOrder": 1
+}
+
+### All
+POST {{BaseUrl}}/ProductVariants/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/ProductVariants/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/ProductVariants/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/ProductVariants/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "name": "3-Year-Old Female",
+    "sku": "HOL-F-3Y-001",
+    "price": 17000.00,
+    "discountedPrice": 16000.00,
+    "stockQuantity": 2,
+    "isInStock": true,
+    "attributes": "{\"age\": \"3 years\", \"gender\": \"Female\", \"weight\": \"520kg\"}",
+    "imageUrl": "https://example.com/products/variant-1-updated.jpg",
+    "isActive": true,
+    "sortOrder": 1
+}
+
+### Delete
+POST {{BaseUrl}}/ProductVariants/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

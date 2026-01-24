@@ -1,0 +1,66 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/TransportTrackings/Create
+Content-Type: application/json
+
+{
+    "transportRequestId": "00000000-0000-0000-0000-000000000001",
+    "latitude": 39.9334,
+    "longitude": 32.8597,
+    "locationDescription": "Departed from Ankara livestock loading point",
+    "status": 0,
+    "statusDescription": "In transit - departed pickup location",
+    "notes": "Animals loaded successfully, departing on schedule"
+}
+
+### All
+POST {{BaseUrl}}/TransportTrackings/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/TransportTrackings/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/TransportTrackings/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/TransportTrackings/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "transportRequestId": "00000000-0000-0000-0000-000000000001",
+    "latitude": 40.5120,
+    "longitude": 30.5193,
+    "locationDescription": "Rest stop near Bolu",
+    "status": 0,
+    "statusDescription": "Rest stop - animals being checked and watered",
+    "notes": "Scheduled rest stop, all animals in good condition"
+}
+
+### Delete
+POST {{BaseUrl}}/TransportTrackings/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

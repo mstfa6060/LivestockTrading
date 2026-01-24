@@ -1,0 +1,68 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/Languages/Create
+Content-Type: application/json
+
+{
+    "code": "tr",
+    "name": "Turkish",
+    "nativeName": "Turkce",
+    "isRightToLeft": false,
+    "isActive": true,
+    "isDefault": false,
+    "sortOrder": 2,
+    "flagIconUrl": "https://example.com/flags/tr.svg"
+}
+
+### All
+POST {{BaseUrl}}/Languages/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/Languages/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/Languages/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/Languages/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "code": "tr",
+    "name": "Turkish",
+    "nativeName": "Turkce",
+    "isRightToLeft": false,
+    "isActive": true,
+    "isDefault": true,
+    "sortOrder": 1,
+    "flagIconUrl": "https://example.com/flags/tr-updated.svg"
+}
+
+### Delete
+POST {{BaseUrl}}/Languages/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

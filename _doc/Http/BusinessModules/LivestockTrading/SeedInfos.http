@@ -1,0 +1,68 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/SeedInfos/Create
+Content-Type: application/json
+
+{
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "type": 0,
+    "variety": "Golden Promise",
+    "scientificName": "Hordeum vulgare",
+    "germinationRate": 95.5,
+    "daysToMaturity": 90,
+    "isOrganic": true,
+    "isHybrid": false
+}
+
+### All
+POST {{BaseUrl}}/SeedInfos/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/SeedInfos/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/SeedInfos/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/SeedInfos/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "type": 0,
+    "variety": "Golden Promise - Improved",
+    "scientificName": "Hordeum vulgare",
+    "germinationRate": 97.0,
+    "daysToMaturity": 85,
+    "isOrganic": true,
+    "isHybrid": false
+}
+
+### Delete
+POST {{BaseUrl}}/SeedInfos/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

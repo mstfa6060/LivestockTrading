@@ -1,0 +1,68 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/FeedInfos/Create
+Content-Type: application/json
+
+{
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "type": 0,
+    "targetAnimal": "Cattle",
+    "targetAge": "Adult",
+    "proteinPercentage": 18.5,
+    "form": 0,
+    "isOrganic": true,
+    "expiryDate": "2025-12-31T23:59:59Z"
+}
+
+### All
+POST {{BaseUrl}}/FeedInfos/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/FeedInfos/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/FeedInfos/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/FeedInfos/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "type": 0,
+    "targetAnimal": "Cattle",
+    "targetAge": "Calf",
+    "proteinPercentage": 22.0,
+    "form": 0,
+    "isOrganic": true,
+    "expiryDate": "2026-06-30T23:59:59Z"
+}
+
+### Delete
+POST {{BaseUrl}}/FeedInfos/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

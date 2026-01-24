@@ -1,0 +1,70 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/TaxRates/Create
+Content-Type: application/json
+
+{
+    "countryCode": "TR",
+    "stateCode": "",
+    "taxName": "KDV",
+    "rate": 18.0,
+    "type": 0,
+    "categoryId": "00000000-0000-0000-0000-000000000001",
+    "isActive": true,
+    "validFrom": "2025-01-01T00:00:00Z",
+    "validUntil": "2025-12-31T23:59:59Z"
+}
+
+### All
+POST {{BaseUrl}}/TaxRates/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/TaxRates/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/TaxRates/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/TaxRates/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "countryCode": "TR",
+    "stateCode": "",
+    "taxName": "KDV - Updated",
+    "rate": 20.0,
+    "type": 0,
+    "categoryId": "00000000-0000-0000-0000-000000000001",
+    "isActive": true,
+    "validFrom": "2025-07-01T00:00:00Z",
+    "validUntil": "2026-12-31T23:59:59Z"
+}
+
+### Delete
+POST {{BaseUrl}}/TaxRates/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

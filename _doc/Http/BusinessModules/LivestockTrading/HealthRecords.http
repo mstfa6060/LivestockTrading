@@ -1,0 +1,76 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/HealthRecords/Create
+Content-Type: application/json
+
+{
+    "animalInfoId": "00000000-0000-0000-0000-000000000001",
+    "recordDate": "2025-01-10T10:00:00Z",
+    "recordType": "Routine Checkup",
+    "veterinarianName": "Dr. Mehmet Yilmaz",
+    "veterinarianLicense": "VET-TR-12345",
+    "clinicName": "Ankara Veterinary Clinic",
+    "diagnosis": "Healthy, no issues found",
+    "treatment": "Routine deworming administered",
+    "medications": "[{\"name\": \"Ivermectin\", \"dosage\": \"10ml\", \"frequency\": \"Single dose\"}]",
+    "notes": "Animal in excellent condition, recommend follow-up in 6 months",
+    "followUpDate": "2025-07-10T10:00:00Z",
+    "documentUrl": "https://example.com/documents/health-record-001.pdf"
+}
+
+### All
+POST {{BaseUrl}}/HealthRecords/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/HealthRecords/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/HealthRecords/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/HealthRecords/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "animalInfoId": "00000000-0000-0000-0000-000000000001",
+    "recordDate": "2025-01-10T10:00:00Z",
+    "recordType": "Follow-up Checkup",
+    "veterinarianName": "Dr. Mehmet Yilmaz",
+    "veterinarianLicense": "VET-TR-12345",
+    "clinicName": "Ankara Veterinary Clinic",
+    "diagnosis": "Minor inflammation observed",
+    "treatment": "Anti-inflammatory medication prescribed",
+    "medications": "[{\"name\": \"Meloxicam\", \"dosage\": \"5ml\", \"frequency\": \"Once daily for 5 days\"}]",
+    "notes": "Monitor for improvement, follow-up in 2 weeks",
+    "followUpDate": "2025-01-24T10:00:00Z",
+    "documentUrl": "https://example.com/documents/health-record-002.pdf"
+}
+
+### Delete
+POST {{BaseUrl}}/HealthRecords/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

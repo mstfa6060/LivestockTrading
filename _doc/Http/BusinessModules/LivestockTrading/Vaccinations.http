@@ -1,0 +1,72 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/Vaccinations/Create
+Content-Type: application/json
+
+{
+    "animalInfoId": "00000000-0000-0000-0000-000000000001",
+    "vaccineName": "Foot and Mouth Disease Vaccine",
+    "vaccineType": "Inactivated",
+    "batchNumber": "BATCH-FMD-2025-001",
+    "vaccinationDate": "2025-01-15T09:00:00Z",
+    "nextDueDate": "2025-07-15T09:00:00Z",
+    "veterinarianName": "Dr. Ayse Kara",
+    "veterinarianLicense": "VET-TR-67890",
+    "notes": "No adverse reactions observed, animal in good health",
+    "certificateUrl": "https://example.com/certificates/vaccination-fmd-001.pdf"
+}
+
+### All
+POST {{BaseUrl}}/Vaccinations/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/Vaccinations/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/Vaccinations/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/Vaccinations/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "animalInfoId": "00000000-0000-0000-0000-000000000001",
+    "vaccineName": "Brucellosis Vaccine",
+    "vaccineType": "Live Attenuated",
+    "batchNumber": "BATCH-BRU-2025-002",
+    "vaccinationDate": "2025-02-01T10:00:00Z",
+    "nextDueDate": "2026-02-01T10:00:00Z",
+    "veterinarianName": "Dr. Ayse Kara",
+    "veterinarianLicense": "VET-TR-67890",
+    "notes": "Booster dose administered",
+    "certificateUrl": "https://example.com/certificates/vaccination-bru-002.pdf"
+}
+
+### Delete
+POST {{BaseUrl}}/Vaccinations/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

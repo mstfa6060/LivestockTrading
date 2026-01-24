@@ -1,0 +1,56 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/FavoriteProducts/Create
+Content-Type: application/json
+
+{
+    "userId": "00000000-0000-0000-0000-000000000001",
+    "productId": "00000000-0000-0000-0000-000000000002"
+}
+
+### All
+POST {{BaseUrl}}/FavoriteProducts/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/FavoriteProducts/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/FavoriteProducts/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/FavoriteProducts/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "userId": "00000000-0000-0000-0000-000000000001",
+    "productId": "00000000-0000-0000-0000-000000000003"
+}
+
+### Delete
+POST {{BaseUrl}}/FavoriteProducts/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

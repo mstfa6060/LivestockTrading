@@ -1,0 +1,70 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/TransporterReviews/Create
+Content-Type: application/json
+
+{
+    "transporterId": "00000000-0000-0000-0000-000000000001",
+    "userId": "00000000-0000-0000-0000-000000000002",
+    "transportRequestId": "00000000-0000-0000-0000-000000000003",
+    "overallRating": 5,
+    "timelinessRating": 5,
+    "communicationRating": 4,
+    "carefulHandlingRating": 5,
+    "professionalismRating": 5,
+    "comment": "Excellent transporter. Animals arrived in perfect condition and on time."
+}
+
+### All
+POST {{BaseUrl}}/TransporterReviews/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/TransporterReviews/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/TransporterReviews/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/TransporterReviews/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "transporterId": "00000000-0000-0000-0000-000000000001",
+    "userId": "00000000-0000-0000-0000-000000000002",
+    "transportRequestId": "00000000-0000-0000-0000-000000000003",
+    "overallRating": 4,
+    "timelinessRating": 3,
+    "communicationRating": 4,
+    "carefulHandlingRating": 5,
+    "professionalismRating": 4,
+    "comment": "Good service overall but arrived a bit later than estimated."
+}
+
+### Delete
+POST {{BaseUrl}}/TransporterReviews/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

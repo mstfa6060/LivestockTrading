@@ -1,0 +1,98 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/AnimalInfos/Create
+Content-Type: application/json
+
+{
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "breedName": "Angus",
+    "gender": 0,
+    "dateOfBirth": "2022-03-15T00:00:00Z",
+    "ageMonths": 34,
+    "weightKg": 580.5,
+    "heightCm": 142.0,
+    "color": "Black",
+    "markings": "White star on forehead",
+    "tagNumber": "TAG-2022-0456",
+    "microchipNumber": "985121045678901",
+    "passportNumber": "PASS-TR-2022-0456",
+    "registrationNumber": "ANG-REG-2022-0456",
+    "healthStatus": 0,
+    "lastHealthCheckDate": "2025-01-10T00:00:00Z",
+    "isPregnant": true,
+    "expectedDueDate": "2025-06-20T00:00:00Z",
+    "numberOfBirths": 2,
+    "dailyMilkProductionLiters": 28.5,
+    "averageDailyEggProduction": 0,
+    "sireDetails": "{\"name\": \"Champion Bull\", \"breed\": \"Angus\", \"registration\": \"SIRE-001\"}",
+    "damDetails": "{\"name\": \"Premium Cow\", \"breed\": \"Angus\", \"registration\": \"DAM-001\"}",
+    "purpose": 0
+}
+
+### All
+POST {{BaseUrl}}/AnimalInfos/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/AnimalInfos/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/AnimalInfos/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/AnimalInfos/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "breedName": "Angus",
+    "gender": 0,
+    "dateOfBirth": "2022-03-15T00:00:00Z",
+    "ageMonths": 36,
+    "weightKg": 595.0,
+    "heightCm": 143.0,
+    "color": "Black",
+    "markings": "White star on forehead",
+    "tagNumber": "TAG-2022-0456",
+    "microchipNumber": "985121045678901",
+    "passportNumber": "PASS-TR-2022-0456",
+    "registrationNumber": "ANG-REG-2022-0456",
+    "healthStatus": 0,
+    "lastHealthCheckDate": "2025-02-15T00:00:00Z",
+    "isPregnant": true,
+    "expectedDueDate": "2025-06-20T00:00:00Z",
+    "numberOfBirths": 2,
+    "dailyMilkProductionLiters": 30.0,
+    "averageDailyEggProduction": 0,
+    "sireDetails": "{\"name\": \"Champion Bull\", \"breed\": \"Angus\", \"registration\": \"SIRE-001\"}",
+    "damDetails": "{\"name\": \"Premium Cow\", \"breed\": \"Angus\", \"registration\": \"DAM-001\"}",
+    "purpose": 0
+}
+
+### Delete
+POST {{BaseUrl}}/AnimalInfos/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

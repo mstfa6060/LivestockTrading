@@ -1,0 +1,62 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/Messages/Create
+Content-Type: application/json
+
+{
+    "conversationId": "00000000-0000-0000-0000-000000000001",
+    "senderUserId": "00000000-0000-0000-0000-000000000002",
+    "recipientUserId": "00000000-0000-0000-0000-000000000003",
+    "content": "Hello, I am interested in purchasing the Holstein dairy cow. Is it still available?",
+    "attachmentUrls": "[\"https://example.com/attachments/farm-photo.jpg\"]"
+}
+
+### All
+POST {{BaseUrl}}/Messages/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/Messages/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/Messages/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/Messages/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "conversationId": "00000000-0000-0000-0000-000000000001",
+    "senderUserId": "00000000-0000-0000-0000-000000000002",
+    "recipientUserId": "00000000-0000-0000-0000-000000000003",
+    "content": "Updated message content - I would like to schedule a visit to see the cow.",
+    "attachmentUrls": "[]"
+}
+
+### Delete
+POST {{BaseUrl}}/Messages/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

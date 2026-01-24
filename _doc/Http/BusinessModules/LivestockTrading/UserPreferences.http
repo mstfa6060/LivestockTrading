@@ -1,0 +1,80 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/UserPreferences/Create
+Content-Type: application/json
+
+{
+    "userId": "00000000-0000-0000-0000-000000000001",
+    "preferredCurrency": "USD",
+    "preferredLanguage": "en",
+    "countryCode": "TR",
+    "timeZone": "Europe/Istanbul",
+    "weightSystem": 0,
+    "distanceSystem": 0,
+    "areaSystem": 0,
+    "emailNotificationsEnabled": true,
+    "smsNotificationsEnabled": true,
+    "pushNotificationsEnabled": true,
+    "darkModeEnabled": false,
+    "productsPerPage": 20,
+    "defaultViewMode": 0
+}
+
+### All
+POST {{BaseUrl}}/UserPreferences/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/UserPreferences/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/UserPreferences/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/UserPreferences/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "userId": "00000000-0000-0000-0000-000000000001",
+    "preferredCurrency": "EUR",
+    "preferredLanguage": "tr",
+    "countryCode": "TR",
+    "timeZone": "Europe/Istanbul",
+    "weightSystem": 0,
+    "distanceSystem": 0,
+    "areaSystem": 0,
+    "emailNotificationsEnabled": true,
+    "smsNotificationsEnabled": false,
+    "pushNotificationsEnabled": true,
+    "darkModeEnabled": true,
+    "productsPerPage": 50,
+    "defaultViewMode": 0
+}
+
+### Delete
+POST {{BaseUrl}}/UserPreferences/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

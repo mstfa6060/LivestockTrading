@@ -1,0 +1,70 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/SellerReviews/Create
+Content-Type: application/json
+
+{
+    "sellerId": "00000000-0000-0000-0000-000000000001",
+    "userId": "00000000-0000-0000-0000-000000000002",
+    "overallRating": 5,
+    "communicationRating": 5,
+    "shippingSpeedRating": 4,
+    "productQualityRating": 5,
+    "title": "Outstanding seller experience",
+    "comment": "Very professional and responsive. Animals were in perfect condition upon delivery.",
+    "isVerifiedPurchase": true
+}
+
+### All
+POST {{BaseUrl}}/SellerReviews/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/SellerReviews/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/SellerReviews/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/SellerReviews/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "sellerId": "00000000-0000-0000-0000-000000000001",
+    "userId": "00000000-0000-0000-0000-000000000002",
+    "overallRating": 4,
+    "communicationRating": 4,
+    "shippingSpeedRating": 3,
+    "productQualityRating": 5,
+    "title": "Good seller, slightly slow shipping",
+    "comment": "Product quality is excellent but shipping took a bit longer than expected.",
+    "isVerifiedPurchase": true
+}
+
+### Delete
+POST {{BaseUrl}}/SellerReviews/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}

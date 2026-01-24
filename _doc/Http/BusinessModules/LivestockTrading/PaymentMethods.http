@@ -1,0 +1,72 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/PaymentMethods/Create
+Content-Type: application/json
+
+{
+    "name": "Bank Transfer",
+    "code": "bank_transfer",
+    "description": "Direct bank transfer payment method",
+    "iconUrl": "https://example.com/icons/bank-transfer.svg",
+    "requiresManualVerification": true,
+    "isActive": true,
+    "supportedCountries": "[\"TR\", \"DE\", \"FR\", \"NL\"]",
+    "supportedCurrencies": "[\"USD\", \"EUR\", \"TRY\"]",
+    "transactionFeePercentage": 0.5,
+    "fixedTransactionFee": 2.00
+}
+
+### All
+POST {{BaseUrl}}/PaymentMethods/All
+Content-Type: application/json
+
+{
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/PaymentMethods/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Pick
+POST {{BaseUrl}}/PaymentMethods/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/PaymentMethods/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "name": "Bank Transfer - Updated",
+    "code": "bank_transfer",
+    "description": "Updated bank transfer payment method with lower fees",
+    "iconUrl": "https://example.com/icons/bank-transfer-v2.svg",
+    "requiresManualVerification": true,
+    "isActive": true,
+    "supportedCountries": "[\"TR\", \"DE\", \"FR\", \"NL\", \"BE\"]",
+    "supportedCurrencies": "[\"USD\", \"EUR\", \"TRY\", \"GBP\"]",
+    "transactionFeePercentage": 0.3,
+    "fixedTransactionFee": 1.50
+}
+
+### Delete
+POST {{BaseUrl}}/PaymentMethods/Delete
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
