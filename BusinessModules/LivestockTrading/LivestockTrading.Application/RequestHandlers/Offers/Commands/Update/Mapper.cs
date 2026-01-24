@@ -13,7 +13,7 @@ public class Mapper
 		entity.Currency = request.Currency;
 		entity.Quantity = request.Quantity;
 		entity.Message = request.Message;
-		entity.Status = request.Status;
+		entity.Status = (OfferStatus)request.Status;
 		entity.ExpiryDate = request.ExpiryDate;
 		entity.CounterOfferToId = request.CounterOfferToId;
 		entity.RespondedAt = request.RespondedAt;
@@ -33,7 +33,7 @@ public class Mapper
 			Currency = entity.Currency,
 			Quantity = entity.Quantity,
 			Message = entity.Message,
-			Status = entity.Status,
+			Status = (int)entity.Status,
 			OfferDate = entity.OfferDate,
 			ExpiryDate = entity.ExpiryDate,
 			CounterOfferToId = entity.CounterOfferToId,

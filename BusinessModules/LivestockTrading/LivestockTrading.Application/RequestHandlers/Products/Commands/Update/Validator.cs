@@ -25,7 +25,7 @@ public class Validator : IRequestValidator
 	public async Task ValidateDomain(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
 	{
 		var request = (RequestModel)payload;
-		await _dbValidator.ValidateProductExist(request.Id, cancellationToken);
+		await _dbValidator.ValidateProductExists(request.Id, cancellationToken);
 		await _dbValidator.ValidateProductSlugUnique(request.Slug, request.Id, cancellationToken);
 	}
 }

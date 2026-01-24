@@ -13,7 +13,7 @@ public class Mapper
 			ParticipantUserId2 = c.ParticipantUserId2,
 			ProductId = c.ProductId,
 			Subject = c.Subject,
-			Status = c.Status,
+			Status = (int)c.Status,
 			LastMessageAt = c.LastMessageAt,
 			CreatedAt = c.CreatedAt
 		}).ToList();

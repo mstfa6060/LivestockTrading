@@ -27,7 +27,7 @@ public class Validator : IRequestValidator
 		var request = (RequestModel)payload;
 		await _dbValidator.ValidateProductSlugUnique(request.Slug, null, cancellationToken);
 		await _dbValidator.ValidateCategoryExist(request.CategoryId, cancellationToken);
-		await _dbValidator.ValidateSellerExist(request.SellerId, cancellationToken);
+		await _dbValidator.ValidateSellerExists(request.SellerId, cancellationToken);
 	}
 }
 

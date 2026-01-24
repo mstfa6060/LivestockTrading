@@ -27,7 +27,7 @@ public class Mapper
 			MaxOrderQuantity = entity.MaxOrderQuantity,
 			IsInStock = entity.IsInStock,
 			SellerId = entity.SellerId,
-			SellerName = entity.Seller?.Name,
+			SellerName = entity.Seller?.BusinessName,
 			LocationId = entity.LocationId,
 			Status = (int)entity.Status,
 			Condition = (int)entity.Condition,

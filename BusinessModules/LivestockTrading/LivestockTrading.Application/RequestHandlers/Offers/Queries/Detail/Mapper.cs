@@ -16,7 +16,7 @@ public class Mapper
 			Currency = entity.Currency,
 			Quantity = entity.Quantity,
 			Message = entity.Message,
-			Status = entity.Status,
+			Status = (int)entity.Status,
 			OfferDate = entity.OfferDate,
 			ExpiryDate = entity.ExpiryDate,
 			CounterOfferToId = entity.CounterOfferToId,

@@ -14,7 +14,7 @@ public class Mapper
 			ProductId = request.ProductId,
 			OrderId = request.OrderId,
 			Subject = request.Subject,
-			Status = request.Status,
+			Status = (ConversationStatus)request.Status,
 			LastMessageAt = DateTime.UtcNow,
 			CreatedAt = DateTime.UtcNow
 		};
@@ -30,7 +30,7 @@ public class Mapper
 			ProductId = entity.ProductId,
 			OrderId = entity.OrderId,
 			Subject = entity.Subject,
-			Status = entity.Status,
+			Status = (int)entity.Status,
 			CreatedAt = entity.CreatedAt
 		};
 	}

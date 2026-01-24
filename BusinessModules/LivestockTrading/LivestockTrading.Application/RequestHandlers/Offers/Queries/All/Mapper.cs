@@ -15,7 +15,7 @@ public class Mapper
 			OfferedPrice = o.OfferedPrice,
 			Currency = o.Currency,
 			Quantity = o.Quantity,
-			Status = o.Status,
+			Status = (int)o.Status,
 			OfferDate = o.OfferDate,
 			ExpiryDate = o.ExpiryDate,
 			CreatedAt = o.CreatedAt

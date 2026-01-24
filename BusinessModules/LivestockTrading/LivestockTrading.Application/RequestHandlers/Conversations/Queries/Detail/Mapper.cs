@@ -14,7 +14,7 @@ public class Mapper
 			ProductId = entity.ProductId,
 			OrderId = entity.OrderId,
 			Subject = entity.Subject,
-			Status = entity.Status,
+			Status = (int)entity.Status,
 			LastMessageAt = entity.LastMessageAt,
 			CreatedAt = entity.CreatedAt,
 			UpdatedAt = entity.UpdatedAt

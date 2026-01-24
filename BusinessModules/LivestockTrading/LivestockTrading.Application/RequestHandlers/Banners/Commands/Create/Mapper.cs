@@ -1,5 +1,5 @@
 using LivestockTrading.Domain.Entities;
-using LivestockTrading.Domain.Enums;
+
 
 namespace LivestockTrading.Application.RequestHandlers.Banners.Commands.Create;
 

@@ -328,6 +328,8 @@ public class LivestockTradingDomainErrors
         public static string TitleRequired { get; set; } = "Baslik zorunludur.";
         public static string ImageUrlRequired { get; set; } = "Gorsel URL zorunludur.";
         public static string DateRequired { get; set; } = "Tarih zorunludur.";
+        public static string StartDateRequired { get; set; } = "Baslangic tarihi zorunludur.";
+        public static string EndDateRequired { get; set; } = "Bitis tarihi zorunludur.";
     }
 
     public static class TaxRateErrors

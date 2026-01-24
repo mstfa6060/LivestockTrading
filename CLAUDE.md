@@ -90,7 +90,7 @@ Detaylar:
 - **Handler.cs** - Implements `IRequestHandler`, constructor takes `(ArfBlocksDependencyProvider, object dataAccess)`
 - **Models.cs** - `RequestModel` (IRequestModel) and `ResponseModel` (IResponseModel or IResponseModel<Array>)
 - **DataAccess.cs** - Implements `IDataAccess`, receives `ArfBlocksDependencyProvider` to resolve DbContext
-- **Mapper.cs** - Entity ↔ DTO mapping
+- **Mapper.cs** - Entity ↔ DTO mapping (enum ↔ int cast'leri burada yapilir)
 - **Validator.cs** - FluentValidation (ValidateRequestModel) + domain validation (ValidateDomain) using `LivestockTradingModuleDbValidationService`
 - **Verificator.cs** - Authorization (VerificateActor) + domain verification (VerificateDomain) using `LivestockTradingModuleDbVerificationService`
 
@@ -318,7 +318,7 @@ public class Validator : IRequestValidator
     public async Task ValidateDomain(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
     {
         var request = (RequestModel)payload;
-        await _dbValidator.ValidateCategoryExist(request.Id, cancellationToken);
+        await _dbValidator.ValidateCategoryExists(request.Id, cancellationToken);
         await _dbValidator.ValidateCategorySlugUnique(request.Slug, request.Id, cancellationToken);
     }
 }
@@ -364,6 +364,44 @@ public class LivestockTradingDomainErrors
 // Services
 base.Add<LivestockTradingModuleDbVerificationService>();
 base.Add<LivestockTradingModuleDbValidationService>();
+```
+
+### Mapper.cs - Enum Type Casting Kurali
+
+Entity'lerdeki enum property'leri, Models.cs'te `int` olarak tanimlanir. Mapper'da explicit cast yapilmalidir:
+
+```csharp
+// Entity → Response (enum → int)
+Status = (int)entity.Status,
+
+// Request → Entity (int → enum)
+Status = (ConversationStatus)request.Status,
+```
+
+Enum'lar Entity dosyalarinda tanimlidir (`Domain/Entities/`), ayri bir Enums namespace'i YOKTUR:
+- `ConversationStatus` → `Entities/Messaging.cs`
+- `OfferStatus` → `Entities/Messaging.cs`
+- `ProductStatus`, `ProductCondition` → `Entities/Product.cs`
+- `SellerStatus` → `Entities/Seller.cs`
+- `BannerPosition` → `Entities/Banner.cs`
+- `TaxType` → `Entities/TaxRate.cs`
+- `OrderStatus`, `PaymentStatus` → `Entities/Order.cs`
+
+> **ONEMLI**: `using LivestockTrading.Domain.Enums;` seklinde bir namespace YOKTUR. Enum'lar `using LivestockTrading.Domain.Entities;` ile gelir.
+
+### Entity Property Referansi
+
+Bazi entity'lerde property isimleri beklenenden farkli olabilir:
+- **Seller**: `BusinessName` (~~Name~~ degil)
+- **Category**: `Name`, `Slug`, `ParentCategoryId`
+- **Brand**: `Name`, `Slug`
+- **Product**: `Title`, `Slug`, `SellerId`, `CategoryId`, `BrandId`
+
+Navigation property'ler Mapper'da null-safe kullanilir:
+```csharp
+CategoryName = entity.Category?.Name,
+BrandName = entity.Brand?.Name,
+SellerName = entity.Seller?.BusinessName,
 ```
 
 ### .http Test Dosyasi Kurali
