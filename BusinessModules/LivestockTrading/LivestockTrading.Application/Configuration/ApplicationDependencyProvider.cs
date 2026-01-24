@@ -1,3 +1,4 @@
+using Common.Services.Caching;
 using LivestockTrading.Infrastructure.RelationalDB;
 using LivestockTrading.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
@@ -31,6 +32,7 @@ public class ApplicationDependencyProvider : ArfBlocksDependencyProvider
 
         // Communication
         base.Add<ArfBlocksCommunicator>();
+        base.Add<ICacheService, CacheService>();
         base.Add<AuthorizationService>();
 
         // Services
