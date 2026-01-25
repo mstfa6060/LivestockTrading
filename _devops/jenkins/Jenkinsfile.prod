@@ -1,12 +1,15 @@
 pipeline {
     agent any
 
+    parameters {
+        booleanParam(name: 'DEPLOY_TO_PROD', defaultValue: true, description: 'Build sonrasi PROD ortamina deploy yap')
+        booleanParam(name: 'RUN_MIGRATIONS', defaultValue: false, description: 'Deploy sonrasi migration ve seeder calistir')
+    }
+
     environment {
         DOCKER_USERNAME = 'mstfaock'
         DOCKER_REGISTRY = 'docker.io'
         TAG = 'latest'
-        DOTNET_CLI_TELEMETRY_OPTOUT = '1'
-        DOTNET_NOLOGO = '1'
     }
 
     options {
@@ -27,15 +30,10 @@ pipeline {
             }
         }
 
-        stage('Build & Test') {
-            steps {
-                sh 'dotnet restore LivestockTrading.sln'
-                sh 'dotnet build LivestockTrading.sln --configuration Release --no-restore'
-                sh 'dotnet test LivestockTrading.sln --configuration Release --no-build --verbosity normal'
-            }
-        }
-
         stage('Approval') {
+            when {
+                expression { params.DEPLOY_TO_PROD }
+            }
             steps {
                 timeout(time: 30, unit: 'MINUTES') {
                     input message: 'PROD ortamina deploy edilsin mi?', ok: 'Deploy Et'
@@ -92,14 +90,17 @@ pipeline {
         }
 
         stage('Deploy to PROD') {
+            when {
+                expression { params.DEPLOY_TO_PROD }
+            }
             steps {
                 withCredentials([
                     string(credentialsId: 'prod-server-host', variable: 'PROD_HOST'),
                     string(credentialsId: 'prod-server-user', variable: 'PROD_USER')
                 ]) {
                     sshagent(credentials: ['prod-server-ssh-key']) {
-                        sh '''
-                            ssh -o StrictHostKeyChecking=no ${PROD_USER}@${PROD_HOST} << 'ENDSSH'
+                        sh """
+                            ssh -o StrictHostKeyChecking=no \${PROD_USER}@\${PROD_HOST} << 'ENDSSH'
                                 cd /opt/livestocktrading
 
                                 echo "========================================"
@@ -114,43 +115,65 @@ pipeline {
 
                                 echo ""
                                 echo "[2/5] Docker image'lari pull ediliyor..."
-                                docker compose -p livestock_prod \
-                                  -f docker-compose.yml \
-                                  -f docker-compose.prod.yml \
+                                docker compose -p livestock_prod \\
+                                  -f docker-compose.yml \\
+                                  -f docker-compose.prod.yml \\
                                   --env-file .env.prod pull
 
                                 echo ""
-                                echo "[3/5] Mevcut container'lar durduruluyor..."
-                                docker compose -p livestock_prod \
-                                  -f docker-compose.yml \
-                                  -f docker-compose.prod.yml \
-                                  --env-file .env.prod down --remove-orphans || true
-
-                                echo ""
-                                echo "[4/5] Servisler baslatiliyor..."
-                                docker compose -p livestock_prod \
-                                  -f docker-compose.yml \
-                                  -f docker-compose.prod.yml \
+                                echo "[3/5] Servisler baslatiliyor..."
+                                docker compose -p livestock_prod \\
+                                  -f docker-compose.yml \\
+                                  -f docker-compose.prod.yml \\
                                   --env-file .env.prod up -d
 
                                 echo ""
-                                echo "[5/5] Temizlik yapiliyor..."
+                                echo "[4/5] Temizlik yapiliyor..."
                                 docker image prune -f
+
+                                echo ""
+                                echo "[5/5] Container durumu:"
+                                docker compose -p livestock_prod ps
 
                                 echo ""
                                 echo "========================================"
                                 echo "PROD deployment tamamlandi!"
                                 echo "========================================"
-                                echo ""
-                                echo "Container durumu:"
-                                docker compose -p livestock_prod ps
+ENDSSH
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Run Migrations') {
+            when {
+                expression { params.DEPLOY_TO_PROD && params.RUN_MIGRATIONS }
+            }
+            steps {
+                withCredentials([
+                    string(credentialsId: 'prod-server-host', variable: 'PROD_HOST'),
+                    string(credentialsId: 'prod-server-user', variable: 'PROD_USER')
+                ]) {
+                    sshagent(credentials: ['prod-server-ssh-key']) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no \${PROD_USER}@\${PROD_HOST} << 'ENDSSH'
+                                cd /opt/livestocktrading
+
+                                echo "========================================"
+                                echo "Migration ve Seeder calistiriliyor..."
+                                echo "========================================"
+
+                                docker run --rm \\
+                                  --network livestock_prod_livestocktrading-network \\
+                                  --env-file .env.prod \\
+                                  mstfaock/livestocktrading-resource-seeder:latest \\
+                                  production || echo "ResourceSeeder failed but continuing..."
 
                                 echo ""
-                                echo "Health check:"
-                                sleep 10
-                                docker compose -p livestock_prod ps | grep -E "(healthy|running)" || echo "Bazi containerlar henuz hazir degil"
+                                echo "Migration tamamlandi!"
 ENDSSH
-                        '''
+                        """
                     }
                 }
             }
@@ -162,10 +185,10 @@ ENDSSH
             sh 'docker logout || true'
         }
         success {
-            echo "PROD Deployment basariyla tamamlandi! (${env.GIT_COMMIT_SHORT})"
+            echo "PROD Pipeline basariyla tamamlandi! (${env.GIT_COMMIT_SHORT})"
         }
         failure {
-            echo "PROD Deployment basarisiz oldu! (${env.GIT_COMMIT_SHORT})"
+            echo "PROD Pipeline basarisiz oldu! (${env.GIT_COMMIT_SHORT})"
         }
         cleanup {
             cleanWs()

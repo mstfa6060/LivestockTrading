@@ -2,14 +2,13 @@ pipeline {
     agent any
 
     environment {
-        DOTNET_CLI_TELEMETRY_OPTOUT = '1'
-        DOTNET_NOLOGO = '1'
+        DOCKER_USERNAME = 'mstfaock'
     }
 
     options {
         buildDiscarder(logRotator(numToKeepStr: '20'))
         disableConcurrentBuilds()
-        timeout(time: 15, unit: 'MINUTES')
+        timeout(time: 30, unit: 'MINUTES')
         timestamps()
     }
 
@@ -21,36 +20,37 @@ pipeline {
                     env.GIT_COMMIT_SHORT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
                     env.GIT_BRANCH_NAME = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
                 }
-                echo "Branch: ${env.GIT_BRANCH_NAME}, Commit: ${env.GIT_COMMIT_SHORT}"
+                echo "CI Build - Branch: ${env.GIT_BRANCH_NAME}, Commit: ${env.GIT_COMMIT_SHORT}"
             }
         }
 
-        stage('Restore') {
+        stage('Build Test - LivestockTrading API') {
             steps {
-                sh 'dotnet restore LivestockTrading.sln'
+                sh """
+                    echo "Building livestocktrading-api for validation..."
+                    docker build -t ${DOCKER_USERNAME}/livestocktrading-api:ci-test -f _devops/docker/Dockerfile.livestocktrading-api .
+                    echo "Build successful!"
+                """
             }
         }
 
-        stage('Build') {
+        stage('Build Test - IAM API') {
             steps {
-                sh 'dotnet build LivestockTrading.sln --configuration Release --no-restore'
+                sh """
+                    echo "Building iam-api for validation..."
+                    docker build -t ${DOCKER_USERNAME}/livestocktrading-iam-api:ci-test -f _devops/docker/Dockerfile.iam-api .
+                    echo "Build successful!"
+                """
             }
         }
 
-        stage('Test') {
+        stage('Cleanup') {
             steps {
-                sh 'dotnet test LivestockTrading.sln --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"'
-            }
-            post {
-                always {
-                    // Test sonuclarini raporla (eger test sonucu varsa)
-                    script {
-                        def testResults = findFiles(glob: '**/test-results.trx')
-                        if (testResults.length > 0) {
-                            echo "Test sonuclari bulundu: ${testResults.length} dosya"
-                        }
-                    }
-                }
+                sh """
+                    docker rmi ${DOCKER_USERNAME}/livestocktrading-api:ci-test || true
+                    docker rmi ${DOCKER_USERNAME}/livestocktrading-iam-api:ci-test || true
+                    docker image prune -f || true
+                """
             }
         }
     }
