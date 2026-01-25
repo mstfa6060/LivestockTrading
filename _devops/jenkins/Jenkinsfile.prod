@@ -2,143 +2,213 @@ pipeline {
     agent any
 
     parameters {
-        booleanParam(name: 'DEPLOY_TO_PROD', defaultValue: true, description: 'Build sonrasi PROD ortamina deploy yap')
+        string(name: 'ONLY_IMAGE', defaultValue: '', description: 'Sadece belirli bir imaji derle (orn: livestocktrading-api). Bos birakilirsa tum imajlar derlenir.')
+        booleanParam(name: 'NO_CACHE', defaultValue: false, description: 'Docker build cache kullanma')
+        booleanParam(name: 'DEPLOY_TO_PROD', defaultValue: true, description: 'Build sonrasi PRODUCTION ortamina otomatik deploy yap')
         booleanParam(name: 'RUN_MIGRATIONS', defaultValue: false, description: 'Deploy sonrasi migration ve seeder calistir')
     }
 
     environment {
-        DOCKER_USERNAME = 'mstfaock'
-        DOCKER_REGISTRY = 'docker.io'
-        TAG = 'latest'
+        REGISTRY = 'docker.io'
+        TAG_SUFFIX = 'latest'
+        IMMUTABLE_TAG = "prod-${BUILD_ID}-${GIT_COMMIT.take(8)}"
+        DOCKER_BUILDKIT = '1'
+        COMPOSE_HTTP_TIMEOUT = '1200'
+        DOCKER_CLIENT_TIMEOUT = '1200'
+
+        DOCKERHUB_CREDENTIAL_ID = 'dockerhub-credentials'
+        SERVER_SSH_KEY_ID = 'maden-server-key'
+        SERVER_HOST_ID = 'dev-server-host'
     }
 
     options {
-        buildDiscarder(logRotator(numToKeepStr: '10'))
-        disableConcurrentBuilds()
-        timeout(time: 60, unit: 'MINUTES')
+        buildDiscarder(logRotator(numToKeepStr: '20'))
+        timeout(time: 3, unit: 'HOURS')
         timestamps()
     }
 
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
                 script {
-                    env.GIT_COMMIT_SHORT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                    echo "PRODUCTION: Kod cekiliyor..."
+                    sh '''
+                        git submodule update --init --recursive || true
+                        echo "Kod basariyla cekildi"
+                        echo "Branch: ${GIT_BRANCH}"
+                        echo "Commit: ${GIT_COMMIT}"
+                    '''
                 }
-                echo "PROD Deployment - Commit: ${env.GIT_COMMIT_SHORT}"
             }
         }
 
-        stage('Approval') {
-            when {
-                expression { params.DEPLOY_TO_PROD }
-            }
+        stage('Generate Build Matrix') {
             steps {
-                timeout(time: 30, unit: 'MINUTES') {
-                    input message: 'PROD ortamina deploy edilsin mi?', ok: 'Deploy Et'
+                script {
+                    def allModules = [
+                        'livestocktrading-api:_devops/docker/Dockerfile.livestocktrading-api:mstfaock/livestocktrading-api',
+                        'iam-api:_devops/docker/Dockerfile.iam-api:mstfaock/livestocktrading-iam-api',
+                        'fileprovider-api:_devops/docker/Dockerfile.fileprovider-api:mstfaock/livestocktrading-fileprovider-api',
+                        'iam-mail-worker:_devops/docker/Dockerfile.iam-mail-worker:mstfaock/livestocktrading-iam-mail-worker',
+                        'iam-sms-worker:_devops/docker/Dockerfile.iam-sms-worker:mstfaock/livestocktrading-iam-sms-worker'
+                    ]
+
+                    def modulesToBuild = []
+                    if (params.ONLY_IMAGE) {
+                        def found = allModules.find { it.split(':')[0] == params.ONLY_IMAGE }
+                        if (!found) {
+                            error "'${params.ONLY_IMAGE}' isimli modul bulunamadi!"
+                        }
+                        modulesToBuild.add(found)
+                        echo "PRODUCTION: Sadece '${params.ONLY_IMAGE}' modulu derlenecek"
+                    } else {
+                        modulesToBuild = allModules
+                        echo "PRODUCTION: Tum moduller derlenecek (${modulesToBuild.size()} adet)"
+                    }
+
+                    env.BUILD_MODULES = modulesToBuild.join('|')
                 }
             }
         }
 
         stage('Docker Login') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                script {
+                    withCredentials([usernamePassword(
+                        credentialsId: env.DOCKERHUB_CREDENTIAL_ID,
+                        usernameVariable: 'DOCKER_USERNAME',
+                        passwordVariable: 'DOCKER_PASSWORD'
+                    )]) {
+                        sh '''
+                            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin > /dev/null 2>&1 && \
+                            echo "Docker Hub login basarili (PRODUCTION)" || \
+                            (echo "Docker login basarisiz!"; exit 1)
+                        '''
+                    }
                 }
             }
         }
 
         stage('Build & Push Images') {
-            parallel {
-                stage('LivestockTrading API') {
-                    steps {
-                        script {
-                            buildAndPush('livestocktrading-api', '_devops/docker/Dockerfile.livestocktrading-api')
+            steps {
+                script {
+                    def modules = env.BUILD_MODULES.split('\\|')
+
+                    modules.eachWithIndex { moduleStr, index ->
+                        def parts = moduleStr.split(':')
+                        def moduleName = parts[0]
+                        def dockerfile = parts[1]
+                        def image = parts[2]
+
+                        echo "PRODUCTION [${index + 1}/${modules.size()}] ${moduleName} build ediliyor..."
+
+                        def cacheArgs = params.NO_CACHE ? '--no-cache' : ''
+
+                        timeout(time: 45, unit: 'MINUTES') {
+                            sh """
+                                docker buildx build \
+                                    ${cacheArgs} \
+                                    --progress=auto \
+                                    --file ${dockerfile} \
+                                    --tag ${image}:${TAG_SUFFIX} \
+                                    --tag ${image}:${IMMUTABLE_TAG} \
+                                    --label org.opencontainers.image.revision=${GIT_COMMIT} \
+                                    --label org.opencontainers.image.version=${IMMUTABLE_TAG} \
+                                    --provenance=false \
+                                    --sbom=false \
+                                    --pull \
+                                    --push .
+                            """
                         }
+
+                        echo "${moduleName} basariyla build edildi ve push edildi (${index + 1}/${modules.size()})"
+                        sh 'docker builder prune -f --filter type=exec.cachemount || true'
                     }
-                }
-                stage('IAM API') {
-                    steps {
-                        script {
-                            buildAndPush('livestocktrading-iam-api', '_devops/docker/Dockerfile.iam-api')
-                        }
-                    }
-                }
-                stage('FileProvider API') {
-                    steps {
-                        script {
-                            buildAndPush('livestocktrading-fileprovider-api', '_devops/docker/Dockerfile.fileprovider-api')
-                        }
-                    }
-                }
-                stage('IAM Mail Worker') {
-                    steps {
-                        script {
-                            buildAndPush('livestocktrading-iam-mail-worker', '_devops/docker/Dockerfile.iam-mail-worker')
-                        }
-                    }
-                }
-                stage('IAM SMS Worker') {
-                    steps {
-                        script {
-                            buildAndPush('livestocktrading-iam-sms-worker', '_devops/docker/Dockerfile.iam-sms-worker')
-                        }
-                    }
+
+                    echo "Tum imajlar basariyla build edildi ve Docker Hub'a push edildi!"
                 }
             }
         }
 
-        stage('Deploy to PROD') {
+        stage('Deploy to PRODUCTION') {
             when {
-                expression { params.DEPLOY_TO_PROD }
+                expression { return params.DEPLOY_TO_PROD }
             }
             steps {
-                withCredentials([
-                    string(credentialsId: 'prod-server-host', variable: 'PROD_HOST'),
-                    string(credentialsId: 'prod-server-user', variable: 'PROD_USER')
-                ]) {
-                    sshagent(credentials: ['prod-server-ssh-key']) {
+                script {
+                    echo "PRODUCTION ortamina deploy basliyor..."
+
+                    withCredentials([
+                        sshUserPrivateKey(credentialsId: env.SERVER_SSH_KEY_ID, keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER'),
+                        string(credentialsId: env.SERVER_HOST_ID, variable: 'SERVER_HOST'),
+                        usernamePassword(credentialsId: env.DOCKERHUB_CREDENTIAL_ID, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')
+                    ]) {
+                        def sshUser = SSH_USER
+                        def sshHost = SERVER_HOST
+                        def dockerUser = DOCKER_USERNAME
+                        def dockerPass = DOCKER_PASSWORD
+
                         sh """
-                            ssh -o StrictHostKeyChecking=no \${PROD_USER}@\${PROD_HOST} << 'ENDSSH'
-                                cd /opt/livestocktrading
+                            chmod 600 "\$SSH_KEY"
 
-                                echo "========================================"
-                                echo "PROD Deployment Basliyor..."
-                                echo "========================================"
+                            ssh -o StrictHostKeyChecking=no -i "\$SSH_KEY" ${sshUser}@${sshHost} bash <<'ENDSSH'
+export DOCKER_USERNAME='${dockerUser}'
+export DOCKER_PASSWORD='${dockerPass}'
 
-                                echo ""
-                                echo "[1/5] Git repository guncelleniyor..."
-                                git fetch origin main
-                                git reset --hard origin/main
-                                git submodule update --init --recursive
+set -e
 
-                                echo ""
-                                echo "[2/5] Docker image'lari pull ediliyor..."
-                                docker compose -p livestock_prod \\
-                                  -f docker-compose.yml \\
-                                  -f docker-compose.prod.yml \\
-                                  --env-file .env.prod pull
+echo "Proje dizinini buluyorum..."
+PROJECT_DIR=""
+for d in /opt/livestocktrading /livestocktrading/backend /root/livestocktrading-backend; do
+    if [ -d "\$d" ]; then
+        PROJECT_DIR="\$d"
+        break
+    fi
+done
 
-                                echo ""
-                                echo "[3/5] Servisler baslatiliyor..."
-                                docker compose -p livestock_prod \\
-                                  -f docker-compose.yml \\
-                                  -f docker-compose.prod.yml \\
-                                  --env-file .env.prod up -d
+if [ -z "\$PROJECT_DIR" ] || [ ! -d "\$PROJECT_DIR" ]; then
+    echo "Proje dizini bulunamadi!"
+    exit 1
+fi
 
-                                echo ""
-                                echo "[4/5] Temizlik yapiliyor..."
-                                docker image prune -f
+echo "Proje dizini bulundu: \$PROJECT_DIR"
 
-                                echo ""
-                                echo "[5/5] Container durumu:"
-                                docker compose -p livestock_prod ps
+echo "Git repository guncelleniyor (main branch)..."
+cd "\$PROJECT_DIR"
+git fetch origin main
+git reset --hard origin/main
+git submodule update --init --recursive
 
-                                echo ""
-                                echo "========================================"
-                                echo "PROD deployment tamamlandi!"
-                                echo "========================================"
+echo "Docker dizinine geciliyor..."
+cd "\$PROJECT_DIR/_devops/docker/compose"
+
+echo "Docker Hub login yapiliyor..."
+echo "\$DOCKER_PASSWORD" | docker login -u "\$DOCKER_USERNAME" --password-stdin || {
+    echo "Docker Hub login basarisiz!";
+    exit 1;
+}
+
+echo "Docker imajlari cekiliyor..."
+docker compose -p livestock_prod \\
+    -f docker-compose.yml \\
+    -f docker-compose.prod.yml \\
+    --env-file .env.prod \\
+    pull
+
+echo "Servisler yeniden baslatiliyor..."
+docker compose -p livestock_prod \\
+    -f docker-compose.yml \\
+    -f docker-compose.prod.yml \\
+    --env-file .env.prod \\
+    up -d
+
+echo "Servislerin hazir olmasi bekleniyor (30 saniye)..."
+sleep 30
+
+echo "Eski Docker imajlari temizleniyor..."
+docker image prune -f
+
+echo "PRODUCTION deploy basariyla tamamlandi!"
 ENDSSH
                         """
                     }
@@ -146,68 +216,90 @@ ENDSSH
             }
         }
 
-        stage('Run Migrations') {
+        stage('Run Migrations & Seeders') {
             when {
-                expression { params.DEPLOY_TO_PROD && params.RUN_MIGRATIONS }
+                allOf {
+                    expression { return params.DEPLOY_TO_PROD }
+                    expression { return params.RUN_MIGRATIONS }
+                }
             }
             steps {
-                withCredentials([
-                    string(credentialsId: 'prod-server-host', variable: 'PROD_HOST'),
-                    string(credentialsId: 'prod-server-user', variable: 'PROD_USER')
-                ]) {
-                    sshagent(credentials: ['prod-server-ssh-key']) {
+                script {
+                    echo "Database migration ve seeding basliyor..."
+
+                    withCredentials([
+                        sshUserPrivateKey(credentialsId: env.SERVER_SSH_KEY_ID, keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER'),
+                        string(credentialsId: env.SERVER_HOST_ID, variable: 'SERVER_HOST')
+                    ]) {
+                        def sshUser = SSH_USER
+                        def sshHost = SERVER_HOST
+
                         sh """
-                            ssh -o StrictHostKeyChecking=no \${PROD_USER}@\${PROD_HOST} << 'ENDSSH'
-                                cd /opt/livestocktrading
+                            ssh -o StrictHostKeyChecking=no -i "\$SSH_KEY" ${sshUser}@${sshHost} bash <<'ENDSSH'
+set -e
 
-                                echo "========================================"
-                                echo "Migration ve Seeder calistiriliyor..."
-                                echo "========================================"
+echo "Proje dizinini buluyorum..."
+PROJECT_DIR=""
+for d in /opt/livestocktrading /livestocktrading/backend /root/livestocktrading-backend; do
+    if [ -d "\$d" ]; then
+        PROJECT_DIR="\$d"
+        break
+    fi
+done
 
-                                docker run --rm \\
-                                  --network livestock_prod_livestocktrading-network \\
-                                  --env-file .env.prod \\
-                                  mstfaock/livestocktrading-resource-seeder:latest \\
-                                  production || echo "ResourceSeeder failed but continuing..."
+if [ -z "\$PROJECT_DIR" ] || [ ! -d "\$PROJECT_DIR" ]; then
+    echo "Proje dizini bulunamadi"
+    exit 1
+fi
 
-                                echo ""
-                                echo "Migration tamamlandi!"
+echo "Proje dizini bulundu: \$PROJECT_DIR"
+cd "\$PROJECT_DIR/_devops/docker/compose"
+
+echo "ResourceSeeder calistiriliyor (production)..."
+docker run --rm \\
+    --network livestock_prod_livestocktrading-network \\
+    --env-file .env.prod \\
+    mstfaock/livestocktrading-resource-seeder:latest \\
+    production || {
+    echo "ResourceSeeder basarisiz oldu, devam ediliyor..."
+}
+
+echo "Migration ve Seeding tamamlandi!"
 ENDSSH
                         """
                     }
+                }
+            }
+        }
+
+        stage('Cleanup') {
+            steps {
+                script {
+                    echo "Jenkins build artifacts temizleniyor..."
+                    sh '''
+                        docker image prune -f || true
+                        docker builder prune -f --filter type=exec.cachemount || true
+                    '''
                 }
             }
         }
     }
 
     post {
+        success {
+            echo "PRODUCTION Pipeline basariyla tamamlandi!"
+            echo "Build ID: ${BUILD_ID}"
+            echo "Commit: ${GIT_COMMIT}"
+            echo "Tag: ${IMMUTABLE_TAG}"
+            echo "Ortam: PRODUCTION"
+        }
+        failure {
+            echo "PRODUCTION Pipeline basarisiz oldu!"
+            echo "Build ID: ${BUILD_ID}"
+            echo "Commit: ${GIT_COMMIT}"
+        }
         always {
             sh 'docker logout || true'
         }
-        success {
-            echo "PROD Pipeline basariyla tamamlandi! (${env.GIT_COMMIT_SHORT})"
-        }
-        failure {
-            echo "PROD Pipeline basarisiz oldu! (${env.GIT_COMMIT_SHORT})"
-        }
-        cleanup {
-            cleanWs()
-        }
     }
-}
-
-def buildAndPush(String imageName, String dockerfile) {
-    def fullImageName = "${DOCKER_USERNAME}/${imageName}"
-    def commitTag = "${env.GIT_COMMIT_SHORT}"
-
-    sh """
-        echo "Building ${imageName}..."
-        docker build -t ${fullImageName}:${TAG} -t ${fullImageName}:${commitTag} -f ${dockerfile} .
-
-        echo "Pushing ${imageName}..."
-        docker push ${fullImageName}:${TAG}
-        docker push ${fullImageName}:${commitTag}
-
-        echo "${imageName} tamamlandi."
-    """
 }
