@@ -12,21 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Serilog Logging
 builder.AddSerilogLogging("IAM.Api");
 
-string DefaultCorsPolicy = "DefaultCorsPolicy";
-
-// CORS ayarları
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(name: DefaultCorsPolicy,
-        policyBuilder =>
-        {
-            policyBuilder
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowAnyOrigin();
-        });
-});
-
 // Add Maden Caching (includes MemoryCache, DistributedCache, and Redis ConnectionMultiplexer)
 builder.Services.AddMadenCaching(builder.Configuration);
 
@@ -52,9 +37,6 @@ app.UseSerilogRequestLogging(options =>
 {
     options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000}ms";
 });
-
-// CORS kullanımı
-app.UseCors(DefaultCorsPolicy);
 
 // ArfBlocks middleware - EN SONDA KALMALI
 app.UseArfBlocksRequestHandlers(options =>
