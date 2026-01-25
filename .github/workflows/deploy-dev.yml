@@ -87,7 +87,7 @@ jobs:
 
             echo "🌱 ResourceSeeder çalıştırılıyor..."
             docker run --rm \
-              --network livestock_dev_default \
+              --network livestock_dev_livestocktrading-network \
               --env-file .env.dev \
               mstfaock/livestocktrading-resource-seeder:dev-latest \
               development || echo "⚠️ ResourceSeeder failed but continuing..."
