@@ -45,3 +45,4 @@ global using ArfFipaso.Sorting.Extensions;
 global using ArfFipaso.Filter.Extensions;
 global using ArfFipaso.Pagination.Extensions;
 global using LivestockTrading.Domain.Errors;
+global using LivestockTrading.Application.Extensions;

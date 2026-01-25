@@ -14,10 +14,7 @@ public class Handler : IRequestHandler
 		var mapper = new Mapper();
 		var req = (RequestModel)payload;
 
-		var entity = await _dataAccessLayer.GetById(req.Id, cancellationToken);
-		if (entity == null)
-			throw new ArfBlocksValidationException(
-				ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.CommonErrors.IdNotValid));
+		var entity = (await _dataAccessLayer.GetById(req.Id, cancellationToken)).EnsureExists();
 
 		var response = mapper.MapToResponse(entity);
 

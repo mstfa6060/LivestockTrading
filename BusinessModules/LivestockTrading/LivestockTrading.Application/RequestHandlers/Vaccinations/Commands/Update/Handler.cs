@@ -14,11 +14,7 @@ public class Handler : IRequestHandler
 		var request = (RequestModel)payload;
 		var mapper = new Mapper();
 
-		var entity = await _dataAccessLayer.GetVaccinationById(request.Id);
-
-		if (entity == null)
-			throw new ArfBlocksValidationException(
-				ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.CommonErrors.IdNotValid));
+		var entity = (await _dataAccessLayer.GetVaccinationById(request.Id)).EnsureExists();
 
 		mapper.MapToEntity(request, entity);
 
