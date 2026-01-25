@@ -1,0 +1,189 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_USERNAME = 'mstfaock'
+        DOCKER_REGISTRY = 'docker.io'
+        TAG = 'dev-latest'
+        DOTNET_CLI_TELEMETRY_OPTOUT = '1'
+        DOTNET_NOLOGO = '1'
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        disableConcurrentBuilds()
+        timeout(time: 45, unit: 'MINUTES')
+        timestamps()
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                script {
+                    env.GIT_COMMIT_SHORT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                }
+                echo "DEV Deployment - Commit: ${env.GIT_COMMIT_SHORT}"
+            }
+        }
+
+        stage('Build & Test') {
+            steps {
+                sh 'dotnet restore LivestockTrading.sln'
+                sh 'dotnet build LivestockTrading.sln --configuration Release --no-restore'
+                sh 'dotnet test LivestockTrading.sln --configuration Release --no-build --verbosity normal || true'
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                }
+            }
+        }
+
+        stage('Build & Push Images') {
+            parallel {
+                stage('LivestockTrading API') {
+                    steps {
+                        script {
+                            buildAndPush('livestocktrading-api', '_devops/docker/Dockerfile.livestocktrading-api')
+                        }
+                    }
+                }
+                stage('IAM API') {
+                    steps {
+                        script {
+                            buildAndPush('livestocktrading-iam-api', '_devops/docker/Dockerfile.iam-api')
+                        }
+                    }
+                }
+                stage('FileProvider API') {
+                    steps {
+                        script {
+                            buildAndPush('livestocktrading-fileprovider-api', '_devops/docker/Dockerfile.fileprovider-api')
+                        }
+                    }
+                }
+                stage('IAM Mail Worker') {
+                    steps {
+                        script {
+                            buildAndPush('livestocktrading-iam-mail-worker', '_devops/docker/Dockerfile.iam-mail-worker')
+                        }
+                    }
+                }
+                stage('IAM SMS Worker') {
+                    steps {
+                        script {
+                            buildAndPush('livestocktrading-iam-sms-worker', '_devops/docker/Dockerfile.iam-sms-worker')
+                        }
+                    }
+                }
+                stage('Resource Seeder') {
+                    steps {
+                        script {
+                            buildAndPush('livestocktrading-resource-seeder', '_devops/docker/Dockerfile.resource-seeder')
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to DEV') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'dev-server-host', variable: 'DEV_HOST'),
+                    string(credentialsId: 'dev-server-user', variable: 'DEV_USER')
+                ]) {
+                    sshagent(credentials: ['dev-server-ssh-key']) {
+                        sh '''
+                            ssh -o StrictHostKeyChecking=no ${DEV_USER}@${DEV_HOST} << 'ENDSSH'
+                                cd /opt/livestocktrading
+
+                                echo "========================================"
+                                echo "DEV Deployment Basliyor..."
+                                echo "========================================"
+
+                                echo ""
+                                echo "[1/6] Git repository guncelleniyor..."
+                                git fetch origin dev
+                                git reset --hard origin/dev
+                                git submodule update --init --recursive
+
+                                echo ""
+                                echo "[2/6] Docker Hub'a giris yapiliyor..."
+                                # Credential helper kullaniliyorsa bu adim atlanabilir
+
+                                echo ""
+                                echo "[3/6] Docker image'lari pull ediliyor..."
+                                docker compose -p livestock_dev \
+                                  -f docker-compose.yml \
+                                  -f docker-compose.dev.yml \
+                                  --env-file .env.dev pull
+
+                                echo ""
+                                echo "[4/6] ResourceSeeder calistiriliyor..."
+                                docker run --rm \
+                                  --network livestock_dev_livestocktrading-network \
+                                  --env-file .env.dev \
+                                  mstfaock/livestocktrading-resource-seeder:dev-latest \
+                                  development || echo "ResourceSeeder failed but continuing..."
+
+                                echo ""
+                                echo "[5/6] Servisler baslatiliyor..."
+                                docker compose -p livestock_dev \
+                                  -f docker-compose.yml \
+                                  -f docker-compose.dev.yml \
+                                  --env-file .env.dev up -d
+
+                                echo ""
+                                echo "[6/6] Temizlik yapiliyor..."
+                                docker image prune -f
+
+                                echo ""
+                                echo "========================================"
+                                echo "DEV deployment tamamlandi!"
+                                echo "========================================"
+                                echo ""
+                                echo "Container durumu:"
+                                docker compose -p livestock_dev ps
+ENDSSH
+                        '''
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            sh 'docker logout || true'
+        }
+        success {
+            echo "DEV Deployment basariyla tamamlandi! (${env.GIT_COMMIT_SHORT})"
+        }
+        failure {
+            echo "DEV Deployment basarisiz oldu! (${env.GIT_COMMIT_SHORT})"
+        }
+        cleanup {
+            cleanWs()
+        }
+    }
+}
+
+def buildAndPush(String imageName, String dockerfile) {
+    def fullImageName = "${DOCKER_USERNAME}/${imageName}"
+    def commitTag = "dev-${env.GIT_COMMIT_SHORT}"
+
+    sh """
+        echo "Building ${imageName}..."
+        docker build -t ${fullImageName}:${TAG} -t ${fullImageName}:${commitTag} -f ${dockerfile} .
+
+        echo "Pushing ${imageName}..."
+        docker push ${fullImageName}:${TAG}
+        docker push ${fullImageName}:${commitTag}
+
+        echo "${imageName} tamamlandi."
+    """
+}

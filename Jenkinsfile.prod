@@ -1,0 +1,190 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_USERNAME = 'mstfaock'
+        DOCKER_REGISTRY = 'docker.io'
+        TAG = 'latest'
+        DOTNET_CLI_TELEMETRY_OPTOUT = '1'
+        DOTNET_NOLOGO = '1'
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        disableConcurrentBuilds()
+        timeout(time: 60, unit: 'MINUTES')
+        timestamps()
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                script {
+                    env.GIT_COMMIT_SHORT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                }
+                echo "PROD Deployment - Commit: ${env.GIT_COMMIT_SHORT}"
+            }
+        }
+
+        stage('Build & Test') {
+            steps {
+                sh 'dotnet restore LivestockTrading.sln'
+                sh 'dotnet build LivestockTrading.sln --configuration Release --no-restore'
+                sh 'dotnet test LivestockTrading.sln --configuration Release --no-build --verbosity normal'
+            }
+        }
+
+        stage('Approval') {
+            steps {
+                timeout(time: 30, unit: 'MINUTES') {
+                    input message: 'PROD ortamina deploy edilsin mi?', ok: 'Deploy Et'
+                }
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                }
+            }
+        }
+
+        stage('Build & Push Images') {
+            parallel {
+                stage('LivestockTrading API') {
+                    steps {
+                        script {
+                            buildAndPush('livestocktrading-api', '_devops/docker/Dockerfile.livestocktrading-api')
+                        }
+                    }
+                }
+                stage('IAM API') {
+                    steps {
+                        script {
+                            buildAndPush('livestocktrading-iam-api', '_devops/docker/Dockerfile.iam-api')
+                        }
+                    }
+                }
+                stage('FileProvider API') {
+                    steps {
+                        script {
+                            buildAndPush('livestocktrading-fileprovider-api', '_devops/docker/Dockerfile.fileprovider-api')
+                        }
+                    }
+                }
+                stage('IAM Mail Worker') {
+                    steps {
+                        script {
+                            buildAndPush('livestocktrading-iam-mail-worker', '_devops/docker/Dockerfile.iam-mail-worker')
+                        }
+                    }
+                }
+                stage('IAM SMS Worker') {
+                    steps {
+                        script {
+                            buildAndPush('livestocktrading-iam-sms-worker', '_devops/docker/Dockerfile.iam-sms-worker')
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to PROD') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'prod-server-host', variable: 'PROD_HOST'),
+                    string(credentialsId: 'prod-server-user', variable: 'PROD_USER')
+                ]) {
+                    sshagent(credentials: ['prod-server-ssh-key']) {
+                        sh '''
+                            ssh -o StrictHostKeyChecking=no ${PROD_USER}@${PROD_HOST} << 'ENDSSH'
+                                cd /opt/livestocktrading
+
+                                echo "========================================"
+                                echo "PROD Deployment Basliyor..."
+                                echo "========================================"
+
+                                echo ""
+                                echo "[1/5] Git repository guncelleniyor..."
+                                git fetch origin main
+                                git reset --hard origin/main
+                                git submodule update --init --recursive
+
+                                echo ""
+                                echo "[2/5] Docker image'lari pull ediliyor..."
+                                docker compose -p livestock_prod \
+                                  -f docker-compose.yml \
+                                  -f docker-compose.prod.yml \
+                                  --env-file .env.prod pull
+
+                                echo ""
+                                echo "[3/5] Mevcut container'lar durduruluyor..."
+                                docker compose -p livestock_prod \
+                                  -f docker-compose.yml \
+                                  -f docker-compose.prod.yml \
+                                  --env-file .env.prod down --remove-orphans || true
+
+                                echo ""
+                                echo "[4/5] Servisler baslatiliyor..."
+                                docker compose -p livestock_prod \
+                                  -f docker-compose.yml \
+                                  -f docker-compose.prod.yml \
+                                  --env-file .env.prod up -d
+
+                                echo ""
+                                echo "[5/5] Temizlik yapiliyor..."
+                                docker image prune -f
+
+                                echo ""
+                                echo "========================================"
+                                echo "PROD deployment tamamlandi!"
+                                echo "========================================"
+                                echo ""
+                                echo "Container durumu:"
+                                docker compose -p livestock_prod ps
+
+                                echo ""
+                                echo "Health check:"
+                                sleep 10
+                                docker compose -p livestock_prod ps | grep -E "(healthy|running)" || echo "Bazi containerlar henuz hazir degil"
+ENDSSH
+                        '''
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            sh 'docker logout || true'
+        }
+        success {
+            echo "PROD Deployment basariyla tamamlandi! (${env.GIT_COMMIT_SHORT})"
+        }
+        failure {
+            echo "PROD Deployment basarisiz oldu! (${env.GIT_COMMIT_SHORT})"
+        }
+        cleanup {
+            cleanWs()
+        }
+    }
+}
+
+def buildAndPush(String imageName, String dockerfile) {
+    def fullImageName = "${DOCKER_USERNAME}/${imageName}"
+    def commitTag = "${env.GIT_COMMIT_SHORT}"
+
+    sh """
+        echo "Building ${imageName}..."
+        docker build -t ${fullImageName}:${TAG} -t ${fullImageName}:${commitTag} -f ${dockerfile} .
+
+        echo "Pushing ${imageName}..."
+        docker push ${fullImageName}:${TAG}
+        docker push ${fullImageName}:${commitTag}
+
+        echo "${imageName} tamamlandi."
+    """
+}
