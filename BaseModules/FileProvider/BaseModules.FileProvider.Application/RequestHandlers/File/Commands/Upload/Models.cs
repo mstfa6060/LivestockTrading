@@ -19,10 +19,16 @@ public class ResponseModel : IResponseModel
 		public int Index { get; set; }
 
 		// Resim varyantlari
-		public Dictionary<string, string> Variants { get; set; }
+		public List<ImageVariant> Variants { get; set; }
 		public int? Width { get; set; }
 		public int? Height { get; set; }
 		public long? SizeBytes { get; set; }
+	}
+
+	public class ImageVariant
+	{
+		public string Key { get; set; }
+		public string Url { get; set; }
 	}
 }
 

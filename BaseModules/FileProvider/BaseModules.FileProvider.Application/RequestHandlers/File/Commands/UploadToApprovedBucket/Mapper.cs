@@ -18,7 +18,11 @@ public class Mapper
 								ContentType = fileEntry.ContentType,
 								IsDefault = fileEntry.IsDefault,
 								Index = fileEntry.Index,
-								Variants = fileEntry.Variants,
+								Variants = fileEntry.Variants?.Select(v => new ResponseModel.ImageVariant
+								{
+									Key = v.Key,
+									Url = v.Url
+								}).ToList(),
 								Width = fileEntry.Width,
 								Height = fileEntry.Height,
 								SizeBytes = fileEntry.SizeBytes,

@@ -43,7 +43,7 @@ public class Handler : IRequestHandler
 
 		// Create File as Physical
 		FileProperties uploadedFileProperties;
-		Dictionary<string, string> variantPaths = null;
+		List<FileVariantInfo> variantPaths = null;
 		int? imageWidth = null;
 		int? imageHeight = null;
 		long? fileSizeBytes = null;
@@ -68,7 +68,7 @@ public class Handler : IRequestHandler
 				});
 
 			uploadedFileProperties = imageResult.Variants["original"];
-			variantPaths = imageResult.Variants.ToDictionary(v => v.Key, v => v.Value.Path);
+			variantPaths = imageResult.Variants.Select(v => new FileVariantInfo { Key = v.Key, Url = v.Value.Path }).ToList();
 			imageWidth = imageResult.Width;
 			imageHeight = imageResult.Height;
 			fileSizeBytes = imageResult.ProcessedSizeBytes;

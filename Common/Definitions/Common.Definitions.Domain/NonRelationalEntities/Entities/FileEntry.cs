@@ -27,9 +27,9 @@ public class FileEntry
 
 	// Resim varyantlari icin
 	/// <summary>
-	/// Resim varyant path'leri: { "thumb": "path/thumb.webp", "medium": "...", "large": "..." }
+	/// Resim varyant path'leri: [{ key: "thumb", url: "path/thumb.webp" }, ...]
 	/// </summary>
-	public Dictionary<string, string> Variants { get; set; }
+	public List<FileVariantInfo> Variants { get; set; }
 
 	/// <summary>
 	/// Resim genisligi (px)
@@ -45,4 +45,20 @@ public class FileEntry
 	/// Dosya boyutu (bytes)
 	/// </summary>
 	public long? SizeBytes { get; set; }
+}
+
+/// <summary>
+/// Resim varyant bilgisi
+/// </summary>
+public class FileVariantInfo
+{
+	/// <summary>
+	/// Varyant anahtari: "thumb", "small", "medium", "large"
+	/// </summary>
+	public string Key { get; set; }
+
+	/// <summary>
+	/// Varyant URL'i
+	/// </summary>
+	public string Url { get; set; }
 }
