@@ -182,6 +182,13 @@ echo "\$DOCKER_PASSWORD" | docker login -u "\$DOCKER_USERNAME" --password-stdin 
 echo "Docker compose dizinine geciliyor..."
 cd "\$REPO_DIR/_devops/docker/compose"
 
+echo "Mevcut servisleri durduruluyor..."
+docker compose -p livestock_prod \\
+    -f docker-compose.yml \\
+    -f docker-compose.prod.yml \\
+    --env-file \$BASE_DIR/.env.prod \\
+    down --remove-orphans || true
+
 echo "Docker imajlari cekiliyor..."
 docker compose -p livestock_prod \\
     -f docker-compose.yml \\
@@ -194,7 +201,7 @@ docker compose -p livestock_prod \\
     -f docker-compose.yml \\
     -f docker-compose.prod.yml \\
     --env-file \$BASE_DIR/.env.prod \\
-    up -d
+    up -d --remove-orphans
 
 echo "Servislerin hazir olmasi bekleniyor (30 saniye)..."
 sleep 30
