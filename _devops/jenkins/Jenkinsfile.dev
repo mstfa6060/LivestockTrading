@@ -3,7 +3,6 @@ pipeline {
 
     parameters {
         string(name: 'ONLY_IMAGE', defaultValue: '', description: 'Sadece belirli bir imaji derle (orn: livestocktrading-api). Bos birakilirsa tum imajlar derlenir.')
-        booleanParam(name: 'NO_CACHE', defaultValue: false, description: 'Docker build cache kullanma')
         booleanParam(name: 'DEPLOY_TO_DEV', defaultValue: true, description: 'Build sonrasi DEV ortamina otomatik deploy yap')
         booleanParam(name: 'RUN_MIGRATIONS', defaultValue: true, description: 'Deploy sonrasi migration ve seeder calistir')
     }
@@ -103,12 +102,10 @@ pipeline {
 
                         echo "DEV [${index + 1}/${modules.size()}] ${moduleName} build ediliyor..."
 
-                        def cacheArgs = params.NO_CACHE ? '--no-cache' : ''
-
                         timeout(time: 45, unit: 'MINUTES') {
                             sh """
                                 docker buildx build \
-                                    ${cacheArgs} \
+                                    --no-cache \
                                     --progress=auto \
                                     --file ${dockerfile} \
                                     --tag ${image}:${TAG_SUFFIX} \
