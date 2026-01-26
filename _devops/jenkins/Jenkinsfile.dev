@@ -180,9 +180,14 @@ if [ -z "\$PROJECT_DIR" ] || [ ! -d "\$PROJECT_DIR" ]; then
 fi
 
 echo "Proje dizini bulundu: \$PROJECT_DIR"
+echo "Dizin icerigi:"
+ls -la "\$PROJECT_DIR"
+echo "Git durumu kontrol ediliyor..."
+cd "\$PROJECT_DIR"
+pwd
+ls -la .git 2>/dev/null || echo ".git dizini bulunamadi!"
 
 echo "Git repository guncelleniyor (dev branch)..."
-cd "\$PROJECT_DIR"
 git fetch origin dev
 git reset --hard origin/dev
 git submodule update --init --recursive
