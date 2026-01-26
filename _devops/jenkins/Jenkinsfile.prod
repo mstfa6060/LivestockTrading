@@ -189,6 +189,9 @@ docker compose -p livestock_prod \\
     --env-file \$BASE_DIR/.env.prod \\
     down --remove-orphans || true
 
+echo "Orphan container'lar temizleniyor..."
+docker ps -a --filter "name=livestock_prod" -q | xargs -r docker rm -f || true
+
 echo "Docker imajlari cekiliyor..."
 docker compose -p livestock_prod \\
     -f docker-compose.yml \\
