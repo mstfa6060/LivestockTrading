@@ -1,0 +1,23 @@
+@BaseUrl = http://localhost:5000
+
+### Tüm Ülkeleri Listele
+POST {{BaseUrl}}/Countries/All
+Content-Type: application/json
+
+{}
+
+### Keyword ile Filtrele (Türkiye)
+POST {{BaseUrl}}/Countries/All
+Content-Type: application/json
+
+{
+    "keyword": "Turkey"
+}
+
+### Keyword ile Filtrele (TR kodu)
+POST {{BaseUrl}}/Countries/All
+Content-Type: application/json
+
+{
+    "keyword": "TR"
+}
