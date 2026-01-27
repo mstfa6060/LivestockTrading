@@ -2,6 +2,13 @@
 # Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
 services:
+  api-gateway:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    build:
+      context: ../..
+      dockerfile: docker/Dockerfile.api-gateway
+
   livestocktrading-api:
     environment:
       ASPNETCORE_ENVIRONMENT: Development

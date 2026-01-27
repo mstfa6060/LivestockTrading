@@ -46,6 +46,7 @@ pipeline {
             steps {
                 script {
                     def allModules = [
+                        'api-gateway:_devops/docker/Dockerfile.api-gateway:mstfaock/livestocktrading-api-gateway',
                         'livestocktrading-api:_devops/docker/Dockerfile.livestocktrading-api:mstfaock/livestocktrading-api',
                         'iam-api:_devops/docker/Dockerfile.iam-api:mstfaock/livestocktrading-iam-api',
                         'fileprovider-api:_devops/docker/Dockerfile.fileprovider-api:mstfaock/livestocktrading-fileprovider-api',
