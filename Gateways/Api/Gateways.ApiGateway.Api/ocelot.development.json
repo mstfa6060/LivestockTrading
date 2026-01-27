@@ -57,6 +57,20 @@
       ]
     },
     {
+      "DownstreamPathTemplate": "/Countries/All",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "iam-api-container",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/iam/Countries/All",
+      "UpstreamHttpMethod": [
+        "POST"
+      ]
+    },
+    {
       "DownstreamPathTemplate": "/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
