@@ -1,12 +1,12 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Common.Services.ErrorCodeGenerator;
 
-// Domain Errors
+// Ambiguity fix
 using CommonDomainErrors = Common.Definitions.Domain.Errors.DomainErrors;
 using LivestockTradingDomainErrors = LivestockTrading.Domain.Errors.LivestockTradingDomainErrors;
 
 // =====================
-// LivestockTrading kökünü bul
+// GlobalLivestock kokunu bul
 // =====================
 static string GetProjectRoot()
 {
@@ -19,17 +19,18 @@ static string GetProjectRoot()
 
         dir = dir.Parent;
     }
-    throw new Exception("Proje kökü (backend'in parent'ı) bulunamadı.");
+    throw new Exception("GlobalLivestock koku (backend'in parent'i) bulunamadi.");
 }
 
 // ==========================================
-// Çıktı yollarını proje köküne göre üret
+// Cikti yollarini proje kokune gore uret
 // ==========================================
 static Dictionary<string, Type> GetPathsAndTypes()
 {
-    var projectRoot = GetProjectRoot();
+    var projectRoot = GetProjectRoot(); // Orn: D:\Projects\GlobalLivestock
     var pathsAndTypes = new Dictionary<string, Type>();
 
+    // 48 dil destegi
     var languages = new[]
     {
         "en","tr","es","fr","de","ar","pt","ru","hi","zh","ja","it","nl","ko",
@@ -40,14 +41,26 @@ static Dictionary<string, Type> GetPathsAndTypes()
 
     foreach (var lang in languages)
     {
-        // --- Ortak Domain Errors (Common) ---
+        // --- Common DomainErrors (IAM, Auth, User, vb.) ---
+        // Web
         pathsAndTypes.Add(
-            Path.Combine(projectRoot, "frontend", "common", "globallivestock-api", "src", "errors", "locales", "modules", "backend", "common", $"{lang}.ts"),
+            Path.Combine(projectRoot, "web", "common", "livestock-api", "src", "errors", "locales", "modules", "backend", "common", $"{lang}.ts"),
             typeof(CommonDomainErrors));
 
-        // --- LivestockTrading modülü ---
+        // Mobile
         pathsAndTypes.Add(
-            Path.Combine(projectRoot, "frontend", "common", "globallivestock-api", "src", "errors", "locales", "modules", "backend", "globallivestock", $"{lang}.ts"),
+            Path.Combine(projectRoot, "mobil", "common", "livestock-api", "src", "errors", "locales", "modules", "backend", "common", $"{lang}.ts"),
+            typeof(CommonDomainErrors));
+
+        // --- LivestockTrading DomainErrors ---
+        // Web
+        pathsAndTypes.Add(
+            Path.Combine(projectRoot, "web", "common", "livestock-api", "src", "errors", "locales", "modules", "backend", "livestocktrading", $"{lang}.ts"),
+            typeof(LivestockTradingDomainErrors));
+
+        // Mobile
+        pathsAndTypes.Add(
+            Path.Combine(projectRoot, "mobil", "common", "livestock-api", "src", "errors", "locales", "modules", "backend", "livestocktrading", $"{lang}.ts"),
             typeof(LivestockTradingDomainErrors));
     }
 
@@ -55,7 +68,7 @@ static Dictionary<string, Type> GetPathsAndTypes()
 }
 
 // ============================
-// Typescript içerik üreten kısım
+// Typescript icerik ureten kisim
 // ============================
 static string GetErrorAsTypescriptFiles(Dictionary<string, string> lines, Type myType)
 {
@@ -77,7 +90,7 @@ static string GetErrorAsTypescriptFiles(Dictionary<string, string> lines, Type m
                     var line = lines.FirstOrDefault(l => l.Key == propertyName);
                     var escapedValue = propertyValue?.ToString()?.Replace("\\", "\\\\")?.Replace("\"", "\\\"");
 
-                    //  DÜZELTME: Değerin boş olup olmadığını da kontrol et
+                    // Degerin bos olup olmadigini kontrol et
                     if (!string.IsNullOrEmpty(line.Key) && line.Value != "\"\"" && !string.IsNullOrWhiteSpace(line.Value))
                         output += $"\n      {propertyName}: {line.Value},";
                     else
@@ -96,7 +109,7 @@ static string GetErrorAsTypescriptFiles(Dictionary<string, string> lines, Type m
 }
 
 // ============================
-// Var olan dosyayı oku (varsa)
+// Var olan dosyayi oku (varsa)
 // ============================
 static async Task<Dictionary<string, string>> Read(string path)
 {
@@ -107,7 +120,7 @@ static async Task<Dictionary<string, string>> Read(string path)
     using var sr = new StreamReader(path);
     var templateContent = await sr.ReadToEndAsync();
 
-    // Hem eski "export const errors = {}" hem yeni "export default {translation:{error:{}}}" için gevşek parser
+    // Parser
     var cleaned = templateContent
         .Replace("export const errors = {", "")
         .Replace("export default {", "")
@@ -132,7 +145,7 @@ static async Task<Dictionary<string, string>> Read(string path)
 }
 
 // ============================
-// Yaz ve klasörü oluştur
+// Yaz ve klasoru olustur
 // ============================
 static async Task<bool> Write(string path, string template)
 {
@@ -142,7 +155,7 @@ static async Task<bool> Write(string path, string template)
         if (!Directory.Exists(directoryPath))
         {
             Directory.CreateDirectory(directoryPath!);
-            Console.WriteLine($" Klasör oluşturuldu: {directoryPath}");
+            Console.WriteLine($"Klasor olusturuldu: {directoryPath}");
         }
 
         await File.WriteAllTextAsync(path, template);
@@ -150,15 +163,22 @@ static async Task<bool> Write(string path, string template)
     }
     catch (Exception e)
     {
-        Console.WriteLine($"❌ Hata: {e.Message}");
+        Console.WriteLine($"Hata: {e.Message}");
         return false;
     }
 }
 
 // ============================
-// MAIN (top-level program)
+// MAIN
 // ============================
+Console.WriteLine("ErrorCodeExporter baslatildi...");
+Console.WriteLine($"Proje koku: {GetProjectRoot()}");
+Console.WriteLine();
+
 var pathsAndTypes = GetPathsAndTypes();
+var successCount = 0;
+var failCount = 0;
+
 foreach (var kv in pathsAndTypes)
 {
     var path = kv.Key;
@@ -168,6 +188,18 @@ foreach (var kv in pathsAndTypes)
     var output = GetErrorAsTypescriptFiles(existing, type);
     var ok = await Write(path, output);
 
-    Console.WriteLine(path);
-    Console.WriteLine($"Result: {ok}");
+    if (ok)
+    {
+        successCount++;
+        Console.WriteLine($"[OK] {Path.GetFileName(path)} -> {path}");
+    }
+    else
+    {
+        failCount++;
+        Console.WriteLine($"[FAIL] {path}");
+    }
 }
+
+Console.WriteLine();
+Console.WriteLine($"Tamamlandi: {successCount} basarili, {failCount} basarisiz");
+Console.WriteLine($"Toplam: {pathsAndTypes.Count} dosya ({pathsAndTypes.Count / 4} dil x 4 hedef)");
