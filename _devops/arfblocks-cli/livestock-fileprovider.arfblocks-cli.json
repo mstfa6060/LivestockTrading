@@ -17,7 +17,7 @@
                 },
                 {
                     "key": "outputImports",
-                    "value": "// Imports \nimport { AppConfig, api as axios } from '@/config/livestock-config'; \nimport { ApiService } from '@/services/ApiService';"
+                    "value": "// Imports \nimport { AppConfig } from \"@config/livestock-config\";\nimport { ApiService } from \"@services/ApiService\";\nimport axios from \"axios\";"
                 },
                 {
                     "key": "outputTypes",
@@ -50,7 +50,7 @@
                 },
                 {
                     "key": "outputImports",
-                    "value": "// Imports \nimport { AppConfig, api as axios } from '@/config/livestock-config'; \nimport { ApiService } from '@/services/ApiService';"
+                    "value": "// Imports \nimport { AppConfig } from \"@config/livestock-config\";\nimport { ApiService } from \"@services/ApiService\";\nimport axios from \"axios\";"
                 },
                 {
                     "key": "outputTypes",
