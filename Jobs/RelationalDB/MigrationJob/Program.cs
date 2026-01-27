@@ -49,6 +49,20 @@ class Program
             throw;
         }
 
+        // Seed Data - Roller
+        // --force-role-reseed argümani ile mevcut roller güncellenebilir
+        try
+        {
+            var forceRoleReseed = args.Contains("--force-role-reseed");
+            var roleSeeder = new RoleSeeder(dbContext);
+            await roleSeeder.SeedAsync(forceRoleReseed);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Role seed FAILED: {ex.Message}");
+            throw;
+        }
+
         // TODO: Diger Seed Data implementasyonlari eklenecek
         // LocationSeeder, PlatformSettingsSeeder, vb.
 

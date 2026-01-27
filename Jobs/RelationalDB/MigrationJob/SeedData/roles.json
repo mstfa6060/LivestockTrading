@@ -1,0 +1,37 @@
+[
+  {
+    "id": "a1000000-0000-0000-0000-000000000001",
+    "name": "Admin",
+    "isSystemRole": true
+  },
+  {
+    "id": "a1000000-0000-0000-0000-000000000002",
+    "name": "Moderator",
+    "isSystemRole": true
+  },
+  {
+    "id": "a1000000-0000-0000-0000-000000000003",
+    "name": "Support",
+    "isSystemRole": true
+  },
+  {
+    "id": "a1000000-0000-0000-0000-000000000004",
+    "name": "Seller",
+    "isSystemRole": true
+  },
+  {
+    "id": "a1000000-0000-0000-0000-000000000005",
+    "name": "Transporter",
+    "isSystemRole": true
+  },
+  {
+    "id": "a1000000-0000-0000-0000-000000000006",
+    "name": "Buyer",
+    "isSystemRole": true
+  },
+  {
+    "id": "a1000000-0000-0000-0000-000000000007",
+    "name": "Veterinarian",
+    "isSystemRole": true
+  }
+]
