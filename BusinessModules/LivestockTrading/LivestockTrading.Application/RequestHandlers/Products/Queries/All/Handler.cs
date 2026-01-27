@@ -15,6 +15,7 @@ public class Handler : IRequestHandler
 		var req = (RequestModel)payload;
 
 		var (products, page) = await _dataAccessLayer.All(
+			req.CountryCode,
 			req.Sorting,
 			req.Filters,
 			req.PageRequest,

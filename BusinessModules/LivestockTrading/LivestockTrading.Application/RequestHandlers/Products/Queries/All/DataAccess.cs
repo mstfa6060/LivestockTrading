@@ -14,6 +14,7 @@ public class DataAccess : IDataAccess
 	}
 
 	public async Task<(List<Product> Products, XPageResponse Page)> All(
+		string countryCode,
 		XSorting sorting,
 		List<XFilterItem> filters,
 		XPageRequest pageRequest,
@@ -21,9 +22,16 @@ public class DataAccess : IDataAccess
 	{
 		var query = _dbContext.Products
 			.AsNoTracking()
-			.Where(p => !p.IsDeleted)
-			.Sort(sorting)
-			.Filter(filters);
+			.Include(p => p.Location)
+			.Where(p => !p.IsDeleted);
+
+		// Ülke filtresi - belirtilmişse sadece o ülkenin ürünlerini getir
+		if (!string.IsNullOrWhiteSpace(countryCode))
+		{
+			query = query.Where(p => p.Location != null && p.Location.CountryCode == countryCode);
+		}
+
+		query = query.Sort(sorting).Filter(filters);
 
 		// Default sorting
 		if (sorting == null)

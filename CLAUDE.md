@@ -449,6 +449,60 @@ BrandName = entity.Brand?.Name,
 SellerName = entity.Seller?.BusinessName,
 ```
 
+### Çok Ülkeli Filtreleme (Multi-Country Filtering)
+
+Platform 50+ dil ve çok sayıda ülkeyi destekler. Kullanıcılar default ülkelerinin ilanlarını görür veya frontend'den başka bir ülke seçebilir.
+
+**Temel Kurallar:**
+1. Ürünler `Location.CountryCode` (ISO 3166-1 alpha-2) üzerinden ülkeye bağlıdır
+2. Frontend `countryCode` parametresi gönderirse sadece o ülkenin ürünleri döner
+3. `countryCode` boş ise tüm ürünler döner (global görünüm)
+
+**Listeleme Endpoint'lerinde Kullanım:**
+```csharp
+// Models.cs
+public class RequestModel : IRequestModel
+{
+    /// <summary>Ülke kodu filtresi (ISO 3166-1 alpha-2, örn: "TR", "US", "DE")</summary>
+    public string CountryCode { get; set; }
+    public XSorting Sorting { get; set; }
+    public List<XFilterItem> Filters { get; set; }
+    public XPageRequest PageRequest { get; set; }
+}
+
+// DataAccess.cs - Include ile Location yüklenir
+var query = _dbContext.Products
+    .AsNoTracking()
+    .Include(p => p.Location)
+    .Where(p => !p.IsDeleted);
+
+// Ülke filtresi uygulanır
+if (!string.IsNullOrWhiteSpace(countryCode))
+{
+    query = query.Where(p => p.Location != null && p.Location.CountryCode == countryCode);
+}
+```
+
+**ResponseModel'de Ülke Bilgisi:**
+```csharp
+public class ResponseModel : IResponseModel<Array>
+{
+    // ... diğer alanlar ...
+    public Guid LocationId { get; set; }
+    public string LocationCountryCode { get; set; }
+    public string LocationCity { get; set; }
+}
+
+// Mapper'da
+LocationCountryCode = entity.Location?.CountryCode,
+LocationCity = entity.Location?.City,
+```
+
+**Kullanıcı Ülke Tercihi:**
+- `User.CountryId`: Kullanıcının varsayılan ülkesi
+- `User.LastViewingCountryId`: Son görüntülediği ülke (frontend güncelleyebilir)
+- Frontend ülke değiştirdiğinde `countryCode` parametresini request body'de gönderir
+
 ### .http Test Dosyasi Kurali
 
 Her entity icin CRUD endpoint'leri gelistirildiginde, `_doc/Http/BusinessModules/LivestockTrading/{EntityName}.http` dosyasi olusturulmalidir. Ornek: `_doc/Http/BusinessModules/LivestockTrading/Categories.http`

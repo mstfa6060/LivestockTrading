@@ -35,11 +35,44 @@ Content-Type: application/json
     "metaKeywords": "holstein, dairy cow, milk cow, livestock"
 }
 
-### All
+### All (tüm ürünler - ülke filtresi yok)
 POST {{BaseUrl}}/Products/All
 Content-Type: application/json
 
 {
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### All - Türkiye'deki ürünler
+POST {{BaseUrl}}/Products/All
+Content-Type: application/json
+
+{
+    "countryCode": "TR",
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### All - ABD'deki ürünler
+POST {{BaseUrl}}/Products/All
+Content-Type: application/json
+
+{
+    "countryCode": "US",
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### All - Almanya'daki ürünler
+POST {{BaseUrl}}/Products/All
+Content-Type: application/json
+
+{
+    "countryCode": "DE",
     "sorting": null,
     "filters": [],
     "pageRequest": { "page": 1, "pageSize": 10 }
