@@ -3,6 +3,11 @@ namespace LivestockTrading.Application.RequestHandlers.Categories.Queries.Detail
 public class RequestModel : IRequestModel
 {
 	public Guid Id { get; set; }
+	/// <summary>
+	/// Dil kodu (ISO 639-1, örn: "tr", "en", "de")
+	/// Belirtilirse Name ve Description çevrilmiş olarak döner
+	/// </summary>
+	public string LanguageCode { get; set; }
 }
 
 public class ResponseModel : IResponseModel

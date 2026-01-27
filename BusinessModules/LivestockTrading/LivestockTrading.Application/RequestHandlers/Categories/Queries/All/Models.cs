@@ -2,6 +2,11 @@ namespace LivestockTrading.Application.RequestHandlers.Categories.Queries.All;
 
 public class RequestModel : IRequestModel
 {
+	/// <summary>
+	/// Dil kodu (ISO 639-1, örn: "tr", "en", "de")
+	/// Belirtilirse Name ve Description çevrilmiş olarak döner
+	/// </summary>
+	public string LanguageCode { get; set; }
 	public XSorting Sorting { get; set; }
 	public List<XFilterItem> Filters { get; set; }
 	public XPageRequest PageRequest { get; set; }

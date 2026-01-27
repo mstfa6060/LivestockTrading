@@ -503,6 +503,62 @@ LocationCity = entity.Location?.City,
 - `User.LastViewingCountryId`: Son görüntülediği ülke (frontend güncelleyebilir)
 - Frontend ülke değiştirdiğinde `countryCode` parametresini request body'de gönderir
 
+### Çoklu Dil Desteği (Multi-Language Translations)
+
+Kategoriler ve diğer global entity'ler çoklu dil desteğine sahiptir. Çeviriler JSON formatında saklanır.
+
+**Entity'de Çeviri Alanları:**
+```csharp
+// Category entity örneği
+public string Name { get; set; }  // Varsayılan isim
+public string NameTranslations { get; set; }  // JSON: {"en":"Livestock","tr":"Hayvancılık","de":"Viehzucht"}
+public string DescriptionTranslations { get; set; }  // JSON çevirileri
+```
+
+**Backend Çeviri Çözümleme:**
+```csharp
+// Models.cs - LanguageCode parametresi ekle
+public class RequestModel : IRequestModel
+{
+    /// <summary>Dil kodu (ISO 639-1, örn: "tr", "en", "de")</summary>
+    public string LanguageCode { get; set; }
+    // ... diğer alanlar
+}
+
+// Mapper.cs - TranslationHelper kullan
+using LivestockTrading.Application.Extensions;
+
+public ResponseModel MapToResponse(Category entity, string languageCode = null)
+{
+    return new ResponseModel
+    {
+        Name = GetTranslatedName(entity, languageCode),
+        // ...
+    };
+}
+
+private static string GetTranslatedName(Category c, string languageCode)
+{
+    if (string.IsNullOrWhiteSpace(languageCode))
+        return c.Name;
+    return TranslationHelper.GetTranslation(c.NameTranslations, languageCode, c.Name);
+}
+
+// Handler.cs - languageCode'u Mapper'a geç
+var response = mapper.MapToResponse(entity, req.LanguageCode);
+```
+
+**TranslationHelper Davranışı:**
+1. `languageCode` ile tam eşleşme arar (örn: "tr")
+2. Bulamazsa büyük/küçük harf duyarsız arar
+3. Bulamazsa İngilizce ("en") fallback
+4. O da yoksa ilk mevcut çeviriyi döndürür
+5. Hiçbiri yoksa `fallbackValue` (genellikle entity.Name) döner
+
+**Çeviri Destekleyen Entity'ler:**
+- `Category`: NameTranslations, DescriptionTranslations
+- Diğer entity'lere aynı pattern ile eklenebilir
+
 ### .http Test Dosyasi Kurali
 
 Her entity icin CRUD endpoint'leri gelistirildiginde, `_doc/Http/BusinessModules/LivestockTrading/{EntityName}.http` dosyasi olusturulmalidir. Ornek: `_doc/Http/BusinessModules/LivestockTrading/Categories.http`

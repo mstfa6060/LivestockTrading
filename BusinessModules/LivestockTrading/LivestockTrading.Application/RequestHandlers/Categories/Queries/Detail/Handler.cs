@@ -19,7 +19,7 @@ public class Handler : IRequestHandler
 			throw new ArfBlocksValidationException(
 				ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.CommonErrors.IdNotValid));
 
-		var response = mapper.MapToResponse(category);
+		var response = mapper.MapToResponse(category, req.LanguageCode);
 
 		return ArfBlocksResults.Success(response);
 	}

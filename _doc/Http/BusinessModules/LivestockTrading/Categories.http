@@ -82,6 +82,33 @@ Content-Type: application/json
     }
 }
 
+### Türkçe çeviri ile
+POST {{BaseUrl}}/Categories/All
+Accept: application/json
+Content-Type: application/json
+
+{
+    "languageCode": "tr"
+}
+
+### İngilizce çeviri ile
+POST {{BaseUrl}}/Categories/All
+Accept: application/json
+Content-Type: application/json
+
+{
+    "languageCode": "en"
+}
+
+### Almanca çeviri ile
+POST {{BaseUrl}}/Categories/All
+Accept: application/json
+Content-Type: application/json
+
+{
+    "languageCode": "de"
+}
+
 ###############################################################################
 # 4. KATEGORI DETAYI (Detail)
 ###############################################################################
@@ -92,6 +119,16 @@ Content-Type: application/json
 
 {
     "id": "CATEGORY_ID_BURAYA"
+}
+
+### Kategori Detayi - Türkçe çeviri ile
+POST {{BaseUrl}}/Categories/Detail
+Accept: application/json
+Content-Type: application/json
+
+{
+    "id": "CATEGORY_ID_BURAYA",
+    "languageCode": "tr"
 }
 
 ###############################################################################
@@ -114,6 +151,17 @@ Content-Type: application/json
 
 {
     "selectedIds": ["CATEGORY_ID_BURAYA"]
+}
+
+### Türkçe çeviri ile Pick
+POST {{BaseUrl}}/Categories/Pick
+Accept: application/json
+Content-Type: application/json
+
+{
+    "keyword": "hayvan",
+    "limit": 10,
+    "languageCode": "tr"
 }
 
 ###############################################################################

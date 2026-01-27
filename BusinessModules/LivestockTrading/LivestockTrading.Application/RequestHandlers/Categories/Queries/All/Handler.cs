@@ -20,7 +20,7 @@ public class Handler : IRequestHandler
 			req.PageRequest,
 			cancellationToken);
 
-		var response = mapper.MapToResponse(categories);
+		var response = mapper.MapToResponse(categories, req.LanguageCode);
 
 		return ArfBlocksResults.Success(response, page);
 	}
