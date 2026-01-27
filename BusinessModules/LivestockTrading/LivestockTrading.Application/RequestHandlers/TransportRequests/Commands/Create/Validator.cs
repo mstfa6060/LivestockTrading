@@ -34,22 +34,22 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
 	{
 		RuleFor(x => x.ProductId)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransportRequestErrors.ProductRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransportRequestErrors.TransportRequestProductRequired));
 
 		RuleFor(x => x.SellerId)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransportRequestErrors.SellerRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransportRequestErrors.TransportRequestSellerRequired));
 
 		RuleFor(x => x.BuyerId)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransportRequestErrors.BuyerRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransportRequestErrors.TransportRequestBuyerRequired));
 
 		RuleFor(x => x.PickupLocationId)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransportRequestErrors.PickupLocationRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransportRequestErrors.TransportRequestPickupLocationRequired));
 
 		RuleFor(x => x.DeliveryLocationId)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransportRequestErrors.DeliveryLocationRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransportRequestErrors.TransportRequestDeliveryLocationRequired));
 	}
 }

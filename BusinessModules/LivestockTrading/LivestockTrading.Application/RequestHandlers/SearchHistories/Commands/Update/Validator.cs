@@ -38,6 +38,6 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
 
 		RuleFor(x => x.SearchQuery)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.SearchHistoryErrors.SearchQueryRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.SearchHistoryErrors.SearchHistoryQueryRequired));
 	}
 }

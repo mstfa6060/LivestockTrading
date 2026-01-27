@@ -36,14 +36,14 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
 	{
 		RuleFor(x => x.Name)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.FarmErrors.NameRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.FarmErrors.FarmNameRequired));
 
 		RuleFor(x => x.SellerId)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.FarmErrors.SellerRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.FarmErrors.FarmSellerRequired));
 
 		RuleFor(x => x.LocationId)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.FarmErrors.LocationRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.FarmErrors.FarmLocationRequired));
 	}
 }

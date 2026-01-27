@@ -38,6 +38,6 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
 
 		RuleFor(x => x.CompanyName)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransporterErrors.CompanyNameRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransporterErrors.TransporterCompanyNameRequired));
 	}
 }

@@ -34,11 +34,11 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
 	{
 		RuleFor(x => x.SellerId)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.SellerReviewErrors.SellerRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.SellerReviewErrors.SellerReviewSellerRequired));
 
 		RuleFor(x => x.UserId)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.SellerReviewErrors.UserRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.SellerReviewErrors.SellerReviewUserRequired));
 
 		RuleFor(x => x.OverallRating)
 			.InclusiveBetween(1, 5)

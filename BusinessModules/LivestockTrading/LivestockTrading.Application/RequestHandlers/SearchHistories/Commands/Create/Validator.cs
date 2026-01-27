@@ -34,10 +34,10 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
 	{
 		RuleFor(x => x.UserId)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.SearchHistoryErrors.UserRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.SearchHistoryErrors.SearchHistoryUserRequired));
 
 		RuleFor(x => x.SearchQuery)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.SearchHistoryErrors.SearchQueryRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.SearchHistoryErrors.SearchHistoryQueryRequired));
 	}
 }

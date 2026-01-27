@@ -34,14 +34,14 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
 	{
 		RuleFor(x => x.CountryCode)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TaxRateErrors.CountryCodeRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TaxRateErrors.TaxRateCountryCodeRequired));
 
 		RuleFor(x => x.TaxName)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TaxRateErrors.TaxNameRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TaxRateErrors.TaxRateNameRequired));
 
 		RuleFor(x => x.Rate)
 			.GreaterThan(0)
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TaxRateErrors.RateRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TaxRateErrors.TaxRateAmountRequired));
 	}
 }

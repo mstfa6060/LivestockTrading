@@ -34,15 +34,15 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
 	{
 		RuleFor(x => x.TransporterId)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransporterReviewErrors.TransporterRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransporterReviewErrors.TransporterReviewTransporterRequired));
 
 		RuleFor(x => x.UserId)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransporterReviewErrors.UserRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransporterReviewErrors.TransporterReviewUserRequired));
 
 		RuleFor(x => x.TransportRequestId)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransportRequestErrors.RequestNotFound));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransportRequestErrors.TransportRequestNotFound));
 
 		RuleFor(x => x.OverallRating)
 			.InclusiveBetween(1, 5)

@@ -34,22 +34,22 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
 	{
 		RuleFor(x => x.ProductId)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.OfferErrors.ProductRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.OfferErrors.OfferProductRequired));
 
 		RuleFor(x => x.BuyerUserId)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.OfferErrors.BuyerRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.OfferErrors.OfferBuyerRequired));
 
 		RuleFor(x => x.SellerUserId)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.OfferErrors.SellerRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.OfferErrors.OfferSellerRequired));
 
 		RuleFor(x => x.OfferedPrice)
 			.GreaterThan(0)
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.OfferErrors.PriceRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.OfferErrors.OfferPriceRequired));
 
 		RuleFor(x => x.Quantity)
 			.GreaterThan(0)
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.OfferErrors.QuantityRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.OfferErrors.OfferQuantityRequired));
 	}
 }

@@ -358,19 +358,51 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
 | Konum | `Infrastructure/Services/` | `Infrastructure/Services/` |
 
 #### DomainErrors Pattern
+
+**KRITIK KURAL: Tum error property isimleri BENZERSIZ olmalidir!**
+
+ErrorCodeExporter, tum hata property'lerini tek bir TypeScript dosyasina export eder. Ayni isimli property'ler TypeScript'te "duplicate key" hatasina neden olur.
+
+**Naming Convention:**
+- Her property ismi entity prefix'i ile baslamalidir
+- Format: `{EntityName}{ErrorType}` (ornek: `CategoryNameRequired`, `BrandSlugAlreadyExists`)
+- Generic isimler KULLANILMAZ: ~~`NameRequired`~~, ~~`SlugRequired`~~, ~~`ProductRequired`~~
+
 ```csharp
 // Domain/Errors/DomainErrors.cs
 public class LivestockTradingDomainErrors
 {
     public static class CommonErrors { ... }
+
     public static class CategoryErrors
     {
         public static string CategoryNotFound { get; set; } = "Kategori bulunamadi.";
-        public static string SlugAlreadyExists { get; set; } = "Bu slug zaten kullaniliyor.";
-        // ...
+        public static string CategorySlugAlreadyExists { get; set; } = "Bu slug zaten kullaniliyor.";  // DOGRU
+        public static string CategoryNameRequired { get; set; } = "Kategori adi zorunludur.";         // DOGRU
+        // public static string SlugAlreadyExists { get; set; } = "...";  // YANLIS - duplicate olur!
+        // public static string NameRequired { get; set; } = "...";       // YANLIS - duplicate olur!
+    }
+
+    public static class BrandErrors
+    {
+        public static string BrandNotFound { get; set; } = "Marka bulunamadi.";
+        public static string BrandSlugAlreadyExists { get; set; } = "Bu slug zaten kullaniliyor.";    // DOGRU
+        public static string BrandNameRequired { get; set; } = "Marka adi zorunludur.";               // DOGRU
+    }
+
+    public static class ProductPriceErrors
+    {
+        public static string PriceNotFound { get; set; } = "Fiyat bilgisi bulunamadi.";
+        public static string PriceProductRequired { get; set; } = "Urun zorunludur.";                 // DOGRU
+        public static string PriceAmountRequired { get; set; } = "Fiyat zorunludur.";                 // DOGRU
     }
 }
 ```
+
+**Yeni hata eklerken kontrol listesi:**
+1. Ayni isimde baska bir property var mi? (`Ctrl+F` ile ara)
+2. Property ismi entity prefix'i ile basliyor mu?
+3. Generic isim kullanilmamis mi? (`NameRequired`, `SlugRequired` gibi)
 
 #### DI Kaydi (ApplicationDependencyProvider)
 ```csharp

@@ -34,10 +34,10 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
 	{
 		RuleFor(x => x.ShippingZoneId)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ShippingRateErrors.ShippingZoneRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ShippingRateErrors.ShippingRateZoneRequired));
 
 		RuleFor(x => x.ShippingCost)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ShippingRateErrors.ShippingCostRequired));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ShippingRateErrors.ShippingRateCostRequired));
 	}
 }

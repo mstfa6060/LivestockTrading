@@ -213,7 +213,7 @@ public class LivestockTradingModuleDbVerificationService : DefinitionDbValidatio
 	{
 		var exists = await _dbContext.ProductReviews.AsNoTracking().AnyAsync(e => e.Id == reviewId && !e.IsDeleted, ct);
 		if (!exists)
-			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ProductReviewErrors.ReviewNotFound));
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ProductReviewErrors.ProductReviewNotFound));
 	}
 
 	// SellerReview
@@ -221,7 +221,7 @@ public class LivestockTradingModuleDbVerificationService : DefinitionDbValidatio
 	{
 		var exists = await _dbContext.SellerReviews.AsNoTracking().AnyAsync(e => e.Id == reviewId && !e.IsDeleted, ct);
 		if (!exists)
-			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.SellerReviewErrors.ReviewNotFound));
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.SellerReviewErrors.SellerReviewNotFound));
 	}
 
 	// TransporterReview
@@ -229,7 +229,7 @@ public class LivestockTradingModuleDbVerificationService : DefinitionDbValidatio
 	{
 		var exists = await _dbContext.TransporterReviews.AsNoTracking().AnyAsync(e => e.Id == reviewId && !e.IsDeleted, ct);
 		if (!exists)
-			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransporterReviewErrors.ReviewNotFound));
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransporterReviewErrors.TransporterReviewNotFound));
 	}
 
 	// FavoriteProduct
@@ -317,7 +317,7 @@ public class LivestockTradingModuleDbVerificationService : DefinitionDbValidatio
 	{
 		var exists = await _dbContext.TransportRequests.AsNoTracking().AnyAsync(e => e.Id == requestId && !e.IsDeleted, ct);
 		if (!exists)
-			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransportRequestErrors.RequestNotFound));
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransportRequestErrors.TransportRequestNotFound));
 	}
 
 	// TransportOffer
@@ -325,7 +325,7 @@ public class LivestockTradingModuleDbVerificationService : DefinitionDbValidatio
 	{
 		var exists = await _dbContext.TransportOffers.AsNoTracking().AnyAsync(e => e.Id == offerId && !e.IsDeleted, ct);
 		if (!exists)
-			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransportOfferErrors.OfferNotFound));
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransportOfferErrors.TransportOfferNotFound));
 	}
 
 	// TransportTracking
@@ -333,7 +333,7 @@ public class LivestockTradingModuleDbVerificationService : DefinitionDbValidatio
 	{
 		var exists = await _dbContext.TransportTrackings.AsNoTracking().AnyAsync(e => e.Id == trackingId && !e.IsDeleted, ct);
 		if (!exists)
-			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransportTrackingErrors.TrackingNotFound));
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransportTrackingErrors.TransportTrackingNotFound));
 	}
 
 	// Currency
@@ -365,7 +365,7 @@ public class LivestockTradingModuleDbVerificationService : DefinitionDbValidatio
 	{
 		var exists = await _dbContext.ShippingCarriers.AsNoTracking().AnyAsync(e => e.Id == carrierId && !e.IsDeleted, ct);
 		if (!exists)
-			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ShippingCarrierErrors.CarrierNotFound));
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ShippingCarrierErrors.ShippingCarrierNotFound));
 	}
 
 	// FAQ
@@ -397,7 +397,7 @@ public class LivestockTradingModuleDbVerificationService : DefinitionDbValidatio
 	{
 		var exists = await _dbContext.ShippingZones.AsNoTracking().AnyAsync(e => e.Id == zoneId && !e.IsDeleted, ct);
 		if (!exists)
-			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ShippingZoneErrors.ZoneNotFound));
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ShippingZoneErrors.ShippingZoneNotFound));
 	}
 
 	// ShippingRate
@@ -405,6 +405,6 @@ public class LivestockTradingModuleDbVerificationService : DefinitionDbValidatio
 	{
 		var exists = await _dbContext.ShippingRates.AsNoTracking().AnyAsync(e => e.Id == rateId && !e.IsDeleted, ct);
 		if (!exists)
-			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ShippingRateErrors.RateNotFound));
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ShippingRateErrors.ShippingRateNotFound));
 	}
 }
