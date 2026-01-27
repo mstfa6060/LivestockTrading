@@ -687,3 +687,49 @@ iam-mail-worker, iam-sms-worker, resource-seeder
 ```
 3. For authenticated endpoints, add `AuthenticationOptions` with the secret key
 4. Rebuild and deploy API Gateway
+
+## Frontend Entegrasyonu
+
+Frontend projesi (`D:\Projects\GlobalLivestock\web`) backend API'lerini `arf-cli` ile olusturulan TypeScript client uzerinden tuketir.
+
+### Frontend API Dokumantasyonu
+
+Frontend gelisitiriciler icin API kullanim dokumani: `D:\Projects\GlobalLivestock\web\common\API-INTEGRATION.md`
+
+**Bu dokuman asagidaki konulari kapsar:**
+- Kimlik dogrulama (Login, Register, Logout, Token yonetimi)
+- JWT ve Refresh Token akislari
+- API cagirma kaliplari (All, Detail, Pick, Create, Update, Delete)
+- Hata yonetimi
+- Dosya yukleme
+- React ornekleri (AuthContext, ProtectedRoute)
+
+### Frontend'i Etkileyen Degisiklikler
+
+Asagidaki degisiklikler yapildiginda `API-INTEGRATION.md` dosyasi MUTLAKA guncellenmelidir:
+
+| Degisiklik Tipi | Guncellenmesi Gereken Bolum |
+|-----------------|----------------------------|
+| Yeni Auth endpoint (OTP, sosyal login, vb.) | Kimlik Dogrulama bolumu |
+| JWT claim yapisi degisikligi | Token Yonetimi bolumu |
+| Token suresi degisikligi | Token Yonetimi bolumu |
+| Yeni public endpoint eklenmesi | Public/Protected Endpoint listesi |
+| Response model formati degisikligi | Ilgili API kullanim ornekleri |
+| Yeni hata kodlari | Hata Yonetimi bolumu |
+| Dosya yukleme API degisikligi | Dosya Yukleme bolumu |
+| Platform enum degisikligi | Platform Degerleri bolumu |
+
+### arf-cli ile API Client Guncelleme
+
+Backend'de endpoint degisikligi yapildiginda frontend API client'i guncellenmelidir:
+
+```bash
+# arf-cli ile TypeScript client olustur
+arf-cli generate --output D:\Projects\GlobalLivestock\web\common\livestock-api
+```
+
+Bu komut asagidaki dosyalari gunceller:
+- `src/api/base_modules/iam/index.ts`
+- `src/api/base_modules/FileProvider/index.ts`
+- `src/api/business_modules/livestocktrading/index.ts`
+- `src/errors/locales/modules/backend/*/tr.ts`
