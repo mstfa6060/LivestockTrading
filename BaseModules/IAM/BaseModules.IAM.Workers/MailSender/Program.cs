@@ -25,16 +25,18 @@ Host.CreateDefaultBuilder(args)
             try
             {
                 var config = sp.GetRequiredService<IConfiguration>();
-                var brevoConfig = config.GetSection("Brevo");
 
-                var smtpHost = brevoConfig["SmtpHost"];
-                var smtpPort = int.Parse(brevoConfig["SmtpPort"]); // BURASI PATLIYOR OLABİLİR
-                var smtpUser = brevoConfig["SmtpUser"];
-                var smtpPass = brevoConfig["SmtpPass"];
-                var fromEmail = brevoConfig["FromEmail"];
-                var fromName = brevoConfig["FromName"];
+                // Gmail kullan (Brevo yerine)
+                var gmailConfig = config.GetSection("Gmail");
 
-                Console.WriteLine($"📧 [Init] SMTP Host: {smtpHost}, Port: {smtpPort}, From: {fromEmail}");
+                var smtpHost = gmailConfig["SmtpHost"];
+                var smtpPort = int.Parse(gmailConfig["SmtpPort"]);
+                var smtpUser = gmailConfig["SmtpUser"];
+                var smtpPass = gmailConfig["SmtpPass"];
+                var fromEmail = gmailConfig["FromEmail"];
+                var fromName = gmailConfig["FromName"];
+
+                Console.WriteLine($"📧 [Init] Gmail SMTP Host: {smtpHost}, Port: {smtpPort}, From: {fromEmail}");
 
                 return new BrevoSmtpEmailService(smtpHost, smtpPort, smtpUser, smtpPass, fromEmail, fromName);
             }

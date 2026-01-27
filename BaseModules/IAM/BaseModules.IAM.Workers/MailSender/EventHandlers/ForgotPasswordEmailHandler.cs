@@ -1,6 +1,7 @@
 using BaseModules.IAM.Domain.Events;
 using Arfware.ArfBlocks.Core;
 using System.Web;
+using Microsoft.Extensions.Configuration;
 
 namespace BaseModules.IAM.Workers.MailSender.EventHandlers;
 
@@ -9,12 +10,14 @@ public class ForgotPasswordEmailHandler
     private readonly IEmailService _emailService;
     private readonly ArfBlocksRequestOperator _requestOperator;
     private readonly ILogger<ForgotPasswordEmailHandler> _logger;
+    private readonly IConfiguration _configuration;
 
-    public ForgotPasswordEmailHandler(IEmailService emailService, ArfBlocksDependencyProvider dependencyProvider, ILogger<ForgotPasswordEmailHandler> logger)
+    public ForgotPasswordEmailHandler(IEmailService emailService, ArfBlocksDependencyProvider dependencyProvider, ILogger<ForgotPasswordEmailHandler> logger, IConfiguration configuration)
     {
         _emailService = emailService;
         _requestOperator = new ArfBlocksRequestOperator(dependencyProvider);
         _logger = logger;
+        _configuration = configuration;
     }
 
     public async Task HandleAsync(ForgotPasswordEvent @event)
@@ -44,7 +47,12 @@ public class ForgotPasswordEmailHandler
             {
                 var subject = "🔐 Şifre Sıfırlama Bağlantısı";
                 var encodedToken = HttpUtility.UrlEncode(user.Token);
-                var link = $"https://mstfa6060.github.io/hirovo-link?token={encodedToken}";
+
+                // Environment'a göre frontend URL'ini al
+                var environmentName = _configuration["ProjectConfigurations:EnvironmentConfiguration:EnvironmentName"] ?? "Development";
+                var frontendBaseUrl = _configuration[$"FrontendUrl:{environmentName}"] ?? "http://localhost:3000";
+                var link = $"{frontendBaseUrl}/reset-password?token={encodedToken}";
+
                 var body = $"""
 Merhaba {user.DisplayName},
 
