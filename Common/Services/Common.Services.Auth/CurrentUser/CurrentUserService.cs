@@ -36,22 +36,15 @@ public class CurrentUserService
                 if (!string.IsNullOrEmpty(authorizationValue) && authorizationValue.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
                 {
                     string jwtInput = authorizationValue.Substring("Bearer ".Length).Trim();
-
-                    jwtInput = jwtInput.Trim('"'); // <<< Önemli: çift tırnakları temizliyoruz
-
+                    jwtInput = jwtInput.Trim('"');
 
                     var jwtHandler = new JwtSecurityTokenHandler();
                     if (!jwtHandler.CanReadToken(jwtInput))
                     {
-                        Console.WriteLine($"Cannot read JWT Token: {jwtInput}");
                         throw new Exception("Invalid JWT format.");
                     }
 
                     this._currentUser = this.ParseJwt(jwtInput);
-                }
-                else
-                {
-                    Console.WriteLine("Authorization header is missing or does not start with Bearer.");
                 }
 
             }
@@ -82,13 +75,12 @@ public class CurrentUserService
             tokenHandler.ValidateToken(jwtInput, validationParameters, out SecurityToken validatedToken);
             var jwtToken = (JwtSecurityToken)validatedToken;
 
-            // 🆕 JWT'den rolleri çıkar
+            // JWT'den rolleri çıkar
+            // Not: .NET claim type mapping nedeniyle hem "role" hem de ClaimTypes.Role kontrol edilir
             var roles = jwtToken.Claims
-                .Where(c => c.Type == "role")
+                .Where(c => c.Type == "role" || c.Type == System.Security.Claims.ClaimTypes.Role)
                 .Select(c => c.Value)
                 .ToList();
-
-            Console.WriteLine($"ParseJWT - Parsed Roles: {string.Join(", ", roles)}");
 
             return new CurrentUserModel
             {

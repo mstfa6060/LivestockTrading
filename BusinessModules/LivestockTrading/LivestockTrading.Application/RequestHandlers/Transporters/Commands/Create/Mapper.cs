@@ -26,6 +26,7 @@ public class Mapper
 			ServiceRegions = request.ServiceRegions,
 			Specializations = request.Specializations,
 			IsActive = request.IsActive,
+			Status = TransporterStatus.PendingVerification,
 			Website = request.Website,
 			Certifications = request.Certifications,
 			DocumentUrls = request.DocumentUrls,

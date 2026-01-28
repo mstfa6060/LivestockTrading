@@ -4,22 +4,15 @@ namespace LivestockTrading.Application.RequestHandlers.Transporters.Commands.Cre
 
 public class Verificator : IRequestVerificator
 {
-	private readonly AuthorizationService _authorizationService;
 	private readonly LivestockTradingModuleDbVerificationService _dbVerification;
 
 	public Verificator(ArfBlocksDependencyProvider dependencyProvider)
 	{
-		_authorizationService = dependencyProvider.GetInstance<AuthorizationService>();
 		_dbVerification = dependencyProvider.GetInstance<LivestockTradingModuleDbVerificationService>();
 	}
 
 	public async Task VerificateActor(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
 	{
-		await _authorizationService
-			.ForResource(typeof(Verificator).Namespace)
-			.VerifyActor()
-			.Assert();
-
 		// Transporter başvurusu: Giriş yapmış herkes başvurabilir, rol kısıtlaması yok
 	}
 

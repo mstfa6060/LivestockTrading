@@ -4,6 +4,7 @@
 ###############################################################################
 
 @BaseUrl = http://localhost:5000
+# @BaseUrl = https://dev-api.livestock-trading.com
 
 
 ###############################################################################
@@ -15,10 +16,10 @@ Accept: application/json
 Content-Type: application/json
 
 {
-    "userName": "test@example.com",
-    "firstName": "Ahmet",
-    "surname": "Yilmaz",
-    "email": "test@example.com",
+    "userName": "mocak",
+    "firstName": "Mustaga",
+    "surname": "ocak",
+    "email": "m.mustafaocak@gmail.com",
     "password": "Test123!",
     "countryId": 180,
     "language": "tr-TR",
@@ -36,7 +37,7 @@ Content-Type: application/json
 
 {
     "provider": "native",
-    "userName": "test@example.com",
+    "userName": "m.mustafaocak@gmail.com",
     "password": "Test123!",
     "platform": 0
 }
