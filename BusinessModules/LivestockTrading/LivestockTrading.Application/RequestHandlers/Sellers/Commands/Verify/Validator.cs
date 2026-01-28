@@ -28,10 +28,10 @@ public class Validator : IRequestValidator
 		var request = (RequestModel)payload;
 
 		// Check seller exists
-		await _dbValidator.ValidateSellerExists(request.SellerId, cancellationToken);
+		await _dbValidator.ValidateSellerExists(request.Id, cancellationToken);
 
 		// Check seller is in pending status
-		await _dbValidator.ValidateSellerIsPendingVerification(request.SellerId, cancellationToken);
+		await _dbValidator.ValidateSellerIsPendingVerification(request.Id, cancellationToken);
 	}
 }
 
@@ -39,7 +39,7 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
 {
 	public RequestModel_Validator()
 	{
-		RuleFor(x => x.SellerId)
+		RuleFor(x => x.Id)
 			.NotEmpty()
 			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.CommonErrors.IdNotValid));
 	}

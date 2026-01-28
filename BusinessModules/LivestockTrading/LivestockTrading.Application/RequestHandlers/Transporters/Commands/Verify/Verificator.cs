@@ -30,6 +30,6 @@ public class Verificator : IRequestVerificator
 	public async Task VerificateDomain(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
 	{
 		var request = (RequestModel)payload;
-		await _dbVerification.ValidateTransporterExists(request.TransporterId, cancellationToken);
+		await _dbVerification.ValidateTransporterExists(request.Id, cancellationToken);
 	}
 }

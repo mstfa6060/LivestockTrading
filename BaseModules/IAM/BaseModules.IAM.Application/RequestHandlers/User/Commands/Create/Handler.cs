@@ -12,8 +12,16 @@ public class Handler : IRequestHandler
 {
 	// LivestockTrading Module ID (from modules.json)
 	private static readonly Guid LivestockTradingModuleId = Guid.Parse("DFD018C9-FC32-42C4-AEFD-70A5942A295E");
-	// Buyer Role ID (from roles.json)
+	// Role IDs (from roles.json)
+	private static readonly Guid AdminRoleId = Guid.Parse("a1000000-0000-0000-0000-000000000001");
 	private static readonly Guid BuyerRoleId = Guid.Parse("a1000000-0000-0000-0000-000000000006");
+
+	// Admin email adresleri - bu kullanıcılar kayıt olduğunda otomatik Admin rolü alır
+	private static readonly string[] AdminEmails = new[]
+	{
+		"nagehanyazici13@gmail.com",
+		"m.mustafaocak@gmail.com"
+	};
 
 	private readonly DataAccess _dataAccessLayer;
 	private readonly ArfBlocksCommunicator _communicator;
@@ -47,12 +55,16 @@ public class Handler : IRequestHandler
 		// Veritabanına ekle
 		await _dataAccessLayer.AddUser(user);
 
-		// Yeni kullanıcıya otomatik Buyer rolü ata
+		// Email adresine göre rol belirle (Admin veya Buyer)
+		var isAdminEmail = AdminEmails.Contains(user.Email, StringComparer.OrdinalIgnoreCase);
+		var roleId = isAdminEmail ? AdminRoleId : BuyerRoleId;
+
+		// Kullanıcıya rol ata
 		var userRole = new UserRole
 		{
 			Id = Guid.NewGuid(),
 			UserId = user.Id,
-			RoleId = BuyerRoleId,
+			RoleId = roleId,
 			ModuleId = LivestockTradingModuleId,
 			CreatedAt = DateTime.UtcNow,
 			UpdatedAt = DateTime.UtcNow,

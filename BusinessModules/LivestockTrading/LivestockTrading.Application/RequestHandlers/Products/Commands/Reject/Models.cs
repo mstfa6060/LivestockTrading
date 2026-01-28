@@ -3,7 +3,7 @@ namespace LivestockTrading.Application.RequestHandlers.Products.Commands.Reject;
 public class RequestModel : IRequestModel
 {
 	public Guid Id { get; set; }
-	public string RejectionReason { get; set; }
+	public string Reason { get; set; }
 }
 
 public class ResponseModel : IResponseModel

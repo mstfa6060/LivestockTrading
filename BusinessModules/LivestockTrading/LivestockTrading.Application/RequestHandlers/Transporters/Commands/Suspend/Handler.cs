@@ -18,7 +18,7 @@ public class Handler : IRequestHandler
 		var request = (RequestModel)payload;
 		var mapper = new Mapper();
 
-		var transporter = await _dataAccessLayer.GetTransporterById(request.TransporterId, cancellationToken);
+		var transporter = await _dataAccessLayer.GetTransporterById(request.Id, cancellationToken);
 
 		if (transporter == null)
 			throw new ArfBlocksValidationException(

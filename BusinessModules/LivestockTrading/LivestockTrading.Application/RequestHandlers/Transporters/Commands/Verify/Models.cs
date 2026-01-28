@@ -2,7 +2,7 @@ namespace LivestockTrading.Application.RequestHandlers.Transporters.Commands.Ver
 
 public class RequestModel : IRequestModel
 {
-	public Guid TransporterId { get; set; }
+	public Guid Id { get; set; }
 }
 
 public class ResponseModel : IResponseModel

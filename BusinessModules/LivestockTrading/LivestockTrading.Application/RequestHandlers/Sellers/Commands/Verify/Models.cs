@@ -2,7 +2,7 @@ namespace LivestockTrading.Application.RequestHandlers.Sellers.Commands.Verify;
 
 public class RequestModel : IRequestModel
 {
-	public Guid SellerId { get; set; }
+	public Guid Id { get; set; }
 }
 
 public class ResponseModel : IResponseModel

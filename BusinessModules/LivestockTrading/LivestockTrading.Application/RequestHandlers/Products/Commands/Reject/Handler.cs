@@ -28,7 +28,7 @@ public class Handler : IRequestHandler
 
 		await _dataAccessLayer.SaveChanges();
 
-		var response = mapper.MapToResponse(product, request.RejectionReason);
+		var response = mapper.MapToResponse(product, request.Reason);
 		return ArfBlocksResults.Success(response);
 	}
 }

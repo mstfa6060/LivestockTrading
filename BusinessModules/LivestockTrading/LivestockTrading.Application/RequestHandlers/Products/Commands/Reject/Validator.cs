@@ -39,7 +39,7 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
 			.NotEmpty()
 			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.CommonErrors.IdNotValid));
 
-		RuleFor(x => x.RejectionReason)
+		RuleFor(x => x.Reason)
 			.NotEmpty()
 			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ProductErrors.RejectionReasonRequired));
 	}

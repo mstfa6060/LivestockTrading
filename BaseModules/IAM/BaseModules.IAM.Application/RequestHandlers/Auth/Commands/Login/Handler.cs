@@ -18,7 +18,15 @@ public class Handler : IRequestHandler
 
 	// LivestockTrading sabitleri
 	private static readonly Guid LivestockTradingModuleId = Guid.Parse("DFD018C9-FC32-42C4-AEFD-70A5942A295E");
-	private static readonly Guid LivestockTradingDefaultUserRoleId = Guid.Parse("B3F8A7D1-4E2C-4A3E-8B5A-D3E7B9C5E2F1");
+	private static readonly Guid AdminRoleId = Guid.Parse("a1000000-0000-0000-0000-000000000001");
+	private static readonly Guid BuyerRoleId = Guid.Parse("a1000000-0000-0000-0000-000000000006");
+
+	// Admin email adresleri - bu kullanıcılar giriş yaptığında otomatik Admin rolü alır
+	private static readonly string[] AdminEmails = new[]
+	{
+		"nagehanyazici13@gmail.com",
+		"m.mustafaocak@gmail.com"
+	};
 
 	public Handler(ArfBlocksDependencyProvider dependencyProvider, DataAccess dataAccess)
 	{
@@ -65,13 +73,15 @@ public class Handler : IRequestHandler
 						Description = "",
 					};
 
-					// Varsayılan rol ataması
-					var googleRole = await _dataAccessLayer.GetRoleById(LivestockTradingDefaultUserRoleId);
+					// Email adresine göre rol belirle (Admin veya Buyer)
+					var isGoogleAdmin = AdminEmails.Contains(user.Email, StringComparer.OrdinalIgnoreCase);
+					var googleRoleId = isGoogleAdmin ? AdminRoleId : BuyerRoleId;
+
 					_dataAccessLayer.AddUserRoleWithModule(new UserRole
 					{
 						Id = Guid.NewGuid(),
 						UserId = user.Id,
-						RoleId = googleRole.Id,
+						RoleId = googleRoleId,
 						ModuleId = LivestockTradingModuleId,
 						CreatedAt = DateTime.UtcNow,
 						UpdatedAt = DateTime.UtcNow,
@@ -118,13 +128,15 @@ public class Handler : IRequestHandler
 						Description = "",
 					};
 
-					// Varsayılan rol ataması
-					var appleRole = await _dataAccessLayer.GetRoleById(LivestockTradingDefaultUserRoleId);
+					// Email adresine göre rol belirle (Admin veya Buyer)
+					var isAppleAdmin = AdminEmails.Contains(user.Email, StringComparer.OrdinalIgnoreCase);
+					var appleRoleId = isAppleAdmin ? AdminRoleId : BuyerRoleId;
+
 					_dataAccessLayer.AddUserRoleWithModule(new UserRole
 					{
 						Id = Guid.NewGuid(),
 						UserId = user.Id,
-						RoleId = appleRole.Id,
+						RoleId = appleRoleId,
 						ModuleId = LivestockTradingModuleId,
 						CreatedAt = DateTime.UtcNow,
 						UpdatedAt = DateTime.UtcNow,

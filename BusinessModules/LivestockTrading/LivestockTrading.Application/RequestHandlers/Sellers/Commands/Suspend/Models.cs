@@ -2,8 +2,8 @@ namespace LivestockTrading.Application.RequestHandlers.Sellers.Commands.Suspend;
 
 public class RequestModel : IRequestModel
 {
-	public Guid SellerId { get; set; }
-	public string SuspensionReason { get; set; }
+	public Guid Id { get; set; }
+	public string Reason { get; set; }
 }
 
 public class ResponseModel : IResponseModel
