@@ -1,6 +1,7 @@
 using Arfware.ArfBlocks.Core;
 using Arfware.ArfBlocks.Core.Exceptions;
 using Common.Definitions.Infrastructure.Services;
+using LivestockTrading.Domain.Entities;
 using LivestockTrading.Domain.Errors;
 using LivestockTrading.Infrastructure.RelationalDB;
 using Common.Services.ErrorCodeGenerator;
@@ -127,6 +128,18 @@ public class LivestockTradingModuleDbValidationService : DefinitionDbValidationS
 			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ProductErrors.ProductSlugAlreadyExists));
 	}
 
+	public async Task ValidateProductIsPendingApproval(Guid productId, CancellationToken ct = default)
+	{
+		var product = await _dbContext.Products.AsNoTracking()
+			.FirstOrDefaultAsync(e => e.Id == productId && !e.IsDeleted, ct);
+
+		if (product == null)
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ProductErrors.ProductNotFound));
+
+		if (product.Status != ProductStatus.PendingApproval)
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ProductErrors.ProductNotPendingApproval));
+	}
+
 	// Location
 	public async Task ValidateLocationExists(Guid locationId, CancellationToken ct = default)
 	{
@@ -141,6 +154,30 @@ public class LivestockTradingModuleDbValidationService : DefinitionDbValidationS
 		var exists = await _dbContext.Sellers.AsNoTracking().AnyAsync(e => e.Id == sellerId && !e.IsDeleted, ct);
 		if (!exists)
 			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.SellerErrors.SellerNotFound));
+	}
+
+	public async Task ValidateSellerIsPendingVerification(Guid sellerId, CancellationToken ct = default)
+	{
+		var seller = await _dbContext.Sellers.AsNoTracking()
+			.FirstOrDefaultAsync(e => e.Id == sellerId && !e.IsDeleted, ct);
+
+		if (seller == null)
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.SellerErrors.SellerNotFound));
+
+		if (seller.Status != SellerStatus.PendingVerification)
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.SellerErrors.SellerNotPendingVerification));
+	}
+
+	public async Task ValidateSellerNotSuspended(Guid sellerId, CancellationToken ct = default)
+	{
+		var seller = await _dbContext.Sellers.AsNoTracking()
+			.FirstOrDefaultAsync(e => e.Id == sellerId && !e.IsDeleted, ct);
+
+		if (seller == null)
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.SellerErrors.SellerNotFound));
+
+		if (seller.Status == SellerStatus.Suspended)
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.SellerErrors.SellerAlreadySuspended));
 	}
 
 	// Farm
@@ -357,6 +394,30 @@ public class LivestockTradingModuleDbValidationService : DefinitionDbValidationS
 		var exists = await _dbContext.Transporters.AsNoTracking().AnyAsync(e => e.Id == transporterId && !e.IsDeleted, ct);
 		if (!exists)
 			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransporterErrors.TransporterNotFound));
+	}
+
+	public async Task ValidateTransporterIsPendingVerification(Guid transporterId, CancellationToken ct = default)
+	{
+		var transporter = await _dbContext.Transporters.AsNoTracking()
+			.FirstOrDefaultAsync(e => e.Id == transporterId && !e.IsDeleted, ct);
+
+		if (transporter == null)
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransporterErrors.TransporterNotFound));
+
+		if (transporter.Status != TransporterStatus.PendingVerification)
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransporterErrors.TransporterNotPendingVerification));
+	}
+
+	public async Task ValidateTransporterNotSuspended(Guid transporterId, CancellationToken ct = default)
+	{
+		var transporter = await _dbContext.Transporters.AsNoTracking()
+			.FirstOrDefaultAsync(e => e.Id == transporterId && !e.IsDeleted, ct);
+
+		if (transporter == null)
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransporterErrors.TransporterNotFound));
+
+		if (transporter.Status == TransporterStatus.Suspended)
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransporterErrors.TransporterAlreadySuspended));
 	}
 
 	// TransportRequest

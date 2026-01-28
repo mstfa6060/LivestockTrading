@@ -1,3 +1,4 @@
+using LivestockTrading.Application.Authorization;
 using LivestockTrading.Infrastructure.Services;
 
 namespace LivestockTrading.Application.RequestHandlers.HealthRecords.Commands.Create;
@@ -5,11 +6,13 @@ namespace LivestockTrading.Application.RequestHandlers.HealthRecords.Commands.Cr
 public class Verificator : IRequestVerificator
 {
 	private readonly AuthorizationService _authorizationService;
+	private readonly PermissionService _permissionService;
 	private readonly LivestockTradingModuleDbVerificationService _dbVerification;
 
 	public Verificator(ArfBlocksDependencyProvider dependencyProvider)
 	{
 		_authorizationService = dependencyProvider.GetInstance<AuthorizationService>();
+		_permissionService = dependencyProvider.GetInstance<PermissionService>();
 		_dbVerification = dependencyProvider.GetInstance<LivestockTradingModuleDbVerificationService>();
 	}
 
@@ -19,6 +22,12 @@ public class Verificator : IRequestVerificator
 			.ForResource(typeof(Verificator).Namespace)
 			.VerifyActor()
 			.Assert();
+
+		// Rol kontrolü: Seller, Veterinarian veya Admin
+		_permissionService.RequireAnyRole(
+			Constants.LivestockTradingConstants.Roles.Seller,
+			Constants.LivestockTradingConstants.Roles.Veterinarian,
+			Constants.LivestockTradingConstants.Roles.Admin);
 	}
 
 	public async Task VerificateDomain(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)

@@ -1,3 +1,4 @@
+using LivestockTrading.Application.Authorization;
 using LivestockTrading.Infrastructure.Services;
 
 namespace LivestockTrading.Application.RequestHandlers.Products.Commands.Update;
@@ -5,11 +6,13 @@ namespace LivestockTrading.Application.RequestHandlers.Products.Commands.Update;
 public class Verificator : IRequestVerificator
 {
 	private readonly AuthorizationService _authorizationService;
+	private readonly PermissionService _permissionService;
 	private readonly LivestockTradingModuleDbVerificationService _dbVerification;
 
 	public Verificator(ArfBlocksDependencyProvider dependencyProvider)
 	{
 		_authorizationService = dependencyProvider.GetInstance<AuthorizationService>();
+		_permissionService = dependencyProvider.GetInstance<PermissionService>();
 		_dbVerification = dependencyProvider.GetInstance<LivestockTradingModuleDbVerificationService>();
 	}
 
@@ -19,11 +22,18 @@ public class Verificator : IRequestVerificator
 			.ForResource(typeof(Verificator).Namespace)
 			.VerifyActor()
 			.Assert();
+
+		// Rol kontrolü: Seller, Admin veya Moderator
+		_permissionService.RequireAnyRole(
+			Constants.LivestockTradingConstants.Roles.Seller,
+			Constants.LivestockTradingConstants.Roles.Admin,
+			Constants.LivestockTradingConstants.Roles.Moderator);
 	}
 
 	public async Task VerificateDomain(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
 	{
 		var request = (RequestModel)payload;
 		await _dbVerification.ValidateProductExists(request.Id, cancellationToken);
+		// TODO: Seller ise kendi ürünü mü kontrolü eklenecek
 	}
 }

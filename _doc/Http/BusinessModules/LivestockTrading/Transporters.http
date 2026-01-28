@@ -1,4 +1,5 @@
 @BaseUrl = http://localhost:5221
+@AdminToken = YOUR_ADMIN_JWT_TOKEN_HERE
 
 ### Create
 POST {{BaseUrl}}/Transporters/Create
@@ -69,4 +70,23 @@ Content-Type: application/json
 
 {
     "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Verify (Admin/Moderator only)
+POST {{BaseUrl}}/Transporters/Verify
+Content-Type: application/json
+Authorization: Bearer {{AdminToken}}
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Suspend (Admin/Moderator only)
+POST {{BaseUrl}}/Transporters/Suspend
+Content-Type: application/json
+Authorization: Bearer {{AdminToken}}
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "reason": "License verification failed"
 }

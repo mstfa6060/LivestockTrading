@@ -1,4 +1,5 @@
 @BaseUrl = http://localhost:5221
+@AdminToken = YOUR_ADMIN_JWT_TOKEN_HERE
 
 ### Create
 POST {{BaseUrl}}/Products/Create
@@ -138,4 +139,23 @@ Content-Type: application/json
 
 {
     "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Approve (Admin/Moderator only)
+POST {{BaseUrl}}/Products/Approve
+Content-Type: application/json
+Authorization: Bearer {{AdminToken}}
+
+{
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Reject (Admin/Moderator only)
+POST {{BaseUrl}}/Products/Reject
+Content-Type: application/json
+Authorization: Bearer {{AdminToken}}
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "reason": "Product listing does not meet quality standards"
 }

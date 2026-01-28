@@ -658,6 +658,102 @@ Each module has `ApplicationDependencyProvider` extending `ArfBlocksDependencyPr
 - JWT role claims format: `"ModuleName.RoleName"` (e.g., `"LivestockTrading.Seller"`)
 - Platform tracking: Web=0, Android=1, iOS=2
 
+### Role-Based Authorization (RBAC)
+
+Platform 5 temel rol ile çalışır. Roller `Jobs/RelationalDB/MigrationJob/SeedData/roles.json` dosyasında tanımlıdır.
+
+**Roller ve Yetkileri:**
+
+| Rol | ID | Açıklama |
+|-----|-----|----------|
+| Admin | `a1000000-0000-0000-0000-000000000001` | Tam yetki, tüm işlemler |
+| Moderator | `a1000000-0000-0000-0000-000000000002` | İçerik moderasyonu, onay/red |
+| Seller | `a1000000-0000-0000-0000-000000000003` | Ürün satışı, çiftlik yönetimi |
+| Transporter | `a1000000-0000-0000-0000-000000000004` | Nakliye hizmetleri |
+| Buyer | `a1000000-0000-0000-0000-000000000006` | Ürün satın alma (varsayılan rol) |
+
+**Otomatik Rol Atama:**
+- Yeni kayıt olan kullanıcılara otomatik olarak `Buyer` rolü atanır
+- `User/Commands/Create/Handler.cs` içinde `UserRole` kaydı oluşturulur
+
+#### PermissionService Kullanımı
+
+Verificator'larda rol kontrolü için `PermissionService` kullanılır:
+
+```csharp
+// Application/Authorization/PermissionService.cs
+using LivestockTrading.Application.Authorization;
+
+public class Verificator : IRequestVerificator
+{
+    private readonly AuthorizationService _authorizationService;
+    private readonly PermissionService _permissionService;
+
+    public Verificator(ArfBlocksDependencyProvider dependencyProvider)
+    {
+        _authorizationService = dependencyProvider.GetInstance<AuthorizationService>();
+        _permissionService = dependencyProvider.GetInstance<PermissionService>();
+    }
+
+    public async Task VerificateActor(IRequestModel payload, EndpointContext context, CancellationToken ct)
+    {
+        await _authorizationService
+            .ForResource(typeof(Verificator).Namespace)
+            .VerifyActor()
+            .Assert();
+
+        // Rol kontrolü - aşağıdaki methodlardan birini kullan
+        _permissionService.RequireAdmin();           // Sadece Admin
+        _permissionService.RequireModerator();       // Admin veya Moderator
+        _permissionService.RequireSeller();          // Admin, Moderator veya Seller
+        _permissionService.RequireTransporter();     // Admin, Moderator veya Transporter
+        _permissionService.RequireAnyRole(RoleConstants.Seller, RoleConstants.Buyer);  // Belirtilen rollerden biri
+    }
+}
+```
+
+#### Endpoint Rol Gereksinimleri
+
+| Endpoint Tipi | Gerekli Rol | Method |
+|---------------|-------------|--------|
+| Products/Approve, Products/Reject | Admin, Moderator | `RequireModerator()` |
+| Sellers/Verify, Sellers/Suspend | Admin, Moderator | `RequireModerator()` |
+| Transporters/Verify, Transporters/Suspend | Admin, Moderator | `RequireModerator()` |
+| Brands, Banners, Currencies, FAQs CRUD | Admin, Moderator | `RequireModerator()` |
+| Products/Create, Products/Update | Seller | `RequireSeller()` |
+| Farms, ProductImages, ProductPrices CRUD | Seller (kendi kaynakları) | `RequireSeller()` |
+| TransportRequests CRUD | Transporter | `RequireTransporter()` |
+| FavoriteProducts, ProductReviews CRUD | Buyer | `RequireAnyRole(Buyer, Seller)` |
+
+#### Yeni Moderasyon Endpoint'leri
+
+**Products:**
+- `POST /Products/Approve` - Ürünü onayla (Status → Approved)
+- `POST /Products/Reject` - Ürünü reddet (Status → Rejected, reason kaydedilir)
+
+**Sellers:**
+- `POST /Sellers/Verify` - Satıcıyı doğrula (Status → Verified)
+- `POST /Sellers/Suspend` - Satıcıyı askıya al (Status → Suspended, reason kaydedilir)
+
+**Transporters:**
+- `POST /Transporters/Verify` - Taşıyıcıyı doğrula (Status → Verified)
+- `POST /Transporters/Suspend` - Taşıyıcıyı askıya al (Status → Suspended, reason kaydedilir)
+
+#### DI Kaydı
+
+```csharp
+// ApplicationDependencyProvider.cs
+base.Add<PermissionService>();
+```
+
+#### İlgili Dosyalar
+
+- `Application/Authorization/PermissionService.cs` - Rol kontrol servisi
+- `Application/Authorization/RoleConstants.cs` - Rol sabitleri
+- `Application/Authorization/RequirePermissionAttribute.cs` - Attribute (opsiyonel)
+- `Domain/Enums/Permission.cs` - Permission enum'ları
+- `Jobs/RelationalDB/MigrationJob/SeedData/roles.json` - Rol seed data
+
 ### Error Handling
 
 ```csharp

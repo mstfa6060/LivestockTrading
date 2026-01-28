@@ -1,4 +1,6 @@
 // DataAccess.cs
+using Common.Definitions.Domain.Entities;
+
 namespace BaseModules.IAM.Application.RequestHandlers.Users.Commands.Create;
 
 public class DataAccess : IDataAccess
@@ -21,6 +23,20 @@ public class DataAccess : IDataAccess
 		{
 			var innerMessage = ex.InnerException?.Message ?? ex.Message;
 			throw new Exception("Save error: " + innerMessage, ex);
+		}
+	}
+
+	public async Task AddUserRole(UserRole userRole)
+	{
+		try
+		{
+			_dbContext.UserRoles.Add(userRole);
+			await _dbContext.SaveChangesAsync();
+		}
+		catch (Exception ex)
+		{
+			var innerMessage = ex.InnerException?.Message ?? ex.Message;
+			throw new Exception("AddUserRole error: " + innerMessage, ex);
 		}
 	}
 

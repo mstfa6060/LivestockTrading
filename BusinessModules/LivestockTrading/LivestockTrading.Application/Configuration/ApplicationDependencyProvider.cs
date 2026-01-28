@@ -1,4 +1,5 @@
 using Common.Services.Caching;
+using LivestockTrading.Application.Authorization;
 using LivestockTrading.Infrastructure.RelationalDB;
 using LivestockTrading.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
@@ -38,5 +39,8 @@ public class ApplicationDependencyProvider : ArfBlocksDependencyProvider
         // Services
         base.Add<LivestockTradingModuleDbVerificationService>();
         base.Add<LivestockTradingModuleDbValidationService>();
+
+        // Authorization
+        base.Add<PermissionService>();
     }
 }

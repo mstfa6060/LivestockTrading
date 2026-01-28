@@ -47,6 +47,10 @@ public class LivestockTradingDomainErrors
         public static string ProductSellerRequired { get; set; } = "Satici zorunludur.";
         public static string ProductLocationRequired { get; set; } = "Konum zorunludur.";
         public static string ProductPriceRequired { get; set; } = "Fiyat zorunludur.";
+        public static string ProductNotPendingApproval { get; set; } = "Urun onay bekleyen durumda degil.";
+        public static string ProductAlreadyApproved { get; set; } = "Urun zaten onaylanmis.";
+        public static string ProductAlreadyRejected { get; set; } = "Urun zaten reddedilmis.";
+        public static string RejectionReasonRequired { get; set; } = "Red nedeni zorunludur.";
     }
 
     public static class LocationErrors
@@ -60,6 +64,9 @@ public class LivestockTradingDomainErrors
         public static string SellerNotFound { get; set; } = "Satici bulunamadi.";
         public static string SellerBusinessNameRequired { get; set; } = "Isletme adi zorunludur.";
         public static string SellerUserIdRequired { get; set; } = "Kullanici ID zorunludur.";
+        public static string SellerNotPendingVerification { get; set; } = "Satici dogrulama bekleyen durumda degil.";
+        public static string SellerAlreadySuspended { get; set; } = "Satici zaten askiya alinmis.";
+        public static string SuspensionReasonRequired { get; set; } = "Askiya alma nedeni zorunludur.";
     }
 
     public static class FarmErrors
@@ -260,6 +267,9 @@ public class LivestockTradingDomainErrors
         public static string TransporterCompanyNameRequired { get; set; } = "Sirket adi zorunludur.";
         public static string TransporterEmailRequired { get; set; } = "E-posta zorunludur.";
         public static string TransporterUserRequired { get; set; } = "Kullanici zorunludur.";
+        public static string TransporterNotPendingVerification { get; set; } = "Tasiyici dogrulama bekleyen durumda degil.";
+        public static string TransporterAlreadySuspended { get; set; } = "Tasiyici zaten askiya alinmis.";
+        public static string SuspensionReasonRequired { get; set; } = "Askiya alma nedeni zorunludur.";
     }
 
     public static class TransportRequestErrors
@@ -351,5 +361,18 @@ public class LivestockTradingDomainErrors
         public static string ShippingRateNotFound { get; set; } = "Kargo ucreti bulunamadi.";
         public static string ShippingRateZoneRequired { get; set; } = "Kargo bolgesi zorunludur.";
         public static string ShippingRateCostRequired { get; set; } = "Kargo ucreti zorunludur.";
+    }
+
+    public static class AuthorizationErrors
+    {
+        public static string InsufficientPermission { get; set; } = "Bu islem icin yetkiniz yok.";
+        public static string AdminRequired { get; set; } = "Bu islem icin Admin yetkisi gereklidir.";
+        public static string ModeratorRequired { get; set; } = "Bu islem icin Moderator yetkisi gereklidir.";
+        public static string StaffRequired { get; set; } = "Bu islem icin personel yetkisi gereklidir.";
+        public static string SellerRequired { get; set; } = "Bu islem icin Satici yetkisi gereklidir.";
+        public static string TransporterRequired { get; set; } = "Bu islem icin Nakliyeci yetkisi gereklidir.";
+        public static string VeterinarianRequired { get; set; } = "Bu islem icin Veteriner yetkisi gereklidir.";
+        public static string OwnershipRequired { get; set; } = "Bu kayit uzerinde islem yapma yetkiniz yok.";
+        public static string ResourceNotAccessible { get; set; } = "Bu kaynaga erisim yetkiniz yok.";
     }
 }

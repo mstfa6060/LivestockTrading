@@ -19,6 +19,8 @@ public class Verificator : IRequestVerificator
 			.ForResource(typeof(Verificator).Namespace)
 			.VerifyActor()
 			.Assert();
+
+		// Transporter başvurusu: Giriş yapmış herkes başvurabilir, rol kısıtlaması yok
 	}
 
 	public async Task VerificateDomain(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)

@@ -1,12 +1,20 @@
+using Common.Definitions.Domain.Entities;
+
 namespace BaseModules.IAM.Application.RequestHandlers.Users.Commands.Create;
 
 /// <summary>
 /// Kullanıcı Oluşturma
 /// Bu endpoint, sistemde yeni bir kullanıcı hesabı oluşturur.
 /// Kullanıcı bilgileri ve kimlik doğrulama ayarları kaydedilir.
+/// Yeni kullanıcıya otomatik olarak LivestockTrading modülünde Buyer rolü atanır.
 /// </summary>
 public class Handler : IRequestHandler
 {
+	// LivestockTrading Module ID (from modules.json)
+	private static readonly Guid LivestockTradingModuleId = Guid.Parse("DFD018C9-FC32-42C4-AEFD-70A5942A295E");
+	// Buyer Role ID (from roles.json)
+	private static readonly Guid BuyerRoleId = Guid.Parse("a1000000-0000-0000-0000-000000000006");
+
 	private readonly DataAccess _dataAccessLayer;
 	private readonly ArfBlocksCommunicator _communicator;
 	private readonly EnvironmentService _environmentService;
@@ -38,6 +46,19 @@ public class Handler : IRequestHandler
 
 		// Veritabanına ekle
 		await _dataAccessLayer.AddUser(user);
+
+		// Yeni kullanıcıya otomatik Buyer rolü ata
+		var userRole = new UserRole
+		{
+			Id = Guid.NewGuid(),
+			UserId = user.Id,
+			RoleId = BuyerRoleId,
+			ModuleId = LivestockTradingModuleId,
+			CreatedAt = DateTime.UtcNow,
+			UpdatedAt = DateTime.UtcNow,
+			IsDeleted = false
+		};
+		await _dataAccessLayer.AddUserRole(userRole);
 
 		// Country bilgisi ile birlikte tekrar çek
 		var userWithCountry = await _dataAccessLayer.GetUserWithCountry(user.Id);

@@ -65,7 +65,10 @@ public class Transporter : BaseEntity
     
     /// <summary>Aktif mi?</summary>
     public bool IsActive { get; set; }
-    
+
+    /// <summary>Nakliyeci durumu</summary>
+    public TransporterStatus Status { get; set; }
+
     /// <summary>Ortalama değerlendirme</summary>
     public decimal? AverageRating { get; set; }
     
@@ -100,7 +103,17 @@ public class Transporter : BaseEntity
         Reviews = new HashSet<TransporterReview>();
         IsActive = true;
         IsVerified = false;
+        Status = TransporterStatus.PendingVerification;
     }
+}
+
+public enum TransporterStatus
+{
+    PendingVerification = 0,
+    Active = 1,
+    Suspended = 2,
+    Banned = 3,
+    Inactive = 4
 }
 
 /// <summary>
