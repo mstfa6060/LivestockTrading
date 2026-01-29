@@ -68,6 +68,15 @@ services:
           cpus: '0.5'
           memory: 512M
 
+  livestocktrading-notification-worker:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
   sqlserver:
     deploy:
       resources:

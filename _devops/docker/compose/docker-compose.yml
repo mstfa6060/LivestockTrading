@@ -209,3 +209,19 @@ services:
     networks:
       - livestocktrading-network
     restart: unless-stopped
+
+  livestocktrading-notification-worker:
+    image: ${DOCKER_REGISTRY:-docker.io}/${DOCKER_USERNAME}/livestocktrading-notification-worker:${TAG:-latest}
+    environment:
+      <<: *common-env
+      Firebase__ServiceAccountJson: ${FIREBASE__SERVICEACCOUNTJSON:-}
+      Firebase__ServiceAccountPath: ""
+      Notification__Provider: Firebase
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - livestocktrading-network
+    restart: unless-stopped

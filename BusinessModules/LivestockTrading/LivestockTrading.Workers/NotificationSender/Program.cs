@@ -35,6 +35,12 @@ try
             });
 
             // Register all event handlers as scoped
+            // Messaging event handlers
+            services.AddScoped<MessageCreatedNotificationHandler>();
+            services.AddScoped<MessageReadNotificationHandler>();
+            services.AddScoped<ConversationCreatedNotificationHandler>();
+
+            // Student event handlers (legacy)
             services.AddScoped<StudentCreatedNotificationHandler>();
             services.AddScoped<StudentUpdatedNotificationHandler>();
             services.AddScoped<StudentDeletedNotificationHandler>();

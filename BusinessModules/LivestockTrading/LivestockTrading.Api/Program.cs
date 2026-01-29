@@ -7,6 +7,7 @@ using Common.Services.Logging;
 using Common.Helpers;
 using Serilog;
 using LivestockTrading.Api.Converters;
+using LivestockTrading.Api.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +52,21 @@ builder.Services.AddMemoryCache(options =>
 {
 });
 
+// SignalR for real-time messaging
+var redisConnectionString = builder.Configuration["Caching:Redis:ConnectionString"];
+if (!string.IsNullOrEmpty(redisConnectionString))
+{
+    builder.Services.AddSignalR()
+        .AddStackExchangeRedis(redisConnectionString, options =>
+        {
+            options.Configuration.ChannelPrefix = "LivestockTrading";
+        });
+}
+else
+{
+    builder.Services.AddSignalR();
+}
+
 // ArfBlocks Dependencies
 builder.Services.AddArfBlocks(options =>
 {
@@ -75,6 +91,9 @@ app.UseCors(DefaultCorsPolicy);
 
 // Controllers
 app.MapControllers();
+
+// SignalR Hubs
+app.MapHub<ChatHub>("/hubs/chat");
 
 // ArfBlocks Request Handlers
 app.UseArfBlocksRequestHandlers(options => { });

@@ -1,6 +1,22 @@
 {
 	"Routes": [
 		{
+			"DownstreamPathTemplate": "/hubs/{everything}",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "livestocktrading-api-container",
+					"Port": 8080
+				}
+			],
+			"UpstreamPathTemplate": "/livestocktrading/hubs/{everything}",
+			"UpstreamHttpMethod": [
+				"GET",
+				"POST",
+				"OPTIONS"
+			]
+		},
+		{
 			"DownstreamPathTemplate": "/Users/ForgotPassword",
 			"DownstreamScheme": "http",
 			"DownstreamHostAndPorts": [

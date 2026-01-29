@@ -17,4 +17,18 @@ public class DataAccess : IDataAccess
 		_dbContext.Conversations.Add(conversation);
 		await _dbContext.SaveChangesAsync();
 	}
+
+	public async Task<string> GetProductTitle(Guid? productId, CancellationToken cancellationToken)
+	{
+		if (!productId.HasValue)
+			return null;
+
+		var product = await _dbContext.Products
+			.AsNoTracking()
+			.Where(p => p.Id == productId.Value && !p.IsDeleted)
+			.Select(p => p.Title)
+			.FirstOrDefaultAsync(cancellationToken);
+
+		return product;
+	}
 }

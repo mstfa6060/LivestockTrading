@@ -814,9 +814,142 @@ Use `ICacheService` with `CacheKeys` class for standardized key management.
 IHostedService pattern consuming RabbitMQ messages:
 - `BaseModules.IAM.Workers.MailSender` - Sends email via Brevo SMTP
 - `BaseModules.IAM.Workers.SmsSender` - Sends SMS via NetGSM
-- `LivestockTrading.Workers.NotificationSender` - Push notifications
+- `LivestockTrading.Workers.NotificationSender` - Push notifications & real-time events
 
-Workers consume from RabbitMQ exchanges (e.g., `iam.notification.sms`, `iam.notification.email`).
+Workers consume from RabbitMQ exchanges (e.g., `iam.notification.sms`, `iam.notification.email`, `livestocktrading.notification.push`).
+
+### Real-Time Messaging (SignalR)
+
+Platform, kullanıcılar arası gerçek zamanlı mesajlaşma için SignalR kullanır.
+
+#### SignalR Hub
+
+**Dosya:** `LivestockTrading.Api/Hubs/ChatHub.cs`
+
+```csharp
+// Hub endpoint: /hubs/chat
+// JWT Authentication gerekli
+
+// Client → Server Methods:
+Task JoinConversation(Guid conversationId)      // Conversation'a katıl
+Task LeaveConversation(Guid conversationId)     // Conversation'dan ayrıl
+Task SendTypingIndicator(Guid conversationId, bool isTyping)  // Yazıyor göstergesi
+Task MarkMessageAsRead(Guid messageId)          // Mesajı okundu işaretle
+Task<List<Guid>> GetOnlineUsers(List<Guid> userIds)  // Online kullanıcıları sorgula
+
+// Server → Client Events:
+ReceiveMessage(message)        // Yeni mesaj geldi
+TypingIndicator(indicator)     // Yazıyor göstergesi
+MessageRead(data)              // Mesaj okundu
+UserOnline(userId)             // Kullanıcı çevrimiçi
+UserOffline(userId)            // Kullanıcı çevrimdışı
+```
+
+#### Domain Events
+
+**Dosya:** `LivestockTrading.Domain/Events/MessagingEvents.cs`
+
+| Event | Tetikleyen | Açıklama |
+|-------|------------|----------|
+| `MessageCreatedEvent` | Messages/Create/Handler | Yeni mesaj gönderildi |
+| `MessageReadEvent` | Messages/Update/Handler | Mesaj okundu |
+| `ConversationCreatedEvent` | Conversations/Create/Handler | Yeni konuşma başlatıldı |
+| `TypingIndicatorEvent` | Messages/SendTypingIndicator/Handler | Yazıyor göstergesi |
+
+#### Event Publishing Pattern
+
+Handler'larda RabbitMQ ile event publish:
+
+```csharp
+// Handler.cs
+private readonly IRabbitMqPublisher _publisher;
+private readonly CurrentUserService _currentUserService;
+
+public async Task<ArfBlocksRequestResult> Handle(...)
+{
+    // ... entity oluştur/güncelle ...
+
+    // Event publish (NotificationSender Worker dinler)
+    await _publisher.PublishFanout("livestocktrading.notification.push", new MessageCreatedEvent
+    {
+        MessageId = entity.Id,
+        ConversationId = entity.ConversationId,
+        SenderUserId = entity.SenderUserId,
+        RecipientUserId = entity.RecipientUserId,
+        SenderName = _currentUserService.GetCurrentUserDisplayName(),  // ÖNEMLİ
+        Content = entity.Content,
+        CreatedAt = entity.SentAt
+    });
+}
+```
+
+#### Notification Worker Event Handlers
+
+**Konum:** `Workers/NotificationSender/EventHandlers/`
+
+| Handler | Event | İşlem |
+|---------|-------|-------|
+| `MessageCreatedNotificationHandler` | MessageCreatedEvent | Push notification gönder |
+| `MessageReadNotificationHandler` | MessageReadEvent | SignalR ile bildir |
+| `ConversationCreatedNotificationHandler` | ConversationCreatedEvent | Push notification gönder |
+
+#### Presence Service
+
+**Dosya:** `LivestockTrading.Application/Services/PresenceService.cs`
+
+Redis ile online/offline durum takibi:
+
+```csharp
+// Kullanıcıyı online yap
+await _presenceService.SetUserOnlineAsync(userId, connectionId);
+
+// Kullanıcıyı offline yap
+await _presenceService.SetUserOfflineAsync(userId, connectionId);
+
+// Online durumu kontrol et
+bool isOnline = await _presenceService.IsUserOnlineAsync(userId);
+```
+
+#### Messaging Endpoint'leri
+
+| Endpoint | Açıklama |
+|----------|----------|
+| `POST /Conversations/Create` | Yeni konuşma başlat |
+| `POST /Conversations/All` | Konuşma listesi |
+| `POST /Conversations/Detail` | Konuşma detayı |
+| `POST /Messages/Create` | Mesaj gönder |
+| `POST /Messages/All` | Mesaj listesi |
+| `POST /Messages/Update` | Mesajı güncelle (okundu) |
+| `POST /Messages/SendTypingIndicator` | Yazıyor göstergesi |
+
+#### İlgili Dosyalar
+
+```
+LivestockTrading.Api/
+├── Hubs/ChatHub.cs                          # SignalR Hub
+└── Program.cs                               # SignalR DI & MapHub
+
+LivestockTrading.Domain/
+└── Events/MessagingEvents.cs                # Domain events
+
+LivestockTrading.Application/
+├── Services/PresenceService.cs              # Online/offline tracking
+└── RequestHandlers/
+    ├── Conversations/Commands/Create/       # Konuşma oluştur
+    └── Messages/
+        ├── Commands/Create/                 # Mesaj gönder
+        ├── Commands/Update/                 # Mesaj güncelle
+        └── Commands/SendTypingIndicator/    # Yazıyor göstergesi
+
+Workers/NotificationSender/
+├── EventHandlers/
+│   ├── MessageCreatedNotificationHandler.cs
+│   ├── MessageReadNotificationHandler.cs
+│   └── ConversationCreatedNotificationHandler.cs
+└── Workers/NotificationWorker.cs            # Event consumer
+
+Gateways/Api/ocelot.json                     # WebSocket route
+```
 
 ### Configuration
 
@@ -940,7 +1073,8 @@ Frontend gelisitiriciler icin API kullanim dokumani: `D:\Projects\GlobalLivestoc
 - API cagirma kaliplari (All, Detail, Pick, Create, Update, Delete)
 - Hata yonetimi
 - Dosya yukleme
-- React ornekleri (AuthContext, ProtectedRoute)
+- Real-Time Mesajlasma (SignalR Hub baglantisi, event dinleme, typing indicator)
+- React ornekleri (AuthContext, ProtectedRoute, useChat hook)
 
 ### Frontend'i Etkileyen Degisiklikler
 
@@ -956,6 +1090,9 @@ Asagidaki degisiklikler yapildiginda `API-INTEGRATION.md` dosyasi MUTLAKA guncel
 | Yeni hata kodlari | Hata Yonetimi bolumu |
 | Dosya yukleme API degisikligi | Dosya Yukleme bolumu |
 | Platform enum degisikligi | Platform Degerleri bolumu |
+| SignalR Hub event degisikligi | Real-Time Mesajlasma bolumu |
+| Yeni messaging endpoint'i | Real-Time Mesajlasma bolumu |
+| Domain event yapisi degisikligi | Real-Time Mesajlasma bolumu |
 
 ### arf-cli ile API Client Guncelleme
 

@@ -43,3 +43,10 @@ services:
     build:
       context: ../..
       dockerfile: docker/Dockerfile.iam-sms-worker
+
+  livestocktrading-notification-worker:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    build:
+      context: ../..
+      dockerfile: docker/Dockerfile.livestocktrading-notification-worker

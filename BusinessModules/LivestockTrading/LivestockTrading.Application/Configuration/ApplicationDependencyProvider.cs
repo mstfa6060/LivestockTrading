@@ -1,5 +1,7 @@
 using Common.Services.Caching;
+using Common.Services.Messaging;
 using LivestockTrading.Application.Authorization;
+using LivestockTrading.Application.Services;
 using LivestockTrading.Infrastructure.RelationalDB;
 using LivestockTrading.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
@@ -35,10 +37,12 @@ public class ApplicationDependencyProvider : ArfBlocksDependencyProvider
         base.Add<ArfBlocksCommunicator>();
         base.Add<ICacheService, CacheService>();
         base.Add<AuthorizationService>();
+        base.Add<IRabbitMqPublisher>(new RabbitMqPublisher());
 
         // Services
         base.Add<LivestockTradingModuleDbVerificationService>();
         base.Add<LivestockTradingModuleDbValidationService>();
+        base.Add<PresenceService>();
 
         // Authorization
         base.Add<PermissionService>();

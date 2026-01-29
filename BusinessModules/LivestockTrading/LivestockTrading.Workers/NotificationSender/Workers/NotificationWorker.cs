@@ -112,6 +112,48 @@ public class NotificationWorker : BackgroundService
 
     private async Task<bool> TryHandleEvents(string message, IServiceScope scope)
     {
+        // Try MessageCreatedEvent (highest priority - messaging)
+        try
+        {
+            var messageCreatedEvent = JsonSerializer.Deserialize<MessageCreatedEvent>(message);
+            if (messageCreatedEvent != null && messageCreatedEvent.MessageId != Guid.Empty)
+            {
+                _logger.LogInformation("Handling MessageCreatedEvent notification for message: {MessageId}", messageCreatedEvent.MessageId);
+                var handler = scope.ServiceProvider.GetRequiredService<MessageCreatedNotificationHandler>();
+                await handler.HandleAsync(messageCreatedEvent);
+                return true;
+            }
+        }
+        catch { }
+
+        // Try MessageReadEvent
+        try
+        {
+            var messageReadEvent = JsonSerializer.Deserialize<MessageReadEvent>(message);
+            if (messageReadEvent != null && messageReadEvent.MessageId != Guid.Empty)
+            {
+                _logger.LogInformation("Handling MessageReadEvent notification for message: {MessageId}", messageReadEvent.MessageId);
+                var handler = scope.ServiceProvider.GetRequiredService<MessageReadNotificationHandler>();
+                await handler.HandleAsync(messageReadEvent);
+                return true;
+            }
+        }
+        catch { }
+
+        // Try ConversationCreatedEvent
+        try
+        {
+            var conversationCreatedEvent = JsonSerializer.Deserialize<ConversationCreatedEvent>(message);
+            if (conversationCreatedEvent != null && conversationCreatedEvent.ConversationId != Guid.Empty)
+            {
+                _logger.LogInformation("Handling ConversationCreatedEvent notification for conversation: {ConversationId}", conversationCreatedEvent.ConversationId);
+                var handler = scope.ServiceProvider.GetRequiredService<ConversationCreatedNotificationHandler>();
+                await handler.HandleAsync(conversationCreatedEvent);
+                return true;
+            }
+        }
+        catch { }
+
         // Try StudentCreatedEvent
         try
         {

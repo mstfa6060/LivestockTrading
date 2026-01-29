@@ -1,7 +1,7 @@
 using Common.Services.Messaging;
 using LivestockTrading.Domain.Events;
 
-namespace LivestockTrading.Application.RequestHandlers.Messages.Commands.Create;
+namespace LivestockTrading.Application.RequestHandlers.Messages.Commands.SendTypingIndicator;
 
 public class Handler : IRequestHandler
 {
@@ -20,28 +20,19 @@ public class Handler : IRequestHandler
 	{
 		var request = (RequestModel)payload;
 		var mapper = new Mapper();
+		var currentUser = _currentUserService.GetCurrentUser();
 
-		var entity = mapper.MapToEntity(request);
-
-		await _dataAccessLayer.AddMessage(entity);
-
-		// Get sender name for notification
-		var senderName = _currentUserService.GetCurrentUserDisplayName();
-
-		// Publish event for push notification and real-time delivery
-		await _publisher.PublishFanout("livestocktrading.notification.push", new MessageCreatedEvent
+		// Publish typing indicator event for real-time delivery via SignalR
+		await _publisher.PublishFanout("livestocktrading.notification.push", new TypingIndicatorEvent
 		{
-			MessageId = entity.Id,
-			ConversationId = entity.ConversationId,
-			SenderUserId = entity.SenderUserId,
-			RecipientUserId = entity.RecipientUserId,
-			SenderName = senderName,
-			Content = entity.Content,
-			AttachmentUrls = entity.AttachmentUrls,
-			CreatedAt = entity.SentAt
+			ConversationId = request.ConversationId,
+			UserId = currentUser.Id,
+			UserName = currentUser.DisplayName,
+			IsTyping = request.IsTyping,
+			Timestamp = DateTime.UtcNow
 		});
 
-		var response = mapper.MapToResponse(entity);
+		var response = mapper.MapToResponse(true);
 		return ArfBlocksResults.Success(response);
 	}
 }
