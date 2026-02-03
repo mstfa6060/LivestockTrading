@@ -34,6 +34,8 @@ public class Mapper
 		entity.MetaTitle = request.MetaTitle;
 		entity.MetaDescription = request.MetaDescription;
 		entity.MetaKeywords = request.MetaKeywords;
+		entity.MediaBucketId = request.MediaBucketId;
+		entity.CoverImageFileId = request.CoverImageFileId;
 		entity.UpdatedAt = DateTime.UtcNow;
 	}
 
@@ -70,6 +72,8 @@ public class Mapper
 			MetaTitle = entity.MetaTitle,
 			MetaDescription = entity.MetaDescription,
 			MetaKeywords = entity.MetaKeywords,
+			MediaBucketId = entity.MediaBucketId,
+			CoverImageFileId = entity.CoverImageFileId,
 			UpdatedAt = entity.UpdatedAt
 		};
 	}

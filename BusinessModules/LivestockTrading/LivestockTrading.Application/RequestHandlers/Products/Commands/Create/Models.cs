@@ -17,7 +17,8 @@ public class RequestModel : IRequestModel
 	public int? MinOrderQuantity { get; set; }
 	public int? MaxOrderQuantity { get; set; }
 	public bool IsInStock { get; set; }
-	public Guid SellerId { get; set; }
+	/// <summary>Satıcı ID - Boş bırakılırsa mevcut kullanıcı için otomatik oluşturulur</summary>
+	public Guid? SellerId { get; set; }
 	public Guid LocationId { get; set; }
 	public int Status { get; set; }
 	public int Condition { get; set; }
@@ -30,6 +31,11 @@ public class RequestModel : IRequestModel
 	public string MetaTitle { get; set; }
 	public string MetaDescription { get; set; }
 	public string MetaKeywords { get; set; }
+
+	/// <summary>FileProvider'daki medya bucket ID (MongoDB)</summary>
+	public string MediaBucketId { get; set; }
+	/// <summary>Kapak görseli FileEntry.Id</summary>
+	public string CoverImageFileId { get; set; }
 }
 
 public class ResponseModel : IResponseModel
@@ -63,5 +69,7 @@ public class ResponseModel : IResponseModel
 	public string MetaTitle { get; set; }
 	public string MetaDescription { get; set; }
 	public string MetaKeywords { get; set; }
+	public string MediaBucketId { get; set; }
+	public string CoverImageFileId { get; set; }
 	public DateTime CreatedAt { get; set; }
 }

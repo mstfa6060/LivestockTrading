@@ -9,9 +9,6 @@ public interface ILivestockTradingModuleDbContext
     DbSet<Category> Categories { get; set; }
     DbSet<Product> Products { get; set; }
     DbSet<Brand> Brands { get; set; }
-    DbSet<ProductImage> ProductImages { get; set; }
-    DbSet<ProductVideo> ProductVideos { get; set; }
-    DbSet<ProductDocument> ProductDocuments { get; set; }
     DbSet<ProductVariant> ProductVariants { get; set; }
     DbSet<ProductPrice> ProductPrices { get; set; }
 

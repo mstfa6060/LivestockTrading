@@ -1108,3 +1108,17 @@ Bu komut asagidaki dosyalari gunceller:
 - `src/api/base_modules/FileProvider/index.ts`
 - `src/api/business_modules/livestocktrading/index.ts`
 - `src/errors/locales/modules/backend/*/tr.ts`
+
+### Frontend'den Gelen Talepler
+
+Frontend ekibinden gelen backend gelistirme talepleri asagidaki dosyada dokumante edilir:
+
+**Dosya:** `D:\Projects\GlobalLivestock\web\common\API-INTEGRATION.md`
+
+Bu dosyanin "Backend Gelistirme Talimatlari" bolumunde:
+- Kritik buglar ve cozum onerileri
+- Yeni endpoint talepleri
+- Mevcut endpoint iyilestirme onerileri
+- Oncelik tablosu
+
+**"Frontend'den gelen taleplere bak"** denildiginde bu dosya incelenmelidir.

@@ -204,30 +204,6 @@ public class LivestockTradingModuleDbValidationService : DefinitionDbValidationS
 			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ProductPriceErrors.PriceNotFound));
 	}
 
-	// ProductImage
-	public async Task ValidateProductImageExists(Guid imageId, CancellationToken ct = default)
-	{
-		var exists = await _dbContext.ProductImages.AsNoTracking().AnyAsync(e => e.Id == imageId && !e.IsDeleted, ct);
-		if (!exists)
-			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ProductImageErrors.ImageNotFound));
-	}
-
-	// ProductVideo
-	public async Task ValidateProductVideoExists(Guid videoId, CancellationToken ct = default)
-	{
-		var exists = await _dbContext.ProductVideos.AsNoTracking().AnyAsync(e => e.Id == videoId && !e.IsDeleted, ct);
-		if (!exists)
-			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ProductVideoErrors.VideoNotFound));
-	}
-
-	// ProductDocument
-	public async Task ValidateProductDocumentExists(Guid documentId, CancellationToken ct = default)
-	{
-		var exists = await _dbContext.ProductDocuments.AsNoTracking().AnyAsync(e => e.Id == documentId && !e.IsDeleted, ct);
-		if (!exists)
-			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ProductDocumentErrors.DocumentNotFound));
-	}
-
 	// AnimalInfo
 	public async Task ValidateAnimalInfoExists(Guid animalInfoId, CancellationToken ct = default)
 	{

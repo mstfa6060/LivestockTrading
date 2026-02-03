@@ -27,7 +27,9 @@ public class Validator : IRequestValidator
 		var request = (RequestModel)payload;
 		await _dbValidator.ValidateProductSlugUnique(request.Slug, null, cancellationToken);
 		await _dbValidator.ValidateCategoryExist(request.CategoryId, cancellationToken);
-		await _dbValidator.ValidateSellerExists(request.SellerId, cancellationToken);
+		// SellerId artık opsiyonel - boş ise Handler'da otomatik oluşturulacak
+		if (request.SellerId.HasValue && request.SellerId.Value != Guid.Empty)
+			await _dbValidator.ValidateSellerExists(request.SellerId.Value, cancellationToken);
 	}
 }
 
@@ -47,9 +49,7 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
 			.NotEmpty()
 			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ProductErrors.ProductCategoryRequired));
 
-		RuleFor(x => x.SellerId)
-			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ProductErrors.ProductSellerRequired));
+		// SellerId artık opsiyonel - boş ise Handler'da otomatik oluşturulacak
 
 		RuleFor(x => x.LocationId)
 			.NotEmpty()

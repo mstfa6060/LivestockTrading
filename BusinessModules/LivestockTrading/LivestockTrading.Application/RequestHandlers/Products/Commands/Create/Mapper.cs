@@ -24,7 +24,7 @@ public class Mapper
 			MinOrderQuantity = request.MinOrderQuantity,
 			MaxOrderQuantity = request.MaxOrderQuantity,
 			IsInStock = request.IsInStock,
-			SellerId = request.SellerId,
+			// SellerId Handler'da set edilir (otomatik oluşturma mantığı)
 			LocationId = request.LocationId,
 			Status = (ProductStatus)request.Status,
 			Condition = (ProductCondition)request.Condition,
@@ -37,6 +37,8 @@ public class Mapper
 			MetaTitle = request.MetaTitle,
 			MetaDescription = request.MetaDescription,
 			MetaKeywords = request.MetaKeywords,
+			MediaBucketId = request.MediaBucketId,
+			CoverImageFileId = request.CoverImageFileId,
 			CreatedAt = DateTime.UtcNow
 		};
 	}
@@ -74,6 +76,8 @@ public class Mapper
 			MetaTitle = entity.MetaTitle,
 			MetaDescription = entity.MetaDescription,
 			MetaKeywords = entity.MetaKeywords,
+			MediaBucketId = entity.MediaBucketId,
+			CoverImageFileId = entity.CoverImageFileId,
 			CreatedAt = entity.CreatedAt
 		};
 	}

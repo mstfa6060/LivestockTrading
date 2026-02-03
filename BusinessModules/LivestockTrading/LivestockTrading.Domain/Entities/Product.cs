@@ -114,19 +114,19 @@ public class Product : BaseEntity
     
     /// <summary>İlan bitiş tarihi</summary>
     public DateTime? ExpiresAt { get; set; }
-    
-    public ICollection<ProductImage> Images { get; set; }
-    public ICollection<ProductVideo> Videos { get; set; }
-    public ICollection<ProductDocument> Documents { get; set; }
+
+    /// <summary>FileProvider'daki medya bucket ID (MongoDB) - tüm foto ve videolar</summary>
+    public string MediaBucketId { get; set; }
+
+    /// <summary>Kapak görseli FileEntry.Id (FileProvider'dan)</summary>
+    public string CoverImageFileId { get; set; }
+
     public ICollection<ProductReview> Reviews { get; set; }
     public ICollection<ProductVariant> Variants { get; set; }
     public ICollection<FavoriteProduct> Favorites { get; set; }
 
     public Product()
     {
-        Images = new HashSet<ProductImage>();
-        Videos = new HashSet<ProductVideo>();
-        Documents = new HashSet<ProductDocument>();
         Reviews = new HashSet<ProductReview>();
         Variants = new HashSet<ProductVariant>();
         Favorites = new HashSet<FavoriteProduct>();

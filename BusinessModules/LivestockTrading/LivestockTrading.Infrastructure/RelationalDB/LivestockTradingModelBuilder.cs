@@ -31,7 +31,7 @@ public static class LivestockTradingModelBuilder
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Title).IsRequired().HasMaxLength(500);
             entity.Property(e => e.Slug).IsRequired().HasMaxLength(500);
-            entity.HasIndex(e => e.Slug);
+            entity.HasIndex(e => e.Slug).IsUnique();
             entity.Property(e => e.BasePrice).HasPrecision(18, 2);
             entity.Property(e => e.DiscountedPrice).HasPrecision(18, 2);
 
@@ -103,36 +103,6 @@ public static class LivestockTradingModelBuilder
                 .WithMany(e => e.Farms)
                 .HasForeignKey(e => e.LocationId)
                 .OnDelete(DeleteBehavior.Restrict);
-        });
-
-        // ========================================
-        // PRODUCT MEDIA
-        // ========================================
-        modelBuilder.Entity<ProductImage>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.HasOne(e => e.Product)
-                .WithMany(e => e.Images)
-                .HasForeignKey(e => e.ProductId)
-                .OnDelete(DeleteBehavior.Cascade);
-        });
-
-        modelBuilder.Entity<ProductVideo>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.HasOne(e => e.Product)
-                .WithMany(e => e.Videos)
-                .HasForeignKey(e => e.ProductId)
-                .OnDelete(DeleteBehavior.Cascade);
-        });
-
-        modelBuilder.Entity<ProductDocument>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.HasOne(e => e.Product)
-                .WithMany(e => e.Documents)
-                .HasForeignKey(e => e.ProductId)
-                .OnDelete(DeleteBehavior.Cascade);
         });
 
         // ========================================
