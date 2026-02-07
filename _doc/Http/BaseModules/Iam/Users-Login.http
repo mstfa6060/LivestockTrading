@@ -241,6 +241,24 @@ Content-Type: application/json
 }
 
 
+### Users.Update (Profil Güncelleme)
+POST {{Url}}/Users/Update
+Authorization: Bearer {{Jwt}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "id": "C503CE7D-D12E-4C8E-A1A5-714110625173",
+  "firstName": "Mustafa",
+  "surname": "Ocak",
+  "phoneNumber": "+905551234567",
+  "countryId": 1,
+  "language": "tr",
+  "preferredCurrencyCode": "TRY",
+  "avatarUrl": "bucket-id-from-fileprovider"
+}
+
+
 ### User.Delete
 POST {{Url}}/User/Delete
 Content-Type: application/json

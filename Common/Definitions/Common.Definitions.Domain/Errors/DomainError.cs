@@ -233,6 +233,11 @@ public class DomainErrors
         public static string GoogleTokenExpired { get; set; } = "Google token süresi dolmuş.";
         public static string InvalidVisibilityRadius { get; set; } = "Geçersiz görünürlük yarıçapı.";
         public static string GoogleEmailNotVerified { get; set; } = "Google e-posta adresi doğrulanmamış.";
+        public static string UserFirstNameRequired { get; set; } = "Ad zorunludur.";
+        public static string UserSurnameRequired { get; set; } = "Soyad zorunludur.";
+        public static string UserEmailAlreadyExists { get; set; } = "Bu e-posta adresi zaten kullanılıyor.";
+        public static string UserUserNameAlreadyExists { get; set; } = "Bu kullanıcı adı zaten kullanılıyor.";
+        public static string UserCountryIdRequired { get; set; } = "Ülke seçimi zorunludur.";
 
     }
 }

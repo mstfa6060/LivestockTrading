@@ -84,6 +84,20 @@ public class IamDbValidationService : DefinitionDbValidationService
             throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => DomainErrors.AuthErrors.UserLoginCodeIsExpired));
     }
 
+    public async Task ValidateUserEmailUniqueForUpdate(string email, Guid userId)
+    {
+        var exists = await _dbContext.AppUsers.AnyAsync(x => x.Email.ToLower() == email.ToLower() && x.Id != userId);
+        if (exists)
+            throw new ArfBlocksValidationException(
+                ErrorCodeGenerator.GetErrorCode(() => DomainErrors.UserErrors.UserEmailAlreadyExists));
+    }
 
-
+    public async Task ValidateUserNameUniqueForUpdate(string userName, Guid userId)
+    {
+        if (string.IsNullOrWhiteSpace(userName)) return;
+        var exists = await _dbContext.AppUsers.AnyAsync(x => x.UserName.ToLower() == userName.ToLower() && x.Id != userId);
+        if (exists)
+            throw new ArfBlocksValidationException(
+                ErrorCodeGenerator.GetErrorCode(() => DomainErrors.UserErrors.UserUserNameAlreadyExists));
+    }
 }
