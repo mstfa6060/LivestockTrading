@@ -364,6 +364,17 @@ public class LivestockTradingDomainErrors
         public static string ShippingRateCostRequired { get; set; } = "Kargo ucreti zorunludur.";
     }
 
+    public static class DashboardErrors
+    {
+        public static string DashboardSellerRequired { get; set; } = "Dashboard icin satici bilgisi zorunludur.";
+        public static string DashboardSellerNotFound { get; set; } = "Satici profili bulunamadi. Dashboard erisimi icin satici kaydi gereklidir.";
+    }
+
+    public static class ProductSearchErrors
+    {
+        public static string SearchQueryTooShort { get; set; } = "Arama sorgusu en az 2 karakter olmalidir.";
+    }
+
     public static class AuthorizationErrors
     {
         public static string InsufficientPermission { get; set; } = "Bu islem icin yetkiniz yok.";

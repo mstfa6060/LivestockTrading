@@ -133,6 +133,40 @@ Content-Type: application/json
     "metaKeywords": "holstein, dairy cow, milk cow, livestock, premium"
 }
 
+### Search - Anahtar kelime ile arama
+POST {{BaseUrl}}/Products/Search
+Content-Type: application/json
+
+{
+    "query": "holstein",
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Search - Kategori + fiyat aralığı + ülke filtresi
+POST {{BaseUrl}}/Products/Search
+Content-Type: application/json
+
+{
+    "query": "",
+    "categoryId": "00000000-0000-0000-0000-000000000001",
+    "minPrice": 5000,
+    "maxPrice": 20000,
+    "countryCode": "TR",
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Search - Şehir + durum filtresi
+POST {{BaseUrl}}/Products/Search
+Content-Type: application/json
+
+{
+    "query": "cow",
+    "condition": 0,
+    "city": "Istanbul",
+    "countryCode": "TR",
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
 ### Delete
 POST {{BaseUrl}}/Products/Delete
 Content-Type: application/json

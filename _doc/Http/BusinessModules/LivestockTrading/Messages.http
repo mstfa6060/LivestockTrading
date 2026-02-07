@@ -53,6 +53,14 @@ Content-Type: application/json
     "attachmentUrls": "[]"
 }
 
+### UnreadCount - Okunmamış mesaj sayısı
+POST {{BaseUrl}}/Messages/UnreadCount
+Content-Type: application/json
+
+{
+    "userId": "00000000-0000-0000-0000-000000000002"
+}
+
 ### Delete
 POST {{BaseUrl}}/Messages/Delete
 Content-Type: application/json

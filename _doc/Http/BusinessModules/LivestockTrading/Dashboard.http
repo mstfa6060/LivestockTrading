@@ -1,0 +1,9 @@
+@BaseUrl = http://localhost:5221
+
+### Dashboard Stats - Satıcı istatistikleri
+POST {{BaseUrl}}/Dashboard/Stats
+Content-Type: application/json
+
+{
+    "userId": "00000000-0000-0000-0000-000000000002"
+}
