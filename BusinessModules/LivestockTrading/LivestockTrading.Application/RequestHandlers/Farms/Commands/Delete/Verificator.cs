@@ -1,5 +1,6 @@
 using LivestockTrading.Application.Authorization;
 using LivestockTrading.Infrastructure.Services;
+using Common.Services.Auth.CurrentUser;
 
 namespace LivestockTrading.Application.RequestHandlers.Farms.Commands.Delete;
 
@@ -7,11 +8,13 @@ public class Verificator : IRequestVerificator
 {
 	private readonly PermissionService _permissionService;
 	private readonly LivestockTradingModuleDbVerificationService _dbVerification;
+	private readonly CurrentUserService _currentUserService;
 
 	public Verificator(ArfBlocksDependencyProvider dependencyProvider)
 	{
 		_permissionService = dependencyProvider.GetInstance<PermissionService>();
 		_dbVerification = dependencyProvider.GetInstance<LivestockTradingModuleDbVerificationService>();
+		_currentUserService = dependencyProvider.GetInstance<CurrentUserService>();
 	}
 
 	public async Task VerificateActor(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
@@ -28,5 +31,12 @@ public class Verificator : IRequestVerificator
 	{
 		var request = (RequestModel)payload;
 		await _dbVerification.ValidateFarmExists(request.Id, cancellationToken);
+
+		// Admin/Moderator can delete any farm; Sellers can only delete their own
+		if (!_permissionService.IsModerator())
+		{
+			var currentUserId = _currentUserService.GetCurrentUserId();
+			await _dbVerification.ValidateFarmOwnership(request.Id, currentUserId, cancellationToken);
+		}
 	}
 }

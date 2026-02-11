@@ -16,7 +16,9 @@ public class Verificator : IRequestVerificator
 
 	public async Task VerificateActor(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
 	{
-		// All authenticated users can manage their notifications
+		// Only Admin/Moderator can create notifications for users
+		_permissionService.RequireModerator();
+		await Task.CompletedTask;
 	}
 
 	public async Task VerificateDomain(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)

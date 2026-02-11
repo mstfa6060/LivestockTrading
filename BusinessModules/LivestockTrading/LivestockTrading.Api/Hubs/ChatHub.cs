@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Common.Services.Caching;
+using LivestockTrading.Infrastructure.RelationalDB;
 using Serilog;
 
 namespace LivestockTrading.Api.Hubs;
@@ -13,12 +15,14 @@ namespace LivestockTrading.Api.Hubs;
 public class ChatHub : Hub
 {
     private readonly ICacheService _cacheService;
+    private readonly LivestockTradingModuleDbContext _dbContext;
     private const string OnlineUsersKey = "chat:online:";
     private const string UserConnectionsKey = "chat:connections:";
 
-    public ChatHub(ICacheService cacheService)
+    public ChatHub(ICacheService cacheService, LivestockTradingModuleDbContext dbContext)
     {
         _cacheService = cacheService;
+        _dbContext = dbContext;
     }
 
     /// <summary>
@@ -26,9 +30,12 @@ public class ChatHub : Hub
     /// </summary>
     public async Task JoinConversation(Guid conversationId)
     {
+        var userId = GetUserId();
+        await VerifyConversationMembership(conversationId, userId);
+
         var groupName = GetConversationGroupName(conversationId);
         await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-        Log.Information("User {UserId} joined conversation {ConversationId}", GetUserId(), conversationId);
+        Log.Information("User {UserId} joined conversation {ConversationId}", userId, conversationId);
     }
 
     /// <summary>
@@ -47,6 +54,8 @@ public class ChatHub : Hub
     public async Task SendTypingIndicator(Guid conversationId, bool isTyping)
     {
         var userId = GetUserId();
+        await VerifyConversationMembership(conversationId, userId);
+
         var groupName = GetConversationGroupName(conversationId);
 
         await Clients.OthersInGroup(groupName).SendAsync("TypingIndicator", new
@@ -64,6 +73,8 @@ public class ChatHub : Hub
     public async Task MarkMessageAsRead(Guid messageId, Guid conversationId)
     {
         var userId = GetUserId();
+        await VerifyConversationMembership(conversationId, userId);
+
         var groupName = GetConversationGroupName(conversationId);
 
         await Clients.OthersInGroup(groupName).SendAsync("MessageRead", new
@@ -125,6 +136,25 @@ public class ChatHub : Hub
     }
 
     #region Private Methods
+
+    /// <summary>
+    /// Verifies that the authenticated user is a participant in the conversation.
+    /// Throws HubException if user is not a member.
+    /// </summary>
+    private async Task VerifyConversationMembership(Guid conversationId, Guid userId)
+    {
+        var isMember = await _dbContext.Conversations
+            .AsNoTracking()
+            .AnyAsync(c => c.Id == conversationId
+                && !c.IsDeleted
+                && (c.ParticipantUserId1 == userId || c.ParticipantUserId2 == userId));
+
+        if (!isMember)
+        {
+            Log.Warning("User {UserId} attempted to access conversation {ConversationId} without membership", userId, conversationId);
+            throw new HubException("You are not a participant in this conversation.");
+        }
+    }
 
     private Guid GetUserId()
     {

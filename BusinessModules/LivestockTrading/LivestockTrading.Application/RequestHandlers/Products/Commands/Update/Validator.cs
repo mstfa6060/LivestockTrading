@@ -1,4 +1,6 @@
 using FluentValidation;
+using LivestockTrading.Application.Authorization;
+using LivestockTrading.Domain.Entities;
 using LivestockTrading.Domain.Errors;
 using LivestockTrading.Infrastructure.Services;
 using Common.Services.ErrorCodeGenerator;
@@ -8,10 +10,12 @@ namespace LivestockTrading.Application.RequestHandlers.Products.Commands.Update;
 public class Validator : IRequestValidator
 {
 	private readonly LivestockTradingModuleDbValidationService _dbValidator;
+	private readonly PermissionService _permissionService;
 
 	public Validator(ArfBlocksDependencyProvider dependencyProvider)
 	{
 		_dbValidator = dependencyProvider.GetInstance<LivestockTradingModuleDbValidationService>();
+		_permissionService = dependencyProvider.GetInstance<PermissionService>();
 	}
 
 	public void ValidateRequestModel(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
@@ -27,6 +31,19 @@ public class Validator : IRequestValidator
 		var request = (RequestModel)payload;
 		await _dbValidator.ValidateProductExists(request.Id, cancellationToken);
 		await _dbValidator.ValidateProductSlugUnique(request.Slug, request.Id, cancellationToken);
+
+		// Sellers can only set status to Draft or PendingApproval.
+		// Admin/Moderator can set any status (via Approve/Reject endpoints or directly).
+		if (!_permissionService.IsModerator())
+		{
+			var requestedStatus = (ProductStatus)request.Status;
+			var allowedStatuses = new[] { ProductStatus.Draft, ProductStatus.PendingApproval };
+			if (!allowedStatuses.Contains(requestedStatus))
+			{
+				throw new ArfBlocksValidationException(
+					ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ProductErrors.ProductSellerStatusTransitionNotAllowed));
+			}
+		}
 	}
 }
 

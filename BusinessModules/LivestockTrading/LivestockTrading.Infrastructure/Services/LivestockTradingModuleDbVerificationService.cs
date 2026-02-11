@@ -64,6 +64,44 @@ public class LivestockTradingModuleDbVerificationService : DefinitionDbValidatio
 		}
 	}
 
+	// Ownership: Product belongs to the current user's seller profile
+	public async Task ValidateProductOwnership(Guid productId, Guid currentUserId, CancellationToken ct = default)
+	{
+		var isOwner = await _dbContext.Products
+			.AsNoTracking()
+			.Where(p => p.Id == productId && !p.IsDeleted)
+			.Join(_dbContext.Sellers.AsNoTracking().Where(s => !s.IsDeleted),
+				p => p.SellerId,
+				s => s.Id,
+				(p, s) => s.UserId)
+			.AnyAsync(userId => userId == currentUserId, ct);
+
+		if (!isOwner)
+		{
+			throw new ArfBlocksVerificationException(
+				ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.AuthorizationErrors.OwnershipRequired));
+		}
+	}
+
+	// Ownership: Farm belongs to the current user's seller profile
+	public async Task ValidateFarmOwnership(Guid farmId, Guid currentUserId, CancellationToken ct = default)
+	{
+		var isOwner = await _dbContext.Farms
+			.AsNoTracking()
+			.Where(f => f.Id == farmId && !f.IsDeleted)
+			.Join(_dbContext.Sellers.AsNoTracking().Where(s => !s.IsDeleted),
+				f => f.SellerId,
+				s => s.Id,
+				(f, s) => s.UserId)
+			.AnyAsync(userId => userId == currentUserId, ct);
+
+		if (!isOwner)
+		{
+			throw new ArfBlocksVerificationException(
+				ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.AuthorizationErrors.OwnershipRequired));
+		}
+	}
+
 	// Brand
 	public async Task ValidateBrandExists(Guid brandId, CancellationToken ct = default)
 	{

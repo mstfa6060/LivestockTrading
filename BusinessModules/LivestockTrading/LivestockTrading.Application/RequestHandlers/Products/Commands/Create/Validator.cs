@@ -58,5 +58,10 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
 		RuleFor(x => x.BasePrice)
 			.GreaterThan(0)
 			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ProductErrors.ProductPriceRequired));
+
+		// New products must start as Draft (0)
+		RuleFor(x => x.Status)
+			.Equal(0)
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ProductErrors.ProductStatusMustBeDraftOnCreate));
 	}
 }

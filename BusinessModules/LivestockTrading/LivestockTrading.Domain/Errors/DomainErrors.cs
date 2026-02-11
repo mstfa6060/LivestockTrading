@@ -51,6 +51,8 @@ public class LivestockTradingDomainErrors
         public static string ProductAlreadyApproved { get; set; } = "Urun zaten onaylanmis.";
         public static string ProductAlreadyRejected { get; set; } = "Urun zaten reddedilmis.";
         public static string RejectionReasonRequired { get; set; } = "Red nedeni zorunludur.";
+        public static string ProductStatusMustBeDraftOnCreate { get; set; } = "Yeni urunler Draft (Taslak) durumunda olusturulmalidir.";
+        public static string ProductSellerStatusTransitionNotAllowed { get; set; } = "Saticilar sadece Taslak veya Onay Bekliyor durumuna gecis yapabilir.";
     }
 
     public static class LocationErrors
@@ -66,7 +68,7 @@ public class LivestockTradingDomainErrors
         public static string SellerUserIdRequired { get; set; } = "Kullanici ID zorunludur.";
         public static string SellerNotPendingVerification { get; set; } = "Satici dogrulama bekleyen durumda degil.";
         public static string SellerAlreadySuspended { get; set; } = "Satici zaten askiya alinmis.";
-        public static string SuspensionReasonRequired { get; set; } = "Askiya alma nedeni zorunludur.";
+        public static string SellerSuspensionReasonRequired { get; set; } = "Askiya alma nedeni zorunludur.";
     }
 
     public static class FarmErrors
@@ -270,7 +272,7 @@ public class LivestockTradingDomainErrors
         public static string TransporterUserRequired { get; set; } = "Kullanici zorunludur.";
         public static string TransporterNotPendingVerification { get; set; } = "Tasiyici dogrulama bekleyen durumda degil.";
         public static string TransporterAlreadySuspended { get; set; } = "Tasiyici zaten askiya alinmis.";
-        public static string SuspensionReasonRequired { get; set; } = "Askiya alma nedeni zorunludur.";
+        public static string TransporterSuspensionReasonRequired { get; set; } = "Askiya alma nedeni zorunludur.";
     }
 
     public static class TransportRequestErrors
