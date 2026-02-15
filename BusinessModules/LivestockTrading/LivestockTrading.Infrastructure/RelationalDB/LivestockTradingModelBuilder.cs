@@ -74,6 +74,7 @@ public static class LivestockTradingModelBuilder
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Latitude).HasPrecision(10, 7);
             entity.Property(e => e.Longitude).HasPrecision(10, 7);
+            entity.HasIndex(e => e.CountryCode);
         });
 
         // ========================================
@@ -218,6 +219,18 @@ public static class LivestockTradingModelBuilder
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Code).IsRequired().HasMaxLength(3);
             entity.HasIndex(e => e.Code).IsUnique();
+        });
+
+        // ========================================
+        // EXCHANGE RATE
+        // ========================================
+        modelBuilder.Entity<ExchangeRate>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.FromCurrency).IsRequired().HasMaxLength(3);
+            entity.Property(e => e.ToCurrency).IsRequired().HasMaxLength(3);
+            entity.Property(e => e.Rate).HasPrecision(18, 6);
+            entity.HasIndex(e => new { e.FromCurrency, e.ToCurrency });
         });
 
         modelBuilder.Entity<ProductPrice>(entity =>

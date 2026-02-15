@@ -1,0 +1,33 @@
+@BaseUrl = http://localhost:5222
+
+### All - Tüm ülkeleri listele (Public)
+POST {{BaseUrl}}/Countries/All
+Content-Type: application/json
+
+{
+    "keyword": ""
+}
+
+### GetByCode - Ülke kodu ile getir (Public)
+POST {{BaseUrl}}/Countries/GetByCode
+Content-Type: application/json
+
+{
+    "code": "TR"
+}
+
+### GetByCode - ABD
+POST {{BaseUrl}}/Countries/GetByCode
+Content-Type: application/json
+
+{
+    "code": "US"
+}
+
+### GetByCode - Almanya
+POST {{BaseUrl}}/Countries/GetByCode
+Content-Type: application/json
+
+{
+    "code": "DE"
+}

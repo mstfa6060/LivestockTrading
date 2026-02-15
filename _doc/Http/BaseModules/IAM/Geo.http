@@ -1,0 +1,7 @@
+@BaseUrl = http://localhost:5222
+
+### Detect - IP'den ülke tespiti (Public)
+POST {{BaseUrl}}/Geo/Detect
+Content-Type: application/json
+
+{}

@@ -48,6 +48,16 @@ public class RequestModel : IRequestModel
 	/// </summary>
 	public Guid? SellerId { get; set; }
 
+	/// <summary>
+	/// Para birimi filtresi (opsiyonel, örn: "USD", "EUR", "TRY")
+	/// </summary>
+	public string Currency { get; set; }
+
+	/// <summary>
+	/// Sıralama kriteri: "relevance", "price_asc", "price_desc", "newest", "most_viewed"
+	/// </summary>
+	public string SortBy { get; set; }
+
 	public XSorting Sorting { get; set; }
 	public XPageRequest PageRequest { get; set; }
 }
@@ -66,6 +76,8 @@ public class ResponseModel : IResponseModel<Array>
 	public int StockQuantity { get; set; }
 	public bool IsInStock { get; set; }
 	public Guid SellerId { get; set; }
+	public string CategoryName { get; set; }
+	public string SellerName { get; set; }
 	public Guid LocationId { get; set; }
 	public string LocationCountryCode { get; set; }
 	public string LocationCity { get; set; }

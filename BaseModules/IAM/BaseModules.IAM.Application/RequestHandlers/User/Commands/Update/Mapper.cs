@@ -10,8 +10,13 @@ public class Mapper
 		if (!string.IsNullOrWhiteSpace(request.Surname))
 			entity.Surname = request.Surname;
 
+		// Telefon numarası değiştiğinde IsPhoneVerified false olmalı
 		if (request.PhoneNumber != null)
+		{
+			if (entity.PhoneNumber != request.PhoneNumber)
+				entity.IsPhoneVerified = false;
 			entity.PhoneNumber = request.PhoneNumber;
+		}
 
 		if (request.CountryId.HasValue && request.CountryId.Value > 0)
 			entity.CountryId = request.CountryId.Value;
@@ -40,7 +45,9 @@ public class Mapper
 			Email = user.Email,
 			FirstName = user.FirstName,
 			Surname = user.Surname,
+			FullName = $"{user.FirstName} {user.Surname}".Trim(),
 			PhoneNumber = user.PhoneNumber,
+			IsPhoneVerified = user.IsPhoneVerified,
 			IsActive = user.IsActive,
 			CountryId = user.CountryId,
 			CountryCode = user.Country?.Code,

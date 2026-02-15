@@ -167,6 +167,28 @@ Content-Type: application/json
     "pageRequest": { "page": 1, "pageSize": 10 }
 }
 
+### Search - Fiyata göre artan sıralama
+POST {{BaseUrl}}/Products/Search
+Content-Type: application/json
+
+{
+    "query": "livestock",
+    "sortBy": "price_asc",
+    "currency": "USD",
+    "pageRequest": { "page": 1, "pageSize": 12 }
+}
+
+### Search - En çok görüntülenen
+POST {{BaseUrl}}/Products/Search
+Content-Type: application/json
+
+{
+    "query": "",
+    "sortBy": "most_viewed",
+    "countryCode": "TR",
+    "pageRequest": { "page": 1, "pageSize": 12 }
+}
+
 ### Delete
 POST {{BaseUrl}}/Products/Delete
 Content-Type: application/json

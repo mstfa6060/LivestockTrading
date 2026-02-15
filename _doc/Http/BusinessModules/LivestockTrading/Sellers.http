@@ -106,3 +106,19 @@ Authorization: Bearer {{AdminToken}}
     "id": "00000000-0000-0000-0000-000000000000",
     "reason": "Violation of platform terms of service"
 }
+
+### GetByUserId - Kullanıcı ID ile satıcı profilini getir (Public)
+POST {{BaseUrl}}/Sellers/GetByUserId
+Content-Type: application/json
+
+{
+    "userId": "00000000-0000-0000-0000-000000000001"
+}
+
+### DetailByUserId - Kullanıcı ID ile satıcı detayı
+POST {{BaseUrl}}/Sellers/DetailByUserId
+Content-Type: application/json
+
+{
+    "userId": "00000000-0000-0000-0000-000000000001"
+}

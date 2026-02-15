@@ -43,6 +43,7 @@ public class ApplicationDependencyProvider : ArfBlocksDependencyProvider
         base.Add<LivestockTradingModuleDbVerificationService>();
         base.Add<LivestockTradingModuleDbValidationService>();
         base.Add<PresenceService>();
+        base.Add<ICurrencyService, CurrencyService>();
 
         // Authorization
         base.Add<PermissionService>();

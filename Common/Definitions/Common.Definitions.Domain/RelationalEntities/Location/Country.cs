@@ -85,6 +85,24 @@ public class Country
     [MaxLength(5)]
     public string DefaultCurrencySymbol { get; set; }
 
+    /// <summary>
+    /// Bayrak emojisi (örn: "🇹🇷", "🇺🇸", "🇩🇪")
+    /// </summary>
+    [MaxLength(10)]
+    public string Flag { get; set; }
+
+    /// <summary>
+    /// IANA zaman dilimi (örn: "Europe/Istanbul", "America/New_York")
+    /// </summary>
+    [MaxLength(50)]
+    public string Timezone { get; set; }
+
+    /// <summary>
+    /// Varsayılan dil kodu - ISO 639-1 (örn: "tr", "en", "de")
+    /// </summary>
+    [MaxLength(5)]
+    public string DefaultLanguage { get; set; }
+
     // Navigation - Bu ülkedeki kullanıcılar
     public List<User> Users { get; set; } = new();
 }

@@ -1,0 +1,16 @@
+@BaseUrl = http://localhost:5222
+
+### Update - Kullanıcı profil güncelleme
+POST {{BaseUrl}}/Users/Update
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000001",
+    "firstName": "Mustafa",
+    "surname": "Ocak",
+    "phoneNumber": "+905551234567",
+    "countryId": 1,
+    "language": "tr",
+    "preferredCurrencyCode": "TRY",
+    "avatarUrl": null
+}

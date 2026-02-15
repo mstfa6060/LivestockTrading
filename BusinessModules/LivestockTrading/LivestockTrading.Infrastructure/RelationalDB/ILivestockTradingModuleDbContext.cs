@@ -43,6 +43,7 @@ public interface ILivestockTradingModuleDbContext
 
     // Helpers & Configuration
     DbSet<Currency> Currencies { get; set; }
+    DbSet<ExchangeRate> ExchangeRates { get; set; }
     DbSet<PaymentMethod> PaymentMethods { get; set; }
     DbSet<ShippingCarrier> ShippingCarriers { get; set; }
     DbSet<FAQ> FAQs { get; set; }

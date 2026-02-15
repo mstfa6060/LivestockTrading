@@ -78,3 +78,22 @@ Content-Type: application/json
 {
     "id": "00000000-0000-0000-0000-000000000000"
 }
+
+### Preferences/My - Kullanıcı tercihlerini getir (yoksa oluşturur)
+POST {{BaseUrl}}/Preferences/My
+Content-Type: application/json
+
+{
+    "userId": "00000000-0000-0000-0000-000000000001"
+}
+
+### Preferences/Update - Kullanıcı tercihlerini güncelle
+POST {{BaseUrl}}/Preferences/Update
+Content-Type: application/json
+
+{
+    "userId": "00000000-0000-0000-0000-000000000001",
+    "preferredCountryCode": "TR",
+    "preferredCurrency": "TRY",
+    "timezone": "Europe/Istanbul"
+}

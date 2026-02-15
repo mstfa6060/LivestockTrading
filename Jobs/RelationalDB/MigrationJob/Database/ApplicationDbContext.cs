@@ -88,6 +88,7 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext, ILivestockT
 
     // Helpers & Configuration
     public DbSet<Currency> Currencies { get; set; }
+    public DbSet<ExchangeRate> ExchangeRates { get; set; }
     public DbSet<PaymentMethod> PaymentMethods { get; set; }
     public DbSet<ShippingCarrier> ShippingCarriers { get; set; }
     public DbSet<FAQ> FAQs { get; set; }

@@ -20,6 +20,8 @@ public class Mapper
 			StockQuantity = p.StockQuantity,
 			IsInStock = p.IsInStock,
 			SellerId = p.SellerId,
+			CategoryName = p.Category?.Name,
+			SellerName = p.Seller?.BusinessName,
 			LocationId = p.LocationId,
 			LocationCountryCode = p.Location?.CountryCode,
 			LocationCity = p.Location?.City,

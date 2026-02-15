@@ -1,0 +1,30 @@
+@BaseUrl = http://localhost:5221
+
+### My (Get current user preferences)
+POST {{BaseUrl}}/Preferences/My
+Content-Type: application/json
+
+{
+    "userId": "00000000-0000-0000-0000-000000000001"
+}
+
+### Update (Create or update user preferences)
+POST {{BaseUrl}}/Preferences/Update
+Content-Type: application/json
+
+{
+    "userId": "00000000-0000-0000-0000-000000000001",
+    "preferredCurrency": "EUR",
+    "preferredLanguage": "tr",
+    "countryCode": "TR",
+    "timeZone": "Europe/Istanbul",
+    "weightSystem": 0,
+    "distanceSystem": 0,
+    "areaSystem": 0,
+    "emailNotificationsEnabled": true,
+    "smsNotificationsEnabled": false,
+    "pushNotificationsEnabled": true,
+    "darkModeEnabled": true,
+    "productsPerPage": 50,
+    "defaultViewMode": 0
+}

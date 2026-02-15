@@ -25,5 +25,21 @@ public class ConversationUnreadItem
 {
 	public Guid ConversationId { get; set; }
 	public int UnreadCount { get; set; }
+
+	/// <summary>
+	/// Son mesajın ilk 100 karakteri
+	/// </summary>
+	public string LastMessage { get; set; }
+
 	public DateTime? LastMessageAt { get; set; }
+
+	/// <summary>
+	/// Son okunmamış mesajı gönderen kullanıcının ID'si
+	/// </summary>
+	public Guid SenderUserId { get; set; }
+
+	/// <summary>
+	/// Gönderenin görünen adı (frontend user cache'den çözümler)
+	/// </summary>
+	public string SenderDisplayName { get; set; }
 }

@@ -87,6 +87,34 @@
 			]
 		},
 		{
+			"DownstreamPathTemplate": "/Countries/GetByCode",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "iam-api-container",
+					"Port": 8080
+				}
+			],
+			"UpstreamPathTemplate": "/iam/Countries/GetByCode",
+			"UpstreamHttpMethod": [
+				"POST"
+			]
+		},
+		{
+			"DownstreamPathTemplate": "/Geo/Detect",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "iam-api-container",
+					"Port": 8080
+				}
+			],
+			"UpstreamPathTemplate": "/iam/Geo/Detect",
+			"UpstreamHttpMethod": [
+				"POST"
+			]
+		},
+		{
 			"DownstreamPathTemplate": "/{everything}",
 			"DownstreamScheme": "http",
 			"DownstreamHostAndPorts": [

@@ -29,6 +29,8 @@ public class Handler : IRequestHandler
 			req.CountryCode,
 			req.City,
 			req.SellerId,
+			req.Currency,
+			req.SortBy,
 			req.Sorting,
 			req.PageRequest,
 			cancellationToken);

@@ -36,6 +36,7 @@ public class ApplicationDependencyProvider : ArfBlocksDependencyProvider
 
 		base.Add<IJwtService, JwtService>();
 		base.Add<ICacheService, CacheService>();
+		base.Add<IGeoLocationService, GeoLocationService>();
 
 		// For Authorization Operations
 		base.Add<AuthorizationService>();

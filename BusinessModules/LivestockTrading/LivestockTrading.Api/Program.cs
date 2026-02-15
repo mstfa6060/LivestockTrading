@@ -8,6 +8,7 @@ using Common.Helpers;
 using Serilog;
 using LivestockTrading.Api.Converters;
 using LivestockTrading.Api.Hubs;
+using LivestockTrading.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -94,6 +95,9 @@ app.MapControllers();
 
 // SignalR Hubs
 app.MapHub<ChatHub>("/hubs/chat");
+
+// Country Code Header Middleware
+app.UseCountryCode();
 
 // ArfBlocks Request Handlers
 app.UseArfBlocksRequestHandlers(options => { });

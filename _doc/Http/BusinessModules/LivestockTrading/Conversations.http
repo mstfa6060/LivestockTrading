@@ -60,3 +60,14 @@ Content-Type: application/json
 {
     "id": "00000000-0000-0000-0000-000000000000"
 }
+
+### StartWithProduct - Ürün üzerinden konuşma başlat
+POST {{BaseUrl}}/Conversations/StartWithProduct
+Content-Type: application/json
+
+{
+    "productId": "00000000-0000-0000-0000-000000000003",
+    "sellerId": "00000000-0000-0000-0000-000000000004",
+    "buyerUserId": "00000000-0000-0000-0000-000000000001",
+    "initialMessage": "Merhaba, bu ürünle ilgileniyorum. Hala satışta mı?"
+}

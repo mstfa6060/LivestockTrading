@@ -1,7 +1,10 @@
 using Common.Services.Logging;
+using Common.Definitions.Infrastructure.RelationalDB;
+using LivestockTrading.Infrastructure.RelationalDB;
 using LivestockTrading.Workers.NotificationSender.EventHandlers;
 using LivestockTrading.Workers.NotificationSender.Services;
 using LivestockTrading.Workers.NotificationSender.Workers;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 // Early Serilog initialization
@@ -25,6 +28,39 @@ try
         {
             // Configure HTTP client factory
             services.AddHttpClient();
+
+            // Configure LivestockTradingModuleDbContext for ExchangeRateUpdater
+            var connectionString = hostContext.Configuration["ProjectConfigurations:RelationalDbConfiguration:ConnectionString"]
+                ?? hostContext.Configuration["ConnectionStrings:DefaultConnection"]
+                ?? Environment.GetEnvironmentVariable("SQL_CONNECTION_STRING");
+
+            if (!string.IsNullOrEmpty(connectionString))
+            {
+                services.AddScoped<LivestockTradingModuleDbContext>(sp =>
+                {
+                    var options = new DbContextOptionsBuilder<DefinitionDbContext>()
+                        .UseSqlServer(connectionString, sql =>
+                        {
+                            sql.EnableRetryOnFailure(
+                                maxRetryCount: 5,
+                                maxRetryDelay: TimeSpan.FromSeconds(3),
+                                errorNumbersToAdd: null
+                            );
+                        })
+                        .Options;
+
+                    return new LivestockTradingModuleDbContext(options);
+                });
+
+                // Register ExchangeRateUpdater scheduled background service
+                services.AddHostedService<ExchangeRateUpdaterService>();
+
+                Log.Information("ExchangeRateUpdaterService registered with database connection");
+            }
+            else
+            {
+                Log.Warning("No database connection string found. ExchangeRateUpdaterService will not be registered");
+            }
 
             // Configure push notification service as singleton
             services.AddSingleton<IPushNotificationService>(sp =>

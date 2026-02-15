@@ -22,6 +22,8 @@ public class DataAccess : IDataAccess
 		string countryCode,
 		string city,
 		Guid? sellerId,
+		string currency,
+		string sortBy,
 		XSorting sorting,
 		XPageRequest pageRequest,
 		CancellationToken ct)
@@ -29,6 +31,8 @@ public class DataAccess : IDataAccess
 		var dbQuery = _dbContext.Products
 			.AsNoTracking()
 			.Include(p => p.Location)
+			.Include(p => p.Category)
+			.Include(p => p.Seller)
 			.Where(p => !p.IsDeleted && p.Status == ProductStatus.Active);
 
 		// Arama sorgusu - başlık, açıklama, slug'da aranır
@@ -76,11 +80,29 @@ public class DataAccess : IDataAccess
 		if (sellerId.HasValue)
 			dbQuery = dbQuery.Where(p => p.SellerId == sellerId.Value);
 
-		// Sıralama
-		dbQuery = dbQuery.Sort(sorting);
+		// Para birimi filtresi
+		if (!string.IsNullOrWhiteSpace(currency))
+			dbQuery = dbQuery.Where(p => p.Currency == currency);
 
-		if (sorting == null)
-			dbQuery = dbQuery.OrderByDescending(p => p.CreatedAt);
+		// Sıralama
+		if (!string.IsNullOrWhiteSpace(sortBy))
+		{
+			dbQuery = sortBy.ToLower() switch
+			{
+				"price_asc" => dbQuery.OrderBy(p => p.BasePrice),
+				"price_desc" => dbQuery.OrderByDescending(p => p.BasePrice),
+				"newest" => dbQuery.OrderByDescending(p => p.CreatedAt),
+				"most_viewed" => dbQuery.OrderByDescending(p => p.ViewCount),
+				_ => dbQuery.OrderByDescending(p => p.CreatedAt) // "relevance" or default
+			};
+		}
+		else
+		{
+			dbQuery = dbQuery.Sort(sorting);
+
+			if (sorting == null)
+				dbQuery = dbQuery.OrderByDescending(p => p.CreatedAt);
+		}
 
 		var page = dbQuery.GetPage(pageRequest);
 		var products = await dbQuery.Paginate(page).ToListAsync(ct);

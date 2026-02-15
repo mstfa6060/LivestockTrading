@@ -7,3 +7,29 @@ Content-Type: application/json
 {
     "userId": "00000000-0000-0000-0000-000000000002"
 }
+
+### Dashboard MyStats - Gelişmiş istatistikler (tüm zamanlar)
+POST {{BaseUrl}}/Dashboard/MyStats
+Content-Type: application/json
+
+{
+    "userId": "00000000-0000-0000-0000-000000000002"
+}
+
+### Dashboard MyStats - Son 1 ay
+POST {{BaseUrl}}/Dashboard/MyStats
+Content-Type: application/json
+
+{
+    "userId": "00000000-0000-0000-0000-000000000002",
+    "period": "month"
+}
+
+### Dashboard MyStats - Son 1 hafta
+POST {{BaseUrl}}/Dashboard/MyStats
+Content-Type: application/json
+
+{
+    "userId": "00000000-0000-0000-0000-000000000002",
+    "period": "week"
+}
