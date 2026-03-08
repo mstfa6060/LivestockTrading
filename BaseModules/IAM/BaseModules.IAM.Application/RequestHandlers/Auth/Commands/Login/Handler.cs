@@ -96,6 +96,8 @@ public class Handler : IRequestHandler
 							District = "",
 							IsAvailable = true,
 							Description = "",
+							CountryId = 180, // Turkey (default)
+							CreatedAt = DateTime.UtcNow,
 						};
 
 						_dataAccessLayer.AddUser(user);
@@ -189,6 +191,8 @@ public class Handler : IRequestHandler
 							District = "",
 							IsAvailable = true,
 							Description = "",
+							CountryId = 180, // Turkey (default)
+							CreatedAt = DateTime.UtcNow,
 						};
 
 						_dataAccessLayer.AddUser(user);
