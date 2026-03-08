@@ -41,6 +41,7 @@ public class RequestModel : IRequestModel
 	public string PhoneNumber { get; set; }
 	public DateTime? BirthDate { get; set; }
 	public string ExternalProviderUserId { get; set; } // Google "sub" değeri
+	public string Email { get; set; } // Google/Apple email adresi
 
 }
 

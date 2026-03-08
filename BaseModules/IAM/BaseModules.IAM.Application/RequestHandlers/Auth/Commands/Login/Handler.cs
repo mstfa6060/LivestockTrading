@@ -54,49 +54,88 @@ public class Handler : IRequestHandler
 
 				if (user == null)
 				{
-					user = new Common.Definitions.Domain.Entities.User
+					var googleEmail = !string.IsNullOrWhiteSpace(request.Email)
+						? request.Email
+						: request.UserName;
+
+					if (string.IsNullOrWhiteSpace(googleEmail))
+						throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => DomainErrors.UserErrors.InvalidCredentials));
+
+					// Aynı email ile mevcut kullanıcı var mı kontrol et (native → Google hesap bağlama)
+					var existingUser = await _dataAccessLayer.GetUser(googleEmail);
+					if (existingUser != null)
 					{
-						Id = Guid.NewGuid(),
-						UserName = request.UserName,
-						Email = request.UserName,
-						FirstName = request.FirstName ?? "Google",
-						Surname = request.Surname ?? "User",
-						AuthProvider = "google",
-						ProviderKey = googleUserId,
-						UserSource = UserSources.Google,
-						IsActive = true,
-						PhoneNumber = request.PhoneNumber,
-						BirthDate = request.BirthDate ?? DateTime.UtcNow.AddYears(-18),
-						City = "",
-						District = "",
-						IsAvailable = true,
-						Description = "",
-					};
+						// Mevcut hesabı Google'a bağla
+						existingUser.AuthProvider = "google";
+						existingUser.ProviderKey = googleUserId;
+						existingUser.UserSource = UserSources.Google;
+						if (!string.IsNullOrWhiteSpace(request.FirstName))
+							existingUser.FirstName = request.FirstName;
+						if (!string.IsNullOrWhiteSpace(request.Surname))
+							existingUser.Surname = request.Surname;
+						_dataAccessLayer.UpdateUser(existingUser);
+						await _dataAccessLayer.SaveChanges();
+						user = existingUser;
+					}
+					else
+					{
+						user = new Common.Definitions.Domain.Entities.User
+						{
+							Id = Guid.NewGuid(),
+							UserName = googleEmail,
+							Email = googleEmail,
+							FirstName = request.FirstName ?? "Google",
+							Surname = request.Surname ?? "User",
+							AuthProvider = "google",
+							ProviderKey = googleUserId,
+							UserSource = UserSources.Google,
+							IsActive = true,
+							PhoneNumber = request.PhoneNumber,
+							BirthDate = request.BirthDate ?? DateTime.UtcNow.AddYears(-18),
+							City = "",
+							District = "",
+							IsAvailable = true,
+							Description = "",
+						};
+
+						_dataAccessLayer.AddUser(user);
+						await _dataAccessLayer.SaveChanges();
+					}
 
 					// Email adresine göre rol belirle (Admin veya Buyer)
 					var isGoogleAdmin = AdminEmails.Contains(user.Email, StringComparer.OrdinalIgnoreCase);
 					var googleRoleId = isGoogleAdmin ? AdminRoleId : BuyerRoleId;
 
-					_dataAccessLayer.AddUserRoleWithModule(new UserRole
+					// Duplicate kontrolü ile rol ata
+					var hasGoogleRole = await _dataAccessLayer.HasModuleRole(user.Id, LivestockTradingModuleId);
+					if (!hasGoogleRole)
 					{
-						Id = Guid.NewGuid(),
-						UserId = user.Id,
-						RoleId = googleRoleId,
-						ModuleId = LivestockTradingModuleId,
-						CreatedAt = DateTime.UtcNow,
-						UpdatedAt = DateTime.UtcNow,
-						IsDeleted = false
-					});
-
-					_dataAccessLayer.AddUser(user);
-					await _dataAccessLayer.SaveChanges();
+						_dataAccessLayer.AddUserRoleWithModule(new UserRole
+						{
+							Id = Guid.NewGuid(),
+							UserId = user.Id,
+							RoleId = googleRoleId,
+							ModuleId = LivestockTradingModuleId,
+							CreatedAt = DateTime.UtcNow,
+							UpdatedAt = DateTime.UtcNow,
+							IsDeleted = false
+						});
+						await _dataAccessLayer.SaveChanges();
+					}
 				}
 				else
 				{
 					// Mevcut Google kullanıcısının bilgilerini güncelle
-					user.UserName = request.UserName;
-					user.Surname = request.Surname;
-					user.FirstName = request.FirstName;
+					if (!string.IsNullOrWhiteSpace(request.Email))
+						user.Email = request.Email;
+					if (!string.IsNullOrWhiteSpace(request.UserName))
+						user.UserName = request.UserName;
+					else if (!string.IsNullOrWhiteSpace(request.Email))
+						user.UserName = request.Email;
+					if (!string.IsNullOrWhiteSpace(request.Surname))
+						user.Surname = request.Surname;
+					if (!string.IsNullOrWhiteSpace(request.FirstName))
+						user.FirstName = request.FirstName;
 					_dataAccessLayer.UpdateUser(user);
 					await _dataAccessLayer.SaveChanges();
 				}
@@ -109,49 +148,83 @@ public class Handler : IRequestHandler
 
 				if (user == null)
 				{
-					user = new Common.Definitions.Domain.Entities.User
+					var appleEmail = !string.IsNullOrWhiteSpace(request.Email)
+						? request.Email
+						: request.UserName;
+
+					if (string.IsNullOrWhiteSpace(appleEmail))
+						throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => DomainErrors.UserErrors.InvalidCredentials));
+
+					// Aynı email ile mevcut kullanıcı var mı kontrol et (native → Apple hesap bağlama)
+					var existingAppleUser = await _dataAccessLayer.GetUser(appleEmail);
+					if (existingAppleUser != null)
 					{
-						Id = Guid.NewGuid(),
-						UserName = request.UserName,
-						Email = request.UserName,
-						FirstName = request.FirstName ?? "Apple",
-						Surname = request.Surname ?? "User",
-						AuthProvider = "apple",
-						ProviderKey = appleUserId,
-						UserSource = UserSources.Apple,
-						IsActive = true,
-						PhoneNumber = request.PhoneNumber,
-						BirthDate = request.BirthDate ?? DateTime.UtcNow.AddYears(-18),
-						City = "",
-						District = "",
-						IsAvailable = true,
-						Description = "",
-					};
+						existingAppleUser.AuthProvider = "apple";
+						existingAppleUser.ProviderKey = appleUserId;
+						existingAppleUser.UserSource = UserSources.Apple;
+						if (!string.IsNullOrWhiteSpace(request.FirstName))
+							existingAppleUser.FirstName = request.FirstName;
+						if (!string.IsNullOrWhiteSpace(request.Surname))
+							existingAppleUser.Surname = request.Surname;
+						_dataAccessLayer.UpdateUser(existingAppleUser);
+						await _dataAccessLayer.SaveChanges();
+						user = existingAppleUser;
+					}
+					else
+					{
+						user = new Common.Definitions.Domain.Entities.User
+						{
+							Id = Guid.NewGuid(),
+							UserName = appleEmail,
+							Email = appleEmail,
+							FirstName = request.FirstName ?? "Apple",
+							Surname = request.Surname ?? "User",
+							AuthProvider = "apple",
+							ProviderKey = appleUserId,
+							UserSource = UserSources.Apple,
+							IsActive = true,
+							PhoneNumber = request.PhoneNumber,
+							BirthDate = request.BirthDate ?? DateTime.UtcNow.AddYears(-18),
+							City = "",
+							District = "",
+							IsAvailable = true,
+							Description = "",
+						};
+
+						_dataAccessLayer.AddUser(user);
+						await _dataAccessLayer.SaveChanges();
+					}
 
 					// Email adresine göre rol belirle (Admin veya Buyer)
 					var isAppleAdmin = AdminEmails.Contains(user.Email, StringComparer.OrdinalIgnoreCase);
 					var appleRoleId = isAppleAdmin ? AdminRoleId : BuyerRoleId;
 
-					_dataAccessLayer.AddUserRoleWithModule(new UserRole
+					// Duplicate kontrolü ile rol ata
+					var hasAppleRole = await _dataAccessLayer.HasModuleRole(user.Id, LivestockTradingModuleId);
+					if (!hasAppleRole)
 					{
-						Id = Guid.NewGuid(),
-						UserId = user.Id,
-						RoleId = appleRoleId,
-						ModuleId = LivestockTradingModuleId,
-						CreatedAt = DateTime.UtcNow,
-						UpdatedAt = DateTime.UtcNow,
-						IsDeleted = false
-					});
-
-					_dataAccessLayer.AddUser(user);
-					await _dataAccessLayer.SaveChanges();
+						_dataAccessLayer.AddUserRoleWithModule(new UserRole
+						{
+							Id = Guid.NewGuid(),
+							UserId = user.Id,
+							RoleId = appleRoleId,
+							ModuleId = LivestockTradingModuleId,
+							CreatedAt = DateTime.UtcNow,
+							UpdatedAt = DateTime.UtcNow,
+							IsDeleted = false
+						});
+						await _dataAccessLayer.SaveChanges();
+					}
 				}
 				else
 				{
 					// Mevcut Apple kullanıcısının bilgilerini güncelle
-					user.UserName = request.UserName;
-					user.Surname = request.Surname;
-					user.FirstName = request.FirstName;
+					if (!string.IsNullOrWhiteSpace(request.UserName))
+						user.UserName = request.UserName;
+					if (!string.IsNullOrWhiteSpace(request.Surname))
+						user.Surname = request.Surname;
+					if (!string.IsNullOrWhiteSpace(request.FirstName))
+						user.FirstName = request.FirstName;
 					_dataAccessLayer.UpdateUser(user);
 					await _dataAccessLayer.SaveChanges();
 				}
