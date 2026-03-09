@@ -63,6 +63,20 @@ class Program
             throw;
         }
 
+        // Seed Data - Kategoriler
+        // --force-category-reseed argümani ile mevcut kategoriler güncellenebilir
+        try
+        {
+            var forceCategoryReseed = args.Contains("--force-category-reseed");
+            var categorySeeder = new CategorySeeder(dbContext);
+            await categorySeeder.SeedAsync(forceCategoryReseed);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Category seed FAILED: {ex.Message}");
+            throw;
+        }
+
         // TODO: Diger Seed Data implementasyonlari eklenecek
         // LocationSeeder, PlatformSettingsSeeder, vb.
 
