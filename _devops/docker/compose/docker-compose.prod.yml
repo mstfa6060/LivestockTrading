@@ -17,6 +17,8 @@ services:
   livestocktrading-api:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
+    volumes:
+      - /opt/livestocktrading/appsettings.Production.json:/app/appsettings.Production.json:ro
     deploy:
       resources:
         limits:
@@ -29,6 +31,8 @@ services:
   iam-api:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
+    volumes:
+      - /opt/livestocktrading/appsettings.Production.json:/app/appsettings.Production.json:ro
     deploy:
       resources:
         limits:
@@ -41,6 +45,8 @@ services:
   fileprovider-api:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
+    volumes:
+      - /opt/livestocktrading/appsettings.Production.json:/app/appsettings.Production.json:ro
     deploy:
       resources:
         limits:
@@ -53,6 +59,8 @@ services:
   iam-mail-worker:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
+    volumes:
+      - /opt/livestocktrading/appsettings.Production.json:/app/appsettings.Production.json:ro
     deploy:
       resources:
         limits:
@@ -62,6 +70,8 @@ services:
   iam-sms-worker:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
+    volumes:
+      - /opt/livestocktrading/appsettings.Production.json:/app/appsettings.Production.json:ro
     deploy:
       resources:
         limits:
@@ -71,6 +81,8 @@ services:
   livestocktrading-notification-worker:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
+    volumes:
+      - /opt/livestocktrading/appsettings.Production.json:/app/appsettings.Production.json:ro
     deploy:
       resources:
         limits:
