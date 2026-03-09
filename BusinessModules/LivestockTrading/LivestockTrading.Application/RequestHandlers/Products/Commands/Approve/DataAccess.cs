@@ -19,6 +19,16 @@ public class DataAccess : IDataAccess
 			.FirstOrDefaultAsync(p => p.Id == productId && !p.IsDeleted);
 	}
 
+	public async Task<Product> GetProductWithDetails(Guid productId)
+	{
+		return await _dbContext.Products
+			.Include(p => p.Category)
+			.Include(p => p.Brand)
+			.Include(p => p.Seller)
+			.Include(p => p.Location)
+			.FirstOrDefaultAsync(p => p.Id == productId && !p.IsDeleted);
+	}
+
 	public async Task SaveChanges()
 	{
 		await _dbContext.SaveChangesAsync();

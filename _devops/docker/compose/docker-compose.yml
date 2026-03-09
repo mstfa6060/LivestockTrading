@@ -237,3 +237,18 @@ services:
     networks:
       - livestocktrading-network
     restart: unless-stopped
+
+  livestocktrading-socialmedia-worker:
+    image: ${DOCKER_REGISTRY:-docker.io}/${DOCKER_USERNAME}/livestocktrading-socialmedia-worker:${TAG:-latest}
+    environment:
+      <<: *common-env
+      Instagram__AccessToken: ${INSTAGRAM_ACCESS_TOKEN:-}
+      Instagram__UserId: ${INSTAGRAM_USER_ID:-}
+      Instagram__AppSecret: ${INSTAGRAM_APP_SECRET:-}
+      Instagram__SiteBaseUrl: ${SITE_BASE_URL:-https://livestock-trading.com}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - livestocktrading-network
+    restart: unless-stopped

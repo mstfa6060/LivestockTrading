@@ -135,6 +135,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SmsSender", "SmsSender", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivestockTrading.Workers.SmsSender", "BusinessModules\LivestockTrading\LivestockTrading.Workers\SmsSender\LivestockTrading.Workers.SmsSender.csproj", "{18E0EFA7-11F6-4940-8E59-65B32B5CCC4B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SocialMediaPoster", "SocialMediaPoster", "{94D281AE-B87C-B298-01CF-8698EF460098}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivestockTrading.Workers.SocialMediaPoster", "BusinessModules\LivestockTrading\LivestockTrading.Workers\SocialMediaPoster\LivestockTrading.Workers.SocialMediaPoster.csproj", "{A7C19E9C-87E0-4CAA-9654-EFEB78729915}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -649,6 +653,18 @@ Global
 		{18E0EFA7-11F6-4940-8E59-65B32B5CCC4B}.Release|x64.Build.0 = Release|Any CPU
 		{18E0EFA7-11F6-4940-8E59-65B32B5CCC4B}.Release|x86.ActiveCfg = Release|Any CPU
 		{18E0EFA7-11F6-4940-8E59-65B32B5CCC4B}.Release|x86.Build.0 = Release|Any CPU
+		{A7C19E9C-87E0-4CAA-9654-EFEB78729915}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7C19E9C-87E0-4CAA-9654-EFEB78729915}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7C19E9C-87E0-4CAA-9654-EFEB78729915}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A7C19E9C-87E0-4CAA-9654-EFEB78729915}.Debug|x64.Build.0 = Debug|Any CPU
+		{A7C19E9C-87E0-4CAA-9654-EFEB78729915}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A7C19E9C-87E0-4CAA-9654-EFEB78729915}.Debug|x86.Build.0 = Debug|Any CPU
+		{A7C19E9C-87E0-4CAA-9654-EFEB78729915}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7C19E9C-87E0-4CAA-9654-EFEB78729915}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7C19E9C-87E0-4CAA-9654-EFEB78729915}.Release|x64.ActiveCfg = Release|Any CPU
+		{A7C19E9C-87E0-4CAA-9654-EFEB78729915}.Release|x64.Build.0 = Release|Any CPU
+		{A7C19E9C-87E0-4CAA-9654-EFEB78729915}.Release|x86.ActiveCfg = Release|Any CPU
+		{A7C19E9C-87E0-4CAA-9654-EFEB78729915}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -715,5 +731,7 @@ Global
 		{4F422E54-27E0-4F17-ACDD-BA9D12BC4F47} = {B839244E-473A-E556-3DDC-D2475E810712}
 		{7DA555FC-06FD-6CE1-959F-375461865913} = {161961BD-E738-0E0B-DC6C-39FD61F74D17}
 		{18E0EFA7-11F6-4940-8E59-65B32B5CCC4B} = {7DA555FC-06FD-6CE1-959F-375461865913}
+		{94D281AE-B87C-B298-01CF-8698EF460098} = {161961BD-E738-0E0B-DC6C-39FD61F74D17}
+		{A7C19E9C-87E0-4CAA-9654-EFEB78729915} = {94D281AE-B87C-B298-01CF-8698EF460098}
 	EndGlobalSection
 EndGlobal

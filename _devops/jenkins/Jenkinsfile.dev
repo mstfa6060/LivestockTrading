@@ -52,6 +52,7 @@ pipeline {
                         'iam-mail-worker:_devops/docker/Dockerfile.iam-mail-worker:mstfaock/livestocktrading-iam-mail-worker',
                         'iam-sms-worker:_devops/docker/Dockerfile.iam-sms-worker:mstfaock/livestocktrading-iam-sms-worker',
                         'livestocktrading-notification-worker:_devops/docker/Dockerfile.livestocktrading-notification-worker:mstfaock/livestocktrading-notification-worker',
+                        'livestocktrading-socialmedia-worker:_devops/docker/Dockerfile.livestocktrading-socialmedia-worker:mstfaock/livestocktrading-socialmedia-worker',
                         'resource-seeder:_devops/docker/Dockerfile.resource-seeder:mstfaock/livestocktrading-resource-seeder'
                     ]
 

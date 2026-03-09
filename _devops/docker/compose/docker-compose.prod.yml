@@ -101,6 +101,17 @@ services:
           cpus: '0.5'
           memory: 512M
 
+  livestocktrading-socialmedia-worker:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+    volumes:
+      - /opt/livestocktrading/appsettings.Production.json:/app/appsettings.Production.json:ro
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
   sqlserver:
     deploy:
       resources:

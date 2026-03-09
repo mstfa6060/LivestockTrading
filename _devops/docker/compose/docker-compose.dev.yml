@@ -54,3 +54,10 @@ services:
     build:
       context: ../..
       dockerfile: docker/Dockerfile.livestocktrading-notification-worker
+
+  livestocktrading-socialmedia-worker:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    build:
+      context: ../..
+      dockerfile: docker/Dockerfile.livestocktrading-socialmedia-worker
