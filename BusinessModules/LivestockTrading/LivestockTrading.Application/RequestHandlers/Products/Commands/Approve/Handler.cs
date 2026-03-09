@@ -33,6 +33,9 @@ public class Handler : IRequestHandler
 
 		await _dataAccessLayer.SaveChanges();
 
+		// Resolve cover image file path from FileEntries table
+		var coverImagePath = await _dataAccessLayer.GetCoverImagePath(product.CoverImageFileId);
+
 		// Publish event for social media posting & notifications
 		await _publisher.PublishFanout("livestocktrading.socialmedia.post", new ProductApprovedEvent
 		{
@@ -49,7 +52,7 @@ public class Handler : IRequestHandler
 			Slug = product.Slug,
 			CountryCode = product.Location?.CountryCode,
 			City = product.Location?.City,
-			CoverImageUrl = product.CoverImageFileId,
+			CoverImageUrl = coverImagePath,
 			MediaBucketId = product.MediaBucketId
 		});
 

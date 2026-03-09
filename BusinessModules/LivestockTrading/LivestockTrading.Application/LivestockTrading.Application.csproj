@@ -18,6 +18,7 @@
     <ProjectReference Include="..\..\..\Common\Contracts\Common.Contracts.Event\Common.Contracts.Event.csproj" />
     <ProjectReference Include="..\..\..\Common\Common.Contracts.PubSub\Common.Contracts.PubSub.csproj" />
     <ProjectReference Include="..\..\..\Common\Definitions\Common.Definitions.Domain\Common.Definitions.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Common\Definitions\Common.Definitions.Infrastructure\Common.Definitions.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\Common\Contracts\Common.Contracts.Queue\Common.Contracts.Queue.csproj" />
     <ProjectReference Include="..\..\..\Common\Helpers\Common.Helpers.csproj" />
   </ItemGroup>

@@ -29,6 +29,26 @@ public class DataAccess : IDataAccess
 			.FirstOrDefaultAsync(p => p.Id == productId && !p.IsDeleted);
 	}
 
+	public async Task<string> GetCoverImagePath(string coverImageFileId)
+	{
+		if (string.IsNullOrWhiteSpace(coverImageFileId) || !Guid.TryParse(coverImageFileId, out _))
+			return null;
+
+		var connection = _dbContext.Database.GetDbConnection();
+		if (connection.State != System.Data.ConnectionState.Open)
+			await connection.OpenAsync();
+
+		using var cmd = connection.CreateCommand();
+		cmd.CommandText = "SELECT [Path] FROM FileEntries WHERE Id = @Id";
+		var param = cmd.CreateParameter();
+		param.ParameterName = "@Id";
+		param.Value = coverImageFileId;
+		cmd.Parameters.Add(param);
+
+		var result = await cmd.ExecuteScalarAsync();
+		return result as string;
+	}
+
 	public async Task SaveChanges()
 	{
 		await _dbContext.SaveChangesAsync();
