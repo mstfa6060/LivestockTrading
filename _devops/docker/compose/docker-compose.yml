@@ -104,6 +104,17 @@ services:
       retries: 3
     restart: unless-stopped
 
+  # Web (Next.js Frontend)
+  web:
+    image: ${DOCKER_REGISTRY:-docker.io}/${DOCKER_USERNAME}/livestocktrading-web:${TAG:-latest}
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: production
+    networks:
+      - livestocktrading-network
+    restart: unless-stopped
+
   # API Gateway
   api-gateway:
     image: ${DOCKER_REGISTRY:-docker.io}/${DOCKER_USERNAME}/livestocktrading-api-gateway:${TAG:-latest}
