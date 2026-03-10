@@ -26,7 +26,7 @@ public class Mapper
 			IsInStock = request.IsInStock,
 			// SellerId Handler'da set edilir (otomatik oluşturma mantığı)
 			LocationId = request.LocationId,
-			Status = (ProductStatus)request.Status,
+			Status = ProductStatus.PendingApproval,
 			Condition = (ProductCondition)request.Condition,
 			IsShippingAvailable = request.IsShippingAvailable,
 			ShippingCost = request.ShippingCost,
