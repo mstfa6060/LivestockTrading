@@ -28,7 +28,23 @@ public class ApplicationDependencyProvider : ArfBlocksDependencyProvider
 
 		// Types
 		base.Add<ArfBlocksDependencyProvider>(this);
-		base.Add<IFileStorageService>(new FileStorageService());
+
+		// MinIO varsa MinIO kullan, yoksa filesystem fallback
+		var minioEndpoint = configuration["MinIO:Endpoint"];
+		if (!string.IsNullOrWhiteSpace(minioEndpoint))
+		{
+			var minioAccessKey = configuration["MinIO:AccessKey"] ?? "minioadmin";
+			var minioSecretKey = configuration["MinIO:SecretKey"] ?? "minioadmin";
+			var minioUseSSL = bool.TryParse(configuration["MinIO:UseSSL"], out var ssl) && ssl;
+			var minioBucket = configuration["MinIO:BucketName"] ?? "livestocktrading";
+			base.Add<IFileStorageService>(new MinIOFileStorageService(minioEndpoint, minioAccessKey, minioSecretKey, minioUseSSL, minioBucket));
+			Console.WriteLine($"[FileProvider] Using MinIO storage: {minioEndpoint}/{minioBucket}");
+		}
+		else
+		{
+			base.Add<IFileStorageService>(new FileStorageService());
+			Console.WriteLine("[FileProvider] Using filesystem storage (MinIO not configured)");
+		}
 		base.Add<IJwtService, JwtService>();
 		base.Add<FileChangeTrackingService, FileChangeTrackingService>();
 		base.Add<DefinitionsDocumentDbContext>();
