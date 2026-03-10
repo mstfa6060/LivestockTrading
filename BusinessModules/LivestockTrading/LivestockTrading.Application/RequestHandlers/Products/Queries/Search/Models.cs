@@ -77,5 +77,6 @@ public class ResponseModel : IResponseModel<Array>
 	public int ReviewCount { get; set; }
 	public string CoverImageFileId { get; set; }
 	public string MediaBucketId { get; set; }
+	public string CoverImageUrl { get; set; }
 	public DateTime CreatedAt { get; set; }
 }

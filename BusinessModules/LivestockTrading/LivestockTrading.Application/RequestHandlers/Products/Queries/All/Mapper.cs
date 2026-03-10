@@ -4,7 +4,7 @@ namespace LivestockTrading.Application.RequestHandlers.Products.Queries.All;
 
 public class Mapper
 {
-	public List<ResponseModel> MapToResponse(List<Product> products)
+	public List<ResponseModel> MapToResponse(List<Product> products, Dictionary<string, string> imagePaths)
 	{
 		return products.Select(p => new ResponseModel
 		{
@@ -29,7 +29,8 @@ public class Mapper
 			AverageRating = p.AverageRating,
 			ReviewCount = p.ReviewCount,
 			CreatedAt = p.CreatedAt,
-			MediaBucketId = p.MediaBucketId
+			MediaBucketId = p.MediaBucketId,
+			CoverImageUrl = !string.IsNullOrWhiteSpace(p.CoverImageFileId) && imagePaths.TryGetValue(p.CoverImageFileId, out var path) ? path : null
 		}).ToList();
 	}
 }

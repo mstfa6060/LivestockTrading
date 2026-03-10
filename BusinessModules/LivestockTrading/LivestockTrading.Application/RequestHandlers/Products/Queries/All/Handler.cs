@@ -21,7 +21,17 @@ public class Handler : IRequestHandler
 			req.PageRequest,
 			cancellationToken);
 
-		var response = mapper.MapToResponse(products);
+		// Batch resolve cover image paths
+		var coverImageFileIds = products
+			.Where(p => !string.IsNullOrWhiteSpace(p.CoverImageFileId))
+			.Select(p => p.CoverImageFileId)
+			.ToList();
+
+		var imagePaths = coverImageFileIds.Count > 0
+			? await _dataAccessLayer.GetCoverImagePaths(coverImageFileIds, cancellationToken)
+			: new Dictionary<string, string>();
+
+		var response = mapper.MapToResponse(products, imagePaths);
 
 		return ArfBlocksResults.Success(response, page);
 	}
