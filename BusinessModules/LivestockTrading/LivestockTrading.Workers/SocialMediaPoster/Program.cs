@@ -31,6 +31,14 @@ try
                 client.Timeout = TimeSpan.FromSeconds(30);
             });
 
+            // Configure HTTP client for FileProvider API (cover image resolution)
+            services.AddHttpClient("FileProvider", client =>
+            {
+                client.BaseAddress = new Uri(
+                    hostContext.Configuration["FileProvider:BaseUrl"] ?? "http://fileprovider-api-container:8080");
+                client.Timeout = TimeSpan.FromSeconds(10);
+            });
+
             // Instagram service as singleton
             services.AddSingleton<IInstagramService, InstagramService>();
 

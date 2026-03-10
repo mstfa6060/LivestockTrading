@@ -1,3 +1,5 @@
+using System.Text;
+using System.Text.Json;
 using LivestockTrading.Domain.Events;
 using LivestockTrading.Workers.SocialMediaPoster.Services;
 
@@ -6,15 +8,23 @@ namespace LivestockTrading.Workers.SocialMediaPoster.EventHandlers;
 public class ProductApprovedSocialMediaHandler
 {
     private readonly IInstagramService _instagramService;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _configuration;
     private readonly ILogger<ProductApprovedSocialMediaHandler> _logger;
 
+    private static readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     public ProductApprovedSocialMediaHandler(
         IInstagramService instagramService,
+        IHttpClientFactory httpClientFactory,
         IConfiguration configuration,
         ILogger<ProductApprovedSocialMediaHandler> logger)
     {
         _instagramService = instagramService;
+        _httpClientFactory = httpClientFactory;
         _configuration = configuration;
         _logger = logger;
     }
@@ -35,8 +45,14 @@ public class ProductApprovedSocialMediaHandler
         // Build caption
         var caption = BuildCaption(evt);
 
-        // Build image URL
+        // Build image URL - try event's CoverImageUrl first, fallback to FileProvider API
         var imageUrl = BuildImageUrl(evt);
+
+        if (string.IsNullOrWhiteSpace(imageUrl) && !string.IsNullOrWhiteSpace(evt.MediaBucketId))
+        {
+            _logger.LogInformation("CoverImageUrl is empty, resolving from FileProvider bucket: {BucketId}", evt.MediaBucketId);
+            imageUrl = await ResolveCoverImageFromBucket(evt.MediaBucketId);
+        }
 
         if (string.IsNullOrWhiteSpace(imageUrl))
         {
@@ -56,6 +72,57 @@ public class ProductApprovedSocialMediaHandler
         else
         {
             _logger.LogWarning("Failed to post product {ProductId} to Instagram", evt.ProductId);
+        }
+    }
+
+    private async Task<string> ResolveCoverImageFromBucket(string mediaBucketId)
+    {
+        try
+        {
+            var client = _httpClientFactory.CreateClient("FileProvider");
+            var requestBody = JsonSerializer.Serialize(new
+            {
+                bucketId = mediaBucketId,
+                changeId = "00000000-0000-0000-0000-000000000000"
+            });
+
+            var response = await client.PostAsync("/Buckets/Detail",
+                new StringContent(requestBody, Encoding.UTF8, "application/json"));
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogWarning("FileProvider Buckets/Detail returned {StatusCode} for bucket: {BucketId}",
+                    response.StatusCode, mediaBucketId);
+                return null;
+            }
+
+            var json = await response.Content.ReadAsStringAsync();
+            var bucketResponse = JsonSerializer.Deserialize<BucketDetailResponse>(json, _jsonOptions);
+
+            var imageExtensions = new[] { ".webp", ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
+            var firstImage = bucketResponse?.Payload?.Files?
+                .Where(f => !string.IsNullOrWhiteSpace(f.Path) &&
+                    ((f.ContentType != null && f.ContentType.StartsWith("image/")) ||
+                     imageExtensions.Any(ext => f.Path.EndsWith(ext, StringComparison.OrdinalIgnoreCase))))
+                .OrderBy(f => f.Index)
+                .FirstOrDefault();
+
+            if (firstImage == null || string.IsNullOrWhiteSpace(firstImage.Path))
+            {
+                _logger.LogWarning("No image files found in bucket: {BucketId}", mediaBucketId);
+                return null;
+            }
+
+            var siteUrl = _configuration["Instagram:SiteBaseUrl"] ?? "https://livestock-trading.com";
+            var imageUrl = $"{siteUrl}/file-storage/{firstImage.Path}";
+
+            _logger.LogInformation("Resolved cover image from bucket: {ImageUrl}", imageUrl);
+            return imageUrl;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to resolve cover image from FileProvider for bucket: {BucketId}", mediaBucketId);
+            return null;
         }
     }
 
@@ -120,5 +187,27 @@ public class ProductApprovedSocialMediaHandler
         // Build URL from FileProvider/MinIO path
         var siteUrl = _configuration["Instagram:SiteBaseUrl"] ?? "https://livestock-trading.com";
         return $"{siteUrl}/file-storage/{evt.CoverImageUrl}";
+    }
+
+    // Response models for FileProvider Buckets/Detail API (ArfBlocks uses "payload")
+    private class BucketDetailResponse
+    {
+        public BucketDetailData Payload { get; set; }
+    }
+
+    private class BucketDetailData
+    {
+        public string BucketId { get; set; }
+        public List<BucketFileResponse> Files { get; set; }
+    }
+
+    private class BucketFileResponse
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public string Path { get; set; }
+        public string ContentType { get; set; }
+        public bool IsDefault { get; set; }
+        public int Index { get; set; }
     }
 }

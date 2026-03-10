@@ -270,9 +270,12 @@ services:
       Instagram__AppSecret: ${INSTAGRAM_APP_SECRET:-}
       Instagram__SiteBaseUrl: ${SITE_BASE_URL:-https://livestock-trading.com}
       Instagram__WebBaseUrl: ${WEB_BASE_URL:-https://livestock-trading.com}
+      FileProvider__BaseUrl: http://fileprovider-api-container:8080
     depends_on:
       rabbitmq:
         condition: service_healthy
+      fileprovider-api:
+        condition: service_started
     networks:
       - livestocktrading-network
     restart: unless-stopped
