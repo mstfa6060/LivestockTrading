@@ -14,6 +14,8 @@ public class ResponseModel : IResponseModel<Array>
 	public string Title { get; set; }
 	public string Message { get; set; }
 	public int Type { get; set; }
+	public string ActionUrl { get; set; }
+	public string ActionData { get; set; }
 	public bool IsRead { get; set; }
 	public DateTime SentAt { get; set; }
 	public DateTime CreatedAt { get; set; }

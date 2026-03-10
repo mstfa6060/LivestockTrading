@@ -13,6 +13,8 @@ public class Mapper
 			Title = entity.Title,
 			Message = entity.Message,
 			Type = (int)entity.Type,
+			ActionUrl = entity.ActionUrl,
+			ActionData = entity.ActionData,
 			IsRead = entity.IsRead,
 			SentAt = entity.SentAt,
 			CreatedAt = entity.CreatedAt
