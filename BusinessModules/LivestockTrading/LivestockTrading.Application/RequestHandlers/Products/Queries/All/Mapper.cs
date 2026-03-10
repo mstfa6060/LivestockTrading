@@ -28,7 +28,8 @@ public class Mapper
 			ViewCount = p.ViewCount,
 			AverageRating = p.AverageRating,
 			ReviewCount = p.ReviewCount,
-			CreatedAt = p.CreatedAt
+			CreatedAt = p.CreatedAt,
+			MediaBucketId = p.MediaBucketId
 		}).ToList();
 	}
 }

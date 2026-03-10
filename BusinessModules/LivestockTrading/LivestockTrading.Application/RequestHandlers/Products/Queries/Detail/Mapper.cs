@@ -47,7 +47,9 @@ public class Mapper
 			PublishedAt = entity.PublishedAt,
 			ExpiresAt = entity.ExpiresAt,
 			CreatedAt = entity.CreatedAt,
-			UpdatedAt = entity.UpdatedAt
+			UpdatedAt = entity.UpdatedAt,
+			MediaBucketId = entity.MediaBucketId,
+			CoverImageFileId = entity.CoverImageFileId
 		};
 	}
 }

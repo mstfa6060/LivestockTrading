@@ -37,4 +37,6 @@ public class ResponseModel : IResponseModel<Array>
 	public decimal? AverageRating { get; set; }
 	public int ReviewCount { get; set; }
 	public DateTime CreatedAt { get; set; }
+	public string MediaBucketId { get; set; }
+	public string ImageUrl { get; set; }
 }
