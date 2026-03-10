@@ -48,10 +48,10 @@ public class SocialMediaWorker : BackgroundService
 
     private void InitializeRabbitMQ()
     {
-        var host = _configuration["RabbitMq:Host"] ?? Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "rabbitmq";
-        var port = int.Parse(_configuration["RabbitMq:Port"] ?? Environment.GetEnvironmentVariable("RABBITMQ_PORT") ?? "5672");
-        var user = _configuration["RabbitMq:User"] ?? Environment.GetEnvironmentVariable("RABBITMQ_USER") ?? "guest";
-        var pass = _configuration["RabbitMq:Password"] ?? Environment.GetEnvironmentVariable("RABBITMQ_PASS") ?? "guest";
+        var host = _configuration["RabbitMq:Host"] ?? "rabbitmq";
+        var port = int.Parse(_configuration["RabbitMq:Port"] ?? "5672");
+        var user = _configuration["RabbitMq:User"] ?? "guest";
+        var pass = _configuration["RabbitMq:Pass"] ?? _configuration["RabbitMq:Password"] ?? "guest";
 
         _logger.LogInformation("Connecting to RabbitMQ at {Host}:{Port}", host, port);
 
