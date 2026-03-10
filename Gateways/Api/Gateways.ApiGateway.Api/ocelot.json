@@ -135,6 +135,146 @@
 			}
 		},
 		{
+			"DownstreamPathTemplate": "/Products/Detail",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "livestocktrading-api-container",
+					"Port": 8080
+				}
+			],
+			"UpstreamPathTemplate": "/livestocktrading/Products/Detail",
+			"UpstreamHttpMethod": [
+				"POST"
+			]
+		},
+		{
+			"DownstreamPathTemplate": "/Products/All",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "livestocktrading-api-container",
+					"Port": 8080
+				}
+			],
+			"UpstreamPathTemplate": "/livestocktrading/Products/All",
+			"UpstreamHttpMethod": [
+				"POST"
+			]
+		},
+		{
+			"DownstreamPathTemplate": "/Products/Pick",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "livestocktrading-api-container",
+					"Port": 8080
+				}
+			],
+			"UpstreamPathTemplate": "/livestocktrading/Products/Pick",
+			"UpstreamHttpMethod": [
+				"POST"
+			]
+		},
+		{
+			"DownstreamPathTemplate": "/Products/Search",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "livestocktrading-api-container",
+					"Port": 8080
+				}
+			],
+			"UpstreamPathTemplate": "/livestocktrading/Products/Search",
+			"UpstreamHttpMethod": [
+				"POST"
+			]
+		},
+		{
+			"DownstreamPathTemplate": "/Categories/All",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "livestocktrading-api-container",
+					"Port": 8080
+				}
+			],
+			"UpstreamPathTemplate": "/livestocktrading/Categories/All",
+			"UpstreamHttpMethod": [
+				"POST"
+			]
+		},
+		{
+			"DownstreamPathTemplate": "/Categories/Pick",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "livestocktrading-api-container",
+					"Port": 8080
+				}
+			],
+			"UpstreamPathTemplate": "/livestocktrading/Categories/Pick",
+			"UpstreamHttpMethod": [
+				"POST"
+			]
+		},
+		{
+			"DownstreamPathTemplate": "/Categories/Detail",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "livestocktrading-api-container",
+					"Port": 8080
+				}
+			],
+			"UpstreamPathTemplate": "/livestocktrading/Categories/Detail",
+			"UpstreamHttpMethod": [
+				"POST"
+			]
+		},
+		{
+			"DownstreamPathTemplate": "/Brands/All",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "livestocktrading-api-container",
+					"Port": 8080
+				}
+			],
+			"UpstreamPathTemplate": "/livestocktrading/Brands/All",
+			"UpstreamHttpMethod": [
+				"POST"
+			]
+		},
+		{
+			"DownstreamPathTemplate": "/Brands/Pick",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "livestocktrading-api-container",
+					"Port": 8080
+				}
+			],
+			"UpstreamPathTemplate": "/livestocktrading/Brands/Pick",
+			"UpstreamHttpMethod": [
+				"POST"
+			]
+		},
+		{
+			"DownstreamPathTemplate": "/Sellers/Detail",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "livestocktrading-api-container",
+					"Port": 8080
+				}
+			],
+			"UpstreamPathTemplate": "/livestocktrading/Sellers/Detail",
+			"UpstreamHttpMethod": [
+				"POST"
+			]
+		},
+		{
 			"DownstreamPathTemplate": "/{everything}",
 			"DownstreamScheme": "http",
 			"DownstreamHostAndPorts": [
