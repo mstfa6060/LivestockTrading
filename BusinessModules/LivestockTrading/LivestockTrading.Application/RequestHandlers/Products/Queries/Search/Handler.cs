@@ -33,17 +33,7 @@ public class Handler : IRequestHandler
 			req.PageRequest,
 			cancellationToken);
 
-		// Batch resolve cover image paths
-		var coverImageFileIds = products
-			.Where(p => !string.IsNullOrWhiteSpace(p.CoverImageFileId))
-			.Select(p => p.CoverImageFileId)
-			.ToList();
-
-		var imagePaths = coverImageFileIds.Count > 0
-			? await _dataAccessLayer.GetCoverImagePaths(coverImageFileIds, cancellationToken)
-			: new Dictionary<string, string>();
-
-		var response = mapper.MapToResponse(products, imagePaths);
+		var response = mapper.MapToResponse(products);
 		return ArfBlocksResults.Success(response, page);
 	}
 }

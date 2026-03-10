@@ -87,39 +87,4 @@ public class DataAccess : IDataAccess
 
 		return (products, page);
 	}
-
-	public async Task<Dictionary<string, string>> GetCoverImagePaths(List<string> fileIds, CancellationToken ct)
-	{
-		var result = new Dictionary<string, string>();
-		var validIds = fileIds.Where(id => !string.IsNullOrWhiteSpace(id) && Guid.TryParse(id, out _)).Distinct().ToList();
-		if (validIds.Count == 0)
-			return result;
-
-		var connection = _dbContext.Database.GetDbConnection();
-		if (connection.State != System.Data.ConnectionState.Open)
-			await connection.OpenAsync(ct);
-
-		var paramNames = validIds.Select((_, i) => $"@p{i}").ToList();
-		using var cmd = connection.CreateCommand();
-		cmd.CommandText = $"SELECT Id, [Path] FROM FileEntries WHERE Id IN ({string.Join(",", paramNames)})";
-
-		for (int i = 0; i < validIds.Count; i++)
-		{
-			var param = cmd.CreateParameter();
-			param.ParameterName = $"@p{i}";
-			param.Value = validIds[i];
-			cmd.Parameters.Add(param);
-		}
-
-		using var reader = await cmd.ExecuteReaderAsync(ct);
-		while (await reader.ReadAsync(ct))
-		{
-			var id = reader.GetString(0);
-			var path = reader.IsDBNull(1) ? null : reader.GetString(1);
-			if (!string.IsNullOrEmpty(path))
-				result[id] = path;
-		}
-
-		return result;
-	}
 }
