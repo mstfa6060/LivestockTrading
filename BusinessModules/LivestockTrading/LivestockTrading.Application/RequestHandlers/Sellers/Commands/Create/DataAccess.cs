@@ -14,6 +14,12 @@ public class DataAccess : IDataAccess
 		_dbContext = dependencyProvider.GetInstance<LivestockTradingModuleDbContext>();
 	}
 
+	public async Task<Seller> GetExistingSellerByUserId(Guid userId, CancellationToken ct)
+	{
+		return await _dbContext.Sellers
+			.FirstOrDefaultAsync(s => s.UserId == userId && !s.IsDeleted, ct);
+	}
+
 	public async Task AddSeller(Seller seller)
 	{
 		_dbContext.Sellers.Add(seller);

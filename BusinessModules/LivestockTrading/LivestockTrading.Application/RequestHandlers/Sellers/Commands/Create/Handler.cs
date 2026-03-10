@@ -21,6 +21,14 @@ public class Handler : IRequestHandler
 		var request = (RequestModel)payload;
 		var mapper = new Mapper();
 
+		// Kullanıcının zaten seller profili varsa onu döndür (duplicate engelle)
+		var existingSeller = await _dataAccessLayer.GetExistingSellerByUserId(request.UserId, cancellationToken);
+		if (existingSeller != null)
+		{
+			var existingResponse = mapper.MapToResponse(existingSeller);
+			return ArfBlocksResults.Success(existingResponse);
+		}
+
 		var entity = mapper.MapToEntity(request);
 
 		// Satıcı profilini oluştur
