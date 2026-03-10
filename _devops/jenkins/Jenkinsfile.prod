@@ -185,16 +185,6 @@ echo "\$DOCKER_PASSWORD" | docker login -u "\$DOCKER_USERNAME" --password-stdin 
 echo "Docker compose dizinine geciliyor..."
 cd "\$REPO_DIR/_devops/docker/compose"
 
-echo "Mevcut servisleri durduruluyor..."
-docker compose -p livestock_prod \\
-    -f docker-compose.yml \\
-    -f docker-compose.prod.yml \\
-    --env-file \$BASE_DIR/.env.prod \\
-    down --remove-orphans || true
-
-echo "Orphan container'lar temizleniyor..."
-docker ps -a --filter "name=livestock_prod" -q | xargs -r docker rm -f || true
-
 echo "Docker imajlari cekiliyor..."
 docker compose -p livestock_prod \\
     -f docker-compose.yml \\
@@ -202,15 +192,15 @@ docker compose -p livestock_prod \\
     --env-file \$BASE_DIR/.env.prod \\
     pull
 
-echo "Servisler yeniden baslatiliyor..."
+echo "Servisler guncelleniyor (zero-downtime)..."
 docker compose -p livestock_prod \\
     -f docker-compose.yml \\
     -f docker-compose.prod.yml \\
     --env-file \$BASE_DIR/.env.prod \\
     up -d --remove-orphans
 
-echo "Servislerin hazir olmasi bekleniyor (30 saniye)..."
-sleep 30
+echo "Servislerin hazir olmasi bekleniyor (15 saniye)..."
+sleep 15
 
 echo "Eski Docker imajlari temizleniyor..."
 docker image prune -f
