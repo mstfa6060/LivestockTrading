@@ -34,19 +34,27 @@ public class DataAccess : IDataAccess
 		if (string.IsNullOrWhiteSpace(coverImageFileId) || !Guid.TryParse(coverImageFileId, out _))
 			return null;
 
-		var connection = _dbContext.Database.GetDbConnection();
-		if (connection.State != System.Data.ConnectionState.Open)
-			await connection.OpenAsync();
+		try
+		{
+			var connection = _dbContext.Database.GetDbConnection();
+			if (connection.State != System.Data.ConnectionState.Open)
+				await connection.OpenAsync();
 
-		using var cmd = connection.CreateCommand();
-		cmd.CommandText = "SELECT [Path] FROM FileEntries WHERE Id = @Id";
-		var param = cmd.CreateParameter();
-		param.ParameterName = "@Id";
-		param.Value = coverImageFileId;
-		cmd.Parameters.Add(param);
+			using var cmd = connection.CreateCommand();
+			cmd.CommandText = "SELECT [Path] FROM FileEntries WHERE Id = @Id";
+			var param = cmd.CreateParameter();
+			param.ParameterName = "@Id";
+			param.Value = coverImageFileId;
+			cmd.Parameters.Add(param);
 
-		var result = await cmd.ExecuteScalarAsync();
-		return result as string;
+			var result = await cmd.ExecuteScalarAsync();
+			return result as string;
+		}
+		catch
+		{
+			// FileEntries table may not exist - worker will fallback to FileProvider API
+			return null;
+		}
 	}
 
 	public async Task SaveChanges()
