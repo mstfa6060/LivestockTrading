@@ -2,7 +2,6 @@ using System.Text.Json;
 using Common.Services.Messaging;
 using LivestockTrading.Domain.Entities;
 using LivestockTrading.Domain.Events;
-using Microsoft.Extensions.Logging;
 
 namespace LivestockTrading.Application.RequestHandlers.Products.Commands.Create;
 
@@ -11,14 +10,12 @@ public class Handler : IRequestHandler
 	private readonly DataAccess _dataAccessLayer;
 	private readonly CurrentUserService _currentUserService;
 	private readonly IRabbitMqPublisher _publisher;
-	private readonly ILogger<Handler> _logger;
 
 	public Handler(ArfBlocksDependencyProvider dependencyProvider, object dataAccess)
 	{
 		_dataAccessLayer = (DataAccess)dataAccess;
 		_currentUserService = dependencyProvider.GetInstance<CurrentUserService>();
 		_publisher = dependencyProvider.GetInstance<IRabbitMqPublisher>();
-		_logger = dependencyProvider.GetInstance<ILogger<Handler>>();
 	}
 
 	public async Task<ArfBlocksRequestResult> Handle(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
@@ -106,9 +103,9 @@ public class Handler : IRequestHandler
 				TargetAdminUserIds = adminUserIds
 			});
 		}
-		catch (Exception ex)
+		catch
 		{
-			_logger.LogWarning(ex, "Failed to send admin notifications for product {ProductId}", product.Id);
+			// Notification failure should not block product creation
 		}
 	}
 }
