@@ -26,26 +26,32 @@ public class Handler : IRequestHandler
 		// Satıcı profilini oluştur
 		await _dataAccessLayer.AddSeller(entity);
 
-		// Kullanıcının Seller rolü var mı kontrol et
-		var hasSellerRole = await _dataAccessLayer.UserHasSellerRole(
-			request.UserId,
-			LivestockTradingModuleId,
-			SellerRoleId);
-
-		// Yoksa Seller rolünü ata
-		if (!hasSellerRole)
+		// Kullanıcıya Seller rolünü ata (best-effort, satıcı oluşturmayı engellemez)
+		try
 		{
-			var userRole = new UserRole
+			var hasSellerRole = await _dataAccessLayer.UserHasSellerRole(
+				request.UserId,
+				LivestockTradingModuleId,
+				SellerRoleId);
+
+			if (!hasSellerRole)
 			{
-				Id = Guid.NewGuid(),
-				UserId = request.UserId,
-				RoleId = SellerRoleId,
-				ModuleId = LivestockTradingModuleId,
-				CreatedAt = DateTime.UtcNow,
-				UpdatedAt = DateTime.UtcNow,
-				IsDeleted = false
-			};
-			await _dataAccessLayer.AddUserRole(userRole);
+				var userRole = new UserRole
+				{
+					Id = Guid.NewGuid(),
+					UserId = request.UserId,
+					RoleId = SellerRoleId,
+					ModuleId = LivestockTradingModuleId,
+					CreatedAt = DateTime.UtcNow,
+					UpdatedAt = DateTime.UtcNow,
+					IsDeleted = false
+				};
+				await _dataAccessLayer.AddUserRole(userRole);
+			}
+		}
+		catch (Exception)
+		{
+			// Rol ataması başarısız olsa da satıcı profili oluşturulmuş durumda
 		}
 
 		var response = mapper.MapToResponse(entity);
