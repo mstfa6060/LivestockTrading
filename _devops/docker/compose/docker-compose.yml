@@ -246,6 +246,7 @@ services:
       Instagram__UserId: ${INSTAGRAM_USER_ID:-}
       Instagram__AppSecret: ${INSTAGRAM_APP_SECRET:-}
       Instagram__SiteBaseUrl: ${SITE_BASE_URL:-https://livestock-trading.com}
+      Instagram__WebBaseUrl: ${WEB_BASE_URL:-https://livestock-trading.com}
     depends_on:
       rabbitmq:
         condition: service_healthy

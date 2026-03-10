@@ -61,7 +61,7 @@ public class ProductApprovedSocialMediaHandler
 
     private string BuildCaption(ProductApprovedEvent evt)
     {
-        var siteUrl = _configuration["Instagram:SiteBaseUrl"] ?? "https://livestock-trading.com";
+        var webUrl = _configuration["Instagram:WebBaseUrl"] ?? _configuration["Instagram:SiteBaseUrl"] ?? "https://livestock-trading.com";
         var parts = new List<string>();
 
         // Title
@@ -89,7 +89,7 @@ public class ProductApprovedSocialMediaHandler
 
         // Link
         if (!string.IsNullOrWhiteSpace(evt.Slug))
-            parts.Add($"View: {siteUrl}/products/{evt.Slug}");
+            parts.Add($"View: {webUrl}/products/{evt.Slug}");
 
         // Hashtags
         var hashtags = new List<string> { "#livestocktrading", "#agriculture", "#farming" };
