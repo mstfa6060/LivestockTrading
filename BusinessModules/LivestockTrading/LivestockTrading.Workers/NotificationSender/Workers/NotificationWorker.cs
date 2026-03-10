@@ -154,6 +154,20 @@ public class NotificationWorker : BackgroundService
         }
         catch { }
 
+        // Try ProductCreatedEvent (admin notification for new products)
+        try
+        {
+            var productCreatedEvent = JsonSerializer.Deserialize<ProductCreatedEvent>(message);
+            if (productCreatedEvent != null && productCreatedEvent.ProductId != Guid.Empty)
+            {
+                _logger.LogInformation("Handling ProductCreatedEvent notification for product: {ProductId}", productCreatedEvent.ProductId);
+                var handler = scope.ServiceProvider.GetRequiredService<ProductCreatedNotificationHandler>();
+                await handler.HandleAsync(productCreatedEvent);
+                return true;
+            }
+        }
+        catch { }
+
         // Try StudentCreatedEvent
         try
         {

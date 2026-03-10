@@ -40,6 +40,9 @@ try
             services.AddScoped<MessageReadNotificationHandler>();
             services.AddScoped<ConversationCreatedNotificationHandler>();
 
+            // Product event handlers
+            services.AddScoped<ProductCreatedNotificationHandler>();
+
             // Student event handlers (legacy)
             services.AddScoped<StudentCreatedNotificationHandler>();
             services.AddScoped<StudentUpdatedNotificationHandler>();

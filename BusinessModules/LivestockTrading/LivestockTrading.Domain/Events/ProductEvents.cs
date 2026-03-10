@@ -33,3 +33,25 @@ public class ProductApprovedEvent : IDomainEvent
     public DateTime ApprovedAt { get; set; } = DateTime.UtcNow;
     public DateTime OccurredAt => ApprovedAt;
 }
+
+/// <summary>
+/// Event fired when a new product is created and sent to moderation (PendingApproval).
+/// Used to notify admin/moderator users about new products awaiting approval.
+/// </summary>
+public class ProductCreatedEvent : IDomainEvent
+{
+    public Guid ProductId { get; set; }
+    public string Title { get; set; }
+    public string ShortDescription { get; set; }
+    public decimal BasePrice { get; set; }
+    public string Currency { get; set; }
+    public string SellerBusinessName { get; set; }
+    public Guid SellerId { get; set; }
+    public string Slug { get; set; }
+
+    /// <summary>Admin/Moderator user IDs to notify (resolved at publish time)</summary>
+    public List<Guid> TargetAdminUserIds { get; set; } = new();
+
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime OccurredAt => CreatedAt;
+}
