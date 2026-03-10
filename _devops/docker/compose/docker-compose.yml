@@ -25,6 +25,7 @@ volumes:
   sqlserver-data:
   redis-data:
   minio-data:
+  mongodb-data:
   file-storage:
 
 services:
@@ -104,6 +105,24 @@ services:
       retries: 3
     restart: unless-stopped
 
+  mongodb:
+    image: mongo:7-jammy
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER:-mongouser}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASS:-mongopass}
+    ports:
+      - "${MONGODB_PORT:-27017}:27017"
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - livestocktrading-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
   # Web (Next.js Frontend)
   web:
     image: ${DOCKER_REGISTRY:-docker.io}/${DOCKER_USERNAME}/livestocktrading-web:${TAG:-latest}
@@ -176,6 +195,8 @@ services:
     image: ${DOCKER_REGISTRY:-docker.io}/${DOCKER_USERNAME}/livestocktrading-fileprovider-api:${TAG:-latest}
     environment:
       <<: *common-env
+      ProjectConfigurations__DocumentDbOptions__ConnectionString: "mongodb://${MONGODB_USER:-mongouser}:${MONGODB_PASS:-mongopass}@mongodb:27017"
+      ProjectConfigurations__DocumentDbOptions__DatabaseName: ${MONGODB_DATABASE:-globallivestock_fileprovider}
     ports:
       - "${FILEPROVIDER_API_PORT:-5003}:8080"
     volumes:
@@ -184,6 +205,8 @@ services:
       sqlserver:
         condition: service_healthy
       minio:
+        condition: service_healthy
+      mongodb:
         condition: service_healthy
     networks:
       livestocktrading-network:
