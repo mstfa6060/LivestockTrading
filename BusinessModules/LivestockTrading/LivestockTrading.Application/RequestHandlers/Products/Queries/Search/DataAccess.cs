@@ -42,9 +42,16 @@ public class DataAccess : IDataAccess
 				p.MetaKeywords.ToLower().Contains(lowerQuery));
 		}
 
-		// Kategori filtresi
+		// Kategori filtresi - üst kategori seçilmişse alt kategorilerin ürünleri de dahil edilir
 		if (categoryId.HasValue)
-			dbQuery = dbQuery.Where(p => p.CategoryId == categoryId.Value);
+		{
+			dbQuery = dbQuery.Where(p =>
+				p.CategoryId == categoryId.Value ||
+				_dbContext.Categories
+					.Where(c => c.ParentCategoryId == categoryId.Value && !c.IsDeleted)
+					.Select(c => c.Id)
+					.Contains(p.CategoryId));
+		}
 
 		// Marka filtresi
 		if (brandId.HasValue)
