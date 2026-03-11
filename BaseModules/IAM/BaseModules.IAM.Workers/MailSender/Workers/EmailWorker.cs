@@ -1,4 +1,6 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
@@ -14,38 +16,44 @@ public class EmailWorker : BackgroundService
     private IConnection _connection;
     private IModel _channel;
     private readonly ForgotPasswordEmailHandler _handler;
+    private readonly IConfiguration _configuration;
+    private readonly ILogger<EmailWorker> _logger;
 
-    public EmailWorker(ForgotPasswordEmailHandler handler)
+    public EmailWorker(ForgotPasswordEmailHandler handler, IConfiguration configuration, ILogger<EmailWorker> logger)
     {
         _handler = handler;
+        _configuration = configuration;
+        _logger = logger;
     }
 
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
+        var host = _configuration["RabbitMq:Host"] ?? Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "rabbitmq";
+        var port = int.Parse(_configuration["RabbitMq:Port"] ?? Environment.GetEnvironmentVariable("RABBITMQ_PORT") ?? "5672");
+        var user = _configuration["RabbitMq:User"] ?? Environment.GetEnvironmentVariable("RABBITMQ_USER") ?? "guest";
+        var pass = _configuration["RabbitMq:Password"] ?? _configuration["RabbitMq:Pass"] ?? Environment.GetEnvironmentVariable("RABBITMQ_PASS") ?? "guest";
+
+        _logger.LogInformation("[EmailWorker] Connecting to RabbitMQ at {Host}:{Port} with user {User}", host, port, user);
+
         var factory = new ConnectionFactory
         {
-            HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "rabbitmq",
-            Port = int.Parse(Environment.GetEnvironmentVariable("RABBITMQ_PORT") ?? "5672"),
-            UserName = Environment.GetEnvironmentVariable("RABBITMQ_USER") ?? "guest",
-            Password = Environment.GetEnvironmentVariable("RABBITMQ_PASS") ?? "guest",
+            HostName = host,
+            Port = port,
+            UserName = user,
+            Password = pass,
             AutomaticRecoveryEnabled = true,
             NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
         };
 
-
         _connection = factory.CreateConnection();
         _channel = _connection.CreateModel();
-
 
         _channel.ExchangeDeclare("iam.notification.email", ExchangeType.Fanout, durable: true);
         _channel.QueueDeclare("iam.notification.email.queue", durable: true, exclusive: false, autoDelete: false);
         _channel.QueueBind("iam.notification.email.queue", "iam.notification.email", "");
 
+        _logger.LogInformation("[EmailWorker] Started and connected to RabbitMQ.");
 
-
-        Console.WriteLine("[IAM EmailWorker] 🔄 Başlatıldı ve RabbitMQ'ya bağlandı.");
-
-        // Bu satır kritik!
         await base.StartAsync(cancellationToken);
     }
 

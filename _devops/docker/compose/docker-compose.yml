@@ -9,6 +9,10 @@ x-common-env: &common-env
   RabbitMq__Port: "5672"
   RabbitMq__User: ${RABBITMQ_USER:-guest}
   RabbitMq__Pass: ${RABBITMQ_PASS:-guest}
+  RABBITMQ_HOST: rabbitmq
+  RABBITMQ_PORT: "5672"
+  RABBITMQ_USER: ${RABBITMQ_USER:-guest}
+  RABBITMQ_PASS: ${RABBITMQ_PASS:-guest}
   Caching__Redis__ConnectionString: "redis:6379"
   Caching__Redis__InstanceName: "livestocktrading:"
   MinIO__Endpoint: "minio:9000"
