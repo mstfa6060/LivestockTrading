@@ -72,6 +72,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
     volumes:
+      - /opt/livestocktrading/appsettings.json:/app/appsettings.json:ro
       - /opt/livestocktrading/appsettings.Production.json:/app/appsettings.Production.json:ro
     deploy:
       resources:
@@ -83,6 +84,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
     volumes:
+      - /opt/livestocktrading/appsettings.json:/app/appsettings.json:ro
       - /opt/livestocktrading/appsettings.Production.json:/app/appsettings.Production.json:ro
     deploy:
       resources:

@@ -26,23 +26,32 @@ Host.CreateDefaultBuilder(args)
             {
                 var config = sp.GetRequiredService<IConfiguration>();
 
-                // Gmail kullan (Brevo yerine)
                 var gmailConfig = config.GetSection("Gmail");
 
-                var smtpHost = gmailConfig["SmtpHost"];
-                var smtpPort = int.Parse(gmailConfig["SmtpPort"]);
-                var smtpUser = gmailConfig["SmtpUser"];
-                var smtpPass = gmailConfig["SmtpPass"];
-                var fromEmail = gmailConfig["FromEmail"];
-                var fromName = gmailConfig["FromName"];
+                var smtpHost = gmailConfig["SmtpHost"]
+                    ?? Environment.GetEnvironmentVariable("BREVO_SMTP_HOST")
+                    ?? "smtp-relay.brevo.com";
+                var smtpPort = int.Parse(
+                    gmailConfig["SmtpPort"]
+                    ?? Environment.GetEnvironmentVariable("BREVO_SMTP_PORT")
+                    ?? "587");
+                var smtpUser = gmailConfig["SmtpUser"]
+                    ?? Environment.GetEnvironmentVariable("BREVO_SMTP_USER");
+                var smtpPass = gmailConfig["SmtpPass"]
+                    ?? Environment.GetEnvironmentVariable("BREVO_SMTP_PASS");
+                var fromEmail = gmailConfig["FromEmail"]
+                    ?? Environment.GetEnvironmentVariable("BREVO_FROM_EMAIL");
+                var fromName = gmailConfig["FromName"]
+                    ?? Environment.GetEnvironmentVariable("BREVO_FROM_NAME")
+                    ?? "Livestock Trading";
 
-                Console.WriteLine($"📧 [Init] Gmail SMTP Host: {smtpHost}, Port: {smtpPort}, From: {fromEmail}");
+                Console.WriteLine($"[Init] SMTP Host: {smtpHost}, Port: {smtpPort}, From: {fromEmail}");
 
                 return new BrevoSmtpEmailService(smtpHost, smtpPort, smtpUser, smtpPass, fromEmail, fromName);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ [Init] Email servisi oluşturulurken hata: {ex.Message}");
+                Console.WriteLine($"[Init] Email servisi oluşturulurken hata: {ex.Message}");
                 throw;
             }
         });
