@@ -14,13 +14,13 @@ public class Handler : IRequestHandler
 		var mapper = new Mapper();
 		var req = (RequestModel)payload;
 
-		var (categories, page) = await _dataAccessLayer.All(
+		var (categories, productCounts, page) = await _dataAccessLayer.All(
 			req.Sorting,
 			req.Filters,
 			req.PageRequest,
 			cancellationToken);
 
-		var response = mapper.MapToResponse(categories, req.LanguageCode);
+		var response = mapper.MapToResponse(categories, productCounts, req.LanguageCode);
 
 		return ArfBlocksResults.Success(response, page);
 	}

@@ -13,7 +13,7 @@ public class DataAccess : IDataAccess
 		_dbContext = dbContextProvider.GetInstance<LivestockTradingModuleDbContext>();
 	}
 
-	public async Task<(List<Category> Categories, XPageResponse Page)> All(
+	public async Task<(List<Category> Categories, Dictionary<Guid, int> ProductCounts, XPageResponse Page)> All(
 		XSorting sorting,
 		List<XFilterItem> filters,
 		XPageRequest pageRequest,
@@ -34,6 +34,14 @@ public class DataAccess : IDataAccess
 		var page = query.GetPage(pageRequest);
 		var categories = await query.Paginate(page).ToListAsync(ct);
 
-		return (categories, page);
+		// Product count per category (only Active products)
+		var productCounts = await _dbContext.Products
+			.AsNoTracking()
+			.Where(p => !p.IsDeleted && p.Status == ProductStatus.Active)
+			.GroupBy(p => p.CategoryId)
+			.Select(g => new { CategoryId = g.Key, Count = g.Count() })
+			.ToDictionaryAsync(x => x.CategoryId, x => x.Count, ct);
+
+		return (categories, productCounts, page);
 	}
 }

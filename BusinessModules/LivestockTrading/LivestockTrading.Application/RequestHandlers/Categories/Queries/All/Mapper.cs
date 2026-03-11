@@ -5,7 +5,7 @@ namespace LivestockTrading.Application.RequestHandlers.Categories.Queries.All;
 
 public class Mapper
 {
-	public List<ResponseModel> MapToResponse(List<Category> categories, string languageCode = null)
+	public List<ResponseModel> MapToResponse(List<Category> categories, Dictionary<Guid, int> productCounts, string languageCode = null)
 	{
 		return categories.Select(c => new ResponseModel
 		{
@@ -21,6 +21,7 @@ public class Mapper
 			DescriptionTranslations = c.DescriptionTranslations,
 			AttributesTemplate = c.AttributesTemplate,
 			SubCategoryCount = c.SubCategories?.Count(sc => !sc.IsDeleted) ?? 0,
+			ProductCount = productCounts.TryGetValue(c.Id, out var count) ? count : 0,
 			CreatedAt = c.CreatedAt
 		}).ToList();
 	}

@@ -26,5 +26,6 @@ public class ResponseModel : IResponseModel<Array>
 	public string DescriptionTranslations { get; set; }
 	public string AttributesTemplate { get; set; }
 	public int SubCategoryCount { get; set; }
+	public int ProductCount { get; set; }
 	public DateTime CreatedAt { get; set; }
 }
