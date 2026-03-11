@@ -4,6 +4,7 @@ using LivestockTrading.Workers.SocialMediaPoster.Services;
 using LivestockTrading.Workers.SocialMediaPoster.Workers;
 using Serilog;
 
+
 // Early Serilog initialization
 Log.Logger = SerilogConfiguration
     .CreateConfiguration("LivestockTrading.SocialMediaPoster", "Production")
@@ -45,8 +46,9 @@ try
             // Event handler as scoped (per message)
             services.AddScoped<ProductApprovedSocialMediaHandler>();
 
-            // Background worker
+            // Background workers
             services.AddHostedService<SocialMediaWorker>();
+            services.AddHostedService<TokenRefreshWorker>();
         })
         .Build();
 

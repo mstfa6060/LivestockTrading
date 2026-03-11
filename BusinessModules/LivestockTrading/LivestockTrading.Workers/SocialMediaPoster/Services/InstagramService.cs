@@ -8,8 +8,10 @@ public class InstagramService : IInstagramService
     private readonly IConfiguration _configuration;
     private readonly ILogger<InstagramService> _logger;
 
-    private string AccessToken => _configuration["Instagram:AccessToken"]
-        ?? Environment.GetEnvironmentVariable("INSTAGRAM_ACCESS_TOKEN") ?? "";
+    // Mutable token - updated on refresh
+    private string _currentAccessToken;
+
+    private string AccessToken => _currentAccessToken;
     private string UserId => _configuration["Instagram:UserId"]
         ?? Environment.GetEnvironmentVariable("INSTAGRAM_USER_ID") ?? "";
     private string BaseUrl => _configuration["Instagram:BaseUrl"]
@@ -23,6 +25,8 @@ public class InstagramService : IInstagramService
         _httpClientFactory = httpClientFactory;
         _configuration = configuration;
         _logger = logger;
+        _currentAccessToken = _configuration["Instagram:AccessToken"]
+            ?? Environment.GetEnvironmentVariable("INSTAGRAM_ACCESS_TOKEN") ?? "";
     }
 
     public async Task<string?> PostImageAsync(string imageUrl, string caption)
@@ -109,6 +113,87 @@ public class InstagramService : IInstagramService
         }
         catch
         {
+            return false;
+        }
+    }
+
+    public async Task<int> GetTokenExpiryDaysAsync()
+    {
+        try
+        {
+            var client = _httpClientFactory.CreateClient("Instagram");
+            var response = await client.GetAsync(
+                $"https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=placeholder&access_token={AccessToken}");
+
+            // Use debug_token endpoint instead
+            var debugResponse = await client.GetAsync(
+                $"{BaseUrl}/debug_token?input_token={AccessToken}&access_token={AccessToken}");
+            var content = await debugResponse.Content.ReadAsStringAsync();
+
+            if (debugResponse.IsSuccessStatusCode)
+            {
+                var json = JsonSerializer.Deserialize<JsonElement>(content);
+                if (json.TryGetProperty("data", out var data) &&
+                    data.TryGetProperty("expires_at", out var expiresAt))
+                {
+                    var expiryUnix = expiresAt.GetInt64();
+                    if (expiryUnix == 0) return 999; // Never expires
+                    var expiryDate = DateTimeOffset.FromUnixTimeSeconds(expiryUnix);
+                    return (int)(expiryDate - DateTimeOffset.UtcNow).TotalDays;
+                }
+            }
+
+            // Fallback: try token info endpoint
+            var infoResponse = await client.GetAsync(
+                $"{BaseUrl}/me?fields=id&access_token={AccessToken}");
+            return infoResponse.IsSuccessStatusCode ? -1 : -1;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to check token expiry");
+            return -1;
+        }
+    }
+
+    public async Task<bool> RefreshTokenAsync()
+    {
+        try
+        {
+            var client = _httpClientFactory.CreateClient("Instagram");
+            var response = await client.GetAsync(
+                $"https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token={AccessToken}");
+            var content = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Failed to refresh Instagram token. Status: {Status}, Response: {Response}",
+                    response.StatusCode, content);
+                return false;
+            }
+
+            var json = JsonSerializer.Deserialize<JsonElement>(content);
+            if (json.TryGetProperty("access_token", out var newToken))
+            {
+                var newTokenValue = newToken.GetString();
+                if (!string.IsNullOrEmpty(newTokenValue))
+                {
+                    _currentAccessToken = newTokenValue;
+                    Environment.SetEnvironmentVariable("INSTAGRAM_ACCESS_TOKEN", newTokenValue);
+
+                    var expiresIn = json.TryGetProperty("expires_in", out var exp) ? exp.GetInt64() : 0;
+                    _logger.LogInformation(
+                        "Instagram token refreshed successfully. New token expires in {Days} days",
+                        expiresIn / 86400);
+                    return true;
+                }
+            }
+
+            _logger.LogError("Token refresh response did not contain access_token");
+            return false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to refresh Instagram token");
             return false;
         }
     }
