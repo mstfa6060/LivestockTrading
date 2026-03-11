@@ -1,11 +1,24 @@
 # =========================
 # push-arfblocks-output-livestock.ps1
 # =========================
+#
+# Yeni akis (v2):
+#   0. Dizinleri olustur
+#   1. Web & Mobile git pull (ONCE cevirileri cek)
+#   2. ArfBlocks CLI output (API client)
+#   3. ErrorCodeExporter (sadece tr.ts uretir)
+#   4. translate-errors.js --sync (yeni keyleri diger dillere ekle, cevirileri koru)
+#   5. Web git add + commit + push
+#   6. Mobile git add + commit + push
+#
+# Tam ceviri icin (Google Translate API ile):
+#   cd web && node scripts/translate-errors.js --missing
+#
 
 # Hatalarda dur
 $ErrorActionPreference = 'Stop'
 
-# PATH (dotnet tools + npm)
+# PATH (dotnet tools + npm + node)
 $env:PATH = "$($env:USERPROFILE)\.dotnet\tools;$($env:APPDATA)\npm;$env:PATH"
 
 # === BASE PATHS ===
@@ -81,9 +94,35 @@ if (-not (Test-Path $mobileApiPath)) {
     Write-Host "[OK] Created mobile API directory: $mobileApiPath" -ForegroundColor Green
 }
 
-# === 1. ArfBlocks CLI output ===
+# === 1. Git Pull ONCE (cevirileri kaybet diye) ===
 Write-Host ""
-Write-Host "[INFO] ArfBlocks CLI output is being generated..." -ForegroundColor Yellow
+Write-Host "[INFO] Step 1: Pulling latest from web & mobile repos..." -ForegroundColor Yellow
+
+if (Ensure-GitRepo $webPath) {
+    Push-Location $webPath
+    Write-Host "  Pulling web ($webBranch)..." -ForegroundColor Cyan
+    git pull --rebase --autostash
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "[WARN] git pull (web) failed, continuing..." -ForegroundColor Yellow
+    }
+    Pop-Location
+}
+
+if (Ensure-GitRepo $mobilePath) {
+    Push-Location $mobilePath
+    Write-Host "  Pulling mobile ($mobileBranch)..." -ForegroundColor Cyan
+    git pull --rebase --autostash
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "[WARN] git pull (mobile) failed, continuing..." -ForegroundColor Yellow
+    }
+    Pop-Location
+}
+
+Write-Host "[OK] Git pull completed." -ForegroundColor Green
+
+# === 2. ArfBlocks CLI output ===
+Write-Host ""
+Write-Host "[INFO] Step 2: ArfBlocks CLI output is being generated..." -ForegroundColor Yellow
 Push-Location $backendPath
 
 Write-Host ""
@@ -102,14 +141,12 @@ Write-Host ""
 Write-Host "[OK] CLI output completed." -ForegroundColor Green
 Pop-Location
 
-# === 2. Error Code Export ===
+# === 3. Error Code Export (sadece tr.ts) ===
 Write-Host ""
-Write-Host "[INFO] Running Error Code Export..." -ForegroundColor Yellow
+Write-Host "[INFO] Step 3: Running Error Code Export (tr.ts only)..." -ForegroundColor Yellow
 $exporterPath = "$backendPath\Jobs\SpecialPurpose\DevTasks\ErrorCodeExporter"
 if (Test-Path $exporterPath) {
     Push-Location $exporterPath
-
-    Write-Host "[WARN] Make sure ErrorCodeExporter includes LivestockTradingDomainErrors!" -ForegroundColor Yellow
 
     dotnet run
     $code = $LASTEXITCODE
@@ -117,7 +154,7 @@ if (Test-Path $exporterPath) {
         Write-Host "[WARN] ErrorCodeExporter failed. Code: $code" -ForegroundColor Yellow
         Write-Host "       Continuing anyway..." -ForegroundColor Yellow
     } else {
-        Write-Host "[OK] Error Code Export completed." -ForegroundColor Green
+        Write-Host "[OK] Error Code Export completed (tr.ts)." -ForegroundColor Green
     }
     Pop-Location
 }
@@ -126,16 +163,54 @@ else {
     Write-Host "       Skipping error code export..." -ForegroundColor Yellow
 }
 
-# === 3. Web push ===
-if (Ensure-GitRepo $webPath) {
-    Write-Host ""
-    Write-Host "[INFO] Pushing to Web..." -ForegroundColor Yellow
+# === 4. Translate errors (sync new keys to all languages) ===
+Write-Host ""
+Write-Host "[INFO] Step 4: Syncing error keys to all languages..." -ForegroundColor Yellow
+
+$translateScript = "$webPath\scripts\translate-errors.js"
+if (Test-Path $translateScript) {
     Push-Location $webPath
 
-    git pull --rebase --autostash
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "[WARN] git pull (web) failed, continuing..." -ForegroundColor Yellow
+    # --sync: Cevirmeden yeni keyleri Turkce fallback ile ekler, mevcut cevirileri korur
+    # --missing: Ucretsiz Google Translate ile cevrilmemis keyleri cevirir (API key gerektirmez)
+    Write-Host "  Ucretsiz Google Translate ile cevrilmemis keyler cevriliyor..." -ForegroundColor Cyan
+    node scripts/translate-errors.js --missing
+
+    $code = $LASTEXITCODE
+    if ($code -ne 0) {
+        Write-Host "[WARN] translate-errors.js failed. Code: $code" -ForegroundColor Yellow
+        Write-Host "       Continuing anyway..." -ForegroundColor Yellow
+    } else {
+        Write-Host "[OK] Error translation sync completed." -ForegroundColor Green
     }
+    Pop-Location
+
+    # Mobile icin: web'deki error dosyalarini mobile'a kopyala
+    $webErrorsPath = "$webPath\common\livestock-api\src\errors\locales\modules\backend"
+    $mobileErrorsPath = "$mobilePath\common\livestock-api\src\errors\locales\modules\backend"
+    if ((Test-Path $webErrorsPath) -and (Test-Path $mobilePath)) {
+        Write-Host "  Copying error translations to mobile..." -ForegroundColor Cyan
+        # common modulunu kopyala
+        if (Test-Path "$mobileErrorsPath\common") {
+            Copy-Item -Path "$webErrorsPath\common\*.ts" -Destination "$mobileErrorsPath\common\" -Force
+        }
+        # livestocktrading modulunu kopyala
+        if (Test-Path "$mobileErrorsPath\livestocktrading") {
+            Copy-Item -Path "$webErrorsPath\livestocktrading\*.ts" -Destination "$mobileErrorsPath\livestocktrading\" -Force
+        }
+        Write-Host "[OK] Error translations copied to mobile." -ForegroundColor Green
+    }
+}
+else {
+    Write-Host "[WARN] translate-errors.js not found: $translateScript" -ForegroundColor Yellow
+    Write-Host "       Skipping error translation..." -ForegroundColor Yellow
+}
+
+# === 5. Web push ===
+if (Ensure-GitRepo $webPath) {
+    Write-Host ""
+    Write-Host "[INFO] Step 5: Pushing to Web..." -ForegroundColor Yellow
+    Push-Location $webPath
 
     git add -A
     git commit -m "Auto ArfBlocks and error message update [Livestock-Web]" --allow-empty
@@ -154,16 +229,11 @@ else {
     Write-Host "       Skipping web push..." -ForegroundColor Yellow
 }
 
-# === 4. Mobile push ===
+# === 6. Mobile push ===
 if (Ensure-GitRepo $mobilePath) {
     Write-Host ""
-    Write-Host "[INFO] Pushing to Mobile..." -ForegroundColor Yellow
+    Write-Host "[INFO] Step 6: Pushing to Mobile..." -ForegroundColor Yellow
     Push-Location $mobilePath
-
-    git pull --rebase --autostash
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "[WARN] git pull (mobile) failed, continuing..." -ForegroundColor Yellow
-    }
 
     git add -A
     git commit -m "Auto ArfBlocks and error message update [Livestock-Mobile]" --allow-empty
@@ -187,4 +257,9 @@ Write-Host "[DONE] All steps completed!" -ForegroundColor Green
 Write-Host "Backend: $backendPath" -ForegroundColor Cyan
 Write-Host "Web:     $webPath" -ForegroundColor Cyan
 Write-Host "Mobile:  $mobilePath" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Tekrar ceviri icin (ucretsiz, API key gerektirmez):" -ForegroundColor Yellow
+Write-Host "  cd $webPath" -ForegroundColor Cyan
+Write-Host "  node scripts/translate-errors.js --missing   (cevrilmemis keyleri cevir)" -ForegroundColor Cyan
+Write-Host "  node scripts/translate-errors.js --all       (hepsini yeniden cevir)" -ForegroundColor Cyan
 Write-Host ""
