@@ -13,26 +13,17 @@ public class DataAccess : IDataAccess
 		_dbContext = dbContextProvider.GetInstance<LivestockTradingModuleDbContext>();
 	}
 
-	public async Task<(List<Category> Categories, Dictionary<Guid, int> ProductCounts, XPageResponse Page)> All(
-		XSorting sorting,
+	public async Task<(List<Category> Categories, Dictionary<Guid, int> ProductCounts)> All(
 		List<XFilterItem> filters,
-		XPageRequest pageRequest,
 		CancellationToken ct)
 	{
-		var query = _dbContext.Categories
+		// Load all categories in memory (translations require in-memory alphabetical sort)
+		var categories = await _dbContext.Categories
 			.Include(c => c.SubCategories)
 			.AsNoTracking()
 			.Where(c => !c.IsDeleted)
-			.Sort(sorting)
-			.Filter(filters);
-
-		// Default sorting
-		if (sorting == null)
-			query = query.OrderByDescending(c => c.CreatedAt);
-
-		// Pagination
-		var page = query.GetPage(pageRequest);
-		var categories = await query.Paginate(page).ToListAsync(ct);
+			.Filter(filters)
+			.ToListAsync(ct);
 
 		// Product count per category (only Active products)
 		var productCounts = await _dbContext.Products
@@ -42,6 +33,6 @@ public class DataAccess : IDataAccess
 			.Select(g => new { CategoryId = g.Key, Count = g.Count() })
 			.ToDictionaryAsync(x => x.CategoryId, x => x.Count, ct);
 
-		return (categories, productCounts, page);
+		return (categories, productCounts);
 	}
 }

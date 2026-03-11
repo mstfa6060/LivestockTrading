@@ -14,14 +14,20 @@ public class Handler : IRequestHandler
 		var mapper = new Mapper();
 		var req = (RequestModel)payload;
 
-		var (categories, productCounts, page) = await _dataAccessLayer.All(
-			req.Sorting,
-			req.Filters,
-			req.PageRequest,
-			cancellationToken);
+		var (categories, productCounts) = await _dataAccessLayer.All(req.Filters, cancellationToken);
 
-		var response = mapper.MapToResponse(categories, productCounts, req.LanguageCode);
+		var mapped = mapper.MapToResponse(categories, productCounts, req.LanguageCode);
 
-		return ArfBlocksResults.Success(response, page);
+		// Alphabetical sort by translated name in the selected language
+		var sorted = mapped
+			.OrderBy(c => c.Name, StringComparer.CurrentCultureIgnoreCase)
+			.ToList();
+
+		// In-memory pagination
+		var sortedQuery = sorted.AsQueryable();
+		var page = sortedQuery.GetPage(req.PageRequest);
+		var paged = sortedQuery.Paginate(page).ToList();
+
+		return ArfBlocksResults.Success(paged, page);
 	}
 }
