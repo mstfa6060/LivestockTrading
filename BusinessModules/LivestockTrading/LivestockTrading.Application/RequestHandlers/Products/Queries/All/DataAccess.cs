@@ -24,7 +24,7 @@ public class DataAccess : IDataAccess
 		var query = _dbContext.Products
 			.AsNoTracking()
 			.Include(p => p.Location)
-			.Where(p => !p.IsDeleted);
+			.Where(p => !p.IsDeleted && p.Status == ProductStatus.Active);
 
 		// Ülke filtresi
 		if (!string.IsNullOrWhiteSpace(countryCode))
