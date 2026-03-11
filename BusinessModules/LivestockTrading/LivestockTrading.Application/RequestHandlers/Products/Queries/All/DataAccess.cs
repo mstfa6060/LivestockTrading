@@ -19,12 +19,13 @@ public class DataAccess : IDataAccess
 		XSorting sorting,
 		List<XFilterItem> filters,
 		XPageRequest pageRequest,
+		bool includeDeleted,
 		CancellationToken ct)
 	{
 		var query = _dbContext.Products
 			.AsNoTracking()
 			.Include(p => p.Location)
-			.Where(p => !p.IsDeleted && p.Status == ProductStatus.Active);
+			.Where(p => includeDeleted || (!p.IsDeleted && p.Status == ProductStatus.Active));
 
 		// Ülke filtresi
 		if (!string.IsNullOrWhiteSpace(countryCode))

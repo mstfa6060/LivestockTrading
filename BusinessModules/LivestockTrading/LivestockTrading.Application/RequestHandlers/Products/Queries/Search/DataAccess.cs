@@ -24,12 +24,13 @@ public class DataAccess : IDataAccess
 		Guid? sellerId,
 		XSorting sorting,
 		XPageRequest pageRequest,
+		bool includeDeleted,
 		CancellationToken ct)
 	{
 		var dbQuery = _dbContext.Products
 			.AsNoTracking()
 			.Include(p => p.Location)
-			.Where(p => !p.IsDeleted && p.Status == ProductStatus.Active);
+			.Where(p => includeDeleted || (!p.IsDeleted && p.Status == ProductStatus.Active));
 
 		// Arama sorgusu - başlık, açıklama, slug'da aranır
 		if (!string.IsNullOrWhiteSpace(query))

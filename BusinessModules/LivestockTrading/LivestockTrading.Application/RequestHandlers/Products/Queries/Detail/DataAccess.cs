@@ -13,7 +13,7 @@ public class DataAccess : IDataAccess
 		_dbContext = dbContextProvider.GetInstance<LivestockTradingModuleDbContext>();
 	}
 
-	public async Task<Product> GetById(Guid id, CancellationToken ct)
+	public async Task<Product> GetById(Guid id, bool includeDeleted, CancellationToken ct)
 	{
 		return await _dbContext.Products
 			.AsNoTracking()
@@ -21,6 +21,6 @@ public class DataAccess : IDataAccess
 			.Include(p => p.Brand)
 			.Include(p => p.Seller)
 			.Include(p => p.Location)
-			.FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted, ct);
+			.FirstOrDefaultAsync(p => p.Id == id && (includeDeleted || !p.IsDeleted), ct);
 	}
 }
