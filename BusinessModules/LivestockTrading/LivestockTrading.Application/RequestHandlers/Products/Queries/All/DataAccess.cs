@@ -15,6 +15,7 @@ public class DataAccess : IDataAccess
 
 	public async Task<(List<Product> Products, XPageResponse Page)> All(
 		string countryCode,
+		Guid? categoryId,
 		XSorting sorting,
 		List<XFilterItem> filters,
 		XPageRequest pageRequest,
@@ -25,19 +26,26 @@ public class DataAccess : IDataAccess
 			.Include(p => p.Location)
 			.Where(p => !p.IsDeleted);
 
-		// Ülke filtresi - belirtilmişse sadece o ülkenin ürünlerini getir
+		// Ülke filtresi
 		if (!string.IsNullOrWhiteSpace(countryCode))
-		{
 			query = query.Where(p => p.Location != null && p.Location.CountryCode == countryCode);
+
+		// Kategori filtresi - üst kategori seçilmişse alt kategorilerin ürünleri de dahil edilir
+		if (categoryId.HasValue)
+		{
+			query = query.Where(p =>
+				p.CategoryId == categoryId.Value ||
+				_dbContext.Categories
+					.Where(c => c.ParentCategoryId == categoryId.Value && !c.IsDeleted)
+					.Select(c => c.Id)
+					.Contains(p.CategoryId));
 		}
 
 		query = query.Sort(sorting).Filter(filters);
 
-		// Default sorting
 		if (sorting == null)
 			query = query.OrderByDescending(p => p.CreatedAt);
 
-		// Pagination
 		var page = query.GetPage(pageRequest);
 		var products = await query.Paginate(page).ToListAsync(ct);
 

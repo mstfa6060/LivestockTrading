@@ -7,6 +7,10 @@ public class RequestModel : IRequestModel
 	/// Belirtilirse sadece bu ülkedeki ürünler döner
 	/// </summary>
 	public string CountryCode { get; set; }
+	/// <summary>
+	/// Kategori filtresi. Üst kategori verilirse alt kategorilerin ürünleri de dahil edilir.
+	/// </summary>
+	public Guid? CategoryId { get; set; }
 	public XSorting Sorting { get; set; }
 	public List<XFilterItem> Filters { get; set; }
 	public XPageRequest PageRequest { get; set; }
