@@ -101,23 +101,29 @@ public class FirebasePushNotificationService : IPushNotificationService
 
     public async Task<int> SendPushToMultipleAsync(List<string> deviceTokens, string title, string body, Dictionary<string, string>? data = null)
     {
+        var (successCount, _) = await SendPushWithCleanupAsync(deviceTokens, title, body, data);
+        return successCount;
+    }
+
+    public async Task<(int SuccessCount, List<string> InvalidTokens)> SendPushWithCleanupAsync(List<string> deviceTokens, string title, string body, Dictionary<string, string>? data = null)
+    {
         if (!_isInitialized)
         {
             _logger.LogWarning("Firebase not initialized. Push notifications not sent.");
-            return 0;
+            return (0, new List<string>());
         }
 
         if (deviceTokens == null || deviceTokens.Count == 0)
         {
             _logger.LogWarning("No device tokens provided.");
-            return 0;
+            return (0, new List<string>());
         }
 
         var validTokens = deviceTokens.Where(t => !string.IsNullOrEmpty(t)).ToList();
         if (validTokens.Count == 0)
         {
             _logger.LogWarning("No valid device tokens provided.");
-            return 0;
+            return (0, new List<string>());
         }
 
         try
@@ -136,12 +142,28 @@ public class FirebasePushNotificationService : IPushNotificationService
             var response = await FirebaseMessaging.DefaultInstance.SendEachForMulticastAsync(message);
             _logger.LogInformation("Multicast push sent. Success: {Success}, Failure: {Failure}",
                 response.SuccessCount, response.FailureCount);
-            return response.SuccessCount;
+
+            // Gecersiz token'lari tespit et
+            var invalidTokens = new List<string>();
+            for (int i = 0; i < response.Responses.Count; i++)
+            {
+                if (!response.Responses[i].IsSuccess && response.Responses[i].Exception is FirebaseMessagingException fex)
+                {
+                    if (fex.MessagingErrorCode == MessagingErrorCode.Unregistered
+                        || fex.MessagingErrorCode == MessagingErrorCode.InvalidArgument)
+                    {
+                        invalidTokens.Add(validTokens[i]);
+                        _logger.LogWarning("Invalid token detected: {Token}, Error: {Error}", validTokens[i], fex.MessagingErrorCode);
+                    }
+                }
+            }
+
+            return (response.SuccessCount, invalidTokens);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error sending multicast push notification");
-            return 0;
+            return (0, new List<string>());
         }
     }
 }

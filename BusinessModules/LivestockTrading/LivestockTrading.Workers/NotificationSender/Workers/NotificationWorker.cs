@@ -154,11 +154,27 @@ public class NotificationWorker : BackgroundService
         }
         catch { }
 
+        // Try ProductApprovedEvent (seller notification - check before ProductCreatedEvent since both have ProductId)
+        try
+        {
+            var productApprovedEvent = JsonSerializer.Deserialize<ProductApprovedEvent>(message);
+            if (productApprovedEvent != null && productApprovedEvent.ProductId != Guid.Empty
+                && productApprovedEvent.SellerId != Guid.Empty && !string.IsNullOrEmpty(productApprovedEvent.Slug))
+            {
+                _logger.LogInformation("Handling ProductApprovedEvent notification for product: {ProductId}", productApprovedEvent.ProductId);
+                var handler = scope.ServiceProvider.GetRequiredService<ProductApprovedNotificationHandler>();
+                await handler.HandleAsync(productApprovedEvent);
+                return true;
+            }
+        }
+        catch { }
+
         // Try ProductCreatedEvent (admin notification for new products)
         try
         {
             var productCreatedEvent = JsonSerializer.Deserialize<ProductCreatedEvent>(message);
-            if (productCreatedEvent != null && productCreatedEvent.ProductId != Guid.Empty)
+            if (productCreatedEvent != null && productCreatedEvent.ProductId != Guid.Empty
+                && productCreatedEvent.TargetAdminUserIds != null && productCreatedEvent.TargetAdminUserIds.Count > 0)
             {
                 _logger.LogInformation("Handling ProductCreatedEvent notification for product: {ProductId}", productCreatedEvent.ProductId);
                 var handler = scope.ServiceProvider.GetRequiredService<ProductCreatedNotificationHandler>();

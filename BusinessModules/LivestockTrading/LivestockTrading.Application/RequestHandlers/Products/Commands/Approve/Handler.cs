@@ -37,7 +37,7 @@ public class Handler : IRequestHandler
 		var coverImagePath = await _dataAccessLayer.GetCoverImagePath(product.CoverImageFileId);
 
 		// Publish event for social media posting & notifications
-		await _publisher.PublishFanout("livestocktrading.socialmedia.post", new ProductApprovedEvent
+		var productApprovedEvent = new ProductApprovedEvent
 		{
 			ProductId = product.Id,
 			Title = product.Title,
@@ -54,7 +54,10 @@ public class Handler : IRequestHandler
 			City = product.Location?.City,
 			CoverImageUrl = coverImagePath,
 			MediaBucketId = product.MediaBucketId
-		});
+		};
+
+		await _publisher.PublishFanout("livestocktrading.socialmedia.post", productApprovedEvent);
+		await _publisher.PublishFanout("livestocktrading.notification.push", productApprovedEvent);
 
 		var response = mapper.MapToResponse(product);
 		return ArfBlocksResults.Success(response);

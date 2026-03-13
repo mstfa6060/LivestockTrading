@@ -1,4 +1,7 @@
+using Common.Definitions.Infrastructure.RelationalDB;
+using Common.Services.Environment;
 using Common.Services.Logging;
+using LivestockTrading.Infrastructure.RelationalDB;
 using LivestockTrading.Workers.NotificationSender.EventHandlers;
 using LivestockTrading.Workers.NotificationSender.Services;
 using LivestockTrading.Workers.NotificationSender.Workers;
@@ -26,6 +29,31 @@ try
             // Configure HTTP client factory
             services.AddHttpClient();
 
+            // Configure DbContext for push token and notification access
+            var connectionString = hostContext.Configuration["ProjectConfigurations:RelationalDbConfiguration:ConnectionString"]
+                ?? hostContext.Configuration.GetConnectionString("SqlConnectionString");
+
+            var environmentName = hostContext.Configuration["ProjectConfigurations:EnvironmentConfiguration:EnvironmentName"]
+                ?? hostContext.Configuration["ASPNETCORE_ENVIRONMENT"]
+                ?? "Development";
+
+            var relationalDbConfig = new RelationalDbConfiguration { ConnectionString = connectionString };
+            var environmentConfig = new EnvironmentConfiguration { EnvironmentName = environmentName };
+            var environmentService = new EnvironmentService(environmentConfig);
+
+            var definitionDbContextOptions = new DefinitionDbContextOptions(relationalDbConfig, environmentService);
+            var livestockTradingDbContextOptions = new LivestockTradingDbContextOptions(relationalDbConfig, environmentService, definitionDbContextOptions);
+
+            services.AddSingleton(relationalDbConfig);
+            services.AddSingleton(environmentService);
+            services.AddSingleton(definitionDbContextOptions);
+            services.AddSingleton(livestockTradingDbContextOptions);
+            services.AddScoped<LivestockTradingModuleDbContext>(sp =>
+            {
+                var opts = sp.GetRequiredService<LivestockTradingDbContextOptions>();
+                return new LivestockTradingModuleDbContext(opts);
+            });
+
             // Configure push notification service as singleton
             services.AddSingleton<IPushNotificationService>(sp =>
             {
@@ -33,6 +61,9 @@ try
                 var logger = sp.GetRequiredService<ILogger<FirebasePushNotificationService>>();
                 return new FirebasePushNotificationService(config, logger);
             });
+
+            // Register push token repository
+            services.AddScoped<PushTokenRepository>();
 
             // Register all event handlers as scoped
             // Messaging event handlers
@@ -42,6 +73,7 @@ try
 
             // Product event handlers
             services.AddScoped<ProductCreatedNotificationHandler>();
+            services.AddScoped<ProductApprovedNotificationHandler>();
 
             // Student event handlers (legacy)
             services.AddScoped<StudentCreatedNotificationHandler>();

@@ -1063,6 +1063,10 @@ iam-mail-worker, iam-sms-worker, resource-seeder
 
 Frontend projesi (`D:\Projects\GlobalLivestock\web`) backend API'lerini `arf-cli` ile olusturulan TypeScript client uzerinden tuketir.
 
+## Mobil Uygulama
+
+Mobil uygulama projesi: `D:\Projects\GlobalLivestock\mobil`
+
 ### Frontend API Dokumantasyonu
 
 Frontend gelisitiriciler icin API kullanim dokumani: `D:\Projects\GlobalLivestock\web\common\API-INTEGRATION.md`

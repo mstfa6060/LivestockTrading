@@ -1,3 +1,5 @@
+using System.Text.Json;
+using LivestockTrading.Domain.Entities;
 using LivestockTrading.Domain.Events;
 using LivestockTrading.Workers.NotificationSender.Services;
 
@@ -6,13 +8,16 @@ namespace LivestockTrading.Workers.NotificationSender.EventHandlers;
 public class MessageCreatedNotificationHandler
 {
     private readonly IPushNotificationService _pushNotificationService;
+    private readonly PushTokenRepository _pushTokenRepository;
     private readonly ILogger<MessageCreatedNotificationHandler> _logger;
 
     public MessageCreatedNotificationHandler(
         IPushNotificationService pushNotificationService,
+        PushTokenRepository pushTokenRepository,
         ILogger<MessageCreatedNotificationHandler> logger)
     {
         _pushNotificationService = pushNotificationService;
+        _pushTokenRepository = pushTokenRepository;
         _logger = logger;
     }
 
@@ -41,25 +46,44 @@ public class MessageCreatedNotificationHandler
             { "senderId", messageEvent.SenderUserId.ToString() }
         };
 
-        // Log the notification details
-        _logger.LogInformation(
-            "Push notification prepared - Title: {Title}, Body: {Body}, RecipientUserId: {RecipientUserId}",
+        // Push bildirim tercihi kontrolu
+        if (!await _pushTokenRepository.IsPushEnabled(messageEvent.RecipientUserId))
+        {
+            _logger.LogInformation("Push notifications disabled for user {UserId}, skipping", messageEvent.RecipientUserId);
+        }
+        else
+        {
+            // Alicinin push token'larini cek ve gonder
+            var tokens = await _pushTokenRepository.GetActiveTokensForUser(messageEvent.RecipientUserId);
+            if (tokens.Count > 0)
+            {
+                var (successCount, invalidTokens) = await _pushNotificationService.SendPushWithCleanupAsync(tokens, title, body, data);
+                _logger.LogInformation("Sent push notification to {SuccessCount}/{TotalCount} devices for user {UserId}",
+                    successCount, tokens.Count, messageEvent.RecipientUserId);
+
+                if (invalidTokens.Count > 0)
+                    await _pushTokenRepository.RevokeTokens(invalidTokens);
+            }
+            else
+            {
+                _logger.LogInformation("No active push tokens found for user {UserId}", messageEvent.RecipientUserId);
+            }
+        }
+
+        // In-app bildirim kaydet
+        var actionData = JsonSerializer.Serialize(new
+        {
+            conversationId = messageEvent.ConversationId,
+            messageId = messageEvent.MessageId,
+            senderId = messageEvent.SenderUserId,
+            senderName = messageEvent.SenderName
+        });
+
+        await _pushTokenRepository.SaveNotification(
+            messageEvent.RecipientUserId,
             title,
             body,
-            messageEvent.RecipientUserId);
-
-        // TODO: Fetch recipient's push tokens from database and send
-        // This requires integration with IAM module's UserPushToken table
-        // For now, we prepare the notification payload for future integration
-
-        // Example implementation when tokens are available:
-        // var tokens = await GetUserPushTokens(messageEvent.RecipientUserId);
-        // if (tokens.Any())
-        // {
-        //     var successCount = await _pushNotificationService.SendPushToMultipleAsync(tokens, title, body, data);
-        //     _logger.LogInformation("Sent push notification to {SuccessCount} devices for user {UserId}", successCount, messageEvent.RecipientUserId);
-        // }
-
-        await Task.CompletedTask;
+            NotificationType.NewMessage,
+            actionData);
     }
 }
