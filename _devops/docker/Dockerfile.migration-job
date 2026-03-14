@@ -16,4 +16,8 @@ RUN dotnet publish "Jobs/RelationalDB/MigrationJob/Jobs.RelationalDB.MigrationJo
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
+# appsettings and SeedData must be present at runtime
+COPY --from=build /src/Jobs/RelationalDB/MigrationJob/appsettings.json ./
+COPY --from=build /src/Jobs/RelationalDB/MigrationJob/appsettings.staging.json ./
+COPY --from=build /src/Jobs/RelationalDB/MigrationJob/SeedData ./SeedData
 ENTRYPOINT ["dotnet", "Jobs.RelationalDB.MigrationJob.dll"]
