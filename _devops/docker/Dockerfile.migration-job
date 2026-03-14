@@ -1,0 +1,20 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+COPY ["LivestockTrading.sln", "./"]
+COPY ["BusinessModules/", "BusinessModules/"]
+COPY ["BaseModules/", "BaseModules/"]
+COPY ["Common/", "Common/"]
+COPY ["Gateways/", "Gateways/"]
+COPY ["Jobs/", "Jobs/"]
+COPY ["Workers/", "Workers/"]
+
+RUN dotnet restore "LivestockTrading.sln"
+RUN dotnet publish "Jobs/RelationalDB/MigrationJob/Jobs.RelationalDB.MigrationJob.csproj" \
+    -c Release -o /app/publish --no-restore \
+    /p:DebugType=None /p:DebugSymbols=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "Jobs.RelationalDB.MigrationJob.dll"]
