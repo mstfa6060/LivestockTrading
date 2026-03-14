@@ -8,9 +8,14 @@ public class RequestModel : IRequestModel
 	/// </summary>
 	public string CountryCode { get; set; }
 	/// <summary>
-	/// Kategori filtresi. Üst kategori verilirse alt kategorilerin ürünleri de dahil edilir.
+	/// Kategori filtresi. Üst kategori seçilmişse alt kategorilerin ürünleri de dahil edilir.
 	/// </summary>
 	public Guid? CategoryId { get; set; }
+	/// <summary>
+	/// Hedef para birimi kodu (ISO 4217, örn: "TRY", "EUR", "GBP").
+	/// Belirtilirse ürün fiyatları bu para birimine dönüştürülüp response'a eklenir.
+	/// </summary>
+	public string TargetCurrencyCode { get; set; }
 	public XSorting Sorting { get; set; }
 	public List<XFilterItem> Filters { get; set; }
 	public XPageRequest PageRequest { get; set; }
@@ -43,4 +48,13 @@ public class ResponseModel : IResponseModel<Array>
 	public DateTime CreatedAt { get; set; }
 	public string MediaBucketId { get; set; }
 	public string CoverImageFileId { get; set; }
+
+	/// <summary>Hedef para birimine dönüştürülmüş fiyat (TargetCurrencyCode verilmişse)</summary>
+	public decimal? ConvertedPrice { get; set; }
+	/// <summary>Hedef para birimine dönüştürülmüş indirimli fiyat</summary>
+	public decimal? ConvertedDiscountedPrice { get; set; }
+	/// <summary>Hedef para birimi kodu</summary>
+	public string ConvertedCurrencyCode { get; set; }
+	/// <summary>Hedef para birimi sembolü</summary>
+	public string ConvertedCurrencySymbol { get; set; }
 }

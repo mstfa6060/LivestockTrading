@@ -53,4 +53,18 @@ public class DataAccess : IDataAccess
 		_dbContext.Notifications.AddRange(notifications);
 		await _dbContext.SaveChangesAsync(ct);
 	}
+
+	public async Task<List<Currency>> GetActiveCurrencies(CancellationToken ct)
+	{
+		return await _dbContext.Currencies
+			.AsNoTracking()
+			.Where(c => !c.IsDeleted && c.IsActive)
+			.ToListAsync(ct);
+	}
+
+	public async Task CreateProductPrices(List<ProductPrice> productPrices, CancellationToken ct)
+	{
+		_dbContext.ProductPrices.AddRange(productPrices);
+		await _dbContext.SaveChangesAsync(ct);
+	}
 }

@@ -82,9 +82,18 @@ RecurringJob.AddOrUpdate<LogStudentActivityJob>(
     recurringOptions
 );
 
+// Döviz kurlarını güncelle - Her 6 saatte bir (00:00, 06:00, 12:00, 18:00)
+RecurringJob.AddOrUpdate<UpdateExchangeRatesJob>(
+    nameof(UpdateExchangeRatesJob),
+    job => job.Process(),
+    "0 */6 * * *",  // Her 6 saatte bir
+    recurringOptions
+);
+
 Log.Information("Hangfire Scheduler started!");
 Log.Information("Active Jobs:");
 Log.Information("  - LogStudentActivityJob (Daily at 09:00 and 18:00)");
+Log.Information("  - UpdateExchangeRatesJob (Every 6 hours)");
 
 try
 {

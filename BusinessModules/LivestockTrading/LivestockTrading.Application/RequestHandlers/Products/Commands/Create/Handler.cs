@@ -31,6 +31,9 @@ public class Handler : IRequestHandler
 
 		await _dataAccessLayer.AddProduct(entity);
 
+		// Otomatik fiyat dönüşümü: diğer para birimleri için ProductPrice kayıtları oluştur
+		await CreateAutomaticPriceConversions(entity, cancellationToken);
+
 		// Notify admin/moderator users about new product pending approval
 		await NotifyAdmins(entity, cancellationToken);
 
@@ -64,6 +67,60 @@ public class Handler : IRequestHandler
 
 		await _dataAccessLayer.CreateSeller(newSeller, ct);
 		return newSeller.Id;
+	}
+
+	private async Task CreateAutomaticPriceConversions(Product product, CancellationToken ct)
+	{
+		try
+		{
+			if (string.IsNullOrWhiteSpace(product.Currency) || product.BasePrice <= 0)
+				return;
+
+			var currencies = await _dataAccessLayer.GetActiveCurrencies(ct);
+			var currencyMap = currencies.ToDictionary(c => c.Code, c => c, StringComparer.OrdinalIgnoreCase);
+
+			if (!currencyMap.TryGetValue(product.Currency, out var sourceCurrency))
+				return;
+
+			var productPrices = new List<ProductPrice>();
+
+			foreach (var targetCurrency in currencies)
+			{
+				// Kaynak para birimini atla
+				if (string.Equals(targetCurrency.Code, product.Currency, StringComparison.OrdinalIgnoreCase))
+					continue;
+
+				if (sourceCurrency.ExchangeRateToUSD <= 0 || targetCurrency.ExchangeRateToUSD <= 0)
+					continue;
+
+				var amountInUsd = product.BasePrice / sourceCurrency.ExchangeRateToUSD;
+				var convertedPrice = Math.Round(amountInUsd * targetCurrency.ExchangeRateToUSD, 2);
+
+				decimal? convertedDiscountedPrice = null;
+				if (product.DiscountedPrice.HasValue)
+				{
+					var discountInUsd = product.DiscountedPrice.Value / sourceCurrency.ExchangeRateToUSD;
+					convertedDiscountedPrice = Math.Round(discountInUsd * targetCurrency.ExchangeRateToUSD, 2);
+				}
+
+				productPrices.Add(new ProductPrice
+				{
+					ProductId = product.Id,
+					CurrencyCode = targetCurrency.Code,
+					Price = convertedPrice,
+					DiscountedPrice = convertedDiscountedPrice,
+					IsActive = true,
+					IsAutomaticConversion = true
+				});
+			}
+
+			if (productPrices.Count > 0)
+				await _dataAccessLayer.CreateProductPrices(productPrices, ct);
+		}
+		catch
+		{
+			// Otomatik fiyat dönüşümü başarısız olursa ürün oluşturma engellenmemeli
+		}
 	}
 
 	private async Task NotifyAdmins(Product product, CancellationToken ct)

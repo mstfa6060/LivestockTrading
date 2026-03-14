@@ -13,6 +13,14 @@ public class DataAccess : IDataAccess
 		_dbContext = dbContextProvider.GetInstance<LivestockTradingModuleDbContext>();
 	}
 
+	public async Task<Dictionary<string, Currency>> GetCurrencyRates(CancellationToken ct)
+	{
+		return await _dbContext.Currencies
+			.AsNoTracking()
+			.Where(c => !c.IsDeleted && c.IsActive)
+			.ToDictionaryAsync(c => c.Code, c => c, ct);
+	}
+
 	public async Task<(List<Product> Products, XPageResponse Page)> All(
 		string countryCode,
 		Guid? categoryId,

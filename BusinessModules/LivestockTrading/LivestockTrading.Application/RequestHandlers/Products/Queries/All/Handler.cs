@@ -28,7 +28,12 @@ public class Handler : IRequestHandler
 			includeDeleted,
 			cancellationToken);
 
-		var response = mapper.MapToResponse(products);
+		// TargetCurrencyCode verilmişse dönüşüm için kur bilgilerini al
+		Dictionary<string, LivestockTrading.Domain.Entities.Currency> currencyRates = null;
+		if (!string.IsNullOrWhiteSpace(req.TargetCurrencyCode))
+			currencyRates = await _dataAccessLayer.GetCurrencyRates(cancellationToken);
+
+		var response = mapper.MapToResponse(products, req.TargetCurrencyCode, currencyRates);
 
 		return ArfBlocksResults.Success(response, page);
 	}

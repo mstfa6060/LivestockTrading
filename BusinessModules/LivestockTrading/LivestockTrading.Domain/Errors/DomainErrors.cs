@@ -305,6 +305,11 @@ public class LivestockTradingDomainErrors
         public static string CurrencyCodeRequired { get; set; } = "Para birimi kodu zorunludur.";
         public static string CurrencyNameRequired { get; set; } = "Para birimi adi zorunludur.";
         public static string CurrencySymbolRequired { get; set; } = "Para birimi sembolu zorunludur.";
+        public static string CurrencyAmountRequired { get; set; } = "Tutar zorunludur.";
+        public static string CurrencyFromCodeRequired { get; set; } = "Kaynak para birimi kodu zorunludur.";
+        public static string CurrencyToCodeRequired { get; set; } = "Hedef para birimi kodu zorunludur.";
+        public static string CurrencyFromNotFound { get; set; } = "Kaynak para birimi bulunamadi.";
+        public static string CurrencyToNotFound { get; set; } = "Hedef para birimi bulunamadi.";
     }
 
     public static class LanguageErrors
