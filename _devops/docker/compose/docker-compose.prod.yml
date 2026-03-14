@@ -114,6 +114,15 @@ services:
           cpus: '0.5'
           memory: 512M
 
+  hangfire-scheduler:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
   mongodb:
     deploy:
       resources:

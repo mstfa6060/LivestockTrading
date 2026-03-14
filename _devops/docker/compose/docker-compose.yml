@@ -284,3 +284,24 @@ services:
     networks:
       - livestocktrading-network
     restart: unless-stopped
+
+  # Hangfire Scheduler (Background Jobs)
+  hangfire-scheduler:
+    image: ${DOCKER_REGISTRY:-docker.io}/${DOCKER_USERNAME}/livestocktrading-hangfire-scheduler:${TAG:-latest}
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ConnectionStrings__Hangfire: ${SQL_CONNECTION_STRING}
+      ApplicationSettings__Urls__LivestockTradingApi: http://livestocktrading-api-container:8080
+      HangfireSettings__User__Username: ${HANGFIRE_USERNAME:-admin}
+      HangfireSettings__User__Password: ${HANGFIRE_PASSWORD:-admin}
+      HangfireSettings__SystemSecret: ${HANGFIRE_SYSTEM_SECRET:-HnGf1r3-Sy5t3m-S3cr3t-D3v-2024}
+    ports:
+      - "${HANGFIRE_PORT:-5010}:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      livestocktrading-api:
+        condition: service_started
+    networks:
+      - livestocktrading-network
+    restart: unless-stopped

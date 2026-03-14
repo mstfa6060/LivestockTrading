@@ -53,6 +53,7 @@ pipeline {
                         'iam-sms-worker:_devops/docker/Dockerfile.iam-sms-worker:mstfaock/livestocktrading-iam-sms-worker',
                         'livestocktrading-notification-worker:_devops/docker/Dockerfile.livestocktrading-notification-worker:mstfaock/livestocktrading-notification-worker',
                         'livestocktrading-socialmedia-worker:_devops/docker/Dockerfile.livestocktrading-socialmedia-worker:mstfaock/livestocktrading-socialmedia-worker',
+                        'hangfire-scheduler:_devops/docker/Dockerfile.hangfire-scheduler:mstfaock/livestocktrading-hangfire-scheduler',
                         'resource-seeder:_devops/docker/Dockerfile.resource-seeder:mstfaock/livestocktrading-resource-seeder'
                     ]
 

@@ -61,3 +61,10 @@ services:
     build:
       context: ../..
       dockerfile: docker/Dockerfile.livestocktrading-socialmedia-worker
+
+  hangfire-scheduler:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    build:
+      context: ../..
+      dockerfile: docker/Dockerfile.hangfire-scheduler
