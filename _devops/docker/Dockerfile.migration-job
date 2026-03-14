@@ -7,7 +7,6 @@ COPY ["BaseModules/", "BaseModules/"]
 COPY ["Common/", "Common/"]
 COPY ["Gateways/", "Gateways/"]
 COPY ["Jobs/", "Jobs/"]
-COPY ["Workers/", "Workers/"]
 
 RUN dotnet restore "LivestockTrading.sln"
 RUN dotnet publish "Jobs/RelationalDB/MigrationJob/Jobs.RelationalDB.MigrationJob.csproj" \
