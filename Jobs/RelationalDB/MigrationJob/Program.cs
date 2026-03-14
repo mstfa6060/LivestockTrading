@@ -77,8 +77,18 @@ class Program
             throw;
         }
 
-        // TODO: Diger Seed Data implementasyonlari eklenecek
-        // LocationSeeder, PlatformSettingsSeeder, vb.
+        // Seed Data - Para Birimleri
+        try
+        {
+            var forceCurrencyReseed = args.Contains("--force-currency-reseed");
+            var currencySeeder = new CurrencySeeder(dbContext);
+            await currencySeeder.SeedAsync(forceCurrencyReseed);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Currency seed FAILED: {ex.Message}");
+            throw;
+        }
 
         Console.WriteLine("All operations completed successfully.");
     }
