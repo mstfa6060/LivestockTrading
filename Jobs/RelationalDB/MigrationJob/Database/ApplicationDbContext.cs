@@ -97,6 +97,13 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext, ILivestockT
     public DbSet<ShippingZone> ShippingZones { get; set; }
     public DbSet<ShippingRate> ShippingRates { get; set; }
 
+    // Monetization
+    public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
+    public DbSet<SellerSubscription> SellerSubscriptions { get; set; }
+    public DbSet<IAPTransaction> IAPTransactions { get; set; }
+    public DbSet<BoostPackage> BoostPackages { get; set; }
+    public DbSet<ProductBoost> ProductBoosts { get; set; }
+
     // Deals & Transport
     public DbSet<Deal> Deals { get; set; }
     public DbSet<Transporter> Transporters { get; set; }
