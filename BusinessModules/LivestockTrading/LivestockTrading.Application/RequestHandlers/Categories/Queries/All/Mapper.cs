@@ -7,6 +7,9 @@ public class Mapper
 {
 	public List<ResponseModel> MapToResponse(List<Category> categories, Dictionary<Guid, int> productCounts, string languageCode = null)
 	{
+		// Build lookup for subcategory aggregation
+		var categoryLookup = categories.ToDictionary(c => c.Id);
+
 		return categories.Select(c => new ResponseModel
 		{
 			Id = c.Id,
@@ -21,9 +24,35 @@ public class Mapper
 			DescriptionTranslations = c.DescriptionTranslations,
 			AttributesTemplate = c.AttributesTemplate,
 			SubCategoryCount = c.SubCategories?.Count(sc => !sc.IsDeleted) ?? 0,
-			ProductCount = productCounts.TryGetValue(c.Id, out var count) ? count : 0,
+			ProductCount = GetTotalProductCount(c, productCounts, categoryLookup),
 			CreatedAt = c.CreatedAt
 		}).ToList();
+	}
+
+	/// <summary>
+	/// Returns product count including all subcategories recursively
+	/// </summary>
+	private static int GetTotalProductCount(Category category, Dictionary<Guid, int> productCounts, Dictionary<Guid, Category> categoryLookup)
+	{
+		productCounts.TryGetValue(category.Id, out var directCount);
+
+		var subCategoryCount = 0;
+		if (category.SubCategories != null)
+		{
+			foreach (var sub in category.SubCategories.Where(sc => !sc.IsDeleted))
+			{
+				if (categoryLookup.TryGetValue(sub.Id, out var subCategory))
+				{
+					subCategoryCount += GetTotalProductCount(subCategory, productCounts, categoryLookup);
+				}
+				else if (productCounts.TryGetValue(sub.Id, out var subCount))
+				{
+					subCategoryCount += subCount;
+				}
+			}
+		}
+
+		return directCount + subCategoryCount;
 	}
 
 	private static string GetTranslatedName(Category c, string languageCode)
