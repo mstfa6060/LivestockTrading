@@ -1,0 +1,310 @@
+// _devops/jenkins/Jenkinsfile.migration
+// Çalıştırma: Jenkins → "LivestockTrading Migration" pipeline
+
+pipeline {
+    agent any
+
+    parameters {
+        // ─── Ortam Seçimi (çoklu seçim) ───────────────────────────────────
+        booleanParam(
+            name: 'MIGRATE_DEV',
+            defaultValue: true,
+            description: '✅ DEV ortamında migration çalıştır (livestocktrading_dev)'
+        )
+        booleanParam(
+            name: 'MIGRATE_PROD',
+            defaultValue: false,
+            description: '⚠️  PROD ortamında migration çalıştır (livestock_prod) — DİKKATLİ OL!'
+        )
+
+        // ─── Seed Data Seçenekleri ─────────────────────────────────────────
+        booleanParam(
+            name: 'FORCE_COUNTRY_RESEED',
+            defaultValue: false,
+            description: 'Ülke verilerini yeniden seed et (mevcut kayıtları günceller)'
+        )
+        booleanParam(
+            name: 'FORCE_CURRENCY_RESEED',
+            defaultValue: false,
+            description: 'Para birimi verilerini yeniden seed et'
+        )
+        booleanParam(
+            name: 'FORCE_CATEGORY_RESEED',
+            defaultValue: false,
+            description: 'Kategori verilerini yeniden seed et'
+        )
+        booleanParam(
+            name: 'FORCE_ROLE_RESEED',
+            defaultValue: false,
+            description: 'Rolleri yeniden seed et'
+        )
+
+        // ─── Resource Seeder ───────────────────────────────────────────────
+        booleanParam(
+            name: 'RUN_RESOURCE_SEEDER',
+            defaultValue: true,
+            description: 'Migration sonrası ResourceSeeder çalıştır (endpoint namespace kayıtları)'
+        )
+    }
+
+    environment {
+        SERVER_SSH_KEY_ID = 'maden-server-key'
+        SERVER_HOST_ID    = 'dev-server-host'
+        MIGRATION_IMAGE   = 'livestock-migration-job'
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '30'))
+        timeout(time: 30, unit: 'MINUTES')
+        timestamps()
+        disableConcurrentBuilds()
+    }
+
+    stages {
+
+        // ─────────────────────────────────────────────────────────────────
+        stage('Validate') {
+            steps {
+                script {
+                    if (!params.MIGRATE_DEV && !params.MIGRATE_PROD) {
+                        error("❌ En az bir ortam seçmelisiniz: MIGRATE_DEV veya MIGRATE_PROD")
+                    }
+
+                    def targets = []
+                    if (params.MIGRATE_DEV)  targets << 'DEV'
+                    if (params.MIGRATE_PROD) targets << 'PROD'
+
+                    def seedFlags = []
+                    if (params.FORCE_COUNTRY_RESEED)  seedFlags << '--force-country-reseed'
+                    if (params.FORCE_CURRENCY_RESEED) seedFlags << '--force-currency-reseed'
+                    if (params.FORCE_CATEGORY_RESEED) seedFlags << '--force-category-reseed'
+                    if (params.FORCE_ROLE_RESEED)     seedFlags << '--force-role-reseed'
+
+                    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                    echo "Hedef ortamlar  : ${targets.join(', ')}"
+                    echo "Seed flag'leri  : ${seedFlags ? seedFlags.join(' ') : '(yok)'}"
+                    echo "ResourceSeeder  : ${params.RUN_RESOURCE_SEEDER ? 'EVET' : 'HAYIR'}"
+                    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                }
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────
+        stage('Build Migration Image') {
+            steps {
+                script {
+                    echo "Migration Job Docker image build ediliyor..."
+
+                    withCredentials([
+                        sshUserPrivateKey(credentialsId: env.SERVER_SSH_KEY_ID, keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER'),
+                        string(credentialsId: env.SERVER_HOST_ID, variable: 'SERVER_HOST')
+                    ]) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no -i "\$SSH_KEY" \${SSH_USER}@\${SERVER_HOST} bash <<'ENDSSH'
+set -e
+BASE_DIR="/opt/livestocktrading"
+REPO_DIR="\$BASE_DIR/repo"
+
+echo "Repo güncelleniyor..."
+cd "\$REPO_DIR"
+git fetch --all
+git checkout main
+git pull origin main
+
+echo "Migration image build ediliyor..."
+docker build -f _devops/docker/Dockerfile.migration-job \\
+    -t ${env.MIGRATION_IMAGE}:latest \\
+    . 2>&1
+
+echo "Image build tamamlandi: ${env.MIGRATION_IMAGE}:latest"
+ENDSSH
+                        """
+                    }
+                }
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────
+        stage('DEV - Migration') {
+            when { expression { return params.MIGRATE_DEV } }
+            steps {
+                script {
+                    def seedArgs = buildSeedArgs()
+
+                    withCredentials([
+                        sshUserPrivateKey(credentialsId: env.SERVER_SSH_KEY_ID, keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER'),
+                        string(credentialsId: env.SERVER_HOST_ID, variable: 'SERVER_HOST')
+                    ]) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no -i "\$SSH_KEY" \${SSH_USER}@\${SERVER_HOST} bash <<'ENDSSH'
+set -e
+BASE_DIR="/opt/livestocktrading"
+
+# Connection string'i .env.dev'den oku
+DEV_SQL_CONN=\$(grep '^SQL_CONNECTION_STRING=' "\$BASE_DIR/.env.dev" | cut -d= -f2-)
+
+if [ -z "\$DEV_SQL_CONN" ]; then
+    echo "❌ .env.dev içinde SQL_CONNECTION_STRING bulunamadı!"
+    exit 1
+fi
+
+echo "DEV migration başlıyor..."
+docker run --rm \\
+    --network livestock_dev_livestocktrading-network \\
+    -e "ConnectionStrings__SqlConnectionString=\$DEV_SQL_CONN" \\
+    ${env.MIGRATION_IMAGE}:latest \\
+    development ${seedArgs}
+
+echo "✅ DEV migration tamamlandı!"
+ENDSSH
+                        """
+                    }
+                }
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────
+        stage('DEV - Resource Seeder') {
+            when {
+                allOf {
+                    expression { return params.MIGRATE_DEV }
+                    expression { return params.RUN_RESOURCE_SEEDER }
+                }
+            }
+            steps {
+                script {
+                    withCredentials([
+                        sshUserPrivateKey(credentialsId: env.SERVER_SSH_KEY_ID, keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER'),
+                        string(credentialsId: env.SERVER_HOST_ID, variable: 'SERVER_HOST')
+                    ]) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no -i "\$SSH_KEY" \${SSH_USER}@\${SERVER_HOST} bash <<'ENDSSH'
+set -e
+BASE_DIR="/opt/livestocktrading"
+
+echo "DEV ResourceSeeder çalışıyor..."
+docker run --rm \\
+    --network host \\
+    --env-file "\$BASE_DIR/.env.dev" \\
+    mstfaock/livestocktrading-resource-seeder:dev-latest \\
+    development || {
+    echo "⚠️  ResourceSeeder başarısız oldu, devam ediliyor..."
+}
+
+echo "✅ DEV ResourceSeeder tamamlandı!"
+ENDSSH
+                        """
+                    }
+                }
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────
+        stage('PROD - Migration') {
+            when { expression { return params.MIGRATE_PROD } }
+            steps {
+                script {
+                    def seedArgs = buildSeedArgs()
+
+                    withCredentials([
+                        sshUserPrivateKey(credentialsId: env.SERVER_SSH_KEY_ID, keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER'),
+                        string(credentialsId: env.SERVER_HOST_ID, variable: 'SERVER_HOST')
+                    ]) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no -i "\$SSH_KEY" \${SSH_USER}@\${SERVER_HOST} bash <<'ENDSSH'
+set -e
+BASE_DIR="/opt/livestocktrading"
+
+# Connection string'i .env.prod'dan oku
+PROD_SQL_CONN=\$(grep '^SQL_CONNECTION_STRING=' "\$BASE_DIR/.env.prod" | cut -d= -f2-)
+
+if [ -z "\$PROD_SQL_CONN" ]; then
+    echo "❌ .env.prod içinde SQL_CONNECTION_STRING bulunamadı!"
+    exit 1
+fi
+
+echo "PROD migration başlıyor..."
+docker run --rm \\
+    --network livestock_prod_livestocktrading-network \\
+    -e "ConnectionStrings__SqlConnectionString=\$PROD_SQL_CONN" \\
+    ${env.MIGRATION_IMAGE}:latest \\
+    production ${seedArgs}
+
+echo "✅ PROD migration tamamlandı!"
+ENDSSH
+                        """
+                    }
+                }
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────
+        stage('PROD - Resource Seeder') {
+            when {
+                allOf {
+                    expression { return params.MIGRATE_PROD }
+                    expression { return params.RUN_RESOURCE_SEEDER }
+                }
+            }
+            steps {
+                script {
+                    withCredentials([
+                        sshUserPrivateKey(credentialsId: env.SERVER_SSH_KEY_ID, keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER'),
+                        string(credentialsId: env.SERVER_HOST_ID, variable: 'SERVER_HOST')
+                    ]) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no -i "\$SSH_KEY" \${SSH_USER}@\${SERVER_HOST} bash <<'ENDSSH'
+set -e
+BASE_DIR="/opt/livestocktrading"
+
+echo "PROD ResourceSeeder çalışıyor..."
+docker run --rm \\
+    --network host \\
+    --env-file "\$BASE_DIR/.env.prod" \\
+    mstfaock/livestocktrading-resource-seeder:latest \\
+    production || {
+    echo "⚠️  ResourceSeeder başarısız oldu, devam ediliyor..."
+}
+
+echo "✅ PROD ResourceSeeder tamamlandı!"
+ENDSSH
+                        """
+                    }
+                }
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────
+        stage('Summary') {
+            steps {
+                script {
+                    def targets = []
+                    if (params.MIGRATE_DEV)  targets << 'DEV ✅'
+                    if (params.MIGRATE_PROD) targets << 'PROD ✅'
+                    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                    echo "Migration tamamlandı: ${targets.join(' | ')}"
+                    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                }
+            }
+        }
+    }
+
+    post {
+        failure {
+            echo "❌ Migration pipeline başarısız oldu! Logları kontrol edin."
+        }
+        success {
+            echo "✅ Migration pipeline başarıyla tamamlandı."
+        }
+    }
+}
+
+// ─── Yardımcı Fonksiyon ────────────────────────────────────────────────────
+def buildSeedArgs() {
+    def args = []
+    if (params.FORCE_COUNTRY_RESEED)  args << '--force-country-reseed'
+    if (params.FORCE_CURRENCY_RESEED) args << '--force-currency-reseed'
+    if (params.FORCE_CATEGORY_RESEED) args << '--force-category-reseed'
+    if (params.FORCE_ROLE_RESEED)     args << '--force-role-reseed'
+    return args.join(' ')
+}
