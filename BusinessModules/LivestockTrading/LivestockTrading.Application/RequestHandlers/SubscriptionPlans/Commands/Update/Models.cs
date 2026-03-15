@@ -1,0 +1,53 @@
+namespace LivestockTrading.Application.RequestHandlers.SubscriptionPlans.Commands.Update;
+
+public class RequestModel : IRequestModel
+{
+	public Guid Id { get; set; }
+	public string Name { get; set; }
+	public string Description { get; set; }
+	public string NameTranslations { get; set; }
+	public string DescriptionTranslations { get; set; }
+	public decimal PriceMonthly { get; set; }
+	public decimal PriceYearly { get; set; }
+	public string Currency { get; set; }
+	public int MaxActiveListings { get; set; }
+	public int MaxPhotosPerListing { get; set; }
+	public int MonthlyBoostCredits { get; set; }
+	public bool HasDetailedAnalytics { get; set; }
+	public bool HasPrioritySupport { get; set; }
+	public bool HasFeaturedBadge { get; set; }
+	public bool IsActive { get; set; }
+	public string AppleProductIdMonthly { get; set; }
+	public string AppleProductIdYearly { get; set; }
+	public string GoogleProductIdMonthly { get; set; }
+	public string GoogleProductIdYearly { get; set; }
+	public int SortOrder { get; set; }
+}
+
+public class ResponseModel : IResponseModel
+{
+	public Guid Id { get; set; }
+	public string Name { get; set; }
+	public string Description { get; set; }
+	public string NameTranslations { get; set; }
+	public string DescriptionTranslations { get; set; }
+	public int TargetType { get; set; }
+	public int Tier { get; set; }
+	public decimal PriceMonthly { get; set; }
+	public decimal PriceYearly { get; set; }
+	public string Currency { get; set; }
+	public string AppleProductIdMonthly { get; set; }
+	public string AppleProductIdYearly { get; set; }
+	public string GoogleProductIdMonthly { get; set; }
+	public string GoogleProductIdYearly { get; set; }
+	public int MaxActiveListings { get; set; }
+	public int MaxPhotosPerListing { get; set; }
+	public int MonthlyBoostCredits { get; set; }
+	public bool HasDetailedAnalytics { get; set; }
+	public bool HasPrioritySupport { get; set; }
+	public bool HasFeaturedBadge { get; set; }
+	public int SortOrder { get; set; }
+	public bool IsActive { get; set; }
+	public DateTime CreatedAt { get; set; }
+	public DateTime? UpdatedAt { get; set; }
+}

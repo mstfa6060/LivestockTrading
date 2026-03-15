@@ -38,6 +38,16 @@ pipeline {
             defaultValue: false,
             description: 'Rolleri yeniden seed et'
         )
+        booleanParam(
+            name: 'FORCE_SUBSCRIPTION_RESEED',
+            defaultValue: false,
+            description: 'Abonelik planlarını yeniden seed et'
+        )
+        booleanParam(
+            name: 'FORCE_BOOST_RESEED',
+            defaultValue: false,
+            description: 'Boost paketlerini yeniden seed et'
+        )
 
         // ─── Resource Seeder ───────────────────────────────────────────────
         booleanParam(
@@ -75,10 +85,12 @@ pipeline {
                     if (params.MIGRATE_PROD) targets << 'PROD'
 
                     def seedFlags = []
-                    if (params.FORCE_COUNTRY_RESEED)  seedFlags << '--force-country-reseed'
-                    if (params.FORCE_CURRENCY_RESEED) seedFlags << '--force-currency-reseed'
-                    if (params.FORCE_CATEGORY_RESEED) seedFlags << '--force-category-reseed'
-                    if (params.FORCE_ROLE_RESEED)     seedFlags << '--force-role-reseed'
+                    if (params.FORCE_COUNTRY_RESEED)      seedFlags << '--force-country-reseed'
+                    if (params.FORCE_CURRENCY_RESEED)     seedFlags << '--force-currency-reseed'
+                    if (params.FORCE_CATEGORY_RESEED)     seedFlags << '--force-category-reseed'
+                    if (params.FORCE_ROLE_RESEED)         seedFlags << '--force-role-reseed'
+                    if (params.FORCE_SUBSCRIPTION_RESEED) seedFlags << '--force-subscription-reseed'
+                    if (params.FORCE_BOOST_RESEED)        seedFlags << '--force-boost-reseed'
 
                     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
                     echo "Hedef ortamlar  : ${targets.join(', ')}"
@@ -302,9 +314,11 @@ ENDSSH
 // ─── Yardımcı Fonksiyon ────────────────────────────────────────────────────
 def buildSeedArgs() {
     def args = []
-    if (params.FORCE_COUNTRY_RESEED)  args << '--force-country-reseed'
-    if (params.FORCE_CURRENCY_RESEED) args << '--force-currency-reseed'
-    if (params.FORCE_CATEGORY_RESEED) args << '--force-category-reseed'
-    if (params.FORCE_ROLE_RESEED)     args << '--force-role-reseed'
+    if (params.FORCE_COUNTRY_RESEED)      args << '--force-country-reseed'
+    if (params.FORCE_CURRENCY_RESEED)     args << '--force-currency-reseed'
+    if (params.FORCE_CATEGORY_RESEED)     args << '--force-category-reseed'
+    if (params.FORCE_ROLE_RESEED)         args << '--force-role-reseed'
+    if (params.FORCE_SUBSCRIPTION_RESEED) args << '--force-subscription-reseed'
+    if (params.FORCE_BOOST_RESEED)        args << '--force-boost-reseed'
     return args.join(' ')
 }

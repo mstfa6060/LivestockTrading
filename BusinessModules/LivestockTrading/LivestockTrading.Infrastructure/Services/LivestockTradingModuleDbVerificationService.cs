@@ -421,4 +421,20 @@ public class LivestockTradingModuleDbVerificationService : DefinitionDbValidatio
 		if (!exists)
 			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ShippingRateErrors.ShippingRateNotFound));
 	}
+
+	// BoostPackage
+	public async Task ValidateBoostPackageExists(Guid boostPackageId, CancellationToken ct = default)
+	{
+		var exists = await _dbContext.BoostPackages.AsNoTracking().AnyAsync(e => e.Id == boostPackageId && !e.IsDeleted, ct);
+		if (!exists)
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.BoostPackageErrors.BoostPackageNotFound));
+	}
+
+	// SubscriptionPlan
+	public async Task ValidateSubscriptionPlanExists(Guid planId, CancellationToken ct = default)
+	{
+		var exists = await _dbContext.SubscriptionPlans.AsNoTracking().AnyAsync(e => e.Id == planId && !e.IsDeleted, ct);
+		if (!exists)
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.SubscriptionPlanErrors.SubscriptionPlanNotFound));
+	}
 }
