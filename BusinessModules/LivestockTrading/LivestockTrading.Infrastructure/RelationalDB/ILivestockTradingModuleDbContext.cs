@@ -52,6 +52,13 @@ public interface ILivestockTradingModuleDbContext
     DbSet<ShippingZone> ShippingZones { get; set; }
     DbSet<ShippingRate> ShippingRates { get; set; }
 
+    // Subscriptions & Monetization
+    DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
+    DbSet<SellerSubscription> SellerSubscriptions { get; set; }
+    DbSet<IAPTransaction> IAPTransactions { get; set; }
+    DbSet<BoostPackage> BoostPackages { get; set; }
+    DbSet<ProductBoost> ProductBoosts { get; set; }
+
     // Deals & Transport
     DbSet<Deal> Deals { get; set; }
     DbSet<Transporter> Transporters { get; set; }
