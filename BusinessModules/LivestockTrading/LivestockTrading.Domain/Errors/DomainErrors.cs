@@ -382,6 +382,44 @@ public class LivestockTradingDomainErrors
         public static string SearchQueryTooShort { get; set; } = "Arama sorgusu en az 2 karakter olmalidir.";
     }
 
+    public static class SubscriptionPlanErrors
+    {
+        public static string SubscriptionPlanNotFound { get; set; } = "Abonelik plani bulunamadi.";
+        public static string SubscriptionPlanNameRequired { get; set; } = "Plan adi zorunludur.";
+        public static string SubscriptionPlanPriceRequired { get; set; } = "Plan fiyati zorunludur.";
+        public static string SubscriptionPlanNotActive { get; set; } = "Bu abonelik plani aktif degil.";
+    }
+
+    public static class SellerSubscriptionErrors
+    {
+        public static string SellerSubscriptionNotFound { get; set; } = "Abonelik bulunamadi.";
+        public static string SellerSubscriptionAlreadyActive { get; set; } = "Zaten aktif bir aboneliginiz var.";
+        public static string SellerSubscriptionExpired { get; set; } = "Aboneliginiz sona ermis.";
+        public static string SellerSubscriptionSellerRequired { get; set; } = "Satici bilgisi zorunludur.";
+        public static string SellerSubscriptionPlanRequired { get; set; } = "Abonelik plani zorunludur.";
+        public static string SellerSubscriptionReceiptRequired { get; set; } = "Satin alma makbuzu zorunludur.";
+        public static string SellerSubscriptionReceiptInvalid { get; set; } = "Satin alma makbuzu gecersiz.";
+        public static string SellerSubscriptionListingLimitReached { get; set; } = "Aktif ilan limitinize ulastiniz. Planınızı yükseltin.";
+    }
+
+    public static class BoostPackageErrors
+    {
+        public static string BoostPackageNotFound { get; set; } = "Boost paketi bulunamadi.";
+        public static string BoostPackageNameRequired { get; set; } = "Paket adi zorunludur.";
+        public static string BoostPackagePriceRequired { get; set; } = "Paket fiyati zorunludur.";
+        public static string BoostPackageNotActive { get; set; } = "Bu boost paketi aktif degil.";
+    }
+
+    public static class ProductBoostErrors
+    {
+        public static string ProductBoostNotFound { get; set; } = "Boost kaydı bulunamadi.";
+        public static string ProductBoostProductRequired { get; set; } = "Urun zorunludur.";
+        public static string ProductBoostPackageRequired { get; set; } = "Boost paketi zorunludur.";
+        public static string ProductBoostAlreadyActive { get; set; } = "Bu urun zaten boost edilmis.";
+        public static string ProductBoostReceiptRequired { get; set; } = "Satin alma makbuzu zorunludur.";
+        public static string ProductBoostReceiptInvalid { get; set; } = "Satin alma makbuzu gecersiz.";
+    }
+
     public static class AuthorizationErrors
     {
         public static string InsufficientPermission { get; set; } = "Bu islem icin yetkiniz yok.";

@@ -1,0 +1,23 @@
+@BaseUrl = http://localhost:5221
+
+### Tum abonelik planlarini listele
+POST {{BaseUrl}}/SubscriptionPlans/All
+Content-Type: application/json
+
+{
+    "languageCode": "tr",
+    "targetType": 0,
+    "pageRequest": {
+        "page": 1,
+        "pageSize": 10
+    }
+}
+
+### Plan detayi
+POST {{BaseUrl}}/SubscriptionPlans/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000001",
+    "languageCode": "tr"
+}

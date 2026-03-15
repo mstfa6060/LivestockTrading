@@ -121,6 +121,13 @@ public class Product : BaseEntity
     /// <summary>Kapak görseli FileEntry.Id (FileProvider'dan)</summary>
     public string CoverImageFileId { get; set; }
 
+    /// <summary>Öne çıkarılmış mı?</summary>
+    public bool IsFeatured { get; set; }
+    /// <summary>Öne çıkarma bitiş tarihi</summary>
+    public DateTime? FeaturedUntil { get; set; }
+    /// <summary>Boost skoru (sıralama ağırlığı, 0 = boost yok)</summary>
+    public int BoostScore { get; set; }
+
     public ICollection<ProductReview> Reviews { get; set; }
     public ICollection<ProductVariant> Variants { get; set; }
     public ICollection<FavoriteProduct> Favorites { get; set; }

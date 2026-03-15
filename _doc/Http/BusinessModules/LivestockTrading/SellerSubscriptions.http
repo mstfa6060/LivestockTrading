@@ -1,0 +1,36 @@
+@BaseUrl = http://localhost:5221
+@Token = Bearer {JWT_TOKEN}
+
+### Abonelik baslat (IAP receipt ile)
+POST {{BaseUrl}}/SellerSubscriptions/Create
+Content-Type: application/json
+Authorization: {{Token}}
+
+{
+    "sellerId": "00000000-0000-0000-0000-000000000001",
+    "subscriptionPlanId": "00000000-0000-0000-0000-000000000002",
+    "period": 0,
+    "platform": 0,
+    "receipt": "APPLE_RECEIPT_DATA_HERE",
+    "storeTransactionId": "1000000123456789"
+}
+
+### Abonelik guncelle (iptal et)
+POST {{BaseUrl}}/SellerSubscriptions/Update
+Content-Type: application/json
+Authorization: {{Token}}
+
+{
+    "id": "00000000-0000-0000-0000-000000000001",
+    "status": 2,
+    "autoRenew": false
+}
+
+### Satici abonelik durumu
+POST {{BaseUrl}}/SellerSubscriptions/Detail
+Content-Type: application/json
+Authorization: {{Token}}
+
+{
+    "sellerId": "00000000-0000-0000-0000-000000000001"
+}

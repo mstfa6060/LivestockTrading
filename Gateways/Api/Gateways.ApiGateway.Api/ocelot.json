@@ -303,6 +303,48 @@
 			]
 		},
 		{
+			"DownstreamPathTemplate": "/SubscriptionPlans/All",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "livestocktrading-api-container",
+					"Port": 8080
+				}
+			],
+			"UpstreamPathTemplate": "/livestocktrading/SubscriptionPlans/All",
+			"UpstreamHttpMethod": [
+				"POST"
+			]
+		},
+		{
+			"DownstreamPathTemplate": "/SubscriptionPlans/Detail",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "livestocktrading-api-container",
+					"Port": 8080
+				}
+			],
+			"UpstreamPathTemplate": "/livestocktrading/SubscriptionPlans/Detail",
+			"UpstreamHttpMethod": [
+				"POST"
+			]
+		},
+		{
+			"DownstreamPathTemplate": "/BoostPackages/All",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "livestocktrading-api-container",
+					"Port": 8080
+				}
+			],
+			"UpstreamPathTemplate": "/livestocktrading/BoostPackages/All",
+			"UpstreamHttpMethod": [
+				"POST"
+			]
+		},
+		{
 			"DownstreamPathTemplate": "/FAQs/All",
 			"DownstreamScheme": "http",
 			"DownstreamHostAndPorts": [

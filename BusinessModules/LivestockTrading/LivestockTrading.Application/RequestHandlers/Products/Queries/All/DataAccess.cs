@@ -53,7 +53,9 @@ public class DataAccess : IDataAccess
 		query = query.Sort(sorting).Filter(filters);
 
 		if (sorting == null)
-			query = query.OrderByDescending(p => p.CreatedAt);
+			query = query.OrderByDescending(p => p.BoostScore > 0 && p.FeaturedUntil > DateTime.UtcNow)
+				.ThenByDescending(p => p.BoostScore)
+				.ThenByDescending(p => p.CreatedAt);
 
 		var page = query.GetPage(pageRequest);
 		var products = await query.Paginate(page).ToListAsync(ct);

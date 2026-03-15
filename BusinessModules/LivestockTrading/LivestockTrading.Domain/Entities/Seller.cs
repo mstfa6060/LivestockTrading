@@ -57,7 +57,10 @@ public class Seller : BaseEntity
     public string ShippingPolicy { get; set; }
     /// <summary>Sosyal medya linkleri JSON</summary>
     public string SocialMediaLinks { get; set; }
-    
+    /// <summary>Aktif abonelik ID</summary>
+    public Guid? ActiveSubscriptionId { get; set; }
+    public SellerSubscription ActiveSubscription { get; set; }
+
     public ICollection<Product> Products { get; set; }
     public ICollection<Farm> Farms { get; set; }
     public ICollection<SellerReview> Reviews { get; set; }

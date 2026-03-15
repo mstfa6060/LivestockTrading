@@ -1,0 +1,13 @@
+@BaseUrl = http://localhost:5221
+
+### Tum boost paketlerini listele
+POST {{BaseUrl}}/BoostPackages/All
+Content-Type: application/json
+
+{
+    "languageCode": "tr",
+    "pageRequest": {
+        "page": 1,
+        "pageSize": 10
+    }
+}

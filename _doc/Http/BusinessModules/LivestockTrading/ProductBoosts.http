@@ -1,0 +1,29 @@
+@BaseUrl = http://localhost:5221
+@Token = Bearer {JWT_TOKEN}
+
+### Urun boost et (IAP receipt ile)
+POST {{BaseUrl}}/ProductBoosts/Create
+Content-Type: application/json
+Authorization: {{Token}}
+
+{
+    "productId": "00000000-0000-0000-0000-000000000001",
+    "sellerId": "00000000-0000-0000-0000-000000000002",
+    "boostPackageId": "00000000-0000-0000-0000-000000000003",
+    "platform": 0,
+    "receipt": "APPLE_RECEIPT_DATA_HERE",
+    "storeTransactionId": "1000000123456789"
+}
+
+### Satici boost gecmisi
+POST {{BaseUrl}}/ProductBoosts/All
+Content-Type: application/json
+Authorization: {{Token}}
+
+{
+    "sellerId": "00000000-0000-0000-0000-000000000002",
+    "pageRequest": {
+        "page": 1,
+        "pageSize": 10
+    }
+}

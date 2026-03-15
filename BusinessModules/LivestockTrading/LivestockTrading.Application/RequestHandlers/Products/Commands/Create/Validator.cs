@@ -1,6 +1,7 @@
 using FluentValidation;
 using LivestockTrading.Domain.Errors;
 using LivestockTrading.Infrastructure.Services;
+using LivestockTrading.Application.Services;
 using Common.Services.ErrorCodeGenerator;
 
 namespace LivestockTrading.Application.RequestHandlers.Products.Commands.Create;
@@ -8,10 +9,12 @@ namespace LivestockTrading.Application.RequestHandlers.Products.Commands.Create;
 public class Validator : IRequestValidator
 {
 	private readonly LivestockTradingModuleDbValidationService _dbValidator;
+	private readonly SubscriptionEnforcementService _subscriptionEnforcement;
 
 	public Validator(ArfBlocksDependencyProvider dependencyProvider)
 	{
 		_dbValidator = dependencyProvider.GetInstance<LivestockTradingModuleDbValidationService>();
+		_subscriptionEnforcement = dependencyProvider.GetInstance<SubscriptionEnforcementService>();
 	}
 
 	public void ValidateRequestModel(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
@@ -29,7 +32,15 @@ public class Validator : IRequestValidator
 		await _dbValidator.ValidateCategoryExist(request.CategoryId, cancellationToken);
 		// SellerId artık opsiyonel - boş ise Handler'da otomatik oluşturulacak
 		if (request.SellerId.HasValue && request.SellerId.Value != Guid.Empty)
+		{
 			await _dbValidator.ValidateSellerExists(request.SellerId.Value, cancellationToken);
+
+			// Abonelik plan limitini kontrol et
+			var canCreate = await _subscriptionEnforcement.CanCreateListing(request.SellerId.Value, cancellationToken);
+			if (!canCreate)
+				throw new ArfBlocksValidationException(
+					ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.SellerSubscriptionErrors.SellerSubscriptionListingLimitReached));
+		}
 	}
 }
 

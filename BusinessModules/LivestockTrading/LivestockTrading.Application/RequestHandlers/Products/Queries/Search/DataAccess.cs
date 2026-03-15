@@ -88,7 +88,9 @@ public class DataAccess : IDataAccess
 		dbQuery = dbQuery.Sort(sorting);
 
 		if (sorting == null)
-			dbQuery = dbQuery.OrderByDescending(p => p.CreatedAt);
+			dbQuery = dbQuery.OrderByDescending(p => p.BoostScore > 0 && p.FeaturedUntil > DateTime.UtcNow)
+				.ThenByDescending(p => p.BoostScore)
+				.ThenByDescending(p => p.CreatedAt);
 
 		var page = dbQuery.GetPage(pageRequest);
 		var products = await dbQuery.Paginate(page).ToListAsync(ct);

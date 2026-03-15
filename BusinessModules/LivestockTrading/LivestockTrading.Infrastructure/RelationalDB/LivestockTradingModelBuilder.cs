@@ -272,6 +272,118 @@ public static class LivestockTradingModelBuilder
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
+        // ========================================
+        // SUBSCRIPTION PLAN
+        // ========================================
+        modelBuilder.Entity<SubscriptionPlan>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.PriceMonthly).HasPrecision(18, 2);
+            entity.Property(e => e.PriceYearly).HasPrecision(18, 2);
+            entity.Property(e => e.Currency).HasMaxLength(3);
+            entity.Property(e => e.AppleProductIdMonthly).HasMaxLength(200);
+            entity.Property(e => e.AppleProductIdYearly).HasMaxLength(200);
+            entity.Property(e => e.GoogleProductIdMonthly).HasMaxLength(200);
+            entity.Property(e => e.GoogleProductIdYearly).HasMaxLength(200);
+        });
+
+        // ========================================
+        // SELLER SUBSCRIPTION
+        // ========================================
+        modelBuilder.Entity<SellerSubscription>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.OriginalTransactionId).HasMaxLength(500);
+
+            entity.HasOne(e => e.Seller)
+                .WithMany()
+                .HasForeignKey(e => e.SellerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.SubscriptionPlan)
+                .WithMany(e => e.SellerSubscriptions)
+                .HasForeignKey(e => e.SubscriptionPlanId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.SellerId);
+            entity.HasIndex(e => e.Status);
+        });
+
+        // ========================================
+        // IAP TRANSACTION
+        // ========================================
+        modelBuilder.Entity<IAPTransaction>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.StoreTransactionId).HasMaxLength(500);
+            entity.Property(e => e.Amount).HasPrecision(18, 2);
+            entity.Property(e => e.Currency).HasMaxLength(3);
+
+            entity.HasOne(e => e.SellerSubscription)
+                .WithMany()
+                .HasForeignKey(e => e.SellerSubscriptionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.StoreTransactionId);
+        });
+
+        // ========================================
+        // BOOST PACKAGE
+        // ========================================
+        modelBuilder.Entity<BoostPackage>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Price).HasPrecision(18, 2);
+            entity.Property(e => e.Currency).HasMaxLength(3);
+            entity.Property(e => e.AppleProductId).HasMaxLength(200);
+            entity.Property(e => e.GoogleProductId).HasMaxLength(200);
+        });
+
+        // ========================================
+        // PRODUCT BOOST
+        // ========================================
+        modelBuilder.Entity<ProductBoost>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Seller)
+                .WithMany()
+                .HasForeignKey(e => e.SellerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.BoostPackage)
+                .WithMany()
+                .HasForeignKey(e => e.BoostPackageId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.IAPTransaction)
+                .WithMany()
+                .HasForeignKey(e => e.IAPTransactionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.ProductId);
+            entity.HasIndex(e => e.ExpiresAt);
+        });
+
+        // ========================================
+        // SELLER - Active Subscription Navigation
+        // ========================================
+        modelBuilder.Entity<Seller>(entity =>
+        {
+            entity.HasOne(e => e.ActiveSubscription)
+                .WithMany()
+                .HasForeignKey(e => e.ActiveSubscriptionId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
         // Country is managed by DefinitionDbContext (base class)
         modelBuilder.Ignore<Country>();
 
