@@ -90,10 +90,19 @@ RecurringJob.AddOrUpdate<UpdateExchangeRatesJob>(
     recurringOptions
 );
 
+// Süresi dolmuş boost'ları temizle - Her saat başı
+RecurringJob.AddOrUpdate<ExpireProductBoostsJob>(
+    nameof(ExpireProductBoostsJob),
+    job => job.Process(),
+    "0 * * * *",  // Her saat başı
+    recurringOptions
+);
+
 Log.Information("Hangfire Scheduler started!");
 Log.Information("Active Jobs:");
 Log.Information("  - LogStudentActivityJob (Daily at 09:00 and 18:00)");
 Log.Information("  - UpdateExchangeRatesJob (Every 6 hours)");
+Log.Information("  - ExpireProductBoostsJob (Every hour)");
 
 try
 {

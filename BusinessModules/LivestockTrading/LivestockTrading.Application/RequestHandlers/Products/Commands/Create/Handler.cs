@@ -1,7 +1,10 @@
 using System.Text.Json;
 using Common.Services.Messaging;
+using LivestockTrading.Application.Services;
 using LivestockTrading.Domain.Entities;
+using LivestockTrading.Domain.Errors;
 using LivestockTrading.Domain.Events;
+using Common.Services.ErrorCodeGenerator;
 
 namespace LivestockTrading.Application.RequestHandlers.Products.Commands.Create;
 
@@ -10,12 +13,14 @@ public class Handler : IRequestHandler
 	private readonly DataAccess _dataAccessLayer;
 	private readonly CurrentUserService _currentUserService;
 	private readonly IRabbitMqPublisher _publisher;
+	private readonly SubscriptionEnforcementService _subscriptionEnforcement;
 
 	public Handler(ArfBlocksDependencyProvider dependencyProvider, object dataAccess)
 	{
 		_dataAccessLayer = (DataAccess)dataAccess;
 		_currentUserService = dependencyProvider.GetInstance<CurrentUserService>();
 		_publisher = dependencyProvider.GetInstance<IRabbitMqPublisher>();
+		_subscriptionEnforcement = dependencyProvider.GetInstance<SubscriptionEnforcementService>();
 	}
 
 	public async Task<ArfBlocksRequestResult> Handle(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
@@ -25,6 +30,15 @@ public class Handler : IRequestHandler
 
 		// Get seller ID - auto-create if not provided
 		var sellerId = await GetOrCreateSellerId(request.SellerId, cancellationToken);
+
+		// SellerId sağlanmadıysa (auto-resolve akışı) limit kontrolü Validator'da yapılmamıştır
+		if (!request.SellerId.HasValue || request.SellerId.Value == Guid.Empty)
+		{
+			var canCreate = await _subscriptionEnforcement.CanCreateListing(sellerId, cancellationToken);
+			if (!canCreate)
+				throw new ArfBlocksValidationException(
+					ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.SellerSubscriptionErrors.SellerSubscriptionListingLimitReached));
+		}
 
 		var entity = mapper.MapToEntity(request);
 		entity.SellerId = sellerId;
