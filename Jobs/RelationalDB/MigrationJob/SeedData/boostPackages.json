@@ -1,0 +1,50 @@
+[
+  {
+    "id": "c0000000-0000-0000-0000-000000000001",
+    "name": "Daily Boost",
+    "nameTranslations": "{\"en\":\"Daily Boost\",\"tr\":\"Günlük Boost\",\"de\":\"Tages-Boost\",\"fr\":\"Boost Quotidien\",\"es\":\"Impulso Diario\",\"ar\":\"تعزيز يومي\",\"ru\":\"Дневной буст\",\"zh\":\"每日推广\"}",
+    "description": "24-hour visibility boost for your listing",
+    "descriptionTranslations": "{\"en\":\"24-hour visibility boost for your listing\",\"tr\":\"İlanınız için 24 saatlik görünürlük artışı\",\"de\":\"24-Stunden-Sichtbarkeits-Boost für Ihre Anzeige\",\"fr\":\"Boost de visibilité de 24 heures pour votre annonce\",\"es\":\"Impulso de visibilidad de 24 horas para su listado\",\"ar\":\"تعزيز رؤية لمدة 24 ساعة لإعلانك\",\"ru\":\"24-часовое повышение видимости вашего объявления\",\"zh\":\"为您的列表提供24小时可见度提升\"}",
+    "durationHours": 24,
+    "price": 2.99,
+    "currency": "USD",
+    "appleProductId": "com.livestocktrading.boost.daily",
+    "googleProductId": "boost_daily",
+    "boostType": 0,
+    "boostScore": 10,
+    "sortOrder": 1,
+    "isActive": true
+  },
+  {
+    "id": "c0000000-0000-0000-0000-000000000002",
+    "name": "Weekly Boost",
+    "nameTranslations": "{\"en\":\"Weekly Boost\",\"tr\":\"Haftalık Boost\",\"de\":\"Wochen-Boost\",\"fr\":\"Boost Hebdomadaire\",\"es\":\"Impulso Semanal\",\"ar\":\"تعزيز أسبوعي\",\"ru\":\"Недельный буст\",\"zh\":\"每周推广\"}",
+    "description": "7-day visibility boost with higher ranking",
+    "descriptionTranslations": "{\"en\":\"7-day visibility boost with higher ranking\",\"tr\":\"Daha yüksek sıralama ile 7 günlük görünürlük artışı\",\"de\":\"7-Tage-Sichtbarkeits-Boost mit höherem Ranking\",\"fr\":\"Boost de visibilité de 7 jours avec un meilleur classement\",\"es\":\"Impulso de visibilidad de 7 días con mayor clasificación\",\"ar\":\"تعزيز رؤية لمدة 7 أيام مع ترتيب أعلى\",\"ru\":\"7-дневное повышение видимости с более высоким рейтингом\",\"zh\":\"7天可见度提升，排名更高\"}",
+    "durationHours": 168,
+    "price": 9.99,
+    "currency": "USD",
+    "appleProductId": "com.livestocktrading.boost.weekly",
+    "googleProductId": "boost_weekly",
+    "boostType": 1,
+    "boostScore": 25,
+    "sortOrder": 2,
+    "isActive": true
+  },
+  {
+    "id": "c0000000-0000-0000-0000-000000000003",
+    "name": "Mega Boost",
+    "nameTranslations": "{\"en\":\"Mega Boost\",\"tr\":\"Mega Boost\",\"de\":\"Mega-Boost\",\"fr\":\"Méga Boost\",\"es\":\"Mega Impulso\",\"ar\":\"تعزيز ضخم\",\"ru\":\"Мега буст\",\"zh\":\"超级推广\"}",
+    "description": "30-day maximum visibility with featured badge",
+    "descriptionTranslations": "{\"en\":\"30-day maximum visibility with featured badge\",\"tr\":\"Öne çıkan rozet ile 30 günlük maksimum görünürlük\",\"de\":\"30-Tage-Maximalsichtbarkeit mit Empfehlungs-Badge\",\"fr\":\"Visibilité maximale de 30 jours avec badge en vedette\",\"es\":\"Visibilidad máxima de 30 días con insignia destacada\",\"ar\":\"رؤية قصوى لمدة 30 يومًا مع شارة مميزة\",\"ru\":\"30-дневная максимальная видимость со значком рекомендации\",\"zh\":\"30天最大可见度，带推荐徽章\"}",
+    "durationHours": 720,
+    "price": 24.99,
+    "currency": "USD",
+    "appleProductId": "com.livestocktrading.boost.mega",
+    "googleProductId": "boost_mega",
+    "boostType": 2,
+    "boostScore": 50,
+    "sortOrder": 3,
+    "isActive": true
+  }
+]

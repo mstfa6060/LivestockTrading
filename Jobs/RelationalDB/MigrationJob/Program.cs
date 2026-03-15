@@ -90,6 +90,32 @@ class Program
             throw;
         }
 
+        // Seed Data - Abonelik Planları
+        try
+        {
+            var forceSubscriptionReseed = args.Contains("--force-subscription-reseed");
+            var subscriptionPlanSeeder = new SubscriptionPlanSeeder(dbContext);
+            await subscriptionPlanSeeder.SeedAsync(forceSubscriptionReseed);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Subscription plan seed FAILED: {ex.Message}");
+            throw;
+        }
+
+        // Seed Data - Boost Paketleri
+        try
+        {
+            var forceBoostReseed = args.Contains("--force-boost-reseed");
+            var boostPackageSeeder = new BoostPackageSeeder(dbContext);
+            await boostPackageSeeder.SeedAsync(forceBoostReseed);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Boost package seed FAILED: {ex.Message}");
+            throw;
+        }
+
         Console.WriteLine("All operations completed successfully.");
     }
 }
