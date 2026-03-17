@@ -79,12 +79,34 @@ Content-Type: application/json
     "pageRequest": { "page": 1, "pageSize": 10 }
 }
 
+### All - Viewer currency (EUR kullanıcısı için fiyat dönüşümü)
+POST {{BaseUrl}}/Products/All
+Content-Type: application/json
+
+{
+    "countryCode": "",
+    "targetCurrencyCode": "",
+    "viewerCurrencyCode": "EUR",
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
 ### Detail
 POST {{BaseUrl}}/Products/Detail
 Content-Type: application/json
 
 {
     "id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Detail - Viewer currency (EUR kullanıcısı için fiyat dönüşümü)
+POST {{BaseUrl}}/Products/Detail
+Content-Type: application/json
+
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "viewerCurrencyCode": "EUR"
 }
 
 ### Pick
@@ -165,6 +187,19 @@ Content-Type: application/json
     "city": "Istanbul",
     "countryCode": "TR",
     "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Search - Viewer currency (GBP kullanıcısı için fiyat dönüşümü)
+POST {{BaseUrl}}/Products/Search
+Content-Type: application/json
+
+{
+    "query": "",
+    "countryCode": "",
+    "city": "",
+    "viewerCurrencyCode": "GBP",
+    "sorting": { "key": "createdAt", "direction": 1 },
+    "pageRequest": { "currentPage": 1, "perPageCount": 10, "listAll": false }
 }
 
 ### Delete

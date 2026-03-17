@@ -19,7 +19,17 @@ public class Handler : IRequestHandler
 			throw new ArfBlocksValidationException(
 				ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ProductErrors.ProductNotFound));
 
-		var response = mapper.MapToResponse(product);
+		// ViewerCurrencyCode verilmişse pre-computed ProductPrice kaydını al
+		LivestockTrading.Domain.Entities.ProductPrice viewerProductPrice = null;
+		string viewerCurrencySymbol = null;
+		if (!string.IsNullOrWhiteSpace(req.ViewerCurrencyCode))
+		{
+			viewerProductPrice = await _dataAccessLayer.GetProductPriceForCurrency(product.Id, req.ViewerCurrencyCode, cancellationToken);
+			if (viewerProductPrice != null)
+				viewerCurrencySymbol = await _dataAccessLayer.GetCurrencySymbol(req.ViewerCurrencyCode, cancellationToken);
+		}
+
+		var response = mapper.MapToResponse(product, viewerProductPrice, req.ViewerCurrencyCode, viewerCurrencySymbol);
 
 		return ArfBlocksResults.Success(response);
 	}

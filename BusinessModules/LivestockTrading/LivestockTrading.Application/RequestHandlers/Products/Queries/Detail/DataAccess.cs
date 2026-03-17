@@ -23,4 +23,24 @@ public class DataAccess : IDataAccess
 			.Include(p => p.Location)
 			.FirstOrDefaultAsync(p => p.Id == id && (includeDeleted || !p.IsDeleted), ct);
 	}
+
+	public async Task<ProductPrice> GetProductPriceForCurrency(Guid productId, string currencyCode, CancellationToken ct)
+	{
+		if (string.IsNullOrWhiteSpace(currencyCode)) return null;
+		var upperCode = currencyCode.ToUpperInvariant();
+		return await _dbContext.ProductPrices
+			.AsNoTracking()
+			.FirstOrDefaultAsync(pp => pp.ProductId == productId && pp.CurrencyCode == upperCode && pp.IsActive && !pp.IsDeleted, ct);
+	}
+
+	public async Task<string> GetCurrencySymbol(string currencyCode, CancellationToken ct)
+	{
+		if (string.IsNullOrWhiteSpace(currencyCode)) return null;
+		var upperCode = currencyCode.ToUpperInvariant();
+		return await _dbContext.Currencies
+			.AsNoTracking()
+			.Where(c => c.Code == upperCode && !c.IsDeleted)
+			.Select(c => c.Symbol)
+			.FirstOrDefaultAsync(ct);
+	}
 }

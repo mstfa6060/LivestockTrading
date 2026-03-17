@@ -39,7 +39,17 @@ public class Handler : IRequestHandler
 			includeDeleted,
 			cancellationToken);
 
-		var response = mapper.MapToResponse(products);
+		// ViewerCurrencyCode verilmişse pre-computed ProductPrice kayıtlarını al
+		Dictionary<Guid, LivestockTrading.Domain.Entities.ProductPrice> viewerPrices = null;
+		string viewerCurrencySymbol = null;
+		if (!string.IsNullOrWhiteSpace(req.ViewerCurrencyCode) && products.Any())
+		{
+			var productIds = products.Select(p => p.Id).ToList();
+			viewerPrices = await _dataAccessLayer.GetProductPricesForCurrency(productIds, req.ViewerCurrencyCode, cancellationToken);
+			viewerCurrencySymbol = await _dataAccessLayer.GetCurrencySymbol(req.ViewerCurrencyCode, cancellationToken);
+		}
+
+		var response = mapper.MapToResponse(products, viewerPrices, req.ViewerCurrencyCode, viewerCurrencySymbol);
 		return ArfBlocksResults.Success(response, page);
 	}
 }

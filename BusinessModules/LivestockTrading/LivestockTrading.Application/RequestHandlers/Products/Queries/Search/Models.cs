@@ -48,6 +48,12 @@ public class RequestModel : IRequestModel
 	/// </summary>
 	public Guid? SellerId { get; set; }
 
+	/// <summary>
+	/// Viewer's currency code (ISO 4217, e.g. "TRY", "EUR", "GBP").
+	/// Returns the pre-computed ProductPrice in this currency alongside the original price.
+	/// </summary>
+	public string ViewerCurrencyCode { get; set; }
+
 	public XSorting Sorting { get; set; }
 	public XPageRequest PageRequest { get; set; }
 }
@@ -78,4 +84,13 @@ public class ResponseModel : IResponseModel<Array>
 	public string CoverImageFileId { get; set; }
 	public string MediaBucketId { get; set; }
 	public DateTime CreatedAt { get; set; }
+
+	/// <summary>Price in viewer's currency (null if no conversion available)</summary>
+	public decimal? ViewerPrice { get; set; }
+	/// <summary>Discounted price in viewer's currency</summary>
+	public decimal? ViewerDiscountedPrice { get; set; }
+	/// <summary>Viewer's currency code</summary>
+	public string ViewerCurrencyCode { get; set; }
+	/// <summary>Viewer's currency symbol</summary>
+	public string ViewerCurrencySymbol { get; set; }
 }

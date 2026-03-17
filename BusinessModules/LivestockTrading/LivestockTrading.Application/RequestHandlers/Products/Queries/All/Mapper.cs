@@ -7,7 +7,10 @@ public class Mapper
 	public List<ResponseModel> MapToResponse(
 		List<Product> products,
 		string targetCurrencyCode = null,
-		Dictionary<string, Currency> currencyRates = null)
+		Dictionary<string, Currency> currencyRates = null,
+		Dictionary<Guid, ProductPrice> viewerPrices = null,
+		string viewerCurrencyCode = null,
+		string viewerCurrencySymbol = null)
 	{
 		return products.Select(p =>
 		{
@@ -38,7 +41,7 @@ public class Mapper
 				CoverImageFileId = p.CoverImageFileId
 			};
 
-			// Fiyat dönüşümü
+			// Fiyat dönüşümü (exchange rate based)
 			if (!string.IsNullOrWhiteSpace(targetCurrencyCode) && currencyRates != null
 				&& !string.IsNullOrWhiteSpace(p.Currency)
 				&& currencyRates.TryGetValue(p.Currency, out var fromCurrency)
@@ -55,6 +58,15 @@ public class Mapper
 					var discountInUsd = p.DiscountedPrice.Value / fromCurrency.ExchangeRateToUSD;
 					response.ConvertedDiscountedPrice = Math.Round(discountInUsd * toCurrency.ExchangeRateToUSD, 2);
 				}
+			}
+
+			// Viewer currency (pre-computed ProductPrice based)
+			if (viewerPrices != null && viewerPrices.TryGetValue(p.Id, out var vp))
+			{
+				response.ViewerPrice = vp.Price;
+				response.ViewerDiscountedPrice = vp.DiscountedPrice;
+				response.ViewerCurrencyCode = viewerCurrencyCode;
+				response.ViewerCurrencySymbol = viewerCurrencySymbol;
 			}
 
 			return response;

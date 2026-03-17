@@ -33,7 +33,17 @@ public class Handler : IRequestHandler
 		if (!string.IsNullOrWhiteSpace(req.TargetCurrencyCode))
 			currencyRates = await _dataAccessLayer.GetCurrencyRates(cancellationToken);
 
-		var response = mapper.MapToResponse(products, req.TargetCurrencyCode, currencyRates);
+		// ViewerCurrencyCode verilmişse pre-computed ProductPrice kayıtlarını al
+		Dictionary<Guid, LivestockTrading.Domain.Entities.ProductPrice> viewerPrices = null;
+		string viewerCurrencySymbol = null;
+		if (!string.IsNullOrWhiteSpace(req.ViewerCurrencyCode) && products.Any())
+		{
+			var productIds = products.Select(p => p.Id).ToList();
+			viewerPrices = await _dataAccessLayer.GetProductPricesForCurrency(productIds, req.ViewerCurrencyCode, cancellationToken);
+			viewerCurrencySymbol = await _dataAccessLayer.GetCurrencySymbol(req.ViewerCurrencyCode, cancellationToken);
+		}
+
+		var response = mapper.MapToResponse(products, req.TargetCurrencyCode, currencyRates, viewerPrices, req.ViewerCurrencyCode, viewerCurrencySymbol);
 
 		return ArfBlocksResults.Success(response, page);
 	}

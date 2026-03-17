@@ -1,5 +1,6 @@
 using LivestockTrading.Domain.Entities;
 using LivestockTrading.Infrastructure.RelationalDB;
+using Microsoft.EntityFrameworkCore;
 
 namespace LivestockTrading.Application.RequestHandlers.Products.Queries.Search;
 
@@ -10,6 +11,31 @@ public class DataAccess : IDataAccess
 	public DataAccess(ArfBlocksDependencyProvider dbContextProvider)
 	{
 		_dbContext = dbContextProvider.GetInstance<LivestockTradingModuleDbContext>();
+	}
+
+	public async Task<Dictionary<Guid, ProductPrice>> GetProductPricesForCurrency(List<Guid> productIds, string currencyCode, CancellationToken ct)
+	{
+		if (string.IsNullOrWhiteSpace(currencyCode) || !productIds.Any())
+			return new Dictionary<Guid, ProductPrice>();
+
+		var upperCode = currencyCode.ToUpperInvariant();
+		return await _dbContext.ProductPrices
+			.AsNoTracking()
+			.Where(pp => productIds.Contains(pp.ProductId) && pp.CurrencyCode == upperCode && pp.IsActive && !pp.IsDeleted)
+			.GroupBy(pp => pp.ProductId)
+			.Select(g => g.First())
+			.ToDictionaryAsync(pp => pp.ProductId, ct);
+	}
+
+	public async Task<string> GetCurrencySymbol(string currencyCode, CancellationToken ct)
+	{
+		if (string.IsNullOrWhiteSpace(currencyCode)) return null;
+		var upperCode = currencyCode.ToUpperInvariant();
+		return await _dbContext.Currencies
+			.AsNoTracking()
+			.Where(c => c.Code == upperCode && !c.IsDeleted)
+			.Select(c => c.Symbol)
+			.FirstOrDefaultAsync(ct);
 	}
 
 	public async Task<(List<Product> Products, XPageResponse Page)> Search(

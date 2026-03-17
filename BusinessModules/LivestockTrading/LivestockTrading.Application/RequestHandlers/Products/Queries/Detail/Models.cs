@@ -3,6 +3,11 @@ namespace LivestockTrading.Application.RequestHandlers.Products.Queries.Detail;
 public class RequestModel : IRequestModel
 {
 	public Guid Id { get; set; }
+	/// <summary>
+	/// Viewer's currency code (ISO 4217, e.g. "TRY", "EUR", "GBP").
+	/// Returns the pre-computed ProductPrice in this currency alongside the original price.
+	/// </summary>
+	public string ViewerCurrencyCode { get; set; }
 }
 
 public class ResponseModel : IResponseModel
@@ -49,4 +54,13 @@ public class ResponseModel : IResponseModel
 	public DateTime? UpdatedAt { get; set; }
 	public string MediaBucketId { get; set; }
 	public string CoverImageFileId { get; set; }
+
+	/// <summary>Price in viewer's currency (null if no conversion available)</summary>
+	public decimal? ViewerPrice { get; set; }
+	/// <summary>Discounted price in viewer's currency</summary>
+	public decimal? ViewerDiscountedPrice { get; set; }
+	/// <summary>Viewer's currency code</summary>
+	public string ViewerCurrencyCode { get; set; }
+	/// <summary>Viewer's currency symbol</summary>
+	public string ViewerCurrencySymbol { get; set; }
 }

@@ -4,9 +4,13 @@ namespace LivestockTrading.Application.RequestHandlers.Products.Queries.Detail;
 
 public class Mapper
 {
-	public ResponseModel MapToResponse(Product entity)
+	public ResponseModel MapToResponse(
+		Product entity,
+		ProductPrice viewerProductPrice = null,
+		string viewerCurrencyCode = null,
+		string viewerCurrencySymbol = null)
 	{
-		return new ResponseModel
+		var response = new ResponseModel
 		{
 			Id = entity.Id,
 			Title = entity.Title,
@@ -51,5 +55,16 @@ public class Mapper
 			MediaBucketId = entity.MediaBucketId,
 			CoverImageFileId = entity.CoverImageFileId
 		};
+
+		// Viewer currency (pre-computed ProductPrice based)
+		if (viewerProductPrice != null)
+		{
+			response.ViewerPrice = viewerProductPrice.Price;
+			response.ViewerDiscountedPrice = viewerProductPrice.DiscountedPrice;
+			response.ViewerCurrencyCode = viewerCurrencyCode;
+			response.ViewerCurrencySymbol = viewerCurrencySymbol;
+		}
+
+		return response;
 	}
 }
