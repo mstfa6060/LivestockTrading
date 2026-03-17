@@ -232,6 +232,21 @@ public static class LivestockTradingModelBuilder
         });
 
         // ========================================
+        // PRODUCT IMAGE
+        // ========================================
+        modelBuilder.Entity<ProductImage>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.ProductId);
+        });
+
+        // ========================================
         // TAX & SHIPPING
         // ========================================
         modelBuilder.Entity<TaxRate>(entity =>

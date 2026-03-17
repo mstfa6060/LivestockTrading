@@ -2,7 +2,7 @@ using LivestockTrading.Application.Authorization;
 using LivestockTrading.Infrastructure.Services;
 using Common.Services.Auth.CurrentUser;
 
-namespace LivestockTrading.Application.RequestHandlers.Transporters.Commands.Delete;
+namespace LivestockTrading.Application.RequestHandlers.ProductImages.Commands.Delete;
 
 public class Verificator : IRequestVerificator
 {
@@ -19,9 +19,9 @@ public class Verificator : IRequestVerificator
 
 	public async Task VerificateActor(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
 	{
-		// Rol kontrolü: Transporter, Admin veya Moderator
+		// Rol kontrolu: Seller, Admin veya Moderator
 		_permissionService.RequireAnyRole(
-			Constants.LivestockTradingConstants.Roles.Transporter,
+			Constants.LivestockTradingConstants.Roles.Seller,
 			Constants.LivestockTradingConstants.Roles.Admin,
 			Constants.LivestockTradingConstants.Roles.Moderator);
 		await Task.CompletedTask;
@@ -30,13 +30,13 @@ public class Verificator : IRequestVerificator
 	public async Task VerificateDomain(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
 	{
 		var request = (RequestModel)payload;
-		await _dbVerification.ValidateTransporterExists(request.Id, cancellationToken);
+		await _dbVerification.ValidateProductImageExists(request.Id, cancellationToken);
 
-		// Admin/Moderator can delete any transporter; Transporters can only delete their own profile
+		// Admin/Moderator can delete any product image; Sellers can only delete images from their own products
 		if (!_permissionService.IsModerator())
 		{
 			var currentUserId = _currentUserService.GetCurrentUserId();
-			await _dbVerification.ValidateTransporterOwnership(request.Id, currentUserId, cancellationToken);
+			await _dbVerification.ValidateProductImageOwnership(request.Id, currentUserId, cancellationToken);
 		}
 	}
 }

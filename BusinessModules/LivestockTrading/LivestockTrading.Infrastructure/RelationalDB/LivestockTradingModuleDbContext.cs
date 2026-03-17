@@ -24,6 +24,7 @@ public class LivestockTradingModuleDbContext : DefinitionDbContext, ILivestockTr
     public DbSet<Brand> Brands { get; set; }
     public DbSet<ProductVariant> ProductVariants { get; set; }
     public DbSet<ProductPrice> ProductPrices { get; set; }
+    public DbSet<ProductImage> ProductImages { get; set; }
 
     // Location & Sellers
     public DbSet<Location> Locations { get; set; }

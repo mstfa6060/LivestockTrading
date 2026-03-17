@@ -350,6 +350,65 @@ public class LivestockTradingModuleDbVerificationService : DefinitionDbValidatio
 			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.TransportTrackingErrors.TransportTrackingNotFound));
 	}
 
+	// Ownership: Seller profile belongs to the current user
+	public async Task ValidateSellerOwnership(Guid sellerId, Guid currentUserId, CancellationToken ct = default)
+	{
+		var isOwner = await _dbContext.Sellers
+			.AsNoTracking()
+			.AnyAsync(s => s.Id == sellerId && !s.IsDeleted && s.UserId == currentUserId, ct);
+
+		if (!isOwner)
+		{
+			throw new ArfBlocksVerificationException(
+				ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.AuthorizationErrors.OwnershipRequired));
+		}
+	}
+
+	// Ownership: Transporter profile belongs to the current user
+	public async Task ValidateTransporterOwnership(Guid transporterId, Guid currentUserId, CancellationToken ct = default)
+	{
+		var isOwner = await _dbContext.Transporters
+			.AsNoTracking()
+			.AnyAsync(t => t.Id == transporterId && !t.IsDeleted && t.UserId == currentUserId, ct);
+
+		if (!isOwner)
+		{
+			throw new ArfBlocksVerificationException(
+				ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.AuthorizationErrors.OwnershipRequired));
+		}
+	}
+
+	// Ownership: ProductImage belongs to the current user's seller profile (via Product → Seller)
+	public async Task ValidateProductImageOwnership(Guid imageId, Guid currentUserId, CancellationToken ct = default)
+	{
+		var isOwner = await _dbContext.ProductImages
+			.AsNoTracking()
+			.Where(pi => pi.Id == imageId && !pi.IsDeleted)
+			.Join(_dbContext.Products.AsNoTracking().Where(p => !p.IsDeleted),
+				pi => pi.ProductId,
+				p => p.Id,
+				(pi, p) => p.SellerId)
+			.Join(_dbContext.Sellers.AsNoTracking().Where(s => !s.IsDeleted),
+				sellerId => sellerId,
+				s => s.Id,
+				(sellerId, s) => s.UserId)
+			.AnyAsync(userId => userId == currentUserId, ct);
+
+		if (!isOwner)
+		{
+			throw new ArfBlocksVerificationException(
+				ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.AuthorizationErrors.OwnershipRequired));
+		}
+	}
+
+	// ProductImage
+	public async Task ValidateProductImageExists(Guid imageId, CancellationToken ct = default)
+	{
+		var exists = await _dbContext.ProductImages.AsNoTracking().AnyAsync(e => e.Id == imageId && !e.IsDeleted, ct);
+		if (!exists)
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ProductImageErrors.ImageNotFound));
+	}
+
 	// Currency
 	public async Task ValidateCurrencyExists(Guid currencyId, CancellationToken ct = default)
 	{

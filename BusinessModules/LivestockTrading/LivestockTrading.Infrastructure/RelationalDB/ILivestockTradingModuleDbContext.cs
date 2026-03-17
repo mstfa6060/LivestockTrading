@@ -11,6 +11,7 @@ public interface ILivestockTradingModuleDbContext
     DbSet<Brand> Brands { get; set; }
     DbSet<ProductVariant> ProductVariants { get; set; }
     DbSet<ProductPrice> ProductPrices { get; set; }
+    DbSet<ProductImage> ProductImages { get; set; }
 
     // Location & Sellers
     DbSet<Location> Locations { get; set; }

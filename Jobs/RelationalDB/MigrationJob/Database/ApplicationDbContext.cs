@@ -56,6 +56,7 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext, ILivestockT
     public DbSet<Brand> Brands { get; set; }
     public DbSet<ProductVariant> ProductVariants { get; set; }
     public DbSet<ProductPrice> ProductPrices { get; set; }
+    public DbSet<ProductImage> ProductImages { get; set; }
 
     // Location & Sellers
     public DbSet<LivestockTrading.Domain.Entities.Location> Locations { get; set; }

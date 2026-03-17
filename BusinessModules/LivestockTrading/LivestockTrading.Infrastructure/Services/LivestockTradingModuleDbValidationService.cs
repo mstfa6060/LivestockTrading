@@ -204,6 +204,14 @@ public class LivestockTradingModuleDbValidationService : DefinitionDbValidationS
 			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ProductPriceErrors.PriceNotFound));
 	}
 
+	// ProductImage
+	public async Task ValidateProductImageExists(Guid imageId, CancellationToken ct = default)
+	{
+		var exists = await _dbContext.ProductImages.AsNoTracking().AnyAsync(e => e.Id == imageId && !e.IsDeleted, ct);
+		if (!exists)
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ProductImageErrors.ImageNotFound));
+	}
+
 	// AnimalInfo
 	public async Task ValidateAnimalInfoExists(Guid animalInfoId, CancellationToken ct = default)
 	{

@@ -1,0 +1,43 @@
+using LivestockTrading.Domain.Entities;
+using LivestockTrading.Infrastructure.RelationalDB;
+using Microsoft.EntityFrameworkCore;
+
+namespace LivestockTrading.Application.RequestHandlers.ProductImages.Queries.All;
+
+public class DataAccess : IDataAccess
+{
+	private readonly LivestockTradingModuleDbContext _dbContext;
+
+	public DataAccess(ArfBlocksDependencyProvider dbContextProvider)
+	{
+		_dbContext = dbContextProvider.GetInstance<LivestockTradingModuleDbContext>();
+	}
+
+	public async Task<(List<ProductImage> Items, XPageResponse Page)> All(
+		Guid? productId,
+		XSorting sorting,
+		List<XFilterItem> filters,
+		XPageRequest pageRequest,
+		CancellationToken ct)
+	{
+		var query = _dbContext.ProductImages
+			.AsNoTracking()
+			.Where(e => !e.IsDeleted)
+			.Sort(sorting)
+			.Filter(filters);
+
+		// Filter by ProductId if provided
+		if (productId.HasValue && productId.Value != Guid.Empty)
+			query = query.Where(e => e.ProductId == productId.Value);
+
+		// Default sorting
+		if (sorting == null)
+			query = query.OrderBy(e => e.SortOrder).ThenByDescending(e => e.CreatedAt);
+
+		// Pagination
+		var page = query.GetPage(pageRequest);
+		var items = await query.Paginate(page).ToListAsync(ct);
+
+		return (items, page);
+	}
+}
