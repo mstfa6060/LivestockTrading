@@ -40,6 +40,12 @@ public class Handler : IRequestHandler
 					ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.SellerSubscriptionErrors.SellerSubscriptionListingLimitReached));
 		}
 
+		// Auto-assign currency from seller's country if not provided
+		if (string.IsNullOrWhiteSpace(request.Currency))
+		{
+			request.Currency = await _dataAccessLayer.GetSellerDefaultCurrency(sellerId, cancellationToken);
+		}
+
 		var entity = mapper.MapToEntity(request);
 		entity.SellerId = sellerId;
 

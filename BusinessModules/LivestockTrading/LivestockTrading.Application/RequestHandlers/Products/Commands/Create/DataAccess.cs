@@ -1,3 +1,4 @@
+using Common.Definitions.Domain.Entities;
 using LivestockTrading.Domain.Entities;
 using LivestockTrading.Infrastructure.RelationalDB;
 using Microsoft.EntityFrameworkCore;
@@ -66,5 +67,33 @@ public class DataAccess : IDataAccess
 	{
 		_dbContext.ProductPrices.AddRange(productPrices);
 		await _dbContext.SaveChangesAsync(ct);
+	}
+
+	public async Task<string> GetSellerDefaultCurrency(Guid sellerId, CancellationToken ct)
+	{
+		// Seller → UserId → User → CountryId → Country → DefaultCurrencyCode
+		var seller = await _dbContext.Sellers
+			.AsNoTracking()
+			.Where(s => s.Id == sellerId && !s.IsDeleted)
+			.Select(s => new { s.UserId })
+			.FirstOrDefaultAsync(ct);
+
+		if (seller == null) return "USD";
+
+		var countryId = await _dbContext.AppUsers
+			.AsNoTracking()
+			.Where(u => u.Id == seller.UserId && !u.IsDeleted)
+			.Select(u => u.CountryId)
+			.FirstOrDefaultAsync(ct);
+
+		if (countryId == 0) return "USD";
+
+		var currencyCode = await _dbContext.Countries
+			.AsNoTracking()
+			.Where(c => c.Id == countryId)
+			.Select(c => c.DefaultCurrencyCode)
+			.FirstOrDefaultAsync(ct);
+
+		return !string.IsNullOrWhiteSpace(currencyCode) ? currencyCode : "USD";
 	}
 }
