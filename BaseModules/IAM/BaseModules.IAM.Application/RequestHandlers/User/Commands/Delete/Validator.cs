@@ -1,6 +1,5 @@
 namespace BaseModules.IAM.Application.RequestHandlers.Users.Commands.Delete;
 
-
 public class Validator : IRequestValidator
 {
 	private readonly IamDbValidationService _dbValidator;
@@ -22,7 +21,19 @@ public class Validator : IRequestValidator
 
 	public async Task ValidateDomain(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
 	{
-		await Task.CompletedTask;
+		var currentUserId = _currentUserService.GetCurrentUserId();
+
+		// Verify the user exists and is not already deleted
+		var user = await _dbValidator.GetUserById(currentUserId);
+		if (user.IsDeleted)
+			throw new ArfBlocksValidationException(
+				ErrorCodeGenerator.GetErrorCode(() => DomainErrors.UserErrors.UserDeleteAlreadyDeleted));
+
+		// Verify password is correct
+		var isPasswordCorrect = SecurityHelper.VerifyPassword(((RequestModel)payload).Password, user.PasswordHash, user.PasswordSalt);
+		if (!isPasswordCorrect)
+			throw new ArfBlocksValidationException(
+				ErrorCodeGenerator.GetErrorCode(() => DomainErrors.UserErrors.UserDeletePasswordIncorrect));
 	}
 }
 
@@ -30,8 +41,8 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
 {
 	public RequestModel_Validator()
 	{
-		RuleFor(x => x.UserId)
+		RuleFor(x => x.Password)
 			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => DomainErrors.AuthErrors.UserIdNotValid));
+			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => DomainErrors.UserErrors.UserDeletePasswordRequired));
 	}
 }

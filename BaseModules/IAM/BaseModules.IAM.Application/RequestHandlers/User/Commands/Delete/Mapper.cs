@@ -2,12 +2,12 @@ namespace BaseModules.IAM.Application.RequestHandlers.Users.Commands.Delete;
 
 public class Mapper
 {
-	public ResponseModel MapToResponse(Common.Definitions.Domain.Entities.User user)
+	public ResponseModel MapToResponse(bool success, string message)
 	{
 		return new ResponseModel
 		{
-			Id = user.Id,
-			IsDeleted = user.IsDeleted
+			Success = success,
+			Message = message
 		};
 	}
 }

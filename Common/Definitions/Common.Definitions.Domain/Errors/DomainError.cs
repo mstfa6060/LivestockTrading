@@ -239,5 +239,11 @@ public class DomainErrors
         public static string UserUserNameAlreadyExists { get; set; } = "Bu kullanıcı adı zaten kullanılıyor.";
         public static string UserCountryIdRequired { get; set; } = "Ülke seçimi zorunludur.";
 
+        // Hesap silme hata kodları
+        public static string UserDeletePasswordRequired { get; set; } = "Hesap silme için şifre onayı zorunludur.";
+        public static string UserDeletePasswordIncorrect { get; set; } = "Şifre doğrulaması başarısız. Hesap silinemedi.";
+        public static string UserDeleteAlreadyDeleted { get; set; } = "Bu hesap zaten silinmiş.";
+        public static string UserDeleteNotAuthenticated { get; set; } = "Hesap silme için giriş yapılmış olmalıdır.";
+
     }
 }

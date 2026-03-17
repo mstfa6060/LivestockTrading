@@ -2,15 +2,28 @@ namespace BaseModules.IAM.Application.RequestHandlers.Users.Commands.Delete;
 
 public class Verificator : IRequestVerificator
 {
-    public Verificator(ArfBlocksDependencyProvider _) { }
+	private readonly AuthorizationService _authorizationService;
+	private readonly CurrentUserService _currentUserService;
 
-    public async Task VerificateActor(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
-    {
-        await Task.CompletedTask;
-    }
+	public Verificator(ArfBlocksDependencyProvider dependencyProvider)
+	{
+		_authorizationService = dependencyProvider.GetInstance<AuthorizationService>();
+		_currentUserService = dependencyProvider.GetInstance<CurrentUserService>();
+	}
 
-    public async Task VerificateDomain(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
-    {
-        await Task.CompletedTask;
-    }
+	public async Task VerificateActor(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
+	{
+		// Verify the user is authenticated
+		var currentUserId = _currentUserService.GetCurrentUserId();
+		if (currentUserId == Guid.Empty)
+			throw new ArfBlocksValidationException(
+				ErrorCodeGenerator.GetErrorCode(() => DomainErrors.UserErrors.UserDeleteNotAuthenticated));
+
+		await Task.CompletedTask;
+	}
+
+	public async Task VerificateDomain(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
+	{
+		await Task.CompletedTask;
+	}
 }

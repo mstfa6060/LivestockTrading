@@ -259,11 +259,13 @@ Content-Type: application/json
 }
 
 
-### User.Delete
-POST {{Url}}/User/Delete
+### Users.Delete (Hesap Silme - Sifre onayiyla)
+POST {{Url}}/Users/Delete
+Authorization: Bearer {{Jwt}}
+Accept: application/json
 Content-Type: application/json
 
 {
-  "userId": "6FA5FCA4-02AC-48D9-815F-44EE68AB8CDD",
-  "isDeleted": true
+  "password": "Deneme123.",
+  "reason": "Test hesabi silme"
 }
