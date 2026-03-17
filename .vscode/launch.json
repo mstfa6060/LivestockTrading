@@ -9,7 +9,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/BaseModules/IAM/BaseModules.IAM.Api/bin/Debug/net8.0/BaseModules.IAM.Api.dll",
+            "program": "${workspaceFolder}/BaseModules/IAM/BaseModules.IAM.Api/bin/Debug/net10.0/BaseModules.IAM.Api.dll",
             "args": [],
             "cwd": "${workspaceFolder}/BaseModules/IAM/BaseModules.IAM.Api",
             "stopAtEntry": false,
@@ -25,7 +25,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/BaseModules/FileProvider/BaseModules.FileProvider.Api/bin/Debug/net8.0/BaseModules.FileProvider.Api.dll",
+            "program": "${workspaceFolder}/BaseModules/FileProvider/BaseModules.FileProvider.Api/bin/Debug/net10.0/BaseModules.FileProvider.Api.dll",
             "args": [],
             "cwd": "${workspaceFolder}/BaseModules/FileProvider/BaseModules.FileProvider.Api",
             "stopAtEntry": false,
@@ -41,7 +41,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/Jobs/SpecialPurpose/ResourceSeeder/bin/Debug/net8.0/ResourceSeeder.dll",
+            "program": "${workspaceFolder}/Jobs/SpecialPurpose/ResourceSeeder/bin/Debug/net10.0/ResourceSeeder.dll",
             "args": [
                 "development"
             ],
