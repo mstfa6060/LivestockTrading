@@ -18,8 +18,10 @@ public class DataAccess : IDataAccess
 		CancellationToken ct)
 	{
 		// Load all categories in memory (translations require in-memory alphabetical sort)
+		// ThenInclude for multi-level subcategory count (L1 → L2 → L3)
 		var categories = await _dbContext.Categories
 			.Include(c => c.SubCategories)
+				.ThenInclude(sc => sc.SubCategories)
 			.AsNoTracking()
 			.Where(c => !c.IsDeleted)
 			.Filter(filters)
