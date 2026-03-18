@@ -47,5 +47,8 @@ public class ApplicationDependencyProvider : ArfBlocksDependencyProvider
 
         // Authorization
         base.Add<PermissionService>();
+
+        // Translation
+        base.Add<AutoTranslationService>();
     }
 }
