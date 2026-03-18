@@ -1,6 +1,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore.SqlServer;
 
@@ -34,6 +35,9 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
                    errorNumbersToAdd: null
                );
            });
+
+        dbContextOptionsBuilder.ConfigureWarnings(w =>
+            w.Ignore(RelationalEventId.PendingModelChangesWarning));
 
 
         return new ApplicationDbContext(dbContextOptionsBuilder.Options);
