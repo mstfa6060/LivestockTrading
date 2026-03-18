@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Net;
 using System.Text.Json;
 
@@ -6,6 +7,7 @@ namespace LivestockTrading.Application.Services;
 /// <summary>
 /// Google Translate ücretsiz endpoint kullanarak otomatik çeviri yapar.
 /// Kategori oluşturma/güncelleme sırasında Name ve Description alanlarını 50+ dile çevirir.
+/// Paralel çeviri ile ~2-3 saniyede tamamlar.
 /// </summary>
 public class AutoTranslationService
 {
@@ -13,6 +15,9 @@ public class AutoTranslationService
 	{
 		Timeout = TimeSpan.FromSeconds(10)
 	};
+
+	// Aynı anda max paralel istek (Google rate limit'e takılmamak için)
+	private const int MaxParallelism = 10;
 
 	// Seed data'daki tüm dil kodları
 	private static readonly string[] TargetLanguages =
@@ -26,51 +31,19 @@ public class AutoTranslationService
 	};
 
 	/// <summary>
-	/// Verilen metni tüm desteklenen dillere çevirir ve JSON string olarak döner.
-	/// Kaynak dil otomatik algılanır.
+	/// Verilen metni tüm desteklenen dillere paralel çevirir ve JSON string olarak döner.
 	/// </summary>
 	public async Task<string> TranslateToAllLanguages(string text, string sourceLang = "auto")
 	{
 		if (string.IsNullOrWhiteSpace(text))
 			return null;
 
-		var translations = new Dictionary<string, string>();
-
-		foreach (var lang in TargetLanguages)
-		{
-			try
-			{
-				// pt-BR → pt, zh-CN → zh-cn (Google format)
-				var googleLang = lang.ToLower() switch
-				{
-					"pt-br" => "pt",
-					"zh-cn" => "zh-CN",
-					"zh-tw" => "zh-TW",
-					_ => lang.ToLower()
-				};
-
-				var translated = await TranslateSingle(text, sourceLang, googleLang);
-
-				if (!string.IsNullOrWhiteSpace(translated))
-					translations[lang] = translated;
-				else
-					translations[lang] = text; // Fallback: orijinal metin
-			}
-			catch
-			{
-				translations[lang] = text; // Hata durumunda orijinal metin
-			}
-
-			// Rate limiting - Google'ın ücretsiz endpoint'i için gerekli
-			await Task.Delay(50);
-		}
-
+		var translations = await TranslateParallel(text, sourceLang, TargetLanguages);
 		return JsonSerializer.Serialize(translations);
 	}
 
 	/// <summary>
-	/// Mevcut çevirileri koruyarak eksik dilleri çevirir.
-	/// Frontend'den gelen kısmi çeviriler varsa onları korur.
+	/// Mevcut çevirileri koruyarak eksik dilleri paralel çevirir.
 	/// </summary>
 	public async Task<string> FillMissingTranslations(string existingTranslationsJson, string fallbackText, string sourceLang = "auto")
 	{
@@ -89,16 +62,29 @@ public class AutoTranslationService
 			}
 		}
 
-		// Tüm diller zaten doluysa çeviri yapma
-		var missingLangs = TargetLanguages.Where(l => !existing.ContainsKey(l) || string.IsNullOrWhiteSpace(existing[l])).ToList();
+		var missingLangs = TargetLanguages
+			.Where(l => !existing.ContainsKey(l) || string.IsNullOrWhiteSpace(existing[l]))
+			.ToArray();
 
-		if (missingLangs.Count == 0)
+		if (missingLangs.Length == 0)
 			return existingTranslationsJson;
 
-		var textToTranslate = fallbackText;
+		var newTranslations = await TranslateParallel(fallbackText, sourceLang, missingLangs);
 
-		foreach (var lang in missingLangs)
+		foreach (var kv in newTranslations)
+			existing[kv.Key] = kv.Value;
+
+		return JsonSerializer.Serialize(existing);
+	}
+
+	private async Task<Dictionary<string, string>> TranslateParallel(string text, string sourceLang, string[] langs)
+	{
+		var results = new ConcurrentDictionary<string, string>();
+		var semaphore = new SemaphoreSlim(MaxParallelism);
+
+		var tasks = langs.Select(async lang =>
 		{
+			await semaphore.WaitAsync();
 			try
 			{
 				var googleLang = lang.ToLower() switch
@@ -109,22 +95,21 @@ public class AutoTranslationService
 					_ => lang.ToLower()
 				};
 
-				var translated = await TranslateSingle(textToTranslate, sourceLang, googleLang);
-
-				if (!string.IsNullOrWhiteSpace(translated))
-					existing[lang] = translated;
-				else
-					existing[lang] = textToTranslate;
+				var translated = await TranslateSingle(text, sourceLang, googleLang);
+				results[lang] = !string.IsNullOrWhiteSpace(translated) ? translated : text;
 			}
 			catch
 			{
-				existing[lang] = textToTranslate;
+				results[lang] = text;
 			}
+			finally
+			{
+				semaphore.Release();
+			}
+		});
 
-			await Task.Delay(50);
-		}
-
-		return JsonSerializer.Serialize(existing);
+		await Task.WhenAll(tasks);
+		return new Dictionary<string, string>(results);
 	}
 
 	private static async Task<string> TranslateSingle(string text, string sourceLang, string targetLang)
@@ -141,7 +126,6 @@ public class AutoTranslationService
 		using var doc = JsonDocument.Parse(json);
 		var root = doc.RootElement;
 
-		// Birden fazla cümle olabilir, hepsini birleştir
 		var result = "";
 		var sentences = root[0];
 		for (int i = 0; i < sentences.GetArrayLength(); i++)
