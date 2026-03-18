@@ -17,7 +17,7 @@ public class AutoTranslationService
 	};
 
 	// Aynı anda max paralel istek (Google rate limit'e takılmamak için)
-	private const int MaxParallelism = 10;
+	private const int MaxParallelism = 5;
 
 	// Seed data'daki tüm dil kodları
 	private static readonly string[] TargetLanguages =
@@ -33,7 +33,7 @@ public class AutoTranslationService
 	/// <summary>
 	/// Verilen metni tüm desteklenen dillere paralel çevirir ve JSON string olarak döner.
 	/// </summary>
-	public async Task<string> TranslateToAllLanguages(string text, string sourceLang = "auto")
+	public async Task<string> TranslateToAllLanguages(string text, string sourceLang = "tr")
 	{
 		if (string.IsNullOrWhiteSpace(text))
 			return null;
@@ -45,7 +45,7 @@ public class AutoTranslationService
 	/// <summary>
 	/// Mevcut çevirileri koruyarak eksik dilleri paralel çevirir.
 	/// </summary>
-	public async Task<string> FillMissingTranslations(string existingTranslationsJson, string fallbackText, string sourceLang = "auto")
+	public async Task<string> FillMissingTranslations(string existingTranslationsJson, string fallbackText, string sourceLang = "tr")
 	{
 		var existing = new Dictionary<string, string>();
 
@@ -117,22 +117,34 @@ public class AutoTranslationService
 		var encodedText = WebUtility.UrlEncode(text);
 		var url = $"https://translate.googleapis.com/translate_a/single?client=gtx&sl={sourceLang}&tl={targetLang}&dt=t&q={encodedText}";
 
-		var response = await _httpClient.GetAsync(url);
-		response.EnsureSuccessStatusCode();
-
-		var json = await response.Content.ReadAsStringAsync();
-
-		// Response format: [[["translated text","source text",null,null,10]],null,"en",...]
-		using var doc = JsonDocument.Parse(json);
-		var root = doc.RootElement;
-
-		var result = "";
-		var sentences = root[0];
-		for (int i = 0; i < sentences.GetArrayLength(); i++)
+		// Retry with backoff (rate limit koruması)
+		for (int attempt = 0; attempt < 3; attempt++)
 		{
-			result += sentences[i][0].GetString();
+			try
+			{
+				var response = await _httpClient.GetAsync(url);
+				response.EnsureSuccessStatusCode();
+
+				var json = await response.Content.ReadAsStringAsync();
+
+				using var doc = JsonDocument.Parse(json);
+				var root = doc.RootElement;
+
+				var result = "";
+				var sentences = root[0];
+				for (int i = 0; i < sentences.GetArrayLength(); i++)
+				{
+					result += sentences[i][0].GetString();
+				}
+
+				return result;
+			}
+			catch when (attempt < 2)
+			{
+				await Task.Delay(200 * (attempt + 1));
+			}
 		}
 
-		return result;
+		return null;
 	}
 }
