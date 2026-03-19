@@ -16,6 +16,8 @@ public class RequestModel : IRequestModel
 	public string Message { get; set; }
 	public int Status { get; set; }
 	public DateTime? ExpiryDate { get; set; }
+	/// <summary>Bildirim icin: talep sahibinin UserId'si</summary>
+	public Guid RequestOwnerUserId { get; set; }
 }
 
 public class ResponseModel : IResponseModel
