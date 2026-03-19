@@ -105,6 +105,9 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext, ILivestockT
     public DbSet<BoostPackage> BoostPackages { get; set; }
     public DbSet<ProductBoost> ProductBoosts { get; set; }
 
+    // Contact
+    public DbSet<ContactForm> ContactForms { get; set; }
+
     // Deals & Transport
     public DbSet<Deal> Deals { get; set; }
     public DbSet<Transporter> Transporters { get; set; }
