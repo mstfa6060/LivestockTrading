@@ -12,10 +12,10 @@ public class ResponseModel : IResponseModel
 	public int Type { get; set; }
 	public string TargetAnimal { get; set; }
 	public string TargetAge { get; set; }
-	public decimal? ProteinPercentage { get; set; }
-	public decimal? FatPercentage { get; set; }
-	public decimal? FiberPercentage { get; set; }
-	public decimal? MoisturePercentage { get; set; }
+	public double? ProteinPercentage { get; set; }
+	public double? FatPercentage { get; set; }
+	public double? FiberPercentage { get; set; }
+	public double? MoisturePercentage { get; set; }
 	public int Form { get; set; }
 	public bool IsOrganic { get; set; }
 	public bool IsGMOFree { get; set; }

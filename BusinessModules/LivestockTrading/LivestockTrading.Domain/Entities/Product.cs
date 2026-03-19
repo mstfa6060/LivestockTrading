@@ -30,13 +30,13 @@ public class Product : BaseEntity
     public Brand Brand { get; set; }
     
     /// <summary>Taban fiyat</summary>
-    public decimal BasePrice { get; set; }
+    public double BasePrice { get; set; }
     
     /// <summary>Para birimi (USD, EUR, TRY, vb.)</summary>
     public string Currency { get; set; }
     
     /// <summary>İndirimli fiyat</summary>
-    public decimal? DiscountedPrice { get; set; }
+    public double? DiscountedPrice { get; set; }
     
     /// <summary>Fiyat birimi (adet, kg, litre, hektar başına vb.)</summary>
     public string PriceUnit { get; set; }
@@ -74,13 +74,13 @@ public class Product : BaseEntity
     public bool IsShippingAvailable { get; set; }
     
     /// <summary>Kargo ücreti</summary>
-    public decimal? ShippingCost { get; set; }
+    public double? ShippingCost { get; set; }
     
     /// <summary>Uluslararası kargo var mı?</summary>
     public bool IsInternationalShipping { get; set; }
     
     /// <summary>Ağırlık</summary>
-    public decimal? Weight { get; set; }
+    public double? Weight { get; set; }
     
     /// <summary>Ağırlık birimi</summary>
     public string WeightUnit { get; set; }
@@ -104,7 +104,7 @@ public class Product : BaseEntity
     public int FavoriteCount { get; set; }
     
     /// <summary>Ortalama değerlendirme puanı</summary>
-    public decimal? AverageRating { get; set; }
+    public double? AverageRating { get; set; }
     
     /// <summary>Yorum sayısı</summary>
     public int ReviewCount { get; set; }

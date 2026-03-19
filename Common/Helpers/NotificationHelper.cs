@@ -183,7 +183,7 @@ public class NotificationHelper
         Guid animalId,
         string animalName,
         string animalType,
-        decimal price,
+        double price,
         string city,
         string district,
         List<string> adminEmails)
@@ -218,7 +218,7 @@ public class NotificationHelper
         Guid sellerId,
         Guid animalId,
         string animalName,
-        decimal bidAmount,
+        double bidAmount,
         Guid bidderId)
     {
         // Satıcı kendi ilanının detayına gitsin
@@ -251,8 +251,8 @@ public class NotificationHelper
         Guid outbiddedUserId,
         Guid animalId,
         string animalName,
-        decimal oldBidAmount,
-        decimal newBidAmount)
+        double oldBidAmount,
+        double newBidAmount)
     {
         var (deepLink, webUrl) = CreateAnimalLinks(animalId);
 
@@ -281,7 +281,7 @@ public class NotificationHelper
         Guid buyerId,
         Guid animalId,
         string animalName,
-        decimal bidAmount,
+        double bidAmount,
         Guid bidId,
         Guid sellerId)
     {
@@ -436,7 +436,7 @@ public class NotificationHelper
         Guid userId,
         Guid animalId,
         string animalName,
-        decimal amount,
+        double amount,
         bool isSeller)
     {
         var (deepLink, webUrl) = isSeller

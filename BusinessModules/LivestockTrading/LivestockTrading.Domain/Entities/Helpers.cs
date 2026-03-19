@@ -15,7 +15,7 @@ public class Currency : BaseEntity
     /// <summary>Para birimi adı</summary>
     public string Name { get; set; }
     /// <summary>USD'ye göre dönüşüm kuru</summary>
-    public decimal ExchangeRateToUSD { get; set; }
+    public double ExchangeRateToUSD { get; set; }
     /// <summary>Son güncellenme tarihi</summary>
     public DateTime LastUpdated { get; set; }
     /// <summary>Aktif mi?</summary>
@@ -74,9 +74,9 @@ public class PaymentMethod : BaseEntity
     /// <summary>Desteklenen para birimleri JSON</summary>
     public string SupportedCurrencies { get; set; }
     /// <summary>İşlem ücreti oranı (%)</summary>
-    public decimal? TransactionFeePercentage { get; set; }
+    public double? TransactionFeePercentage { get; set; }
     /// <summary>Sabit işlem ücreti</summary>
-    public decimal? FixedTransactionFee { get; set; }
+    public double? FixedTransactionFee { get; set; }
     
     public PaymentMethod()
     {

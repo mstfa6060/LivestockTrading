@@ -23,7 +23,7 @@ public class SeedInfo : BaseEntity
     /// <summary>Tohum rengi</summary>
     public string SeedColor { get; set; }
     /// <summary>Çimlenme oranı (%)</summary>
-    public decimal? GerminationRate { get; set; }
+    public double? GerminationRate { get; set; }
     /// <summary>Çimlenme süresi (gün)</summary>
     public int? GerminationDays { get; set; }
     /// <summary>İklim bölgeleri JSON: [7,8,9,10]</summary>

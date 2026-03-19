@@ -12,5 +12,5 @@ public class ResponseModel : IResponseModel<Array>
 	public Guid Id { get; set; }
 	public string TaxName { get; set; }
 	public string CountryCode { get; set; }
-	public decimal Rate { get; set; }
+	public double Rate { get; set; }
 }

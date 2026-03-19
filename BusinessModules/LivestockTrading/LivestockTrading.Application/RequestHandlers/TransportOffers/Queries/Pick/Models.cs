@@ -11,5 +11,5 @@ public class ResponseModel : IResponseModel<Array>
 {
 	public Guid Id { get; set; }
 	public Guid TransporterId { get; set; }
-	public decimal OfferedPrice { get; set; }
+	public double OfferedPrice { get; set; }
 }

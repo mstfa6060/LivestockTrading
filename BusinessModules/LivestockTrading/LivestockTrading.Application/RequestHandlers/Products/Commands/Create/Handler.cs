@@ -116,7 +116,7 @@ public class Handler : IRequestHandler
 				var amountInUsd = product.BasePrice / sourceCurrency.ExchangeRateToUSD;
 				var convertedPrice = Math.Round(amountInUsd * targetCurrency.ExchangeRateToUSD, 2);
 
-				decimal? convertedDiscountedPrice = null;
+				double? convertedDiscountedPrice = null;
 				if (product.DiscountedPrice.HasValue)
 				{
 					var discountInUsd = product.DiscountedPrice.Value / sourceCurrency.ExchangeRateToUSD;

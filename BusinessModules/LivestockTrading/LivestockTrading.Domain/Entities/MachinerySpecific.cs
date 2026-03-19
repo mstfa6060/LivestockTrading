@@ -23,27 +23,27 @@ public class MachineryInfo : BaseEntity
     /// <summary>Güç kaynağı (Dizel, Elektrik, Manuel, Benzin, Hibrit)</summary>
     public string PowerSource { get; set; }
     /// <summary>Güç (HP)</summary>
-    public decimal? PowerHp { get; set; }
+    public double? PowerHp { get; set; }
     /// <summary>Güç (kW)</summary>
-    public decimal? PowerKw { get; set; }
+    public double? PowerKw { get; set; }
     /// <summary>Motor kapasitesi</summary>
     public string EngineCapacity { get; set; }
     /// <summary>Uzunluk (cm)</summary>
-    public decimal? LengthCm { get; set; }
+    public double? LengthCm { get; set; }
     /// <summary>Genişlik (cm)</summary>
-    public decimal? WidthCm { get; set; }
+    public double? WidthCm { get; set; }
     /// <summary>Yükseklik (cm)</summary>
-    public decimal? HeightCm { get; set; }
+    public double? HeightCm { get; set; }
     /// <summary>Ağırlık (kg)</summary>
-    public decimal? WeightKg { get; set; }
+    public double? WeightKg { get; set; }
     /// <summary>Çalışma genişliği (cm)</summary>
-    public decimal? WorkingWidthCm { get; set; }
+    public double? WorkingWidthCm { get; set; }
     /// <summary>Kapasite (litre)</summary>
-    public decimal? CapacityLiters { get; set; }
+    public double? CapacityLiters { get; set; }
     /// <summary>Yük kapasitesi (kg)</summary>
-    public decimal? LoadCapacityKg { get; set; }
+    public double? LoadCapacityKg { get; set; }
     /// <summary>Hız (km/s)</summary>
-    public decimal? SpeedKmh { get; set; }
+    public double? SpeedKmh { get; set; }
     /// <summary>Kullanım saati</summary>
     public int? HoursUsed { get; set; }
     /// <summary>Son servis tarihi</summary>

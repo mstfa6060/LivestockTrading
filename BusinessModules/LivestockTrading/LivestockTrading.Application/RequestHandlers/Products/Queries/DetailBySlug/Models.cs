@@ -21,9 +21,9 @@ public class ResponseModel : IResponseModel
 	public string CategoryName { get; set; }
 	public Guid? BrandId { get; set; }
 	public string BrandName { get; set; }
-	public decimal BasePrice { get; set; }
+	public double BasePrice { get; set; }
 	public string Currency { get; set; }
-	public decimal? DiscountedPrice { get; set; }
+	public double? DiscountedPrice { get; set; }
 	public string PriceUnit { get; set; }
 	public int StockQuantity { get; set; }
 	public string StockUnit { get; set; }
@@ -36,9 +36,9 @@ public class ResponseModel : IResponseModel
 	public int Status { get; set; }
 	public int Condition { get; set; }
 	public bool IsShippingAvailable { get; set; }
-	public decimal? ShippingCost { get; set; }
+	public double? ShippingCost { get; set; }
 	public bool IsInternationalShipping { get; set; }
-	public decimal? Weight { get; set; }
+	public double? Weight { get; set; }
 	public string WeightUnit { get; set; }
 	public string Attributes { get; set; }
 	public string MetaTitle { get; set; }
@@ -46,7 +46,7 @@ public class ResponseModel : IResponseModel
 	public string MetaKeywords { get; set; }
 	public int ViewCount { get; set; }
 	public int FavoriteCount { get; set; }
-	public decimal? AverageRating { get; set; }
+	public double? AverageRating { get; set; }
 	public int ReviewCount { get; set; }
 	public DateTime? PublishedAt { get; set; }
 	public DateTime? ExpiresAt { get; set; }
@@ -56,9 +56,9 @@ public class ResponseModel : IResponseModel
 	public DateTime? UpdatedAt { get; set; }
 
 	/// <summary>Price in viewer's currency (null if no conversion available)</summary>
-	public decimal? ViewerPrice { get; set; }
+	public double? ViewerPrice { get; set; }
 	/// <summary>Discounted price in viewer's currency</summary>
-	public decimal? ViewerDiscountedPrice { get; set; }
+	public double? ViewerDiscountedPrice { get; set; }
 	/// <summary>Viewer's currency code</summary>
 	public string ViewerCurrencyCode { get; set; }
 	/// <summary>Viewer's currency symbol</summary>

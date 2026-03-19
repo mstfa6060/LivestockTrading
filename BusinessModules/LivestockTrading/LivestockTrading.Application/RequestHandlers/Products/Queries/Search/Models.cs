@@ -20,12 +20,12 @@ public class RequestModel : IRequestModel
 	/// <summary>
 	/// Minimum fiyat filtresi (opsiyonel)
 	/// </summary>
-	public decimal? MinPrice { get; set; }
+	public double? MinPrice { get; set; }
 
 	/// <summary>
 	/// Maksimum fiyat filtresi (opsiyonel)
 	/// </summary>
-	public decimal? MaxPrice { get; set; }
+	public double? MaxPrice { get; set; }
 
 	/// <summary>
 	/// Ürün durumu filtresi (opsiyonel, enum int değeri)
@@ -66,9 +66,9 @@ public class ResponseModel : IResponseModel<Array>
 	public string ShortDescription { get; set; }
 	public Guid CategoryId { get; set; }
 	public Guid? BrandId { get; set; }
-	public decimal BasePrice { get; set; }
+	public double BasePrice { get; set; }
 	public string Currency { get; set; }
-	public decimal? DiscountedPrice { get; set; }
+	public double? DiscountedPrice { get; set; }
 	public int StockQuantity { get; set; }
 	public bool IsInStock { get; set; }
 	public Guid SellerId { get; set; }
@@ -79,16 +79,16 @@ public class ResponseModel : IResponseModel<Array>
 	public int Condition { get; set; }
 	public int ViewCount { get; set; }
 	public int FavoriteCount { get; set; }
-	public decimal? AverageRating { get; set; }
+	public double? AverageRating { get; set; }
 	public int ReviewCount { get; set; }
 	public string CoverImageFileId { get; set; }
 	public string MediaBucketId { get; set; }
 	public DateTime CreatedAt { get; set; }
 
 	/// <summary>Price in viewer's currency (null if no conversion available)</summary>
-	public decimal? ViewerPrice { get; set; }
+	public double? ViewerPrice { get; set; }
 	/// <summary>Discounted price in viewer's currency</summary>
-	public decimal? ViewerDiscountedPrice { get; set; }
+	public double? ViewerDiscountedPrice { get; set; }
 	/// <summary>Viewer's currency code</summary>
 	public string ViewerCurrencyCode { get; set; }
 	/// <summary>Viewer's currency symbol</summary>

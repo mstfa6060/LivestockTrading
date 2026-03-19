@@ -6,13 +6,13 @@ public class RequestModel : IRequestModel
 	public Guid ProductId { get; set; }
 	public Guid SellerId { get; set; }
 	public Guid BuyerId { get; set; }
-	public decimal? AgreedPrice { get; set; }
+	public double? AgreedPrice { get; set; }
 	public string Currency { get; set; }
 	public Guid PickupLocationId { get; set; }
 	public Guid DeliveryLocationId { get; set; }
-	public decimal? EstimatedDistanceKm { get; set; }
-	public decimal? WeightKg { get; set; }
-	public decimal? VolumeCubicMeters { get; set; }
+	public double? EstimatedDistanceKm { get; set; }
+	public double? WeightKg { get; set; }
+	public double? VolumeCubicMeters { get; set; }
 	public string SpecialInstructions { get; set; }
 	public DateTime? PreferredPickupDate { get; set; }
 	public DateTime? PreferredDeliveryDate { get; set; }
@@ -28,13 +28,13 @@ public class ResponseModel : IResponseModel
 	public Guid ProductId { get; set; }
 	public Guid SellerId { get; set; }
 	public Guid BuyerId { get; set; }
-	public decimal? AgreedPrice { get; set; }
+	public double? AgreedPrice { get; set; }
 	public string Currency { get; set; }
 	public Guid PickupLocationId { get; set; }
 	public Guid DeliveryLocationId { get; set; }
-	public decimal? EstimatedDistanceKm { get; set; }
-	public decimal? WeightKg { get; set; }
-	public decimal? VolumeCubicMeters { get; set; }
+	public double? EstimatedDistanceKm { get; set; }
+	public double? WeightKg { get; set; }
+	public double? VolumeCubicMeters { get; set; }
 	public string SpecialInstructions { get; set; }
 	public DateTime? PreferredPickupDate { get; set; }
 	public DateTime? PreferredDeliveryDate { get; set; }

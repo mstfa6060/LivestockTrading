@@ -9,8 +9,8 @@ public class ResponseModel : IResponseModel
 {
 	public Guid Id { get; set; }
 	public Guid TransportRequestId { get; set; }
-	public decimal? Latitude { get; set; }
-	public decimal? Longitude { get; set; }
+	public double? Latitude { get; set; }
+	public double? Longitude { get; set; }
 	public string LocationDescription { get; set; }
 	public int Status { get; set; }
 	public string StatusDescription { get; set; }

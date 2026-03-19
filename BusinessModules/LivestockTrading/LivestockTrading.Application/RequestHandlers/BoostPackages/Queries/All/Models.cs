@@ -14,7 +14,7 @@ public class ResponseModel : IResponseModel<Array>
 	public string Name { get; set; }
 	public string Description { get; set; }
 	public int DurationHours { get; set; }
-	public decimal Price { get; set; }
+	public double Price { get; set; }
 	public string Currency { get; set; }
 	public string AppleProductId { get; set; }
 	public string GoogleProductId { get; set; }

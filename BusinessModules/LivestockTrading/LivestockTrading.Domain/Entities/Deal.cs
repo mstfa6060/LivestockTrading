@@ -24,7 +24,7 @@ public class Deal : BaseEntity
     public Guid BuyerId { get; set; }
     
     /// <summary>Anlaşılan fiyat</summary>
-    public decimal AgreedPrice { get; set; }
+    public double AgreedPrice { get; set; }
     
     /// <summary>Para birimi</summary>
     public string Currency { get; set; }

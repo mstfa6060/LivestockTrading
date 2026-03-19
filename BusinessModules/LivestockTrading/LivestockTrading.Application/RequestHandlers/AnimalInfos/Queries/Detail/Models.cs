@@ -13,8 +13,8 @@ public class ResponseModel : IResponseModel
 	public int Gender { get; set; }
 	public DateTime? DateOfBirth { get; set; }
 	public int? AgeMonths { get; set; }
-	public decimal? WeightKg { get; set; }
-	public decimal? HeightCm { get; set; }
+	public double? WeightKg { get; set; }
+	public double? HeightCm { get; set; }
 	public string Color { get; set; }
 	public string Markings { get; set; }
 	public string TagNumber { get; set; }
@@ -26,8 +26,8 @@ public class ResponseModel : IResponseModel
 	public bool IsPregnant { get; set; }
 	public DateTime? ExpectedDueDate { get; set; }
 	public int? NumberOfBirths { get; set; }
-	public decimal? DailyMilkProductionLiters { get; set; }
-	public decimal? AverageDailyEggProduction { get; set; }
+	public double? DailyMilkProductionLiters { get; set; }
+	public double? AverageDailyEggProduction { get; set; }
 	public string SireDetails { get; set; }
 	public string DamDetails { get; set; }
 	public int Purpose { get; set; }

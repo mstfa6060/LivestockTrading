@@ -8,8 +8,8 @@ public class RequestModel : IRequestModel
 	public Guid SellerId { get; set; }
 	public Guid LocationId { get; set; }
 	public int Type { get; set; }
-	public decimal? TotalAreaHectares { get; set; }
-	public decimal? CultivatedAreaHectares { get; set; }
+	public double? TotalAreaHectares { get; set; }
+	public double? CultivatedAreaHectares { get; set; }
 	public string Certifications { get; set; }
 	public bool IsOrganic { get; set; }
 	public string ImageUrls { get; set; }
@@ -26,8 +26,8 @@ public class ResponseModel : IResponseModel
 	public Guid SellerId { get; set; }
 	public Guid LocationId { get; set; }
 	public int Type { get; set; }
-	public decimal? TotalAreaHectares { get; set; }
-	public decimal? CultivatedAreaHectares { get; set; }
+	public double? TotalAreaHectares { get; set; }
+	public double? CultivatedAreaHectares { get; set; }
 	public string Certifications { get; set; }
 	public bool IsOrganic { get; set; }
 	public string ImageUrls { get; set; }

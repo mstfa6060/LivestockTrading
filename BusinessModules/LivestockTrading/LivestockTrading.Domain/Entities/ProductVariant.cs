@@ -17,9 +17,9 @@ public class ProductVariant : BaseEntity
     /// <summary>Stok Kodu (SKU)</summary>
     public string SKU { get; set; }
     /// <summary>Fiyat (ana ürün fiyatını geçersiz kılabilir)</summary>
-    public decimal? Price { get; set; }
+    public double? Price { get; set; }
     /// <summary>İndirimli fiyat</summary>
-    public decimal? DiscountedPrice { get; set; }
+    public double? DiscountedPrice { get; set; }
     /// <summary>Stok miktarı</summary>
     public int StockQuantity { get; set; }
     /// <summary>Stokta var mı?</summary>

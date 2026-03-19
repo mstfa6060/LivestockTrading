@@ -40,13 +40,13 @@ public class Seller : BaseEntity
     /// <summary>Satıcı durumu</summary>
     public SellerStatus Status { get; set; }
     /// <summary>Ortalama değerlendirme</summary>
-    public decimal? AverageRating { get; set; }
+    public double? AverageRating { get; set; }
     /// <summary>Toplam değerlendirme sayısı</summary>
     public int TotalReviews { get; set; }
     /// <summary>Toplam satış sayısı</summary>
     public int TotalSales { get; set; }
     /// <summary>Toplam gelir</summary>
-    public decimal TotalRevenue { get; set; }
+    public double TotalRevenue { get; set; }
     /// <summary>Çalışma saatleri JSON</summary>
     public string BusinessHours { get; set; }
     /// <summary>Kabul edilen ödeme yöntemleri JSON</summary>

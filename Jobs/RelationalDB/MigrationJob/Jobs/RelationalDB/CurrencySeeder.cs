@@ -140,7 +140,7 @@ public class CurrencySeeder
         public string Code { get; set; }
         public string Symbol { get; set; }
         public string Name { get; set; }
-        public decimal ExchangeRateToUSD { get; set; }
+        public double ExchangeRateToUSD { get; set; }
         public bool IsActive { get; set; }
     }
 }

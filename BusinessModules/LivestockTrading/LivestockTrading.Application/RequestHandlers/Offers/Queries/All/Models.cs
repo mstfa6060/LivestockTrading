@@ -13,7 +13,7 @@ public class ResponseModel : IResponseModel<Array>
 	public Guid ProductId { get; set; }
 	public Guid BuyerUserId { get; set; }
 	public Guid SellerUserId { get; set; }
-	public decimal OfferedPrice { get; set; }
+	public double OfferedPrice { get; set; }
 	public string Currency { get; set; }
 	public int Quantity { get; set; }
 	public int Status { get; set; }

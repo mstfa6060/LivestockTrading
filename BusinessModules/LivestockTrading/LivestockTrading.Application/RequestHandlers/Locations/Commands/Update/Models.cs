@@ -10,8 +10,8 @@ public class RequestModel : IRequestModel
 	public string State { get; set; }
 	public string PostalCode { get; set; }
 	public string CountryCode { get; set; }
-	public decimal? Latitude { get; set; }
-	public decimal? Longitude { get; set; }
+	public double? Latitude { get; set; }
+	public double? Longitude { get; set; }
 	public string Phone { get; set; }
 	public string Email { get; set; }
 	public int Type { get; set; }
@@ -29,8 +29,8 @@ public class ResponseModel : IResponseModel
 	public string State { get; set; }
 	public string PostalCode { get; set; }
 	public string CountryCode { get; set; }
-	public decimal? Latitude { get; set; }
-	public decimal? Longitude { get; set; }
+	public double? Latitude { get; set; }
+	public double? Longitude { get; set; }
 	public string Phone { get; set; }
 	public string Email { get; set; }
 	public int Type { get; set; }

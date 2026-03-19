@@ -17,7 +17,7 @@ public class TransportOffer : BaseEntity
     public Transporter Transporter { get; set; }
     
     /// <summary>Teklif edilen fiyat</summary>
-    public decimal OfferedPrice { get; set; }
+    public double OfferedPrice { get; set; }
     
     /// <summary>Para birimi</summary>
     public string Currency { get; set; }
@@ -38,7 +38,7 @@ public class TransportOffer : BaseEntity
     public bool InsuranceIncluded { get; set; }
     
     /// <summary>Sigorta tutarı</summary>
-    public decimal? InsuranceAmount { get; set; }
+    public double? InsuranceAmount { get; set; }
     
     /// <summary>Ek hizmetler (JSON: ["Soğuk zincir","Canlı hayvan bakımı"])</summary>
     public string AdditionalServices { get; set; }

@@ -14,7 +14,7 @@ public class ResponseModel : IResponseModel<Array>
 	public Guid SellerId { get; set; }
 	public Guid LocationId { get; set; }
 	public int Type { get; set; }
-	public decimal? TotalAreaHectares { get; set; }
+	public double? TotalAreaHectares { get; set; }
 	public bool IsOrganic { get; set; }
 	public bool IsActive { get; set; }
 	public bool IsVerified { get; set; }

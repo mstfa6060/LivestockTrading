@@ -23,9 +23,9 @@ public class Farm : BaseEntity
     /// <summary>Çiftlik tipi</summary>
     public FarmType Type { get; set; }
     /// <summary>Toplam alan (hektar)</summary>
-    public decimal? TotalAreaHectares { get; set; }
+    public double? TotalAreaHectares { get; set; }
     /// <summary>Ekilebilir alan (hektar)</summary>
-    public decimal? CultivatedAreaHectares { get; set; }
+    public double? CultivatedAreaHectares { get; set; }
     /// <summary>Sertifikalar JSON: ["Organik","GAP","Helal"]</summary>
     public string Certifications { get; set; }
     /// <summary>Organik mi?</summary>

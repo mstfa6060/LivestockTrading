@@ -57,7 +57,7 @@ public class UpdateExchangeRatesJob
         }
     }
 
-    private async Task<Dictionary<string, decimal>> FetchExchangeRates()
+    private async Task<Dictionary<string, double>> FetchExchangeRates()
     {
         try
         {
@@ -88,7 +88,7 @@ public class UpdateExchangeRatesJob
         }
     }
 
-    private async Task<int> SendRatesToApi(Dictionary<string, decimal> rates)
+    private async Task<int> SendRatesToApi(Dictionary<string, double> rates)
     {
         var baseUrl = _appSettings.Value.Urls.LivestockTradingApi;
         var url = $"{baseUrl}/Currencies/UpdateRates";
@@ -152,7 +152,7 @@ public class UpdateExchangeRatesJob
         public string Result { get; set; }
         public string BaseCode { get; set; }
         public string TimeLastUpdateUtc { get; set; }
-        public Dictionary<string, decimal> Rates { get; set; }
+        public Dictionary<string, double> Rates { get; set; }
     }
 
     private class ApiResponse

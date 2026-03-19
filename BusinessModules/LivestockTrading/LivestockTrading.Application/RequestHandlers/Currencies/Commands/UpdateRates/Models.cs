@@ -12,7 +12,7 @@ public class CurrencyRateItem
 	public string Code { get; set; }
 
 	/// <summary>USD'ye göre dönüşüm kuru</summary>
-	public decimal ExchangeRateToUSD { get; set; }
+	public double ExchangeRateToUSD { get; set; }
 }
 
 public class ResponseModel : IResponseModel

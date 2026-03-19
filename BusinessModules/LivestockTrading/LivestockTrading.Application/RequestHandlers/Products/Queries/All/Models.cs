@@ -34,9 +34,9 @@ public class ResponseModel : IResponseModel<Array>
 	public string ShortDescription { get; set; }
 	public Guid CategoryId { get; set; }
 	public Guid? BrandId { get; set; }
-	public decimal BasePrice { get; set; }
+	public double BasePrice { get; set; }
 	public string Currency { get; set; }
-	public decimal? DiscountedPrice { get; set; }
+	public double? DiscountedPrice { get; set; }
 	public int StockQuantity { get; set; }
 	public bool IsInStock { get; set; }
 	public Guid SellerId { get; set; }
@@ -48,25 +48,25 @@ public class ResponseModel : IResponseModel<Array>
 	public int Status { get; set; }
 	public int Condition { get; set; }
 	public int ViewCount { get; set; }
-	public decimal? AverageRating { get; set; }
+	public double? AverageRating { get; set; }
 	public int ReviewCount { get; set; }
 	public DateTime CreatedAt { get; set; }
 	public string MediaBucketId { get; set; }
 	public string CoverImageFileId { get; set; }
 
 	/// <summary>Hedef para birimine dönüştürülmüş fiyat (TargetCurrencyCode verilmişse)</summary>
-	public decimal? ConvertedPrice { get; set; }
+	public double? ConvertedPrice { get; set; }
 	/// <summary>Hedef para birimine dönüştürülmüş indirimli fiyat</summary>
-	public decimal? ConvertedDiscountedPrice { get; set; }
+	public double? ConvertedDiscountedPrice { get; set; }
 	/// <summary>Hedef para birimi kodu</summary>
 	public string ConvertedCurrencyCode { get; set; }
 	/// <summary>Hedef para birimi sembolü</summary>
 	public string ConvertedCurrencySymbol { get; set; }
 
 	/// <summary>Price in viewer's currency (null if no conversion available)</summary>
-	public decimal? ViewerPrice { get; set; }
+	public double? ViewerPrice { get; set; }
 	/// <summary>Discounted price in viewer's currency</summary>
-	public decimal? ViewerDiscountedPrice { get; set; }
+	public double? ViewerDiscountedPrice { get; set; }
 	/// <summary>Viewer's currency code</summary>
 	public string ViewerCurrencyCode { get; set; }
 	/// <summary>Viewer's currency symbol</summary>

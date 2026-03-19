@@ -23,10 +23,10 @@ public class ResponseModel : IResponseModel
 	public DateTime? VerifiedAt { get; set; }
 	public bool IsActive { get; set; }
 	public int Status { get; set; }
-	public decimal? AverageRating { get; set; }
+	public double? AverageRating { get; set; }
 	public int TotalReviews { get; set; }
 	public int TotalSales { get; set; }
-	public decimal TotalRevenue { get; set; }
+	public double TotalRevenue { get; set; }
 	public string BusinessHours { get; set; }
 	public string AcceptedPaymentMethods { get; set; }
 	public string ReturnPolicy { get; set; }

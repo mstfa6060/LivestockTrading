@@ -10,7 +10,7 @@ public class ProductApprovedEvent : IDomainEvent
     public string Title { get; set; }
     public string Description { get; set; }
     public string ShortDescription { get; set; }
-    public decimal BasePrice { get; set; }
+    public double BasePrice { get; set; }
     public string Currency { get; set; }
     public string CategoryName { get; set; }
     public string BrandName { get; set; }
@@ -43,7 +43,7 @@ public class ProductCreatedEvent : IDomainEvent
     public Guid ProductId { get; set; }
     public string Title { get; set; }
     public string ShortDescription { get; set; }
-    public decimal BasePrice { get; set; }
+    public double BasePrice { get; set; }
     public string Currency { get; set; }
     public string SellerBusinessName { get; set; }
     public Guid SellerId { get; set; }

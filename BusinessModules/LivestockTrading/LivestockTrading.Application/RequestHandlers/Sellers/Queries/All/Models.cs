@@ -18,7 +18,7 @@ public class ResponseModel : IResponseModel<Array>
 	public bool IsVerified { get; set; }
 	public bool IsActive { get; set; }
 	public int Status { get; set; }
-	public decimal? AverageRating { get; set; }
+	public double? AverageRating { get; set; }
 	public int TotalReviews { get; set; }
 	public int TotalSales { get; set; }
 	public DateTime CreatedAt { get; set; }

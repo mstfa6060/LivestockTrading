@@ -14,7 +14,7 @@ public class ResponseModel : IResponseModel<Array>
 	public int Type { get; set; }
 	public string Model { get; set; }
 	public int? YearOfManufacture { get; set; }
-	public decimal? PowerHp { get; set; }
+	public double? PowerHp { get; set; }
 	public int? HoursUsed { get; set; }
 	public bool HasWarranty { get; set; }
 	public DateTime CreatedAt { get; set; }

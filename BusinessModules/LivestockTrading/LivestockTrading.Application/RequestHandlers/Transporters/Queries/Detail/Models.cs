@@ -27,7 +27,7 @@ public class ResponseModel : IResponseModel
 	public bool IsVerified { get; set; }
 	public DateTime? VerifiedAt { get; set; }
 	public bool IsActive { get; set; }
-	public decimal? AverageRating { get; set; }
+	public double? AverageRating { get; set; }
 	public int TotalTransports { get; set; }
 	public int CompletedTransports { get; set; }
 	public string Website { get; set; }

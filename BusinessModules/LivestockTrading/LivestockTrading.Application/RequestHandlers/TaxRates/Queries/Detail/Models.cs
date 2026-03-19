@@ -11,7 +11,7 @@ public class ResponseModel : IResponseModel
 	public string CountryCode { get; set; }
 	public string StateCode { get; set; }
 	public string TaxName { get; set; }
-	public decimal Rate { get; set; }
+	public double Rate { get; set; }
 	public int Type { get; set; }
 	public Guid? CategoryId { get; set; }
 	public bool IsActive { get; set; }

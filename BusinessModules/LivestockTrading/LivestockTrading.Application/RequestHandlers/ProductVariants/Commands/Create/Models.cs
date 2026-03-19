@@ -5,8 +5,8 @@ public class RequestModel : IRequestModel
 	public Guid ProductId { get; set; }
 	public string Name { get; set; }
 	public string SKU { get; set; }
-	public decimal? Price { get; set; }
-	public decimal? DiscountedPrice { get; set; }
+	public double? Price { get; set; }
+	public double? DiscountedPrice { get; set; }
 	public int StockQuantity { get; set; }
 	public bool IsInStock { get; set; }
 	public string Attributes { get; set; }
@@ -21,8 +21,8 @@ public class ResponseModel : IResponseModel
 	public Guid ProductId { get; set; }
 	public string Name { get; set; }
 	public string SKU { get; set; }
-	public decimal? Price { get; set; }
-	public decimal? DiscountedPrice { get; set; }
+	public double? Price { get; set; }
+	public double? DiscountedPrice { get; set; }
 	public int StockQuantity { get; set; }
 	public bool IsInStock { get; set; }
 	public string Attributes { get; set; }

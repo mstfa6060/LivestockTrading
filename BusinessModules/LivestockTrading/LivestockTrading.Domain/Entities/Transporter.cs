@@ -70,7 +70,7 @@ public class Transporter : BaseEntity
     public TransporterStatus Status { get; set; }
 
     /// <summary>Ortalama değerlendirme</summary>
-    public decimal? AverageRating { get; set; }
+    public double? AverageRating { get; set; }
     
     /// <summary>Toplam taşıma sayısı</summary>
     public int TotalTransports { get; set; }

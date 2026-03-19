@@ -32,8 +32,6 @@ public static class LivestockTradingModelBuilder
             entity.Property(e => e.Title).IsRequired().HasMaxLength(500);
             entity.Property(e => e.Slug).IsRequired().HasMaxLength(500);
             entity.HasIndex(e => e.Slug).IsUnique();
-            entity.Property(e => e.BasePrice).HasPrecision(18, 2);
-            entity.Property(e => e.DiscountedPrice).HasPrecision(18, 2);
 
             entity.HasOne(e => e.Category)
                 .WithMany(e => e.Products)
@@ -72,8 +70,6 @@ public static class LivestockTradingModelBuilder
         modelBuilder.Entity<Location>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Latitude).HasPrecision(10, 7);
-            entity.Property(e => e.Longitude).HasPrecision(10, 7);
         });
 
         // ========================================
@@ -111,8 +107,6 @@ public static class LivestockTradingModelBuilder
         modelBuilder.Entity<ProductVariant>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Price).HasPrecision(18, 2);
-            entity.Property(e => e.DiscountedPrice).HasPrecision(18, 2);
 
             entity.HasOne(e => e.Product)
                 .WithMany(e => e.Variants)
@@ -223,8 +217,6 @@ public static class LivestockTradingModelBuilder
         modelBuilder.Entity<ProductPrice>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Price).HasPrecision(18, 2);
-            entity.Property(e => e.DiscountedPrice).HasPrecision(18, 2);
             entity.HasOne(e => e.Product)
                 .WithMany()
                 .HasForeignKey(e => e.ProductId)
@@ -252,7 +244,6 @@ public static class LivestockTradingModelBuilder
         modelBuilder.Entity<TaxRate>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Rate).HasPrecision(5, 2);
             entity.Property(e => e.CountryCode).HasMaxLength(3);
             entity.Property(e => e.StateCode).HasMaxLength(10);
         });
@@ -271,10 +262,6 @@ public static class LivestockTradingModelBuilder
         modelBuilder.Entity<ShippingRate>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.ShippingCost).HasPrecision(18, 2);
-            entity.Property(e => e.MinWeight).HasPrecision(10, 2);
-            entity.Property(e => e.MaxWeight).HasPrecision(10, 2);
-            entity.Property(e => e.MinOrderAmount).HasPrecision(18, 2);
 
             entity.HasOne(e => e.ShippingZone)
                 .WithMany(e => e.ShippingRates)
@@ -294,8 +281,6 @@ public static class LivestockTradingModelBuilder
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
-            entity.Property(e => e.PriceMonthly).HasPrecision(18, 2);
-            entity.Property(e => e.PriceYearly).HasPrecision(18, 2);
             entity.Property(e => e.Currency).HasMaxLength(3);
             entity.Property(e => e.AppleProductIdMonthly).HasMaxLength(200);
             entity.Property(e => e.AppleProductIdYearly).HasMaxLength(200);
@@ -332,7 +317,6 @@ public static class LivestockTradingModelBuilder
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.StoreTransactionId).HasMaxLength(500);
-            entity.Property(e => e.Amount).HasPrecision(18, 2);
             entity.Property(e => e.Currency).HasMaxLength(3);
 
             entity.HasOne(e => e.SellerSubscription)
@@ -351,7 +335,6 @@ public static class LivestockTradingModelBuilder
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
-            entity.Property(e => e.Price).HasPrecision(18, 2);
             entity.Property(e => e.Currency).HasMaxLength(3);
             entity.Property(e => e.AppleProductId).HasMaxLength(200);
             entity.Property(e => e.GoogleProductId).HasMaxLength(200);
@@ -422,8 +405,6 @@ public static class LivestockTradingModelBuilder
             entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Code).IsRequired().HasMaxLength(50);
             entity.HasIndex(e => e.Code).IsUnique();
-            entity.Property(e => e.TransactionFeePercentage).HasPrecision(5, 2);
-            entity.Property(e => e.FixedTransactionFee).HasPrecision(18, 2);
         });
 
         // ========================================
@@ -461,7 +442,6 @@ public static class LivestockTradingModelBuilder
             entity.HasKey(e => e.Id);
             entity.Property(e => e.DealNumber).IsRequired().HasMaxLength(50);
             entity.HasIndex(e => e.DealNumber).IsUnique();
-            entity.Property(e => e.AgreedPrice).HasPrecision(18, 2);
             entity.Property(e => e.Currency).HasMaxLength(3);
 
             entity.HasOne(e => e.Product)
@@ -493,7 +473,6 @@ public static class LivestockTradingModelBuilder
             entity.Property(e => e.Email).HasMaxLength(200);
             entity.Property(e => e.Phone).HasMaxLength(20);
             entity.Property(e => e.CountryCode).HasMaxLength(3);
-            entity.Property(e => e.AverageRating).HasPrecision(3, 2);
 
             entity.HasIndex(e => e.UserId).IsUnique();
             entity.HasIndex(e => e.IsVerified);
@@ -526,11 +505,7 @@ public static class LivestockTradingModelBuilder
         modelBuilder.Entity<TransportRequest>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.AgreedPrice).HasPrecision(18, 2);
             entity.Property(e => e.Currency).HasMaxLength(3);
-            entity.Property(e => e.EstimatedDistanceKm).HasPrecision(10, 2);
-            entity.Property(e => e.WeightKg).HasPrecision(10, 2);
-            entity.Property(e => e.VolumeCubicMeters).HasPrecision(10, 3);
 
             entity.HasOne(e => e.Product)
                 .WithMany()
@@ -568,9 +543,7 @@ public static class LivestockTradingModelBuilder
         modelBuilder.Entity<TransportOffer>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.OfferedPrice).HasPrecision(18, 2);
             entity.Property(e => e.Currency).HasMaxLength(3);
-            entity.Property(e => e.InsuranceAmount).HasPrecision(18, 2);
 
             entity.HasOne(e => e.TransportRequest)
                 .WithMany(e => e.TransportOffers)
@@ -591,8 +564,6 @@ public static class LivestockTradingModelBuilder
         modelBuilder.Entity<TransportTracking>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Latitude).HasPrecision(10, 7);
-            entity.Property(e => e.Longitude).HasPrecision(10, 7);
 
             entity.HasOne(e => e.TransportRequest)
                 .WithMany(e => e.TrackingHistory)
@@ -608,10 +579,6 @@ public static class LivestockTradingModelBuilder
         modelBuilder.Entity<AnimalInfo>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.WeightKg).HasPrecision(10, 2);
-            entity.Property(e => e.HeightCm).HasPrecision(10, 2);
-            entity.Property(e => e.DailyMilkProductionLiters).HasPrecision(10, 2);
-            entity.Property(e => e.AverageDailyEggProduction).HasPrecision(10, 2);
 
             entity.HasOne(e => e.Product)
                 .WithMany()
@@ -664,16 +631,6 @@ public static class LivestockTradingModelBuilder
         modelBuilder.Entity<MachineryInfo>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.PowerHp).HasPrecision(10, 2);
-            entity.Property(e => e.PowerKw).HasPrecision(10, 2);
-            entity.Property(e => e.LengthCm).HasPrecision(10, 2);
-            entity.Property(e => e.WidthCm).HasPrecision(10, 2);
-            entity.Property(e => e.HeightCm).HasPrecision(10, 2);
-            entity.Property(e => e.WeightKg).HasPrecision(10, 2);
-            entity.Property(e => e.WorkingWidthCm).HasPrecision(10, 2);
-            entity.Property(e => e.CapacityLiters).HasPrecision(10, 2);
-            entity.Property(e => e.LoadCapacityKg).HasPrecision(10, 2);
-            entity.Property(e => e.SpeedKmh).HasPrecision(10, 2);
 
             entity.HasOne(e => e.Product)
                 .WithMany()
@@ -687,7 +644,6 @@ public static class LivestockTradingModelBuilder
         modelBuilder.Entity<SeedInfo>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.GerminationRate).HasPrecision(5, 2);
 
             entity.HasOne(e => e.Product)
                 .WithMany()
@@ -701,15 +657,6 @@ public static class LivestockTradingModelBuilder
         modelBuilder.Entity<FeedInfo>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.ProteinPercentage).HasPrecision(5, 2);
-            entity.Property(e => e.FatPercentage).HasPrecision(5, 2);
-            entity.Property(e => e.FiberPercentage).HasPrecision(5, 2);
-            entity.Property(e => e.MoisturePercentage).HasPrecision(5, 2);
-            entity.Property(e => e.AshPercentage).HasPrecision(5, 2);
-            entity.Property(e => e.CalciumPercentage).HasPrecision(5, 2);
-            entity.Property(e => e.PhosphorusPercentage).HasPrecision(5, 2);
-            entity.Property(e => e.EnergyKcalPerKg).HasPrecision(10, 2);
-            entity.Property(e => e.MetabolizableEnergyMJPerKg).HasPrecision(10, 2);
 
             entity.HasOne(e => e.Product)
                 .WithMany()
@@ -766,7 +713,6 @@ public static class LivestockTradingModelBuilder
         modelBuilder.Entity<Offer>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.OfferedPrice).HasPrecision(18, 2);
             entity.HasIndex(e => e.BuyerUserId);
             entity.HasIndex(e => e.SellerUserId);
 

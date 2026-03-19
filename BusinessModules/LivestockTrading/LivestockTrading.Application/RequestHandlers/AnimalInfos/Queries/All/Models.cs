@@ -14,7 +14,7 @@ public class ResponseModel : IResponseModel<Array>
 	public string BreedName { get; set; }
 	public int Gender { get; set; }
 	public int? AgeMonths { get; set; }
-	public decimal? WeightKg { get; set; }
+	public double? WeightKg { get; set; }
 	public string Color { get; set; }
 	public string TagNumber { get; set; }
 	public int HealthStatus { get; set; }

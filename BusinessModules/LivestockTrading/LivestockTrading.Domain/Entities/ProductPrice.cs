@@ -10,8 +10,8 @@ public class ProductPrice : BaseEntity
     public Guid ProductId { get; set; }
     public Product Product { get; set; }
     public string CurrencyCode { get; set; }
-    public decimal Price { get; set; }
-    public decimal? DiscountedPrice { get; set; }
+    public double Price { get; set; }
+    public double? DiscountedPrice { get; set; }
     public string CountryCodes { get; set; }
     public bool IsActive { get; set; }
     public DateTime? ValidFrom { get; set; }

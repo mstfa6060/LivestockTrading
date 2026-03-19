@@ -8,7 +8,7 @@ public class RequestModel : IRequestModel
 	public string NameTranslations { get; set; }
 	public string DescriptionTranslations { get; set; }
 	public int DurationHours { get; set; }
-	public decimal Price { get; set; }
+	public double Price { get; set; }
 	public string Currency { get; set; }
 	public int BoostType { get; set; }
 	public int BoostScore { get; set; }
@@ -26,7 +26,7 @@ public class ResponseModel : IResponseModel
 	public string NameTranslations { get; set; }
 	public string DescriptionTranslations { get; set; }
 	public int DurationHours { get; set; }
-	public decimal Price { get; set; }
+	public double Price { get; set; }
 	public string Currency { get; set; }
 	public int BoostType { get; set; }
 	public int BoostScore { get; set; }

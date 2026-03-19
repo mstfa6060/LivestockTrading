@@ -16,7 +16,7 @@ public class ResponseModel : IResponseModel
 	public int TotalFavorites { get; set; }
 	public int TotalMessages { get; set; }
 	public int TotalSales { get; set; }
-	public decimal Revenue { get; set; }
+	public double Revenue { get; set; }
 	public List<RecentActivityItem> RecentActivity { get; set; }
 }
 

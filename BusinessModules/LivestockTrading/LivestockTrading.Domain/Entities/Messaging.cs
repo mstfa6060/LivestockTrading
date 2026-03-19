@@ -83,7 +83,7 @@ public class Offer : BaseEntity
     /// <summary>Satıcı kullanıcı ID</summary>
     public Guid SellerUserId { get; set; }
     /// <summary>Teklif edilen fiyat</summary>
-    public decimal OfferedPrice { get; set; }
+    public double OfferedPrice { get; set; }
     /// <summary>Para birimi</summary>
     public string Currency { get; set; }
     /// <summary>Miktar</summary>

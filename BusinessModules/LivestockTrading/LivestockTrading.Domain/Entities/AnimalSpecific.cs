@@ -21,9 +21,9 @@ public class AnimalInfo : BaseEntity
     /// <summary>Yaş (ay)</summary>
     public int? AgeMonths { get; set; }
     /// <summary>Ağırlık (kg)</summary>
-    public decimal? WeightKg { get; set; }
+    public double? WeightKg { get; set; }
     /// <summary>Boy (cm)</summary>
-    public decimal? HeightCm { get; set; }
+    public double? HeightCm { get; set; }
     /// <summary>Renk</summary>
     public string Color { get; set; }
     /// <summary>İşaretler/Özellikler</summary>
@@ -47,9 +47,9 @@ public class AnimalInfo : BaseEntity
     /// <summary>Doğum sayısı</summary>
     public int? NumberOfBirths { get; set; }
     /// <summary>Günlük süt üretimi (litre)</summary>
-    public decimal? DailyMilkProductionLiters { get; set; }
+    public double? DailyMilkProductionLiters { get; set; }
     /// <summary>Ortalama günlük yumurta üretimi</summary>
-    public decimal? AverageDailyEggProduction { get; set; }
+    public double? AverageDailyEggProduction { get; set; }
     /// <summary>Baba bilgileri</summary>
     public string SireDetails { get; set; }
     /// <summary>Anne bilgileri</summary>

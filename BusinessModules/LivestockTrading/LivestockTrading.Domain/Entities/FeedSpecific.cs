@@ -17,23 +17,23 @@ public class FeedInfo : BaseEntity
     /// <summary>Hedef yaş (Yetişkin, Genç, Yavru)</summary>
     public string TargetAge { get; set; }
     /// <summary>Protein oranı (%)</summary>
-    public decimal? ProteinPercentage { get; set; }
+    public double? ProteinPercentage { get; set; }
     /// <summary>Yağ oranı (%)</summary>
-    public decimal? FatPercentage { get; set; }
+    public double? FatPercentage { get; set; }
     /// <summary>Lif oranı (%)</summary>
-    public decimal? FiberPercentage { get; set; }
+    public double? FiberPercentage { get; set; }
     /// <summary>Nem oranı (%)</summary>
-    public decimal? MoisturePercentage { get; set; }
+    public double? MoisturePercentage { get; set; }
     /// <summary>Kül oranı (%)</summary>
-    public decimal? AshPercentage { get; set; }
+    public double? AshPercentage { get; set; }
     /// <summary>Kalsiyum oranı (%)</summary>
-    public decimal? CalciumPercentage { get; set; }
+    public double? CalciumPercentage { get; set; }
     /// <summary>Fosfor oranı (%)</summary>
-    public decimal? PhosphorusPercentage { get; set; }
+    public double? PhosphorusPercentage { get; set; }
     /// <summary>Enerji (kcal/kg)</summary>
-    public decimal? EnergyKcalPerKg { get; set; }
+    public double? EnergyKcalPerKg { get; set; }
     /// <summary>Metabolik enerji (MJ/kg)</summary>
-    public decimal? MetabolizableEnergyMJPerKg { get; set; }
+    public double? MetabolizableEnergyMJPerKg { get; set; }
     /// <summary>Vitamin ve mineraller detaylı JSON</summary>
     public string VitaminsAndMinerals { get; set; }
     /// <summary>İçerik listesi (yüzdeye göre sıralı)</summary>

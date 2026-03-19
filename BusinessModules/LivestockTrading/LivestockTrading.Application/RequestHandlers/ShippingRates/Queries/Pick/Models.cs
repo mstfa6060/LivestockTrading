@@ -10,6 +10,6 @@ public class RequestModel : IRequestModel
 public class ResponseModel : IResponseModel<Array>
 {
 	public Guid Id { get; set; }
-	public decimal ShippingCost { get; set; }
+	public double ShippingCost { get; set; }
 	public string Currency { get; set; }
 }

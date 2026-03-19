@@ -8,17 +8,17 @@ public class RequestModel : IRequestModel
 	public int? YearOfManufacture { get; set; }
 	public string SerialNumber { get; set; }
 	public string PowerSource { get; set; }
-	public decimal? PowerHp { get; set; }
-	public decimal? PowerKw { get; set; }
+	public double? PowerHp { get; set; }
+	public double? PowerKw { get; set; }
 	public string EngineCapacity { get; set; }
-	public decimal? LengthCm { get; set; }
-	public decimal? WidthCm { get; set; }
-	public decimal? HeightCm { get; set; }
-	public decimal? WeightKg { get; set; }
-	public decimal? WorkingWidthCm { get; set; }
-	public decimal? CapacityLiters { get; set; }
-	public decimal? LoadCapacityKg { get; set; }
-	public decimal? SpeedKmh { get; set; }
+	public double? LengthCm { get; set; }
+	public double? WidthCm { get; set; }
+	public double? HeightCm { get; set; }
+	public double? WeightKg { get; set; }
+	public double? WorkingWidthCm { get; set; }
+	public double? CapacityLiters { get; set; }
+	public double? LoadCapacityKg { get; set; }
+	public double? SpeedKmh { get; set; }
 	public int? HoursUsed { get; set; }
 	public DateTime? LastServiceDate { get; set; }
 	public string ServiceHistory { get; set; }
@@ -40,17 +40,17 @@ public class ResponseModel : IResponseModel
 	public int? YearOfManufacture { get; set; }
 	public string SerialNumber { get; set; }
 	public string PowerSource { get; set; }
-	public decimal? PowerHp { get; set; }
-	public decimal? PowerKw { get; set; }
+	public double? PowerHp { get; set; }
+	public double? PowerKw { get; set; }
 	public string EngineCapacity { get; set; }
-	public decimal? LengthCm { get; set; }
-	public decimal? WidthCm { get; set; }
-	public decimal? HeightCm { get; set; }
-	public decimal? WeightKg { get; set; }
-	public decimal? WorkingWidthCm { get; set; }
-	public decimal? CapacityLiters { get; set; }
-	public decimal? LoadCapacityKg { get; set; }
-	public decimal? SpeedKmh { get; set; }
+	public double? LengthCm { get; set; }
+	public double? WidthCm { get; set; }
+	public double? HeightCm { get; set; }
+	public double? WeightKg { get; set; }
+	public double? WorkingWidthCm { get; set; }
+	public double? CapacityLiters { get; set; }
+	public double? LoadCapacityKg { get; set; }
+	public double? SpeedKmh { get; set; }
 	public int? HoursUsed { get; set; }
 	public DateTime? LastServiceDate { get; set; }
 	public string ServiceHistory { get; set; }

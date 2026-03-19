@@ -18,7 +18,7 @@ public class ResponseModel : IResponseModel<Array>
 	public bool IsActive { get; set; }
 	public string SupportedCountries { get; set; }
 	public string SupportedCurrencies { get; set; }
-	public decimal? TransactionFeePercentage { get; set; }
-	public decimal? FixedTransactionFee { get; set; }
+	public double? TransactionFeePercentage { get; set; }
+	public double? FixedTransactionFee { get; set; }
 	public DateTime CreatedAt { get; set; }
 }

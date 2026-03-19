@@ -10,8 +10,8 @@ public class RequestModel : IRequestModel
 	public bool IsActive { get; set; } = true;
 	public string SupportedCountries { get; set; }
 	public string SupportedCurrencies { get; set; }
-	public decimal? TransactionFeePercentage { get; set; }
-	public decimal? FixedTransactionFee { get; set; }
+	public double? TransactionFeePercentage { get; set; }
+	public double? FixedTransactionFee { get; set; }
 }
 
 public class ResponseModel : IResponseModel
@@ -25,7 +25,7 @@ public class ResponseModel : IResponseModel
 	public bool IsActive { get; set; }
 	public string SupportedCountries { get; set; }
 	public string SupportedCurrencies { get; set; }
-	public decimal? TransactionFeePercentage { get; set; }
-	public decimal? FixedTransactionFee { get; set; }
+	public double? TransactionFeePercentage { get; set; }
+	public double? FixedTransactionFee { get; set; }
 	public DateTime CreatedAt { get; set; }
 }

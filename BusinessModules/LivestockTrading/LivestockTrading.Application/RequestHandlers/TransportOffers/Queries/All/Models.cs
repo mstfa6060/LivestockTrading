@@ -12,7 +12,7 @@ public class ResponseModel : IResponseModel<Array>
 	public Guid Id { get; set; }
 	public Guid TransportRequestId { get; set; }
 	public Guid TransporterId { get; set; }
-	public decimal OfferedPrice { get; set; }
+	public double OfferedPrice { get; set; }
 	public string Currency { get; set; }
 	public int Status { get; set; }
 	public int? EstimatedDurationDays { get; set; }

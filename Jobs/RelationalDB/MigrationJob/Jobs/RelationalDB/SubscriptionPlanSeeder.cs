@@ -184,8 +184,8 @@ public class SubscriptionPlanSeeder
         public string DescriptionTranslations { get; set; }
         public int TargetType { get; set; }
         public int Tier { get; set; }
-        public decimal PriceMonthly { get; set; }
-        public decimal PriceYearly { get; set; }
+        public double PriceMonthly { get; set; }
+        public double PriceYearly { get; set; }
         public string Currency { get; set; }
         public string AppleProductIdMonthly { get; set; }
         public string AppleProductIdYearly { get; set; }

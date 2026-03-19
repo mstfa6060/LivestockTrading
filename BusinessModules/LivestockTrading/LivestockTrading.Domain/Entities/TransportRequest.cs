@@ -21,7 +21,7 @@ public class TransportRequest : BaseEntity
     public Guid BuyerId { get; set; }
     
     /// <summary>Anlaşılan fiyat (bilgi amaçlı)</summary>
-    public decimal? AgreedPrice { get; set; }
+    public double? AgreedPrice { get; set; }
     
     /// <summary>Para birimi</summary>
     public string Currency { get; set; }
@@ -35,13 +35,13 @@ public class TransportRequest : BaseEntity
     public Location DeliveryLocation { get; set; }
     
     /// <summary>Tahmini mesafe (km)</summary>
-    public decimal? EstimatedDistanceKm { get; set; }
+    public double? EstimatedDistanceKm { get; set; }
     
     /// <summary>Ürün ağırlığı (kg)</summary>
-    public decimal? WeightKg { get; set; }
+    public double? WeightKg { get; set; }
     
     /// <summary>Hacim (m³)</summary>
-    public decimal? VolumeCubicMeters { get; set; }
+    public double? VolumeCubicMeters { get; set; }
     
     /// <summary>Özel talimatlar (Soğuk zincir, dikkat edilmesi gerekenler)</summary>
     public string SpecialInstructions { get; set; }

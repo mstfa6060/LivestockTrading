@@ -24,9 +24,9 @@ public class Location : BaseEntity
     /// <summary>Ülke kodu (ISO 3166-1 alpha-2)</summary>
     public string CountryCode { get; set; }
     /// <summary>Enlem</summary>
-    public decimal? Latitude { get; set; }
+    public double? Latitude { get; set; }
     /// <summary>Boylam</summary>
-    public decimal? Longitude { get; set; }
+    public double? Longitude { get; set; }
     /// <summary>Telefon</summary>
     public string Phone { get; set; }
     /// <summary>E-posta</summary>

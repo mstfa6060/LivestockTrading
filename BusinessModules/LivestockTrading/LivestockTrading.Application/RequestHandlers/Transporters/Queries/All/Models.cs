@@ -19,7 +19,7 @@ public class ResponseModel : IResponseModel<Array>
 	public string CountryCode { get; set; }
 	public bool IsVerified { get; set; }
 	public bool IsActive { get; set; }
-	public decimal? AverageRating { get; set; }
+	public double? AverageRating { get; set; }
 	public int TotalTransports { get; set; }
 	public DateTime CreatedAt { get; set; }
 }

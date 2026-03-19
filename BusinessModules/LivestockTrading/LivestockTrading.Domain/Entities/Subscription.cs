@@ -22,9 +22,9 @@ public class SubscriptionPlan : BaseEntity
     /// <summary>Plan seviyesi</summary>
     public SubscriptionTier Tier { get; set; }
     /// <summary>Aylık fiyat (USD)</summary>
-    public decimal PriceMonthly { get; set; }
+    public double PriceMonthly { get; set; }
     /// <summary>Yıllık fiyat (USD)</summary>
-    public decimal PriceYearly { get; set; }
+    public double PriceYearly { get; set; }
     /// <summary>Para birimi</summary>
     public string Currency { get; set; }
     /// <summary>Apple App Store ürün ID (aylık)</summary>
@@ -158,7 +158,7 @@ public class IAPTransaction : BaseEntity
     /// <summary>Store receipt verisi</summary>
     public string Receipt { get; set; }
     /// <summary>Tutar</summary>
-    public decimal Amount { get; set; }
+    public double Amount { get; set; }
     /// <summary>Para birimi</summary>
     public string Currency { get; set; }
     /// <summary>Durum</summary>

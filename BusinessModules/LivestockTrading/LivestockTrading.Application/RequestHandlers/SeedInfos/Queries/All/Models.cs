@@ -14,7 +14,7 @@ public class ResponseModel : IResponseModel<Array>
 	public int Type { get; set; }
 	public string Variety { get; set; }
 	public string ScientificName { get; set; }
-	public decimal? GerminationRate { get; set; }
+	public double? GerminationRate { get; set; }
 	public int? DaysToMaturity { get; set; }
 	public bool IsOrganic { get; set; }
 	public bool IsHybrid { get; set; }

@@ -9,9 +9,9 @@ public class RequestModel : IRequestModel
 	public string ShortDescription { get; set; }
 	public Guid CategoryId { get; set; }
 	public Guid? BrandId { get; set; }
-	public decimal BasePrice { get; set; }
+	public double BasePrice { get; set; }
 	public string Currency { get; set; }
-	public decimal? DiscountedPrice { get; set; }
+	public double? DiscountedPrice { get; set; }
 	public string PriceUnit { get; set; }
 	public int StockQuantity { get; set; }
 	public string StockUnit { get; set; }
@@ -23,9 +23,9 @@ public class RequestModel : IRequestModel
 	public int Status { get; set; }
 	public int Condition { get; set; }
 	public bool IsShippingAvailable { get; set; }
-	public decimal? ShippingCost { get; set; }
+	public double? ShippingCost { get; set; }
 	public bool IsInternationalShipping { get; set; }
-	public decimal? Weight { get; set; }
+	public double? Weight { get; set; }
 	public string WeightUnit { get; set; }
 	public string Attributes { get; set; }
 	public string MetaTitle { get; set; }
@@ -44,9 +44,9 @@ public class ResponseModel : IResponseModel
 	public string ShortDescription { get; set; }
 	public Guid CategoryId { get; set; }
 	public Guid? BrandId { get; set; }
-	public decimal BasePrice { get; set; }
+	public double BasePrice { get; set; }
 	public string Currency { get; set; }
-	public decimal? DiscountedPrice { get; set; }
+	public double? DiscountedPrice { get; set; }
 	public string PriceUnit { get; set; }
 	public int StockQuantity { get; set; }
 	public string StockUnit { get; set; }
@@ -58,9 +58,9 @@ public class ResponseModel : IResponseModel
 	public int Status { get; set; }
 	public int Condition { get; set; }
 	public bool IsShippingAvailable { get; set; }
-	public decimal? ShippingCost { get; set; }
+	public double? ShippingCost { get; set; }
 	public bool IsInternationalShipping { get; set; }
-	public decimal? Weight { get; set; }
+	public double? Weight { get; set; }
 	public string WeightUnit { get; set; }
 	public string Attributes { get; set; }
 	public string MetaTitle { get; set; }

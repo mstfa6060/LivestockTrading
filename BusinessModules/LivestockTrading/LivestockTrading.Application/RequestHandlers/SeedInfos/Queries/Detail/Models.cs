@@ -15,7 +15,7 @@ public class ResponseModel : IResponseModel
 	public string CommonNames { get; set; }
 	public string SeedSize { get; set; }
 	public string SeedColor { get; set; }
-	public decimal? GerminationRate { get; set; }
+	public double? GerminationRate { get; set; }
 	public int? GerminationDays { get; set; }
 	public string ClimateZones { get; set; }
 	public string SoilType { get; set; }

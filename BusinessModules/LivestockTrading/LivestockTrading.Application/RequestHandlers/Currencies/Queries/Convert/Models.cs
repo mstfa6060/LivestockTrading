@@ -3,7 +3,7 @@ namespace LivestockTrading.Application.RequestHandlers.Currencies.Queries.Conver
 public class RequestModel : IRequestModel
 {
 	/// <summary>Dönüştürülecek tutar</summary>
-	public decimal Amount { get; set; }
+	public double Amount { get; set; }
 
 	/// <summary>Kaynak para birimi kodu (ISO 4217, örn: "USD", "EUR", "TRY")</summary>
 	public string FromCurrencyCode { get; set; }
@@ -15,10 +15,10 @@ public class RequestModel : IRequestModel
 public class ResponseModel : IResponseModel
 {
 	/// <summary>Orijinal tutar</summary>
-	public decimal OriginalAmount { get; set; }
+	public double OriginalAmount { get; set; }
 
 	/// <summary>Dönüştürülmüş tutar</summary>
-	public decimal ConvertedAmount { get; set; }
+	public double ConvertedAmount { get; set; }
 
 	/// <summary>Kaynak para birimi kodu</summary>
 	public string FromCurrencyCode { get; set; }
@@ -27,7 +27,7 @@ public class ResponseModel : IResponseModel
 	public string ToCurrencyCode { get; set; }
 
 	/// <summary>Uygulanan dönüşüm kuru (from → to)</summary>
-	public decimal ExchangeRate { get; set; }
+	public double ExchangeRate { get; set; }
 
 	/// <summary>Kaynak para birimi sembolü</summary>
 	public string FromSymbol { get; set; }

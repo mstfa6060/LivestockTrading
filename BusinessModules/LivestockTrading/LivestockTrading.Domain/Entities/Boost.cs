@@ -19,7 +19,7 @@ public class BoostPackage : BaseEntity
     /// <summary>Boost süresi (saat)</summary>
     public int DurationHours { get; set; }
     /// <summary>Fiyat (USD)</summary>
-    public decimal Price { get; set; }
+    public double Price { get; set; }
     /// <summary>Para birimi</summary>
     public string Currency { get; set; }
     /// <summary>Apple App Store ürün ID</summary>

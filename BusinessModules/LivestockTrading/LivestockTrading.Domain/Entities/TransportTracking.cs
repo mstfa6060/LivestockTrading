@@ -13,10 +13,10 @@ public class TransportTracking : BaseEntity
     public TransportRequest TransportRequest { get; set; }
 
     /// <summary>Enlem</summary>
-    public decimal? Latitude { get; set; }
+    public double? Latitude { get; set; }
 
     /// <summary>Boylam</summary>
-    public decimal? Longitude { get; set; }
+    public double? Longitude { get; set; }
 
     /// <summary>Konum açıklaması</summary>
     public string LocationDescription { get; set; }
