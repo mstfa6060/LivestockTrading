@@ -66,6 +66,9 @@ public class LivestockTradingModuleDbContext : DefinitionDbContext, ILivestockTr
     public DbSet<ShippingZone> ShippingZones { get; set; }
     public DbSet<ShippingRate> ShippingRates { get; set; }
 
+    // Contact
+    public DbSet<ContactForm> ContactForms { get; set; }
+
     // Subscriptions & Monetization
     public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
     public DbSet<SellerSubscription> SellerSubscriptions { get; set; }

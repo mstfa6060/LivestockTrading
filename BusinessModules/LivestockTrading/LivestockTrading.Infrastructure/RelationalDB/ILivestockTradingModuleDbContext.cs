@@ -60,6 +60,9 @@ public interface ILivestockTradingModuleDbContext
     DbSet<BoostPackage> BoostPackages { get; set; }
     DbSet<ProductBoost> ProductBoosts { get; set; }
 
+    // Contact
+    DbSet<ContactForm> ContactForms { get; set; }
+
     // Deals & Transport
     DbSet<Deal> Deals { get; set; }
     DbSet<Transporter> Transporters { get; set; }

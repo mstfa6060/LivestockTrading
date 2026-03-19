@@ -420,6 +420,16 @@ public class LivestockTradingDomainErrors
         public static string ProductBoostReceiptInvalid { get; set; } = "Satin alma makbuzu gecersiz.";
     }
 
+    public static class ContactFormErrors
+    {
+        public static string ContactFormNotFound { get; set; } = "Iletisim formu bulunamadi.";
+        public static string ContactFormNameRequired { get; set; } = "Ad soyad zorunludur.";
+        public static string ContactFormEmailRequired { get; set; } = "E-posta adresi zorunludur.";
+        public static string ContactFormEmailInvalid { get; set; } = "Gecerli bir e-posta adresi giriniz.";
+        public static string ContactFormSubjectRequired { get; set; } = "Konu zorunludur.";
+        public static string ContactFormMessageRequired { get; set; } = "Mesaj zorunludur.";
+    }
+
     public static class AuthorizationErrors
     {
         public static string InsufficientPermission { get; set; } = "Bu islem icin yetkiniz yok.";

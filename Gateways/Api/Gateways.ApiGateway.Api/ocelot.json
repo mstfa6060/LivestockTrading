@@ -359,6 +359,20 @@
 			]
 		},
 		{
+			"DownstreamPathTemplate": "/ContactForms/Create",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "livestocktrading-api-container",
+					"Port": 8080
+				}
+			],
+			"UpstreamPathTemplate": "/livestocktrading/ContactForms/Create",
+			"UpstreamHttpMethod": [
+				"POST"
+			]
+		},
+		{
 			"DownstreamPathTemplate": "/Transporters/All",
 			"DownstreamScheme": "http",
 			"DownstreamHostAndPorts": [
