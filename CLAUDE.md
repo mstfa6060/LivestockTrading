@@ -2,6 +2,13 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Current Priority: TASKS.md (Birlesik Gorev Listesi)
+
+When starting a new chat without a specific task, refer to `../TASKS.md` in the parent directory (`d:\Projects\GlobalLivestock\TASKS.md`). This is the **unified task list** across all three projects (web, mobil, backend). Work through the unchecked items in priority order.
+
+Additional project-specific reference:
+- `CHANGELOG.md` — All features, fixes, and improvements log (58 commits in revenue strategy)
+
 ## Build & Development Commands
 
 ```bash
