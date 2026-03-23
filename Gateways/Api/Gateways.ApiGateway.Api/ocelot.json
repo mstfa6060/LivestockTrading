@@ -695,6 +695,23 @@
 			]
 		},
 		{
+			"DownstreamPathTemplate": "/ProductReports/All",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "livestocktrading-api-container",
+					"Port": 8080
+				}
+			],
+			"UpstreamPathTemplate": "/livestocktrading/ProductReports/All",
+			"UpstreamHttpMethod": [
+				"POST"
+			],
+			"AuthenticationOptions": {
+				"AuthenticationProviderKey": "Rj!7dXrQ*5z9@Lb^PqKf!M2&gUw#AeZx7Vp$ChN+36YT@tW%"
+			}
+		},
+		{
 			"DownstreamPathTemplate": "/{everything}",
 			"DownstreamScheme": "http",
 			"DownstreamHostAndPorts": [

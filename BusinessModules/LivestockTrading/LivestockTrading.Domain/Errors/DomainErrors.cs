@@ -430,6 +430,15 @@ public class LivestockTradingDomainErrors
         public static string ContactFormMessageRequired { get; set; } = "Mesaj zorunludur.";
     }
 
+    public static class ProductReportErrors
+    {
+        public static string ProductReportNotFound { get; set; } = "Ürün raporu bulunamadı.";
+        public static string ProductReportProductIdRequired { get; set; } = "Ürün kimliği zorunludur.";
+        public static string ProductReportReasonRequired { get; set; } = "Rapor sebebi zorunludur.";
+        public static string ProductReportDescriptionRequired { get; set; } = "Açıklama zorunludur.";
+        public static string ProductReportAlreadyExists { get; set; } = "Bu ürün için zaten bir rapor gönderdiniz.";
+    }
+
     public static class AuthorizationErrors
     {
         public static string InsufficientPermission { get; set; } = "Bu islem icin yetkiniz yok.";

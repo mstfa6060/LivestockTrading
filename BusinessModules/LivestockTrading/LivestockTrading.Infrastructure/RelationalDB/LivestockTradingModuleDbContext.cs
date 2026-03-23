@@ -69,6 +69,9 @@ public class LivestockTradingModuleDbContext : DefinitionDbContext, ILivestockTr
     // Contact
     public DbSet<ContactForm> ContactForms { get; set; }
 
+    // Reports
+    public DbSet<ProductReport> ProductReports { get; set; }
+
     // Subscriptions & Monetization
     public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
     public DbSet<SellerSubscription> SellerSubscriptions { get; set; }
