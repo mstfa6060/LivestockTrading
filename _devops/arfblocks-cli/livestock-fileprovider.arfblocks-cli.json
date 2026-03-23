@@ -21,7 +21,7 @@
                 },
                 {
                     "key": "outputTypes",
-                    "value": "// Custom Types \ntype Guid = string; \ntype Double = number;\ntype Decimal = number;\ntype Int64 = number;\ntype Int32 = number;\ntype int = number;\ntype long = number;\ntype __ERROR_TYPE_NOT_HANDLED__ = File;"
+                    "value": "// Custom Types \ntype Guid = string; \ntype Double = number;\ntype Decimal = number;\ntype Int64 = number;\ntype Int32 = number;\ntype int = number;\ntype long = number;\ntype float = number;\ntype Single = number;\ntype __ERROR_TYPE_NOT_HANDLED__ = File;"
                 },
                 {
                     "key": "outputSettings",
@@ -54,7 +54,7 @@
                 },
                 {
                     "key": "outputTypes",
-                    "value": "// Custom Types \ntype Guid = string; \ntype Double = number;\ntype Decimal = number;\ntype Int64 = number;\ntype Int32 = number;\ntype int = number;\ntype long = number;\ntype __ERROR_TYPE_NOT_HANDLED__ = File;"
+                    "value": "// Custom Types \ntype Guid = string; \ntype Double = number;\ntype Decimal = number;\ntype Int64 = number;\ntype Int32 = number;\ntype int = number;\ntype long = number;\ntype float = number;\ntype Single = number;\ntype __ERROR_TYPE_NOT_HANDLED__ = File;"
                 },
                 {
                     "key": "outputSettings",
