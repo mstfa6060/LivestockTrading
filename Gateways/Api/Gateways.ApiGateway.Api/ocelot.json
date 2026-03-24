@@ -90,7 +90,11 @@
 			"UpstreamPathTemplate": "/iam/Countries/All",
 			"UpstreamHttpMethod": [
 				"POST"
-			]
+			],
+			"FileCacheOptions": {
+				"TtlSeconds": 3600,
+				"Region": "countries"
+			}
 		},
 		{
 			"DownstreamPathTemplate": "/{everything}",
@@ -208,7 +212,11 @@
 			"UpstreamPathTemplate": "/livestocktrading/Categories/All",
 			"UpstreamHttpMethod": [
 				"POST"
-			]
+			],
+			"FileCacheOptions": {
+				"TtlSeconds": 1800,
+				"Region": "categories"
+			}
 		},
 		{
 			"DownstreamPathTemplate": "/Categories/Pick",
@@ -704,7 +712,11 @@
 			"UpstreamPathTemplate": "/livestocktrading/Currencies/All",
 			"UpstreamHttpMethod": [
 				"POST"
-			]
+			],
+			"FileCacheOptions": {
+				"TtlSeconds": 1800,
+				"Region": "currencies"
+			}
 		},
 		{
 			"DownstreamPathTemplate": "/ProductReports/All",
