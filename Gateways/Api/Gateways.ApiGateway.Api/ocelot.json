@@ -70,7 +70,13 @@
 			"UpstreamPathTemplate": "/iam/auth/{everything}",
 			"UpstreamHttpMethod": [
 				"POST"
-			]
+			],
+			"RateLimitOptions": {
+				"EnableRateLimiting": true,
+				"Period": "1m",
+				"PeriodTimespan": 60,
+				"Limit": 10
+			}
 		},
 		{
 			"DownstreamPathTemplate": "/Countries/All",
@@ -370,7 +376,13 @@
 			"UpstreamPathTemplate": "/livestocktrading/ContactForms/Create",
 			"UpstreamHttpMethod": [
 				"POST"
-			]
+			],
+			"RateLimitOptions": {
+				"EnableRateLimiting": true,
+				"Period": "1m",
+				"PeriodTimespan": 60,
+				"Limit": 5
+			}
 		},
 		{
 			"DownstreamPathTemplate": "/Transporters/All",
@@ -749,6 +761,16 @@
 	],
 	"GlobalConfiguration": {
 		"RequestIdKey": "OcRequestId",
-		"BaseUrl": "http://infrastructure-api-gateway-service"
+		"BaseUrl": "http://infrastructure-api-gateway-service",
+		"RateLimitOptions": {
+			"ClientWhitelist": [],
+			"EnableRateLimiting": true,
+			"Period": "1m",
+			"PeriodTimespan": 60,
+			"Limit": 60,
+			"DisableRateLimitHeaders": false,
+			"QuotaExceededMessage": "Rate limit exceeded. Please try again later.",
+			"HttpStatusCode": 429
+		}
 	}
 }
