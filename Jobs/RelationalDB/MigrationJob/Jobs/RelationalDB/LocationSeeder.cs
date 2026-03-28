@@ -46,6 +46,10 @@ public class LocationSeeder
 
     private async Task DeleteExistingDataAsync()
     {
+        // Locations tablosundaki DistrictId referanslarını temizle (FK constraint)
+        await _db.Database.ExecuteSqlRawAsync("UPDATE Locations SET DistrictId = NULL WHERE DistrictId IS NOT NULL");
+        Console.WriteLine("  OK: Locations.DistrictId referansları temizlendi.");
+
         // FK sırasına dikkat: önce Neighborhoods, sonra Districts, sonra Provinces
         var neighborhoodCount = await _db.Set<Neighborhood>().CountAsync();
         if (neighborhoodCount > 0)
