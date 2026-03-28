@@ -3,7 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Common.Definitions.Domain.Entities;
 
 /// <summary>
-/// İlçeler
+/// İlçeler / Şehirler
+/// GeoNames cities15000 verileri ile doldurulur
 /// </summary>
 [Table("Districts")]
 public class District
@@ -11,14 +12,24 @@ public class District
     public int Id { get; set; }
 
     /// <summary>
-    /// İlçe adı (örn: "Kadıköy", "Çankaya")
+    /// İlçe/şehir adı (örn: "Kadıköy", "Houston", "München")
     /// </summary>
     public string Name { get; set; }
 
     /// <summary>
-    /// Bağlı olduğu il Id
+    /// Bağlı olduğu il/bölge Id
     /// </summary>
     public int ProvinceId { get; set; }
+
+    /// <summary>
+    /// Çoklu dil çevirileri JSON
+    /// </summary>
+    public string NameTranslations { get; set; }
+
+    /// <summary>
+    /// GeoNames kaynak ID (re-import için)
+    /// </summary>
+    public int GeoNameId { get; set; }
 
     /// <summary>
     /// Sıralama

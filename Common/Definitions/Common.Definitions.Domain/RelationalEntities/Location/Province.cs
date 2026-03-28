@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Common.Definitions.Domain.Entities;
 
 /// <summary>
-/// Türkiye illeri - 81 il
-/// Ortak kullanım için Common.Definitions seviyesinde
+/// Ülkelerin idari bölgeleri (il/eyalet/bölge)
+/// GeoNames admin1 verileri ile doldurulur
 /// </summary>
 [Table("Provinces")]
 public class Province
@@ -12,14 +12,29 @@ public class Province
     public int Id { get; set; }
 
     /// <summary>
-    /// İl adı (örn: "İstanbul", "Ankara")
+    /// Bağlı olduğu ülke Id
+    /// </summary>
+    public int CountryId { get; set; }
+
+    /// <summary>
+    /// Bölge adı (örn: "İstanbul", "Texas", "Bayern")
     /// </summary>
     public string Name { get; set; }
 
     /// <summary>
-    /// Plaka kodu (örn: "34", "06")
+    /// İdari kod (örn: "34", "TX", "BY")
     /// </summary>
     public string Code { get; set; }
+
+    /// <summary>
+    /// Çoklu dil çevirileri JSON (örn: {"en":"Istanbul","tr":"İstanbul","ar":"إسطنبول"})
+    /// </summary>
+    public string NameTranslations { get; set; }
+
+    /// <summary>
+    /// GeoNames kaynak ID (re-import için)
+    /// </summary>
+    public int GeoNameId { get; set; }
 
     /// <summary>
     /// Sıralama için
@@ -27,5 +42,8 @@ public class Province
     public int SortOrder { get; set; }
 
     // Navigation
+    [ForeignKey("CountryId")]
+    public Country Country { get; set; }
+
     public List<District> Districts { get; set; } = new();
 }

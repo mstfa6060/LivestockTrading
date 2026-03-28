@@ -9,9 +9,11 @@ public class DataAccess : IDataAccess
         _dbContext = dependencyProvider.GetInstance<IamDbContext>();
     }
 
-    public async Task<List<Province>> GetAll(string keyword, CancellationToken ct)
+    public async Task<List<Province>> GetAll(int countryId, string keyword, CancellationToken ct)
     {
-        var query = _dbContext.Provinces.AsNoTracking();
+        var query = _dbContext.Provinces
+            .AsNoTracking()
+            .Where(p => p.CountryId == countryId);
 
         if (!string.IsNullOrWhiteSpace(keyword))
             query = query.Where(p => p.Name.Contains(keyword));

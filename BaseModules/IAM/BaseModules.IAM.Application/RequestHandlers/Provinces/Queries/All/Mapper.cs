@@ -7,8 +7,10 @@ public class Mapper
         return provinces.Select(p => new ResponseModel
         {
             Id = p.Id,
+            CountryId = p.CountryId,
             Name = p.Name,
-            Code = p.Code
+            Code = p.Code,
+            NameTranslations = p.NameTranslations
         }).ToList();
     }
 }

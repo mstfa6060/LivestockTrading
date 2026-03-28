@@ -8,7 +8,8 @@ public class Mapper
         {
             Id = d.Id,
             Name = d.Name,
-            ProvinceId = d.ProvinceId
+            ProvinceId = d.ProvinceId,
+            NameTranslations = d.NameTranslations
         }).ToList();
     }
 }

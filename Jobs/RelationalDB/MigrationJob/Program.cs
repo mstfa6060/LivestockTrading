@@ -116,6 +116,20 @@ class Program
             throw;
         }
 
+        // Seed Data - Lokasyonlar (GeoNames: Province/District)
+        // --force-location-reseed argümani ile mevcut veriler silinip yeniden seed edilir
+        try
+        {
+            var forceLocationReseed = args.Contains("--force-location-reseed");
+            var locationSeeder = new LocationSeeder(dbContext);
+            await locationSeeder.SeedAsync(forceLocationReseed);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Location seed FAILED: {ex.Message}");
+            throw;
+        }
+
         Console.WriteLine("All operations completed successfully.");
     }
 }

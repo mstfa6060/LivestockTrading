@@ -143,23 +143,37 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext, ILivestockT
         // LOCATION TABLES (İl/İlçe/Mahalle)
         // ═══════════════════════════════════════════════════════════════
 
-        // Province (İl)
+        // Province (İl/Eyalet/Bölge — tüm ülkeler)
         modelBuilder.Entity<Province>(entity =>
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedNever(); // Seed data için
             entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
-            entity.Property(e => e.Code).IsRequired().HasMaxLength(3);
-            entity.HasIndex(e => e.Code).IsUnique();
+            entity.Property(e => e.Code).IsRequired().HasMaxLength(10);
+            entity.Property(e => e.NameTranslations).HasMaxLength(2000);
+            entity.Property(e => e.GeoNameId);
+
+            // CountryId FK
+            entity.HasOne(p => p.Country)
+                .WithMany(c => c.Provinces)
+                .HasForeignKey(p => p.CountryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Indexes
+            entity.HasIndex(e => e.CountryId);
+            entity.HasIndex(e => new { e.CountryId, e.Code }).IsUnique();
             entity.HasIndex(e => e.Name);
+            entity.HasIndex(e => e.GeoNameId);
         });
 
-        // District (İlçe)
+        // District (İlçe/Şehir)
         modelBuilder.Entity<District>(entity =>
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedNever(); // Seed data için
             entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.NameTranslations).HasMaxLength(2000);
+            entity.Property(e => e.GeoNameId);
 
             entity.HasOne(d => d.Province)
                 .WithMany(p => p.Districts)
@@ -168,6 +182,7 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext, ILivestockT
 
             entity.HasIndex(e => e.ProvinceId);
             entity.HasIndex(e => e.Name);
+            entity.HasIndex(e => e.GeoNameId);
         });
 
         // Neighborhood (Mahalle)

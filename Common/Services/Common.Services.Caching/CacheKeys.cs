@@ -54,6 +54,17 @@ public static class CacheKeys
         public static string NearbyWorkersPattern => $"{Prefix}nearby-workers:*";
     }
 
+    // Geographic reference data (GeoNames)
+    public static class GeoData
+    {
+        private const string Prefix = "geo:";
+
+        public static string Provinces(int countryId) => $"{Prefix}provinces:{countryId}";
+        public static string Districts(int provinceId) => $"{Prefix}districts:{provinceId}";
+        public static string ProvincesPattern => $"{Prefix}provinces:*";
+        public static string DistrictsPattern => $"{Prefix}districts:*";
+    }
+
     // User Context
     public static class User
     {

@@ -23,6 +23,8 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
 {
     public RequestModel_Validator()
     {
-        // Keyword opsiyonel, validasyon gerekmiyor
+        RuleFor(x => x.CountryId)
+            .GreaterThan(0)
+            .WithMessage("CountryId zorunludur ve 0'dan büyük olmalıdır.");
     }
 }

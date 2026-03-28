@@ -87,4 +87,7 @@ public class Country
 
     // Navigation - Bu ülkedeki kullanıcılar
     public List<User> Users { get; set; } = new();
+
+    // Navigation - Bu ülkenin il/eyalet/bölgeleri
+    public List<Province> Provinces { get; set; } = new();
 }
