@@ -1,5 +1,6 @@
 using Arfware.ArfBlocks.Core;
 using BaseModules.IAM.Application.Messaging;
+using BaseModules.IAM.Infrastructure.Services;
 using Common.Services.Caching;
 using Common.Services.Messaging;
 using Microsoft.Extensions.Configuration;
@@ -36,6 +37,9 @@ public class ApplicationDependencyProvider : ArfBlocksDependencyProvider
 
 		base.Add<IJwtService, JwtService>();
 		base.Add<ICacheService, CacheService>();
+
+		// GeoIP Service (IP → Country detection)
+		base.Add<GeoIpService>();
 
 		// For Authorization Operations
 		base.Add<AuthorizationService>();

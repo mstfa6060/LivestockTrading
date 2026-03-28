@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Arfware.ArfBlocks.Core.Extentions;
 using Arfware.ArfBlocks.Core;
 using BaseModules.IAM.Application.Configuration;
+using BaseModules.IAM.Infrastructure.Services;
 using Common.Services.Caching.Extensions;
 using Common.Services.Logging;
 using Serilog;
@@ -26,6 +27,9 @@ builder.Services.AddArfBlocks(options =>
 });
 
 builder.Services.AddHttpContextAccessor();
+
+// MaxMind GeoIP Service (IP → Country detection)
+builder.Services.AddSingleton<GeoIpService>();
 
 var app = builder.Build();
 

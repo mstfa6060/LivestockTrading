@@ -5,6 +5,7 @@ using Hangfire.SqlServer;
 using Jobs.BackgroundJobs.HangfireScheduler.Models;
 using Jobs.BackgroundJobs.HangfireScheduler.Authorization;
 using Jobs.BackgroundJobs.HangfireScheduler.Jobs.LivestockTrading;
+using Jobs.BackgroundJobs.HangfireScheduler.Jobs.IAM;
 using Microsoft.Extensions.Options;
 using Common.Services.Logging;
 using Serilog;
@@ -98,11 +99,22 @@ RecurringJob.AddOrUpdate<ExpireProductBoostsJob>(
     recurringOptions
 );
 
+// IAM JOBS
+
+// MaxMind GeoLite2 veritabanını güncelle - Haftada 1 (Pazartesi 03:00)
+RecurringJob.AddOrUpdate<UpdateGeoIpDatabaseJob>(
+    nameof(UpdateGeoIpDatabaseJob),
+    job => job.Process(),
+    "0 3 * * 1",  // Her Pazartesi saat 03:00
+    recurringOptions
+);
+
 Log.Information("Hangfire Scheduler started!");
 Log.Information("Active Jobs:");
 Log.Information("  - LogStudentActivityJob (Daily at 09:00 and 18:00)");
 Log.Information("  - UpdateExchangeRatesJob (Every 6 hours)");
 Log.Information("  - ExpireProductBoostsJob (Every hour)");
+Log.Information("  - UpdateGeoIpDatabaseJob (Weekly, Monday 03:00)");
 
 try
 {

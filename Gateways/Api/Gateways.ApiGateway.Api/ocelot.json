@@ -97,6 +97,24 @@
 			}
 		},
 		{
+			"DownstreamPathTemplate": "/GeoIp/DetectCountry",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "iam-api-container",
+					"Port": 8080
+				}
+			],
+			"UpstreamPathTemplate": "/iam/GeoIp/DetectCountry",
+			"UpstreamHttpMethod": [
+				"POST"
+			],
+			"FileCacheOptions": {
+				"TtlSeconds": 86400,
+				"Region": "geoip"
+			}
+		},
+		{
 			"DownstreamPathTemplate": "/Provinces/All",
 			"DownstreamScheme": "http",
 			"DownstreamHostAndPorts": [
