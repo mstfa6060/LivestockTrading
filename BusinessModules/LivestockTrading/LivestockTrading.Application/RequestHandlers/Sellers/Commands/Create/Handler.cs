@@ -90,7 +90,7 @@ public class Handler : IRequestHandler
 				Title = "Yeni satıcı onay bekliyor",
 				Message = $"Yeni satıcı profili oluşturuldu: {seller.BusinessName}",
 				Type = NotificationType.SellerPendingVerification,
-				ActionUrl = "/dashboard/moderation",
+				ActionUrl = "/dashboard/seller-moderation",
 				ActionData = JsonSerializer.Serialize(new { SellerId = seller.Id, BusinessName = seller.BusinessName })
 			}).ToList();
 

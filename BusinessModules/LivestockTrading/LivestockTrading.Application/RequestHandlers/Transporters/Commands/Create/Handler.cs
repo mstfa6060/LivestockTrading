@@ -81,7 +81,7 @@ public class Handler : IRequestHandler
 				Title = "Yeni nakliyeci onay bekliyor",
 				Message = $"Yeni nakliyeci profili oluşturuldu: {transporter.CompanyName}",
 				Type = NotificationType.TransporterPendingVerification,
-				ActionUrl = "/dashboard/moderation",
+				ActionUrl = "/dashboard/transporter-moderation",
 				ActionData = JsonSerializer.Serialize(new { TransporterId = transporter.Id, CompanyName = transporter.CompanyName })
 			}).ToList();
 
