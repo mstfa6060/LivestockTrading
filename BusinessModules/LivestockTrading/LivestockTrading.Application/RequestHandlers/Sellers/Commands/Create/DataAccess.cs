@@ -9,6 +9,10 @@ public class DataAccess : IDataAccess
 {
 	private readonly LivestockTradingModuleDbContext _dbContext;
 
+	private static readonly Guid LivestockTradingModuleId = Guid.Parse("DFD018C9-FC32-42C4-AEFD-70A5942A295E");
+	private static readonly Guid AdminRoleId = Guid.Parse("a1000000-0000-0000-0000-000000000001");
+	private static readonly Guid ModeratorRoleId = Guid.Parse("a1000000-0000-0000-0000-000000000002");
+
 	public DataAccess(ArfBlocksDependencyProvider dependencyProvider)
 	{
 		_dbContext = dependencyProvider.GetInstance<LivestockTradingModuleDbContext>();
@@ -39,5 +43,23 @@ public class DataAccess : IDataAccess
 	{
 		_dbContext.UserRoles.Add(userRole);
 		await _dbContext.SaveChangesAsync();
+	}
+
+	public async Task<List<Guid>> GetAdminModeratorUserIds(CancellationToken ct)
+	{
+		return await _dbContext.UserRoles
+			.AsNoTracking()
+			.Where(ur => !ur.IsDeleted
+				&& ur.ModuleId == LivestockTradingModuleId
+				&& (ur.RoleId == AdminRoleId || ur.RoleId == ModeratorRoleId))
+			.Select(ur => ur.UserId)
+			.Distinct()
+			.ToListAsync(ct);
+	}
+
+	public async Task CreateNotifications(List<Notification> notifications, CancellationToken ct)
+	{
+		_dbContext.Notifications.AddRange(notifications);
+		await _dbContext.SaveChangesAsync(ct);
 	}
 }

@@ -75,6 +75,10 @@ try
             services.AddScoped<ProductCreatedNotificationHandler>();
             services.AddScoped<ProductApprovedNotificationHandler>();
 
+            // Seller/Transporter event handlers
+            services.AddScoped<SellerCreatedNotificationHandler>();
+            services.AddScoped<TransporterCreatedNotificationHandler>();
+
             // Student event handlers (legacy)
             services.AddScoped<StudentCreatedNotificationHandler>();
             services.AddScoped<StudentUpdatedNotificationHandler>();

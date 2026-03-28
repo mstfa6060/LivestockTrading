@@ -184,6 +184,36 @@ public class NotificationWorker : BackgroundService
         }
         catch { }
 
+        // Try SellerCreatedEvent
+        try
+        {
+            var sellerCreatedEvent = JsonSerializer.Deserialize<SellerCreatedEvent>(message);
+            if (sellerCreatedEvent != null && sellerCreatedEvent.SellerId != Guid.Empty
+                && sellerCreatedEvent.TargetAdminUserIds != null && sellerCreatedEvent.TargetAdminUserIds.Count > 0)
+            {
+                _logger.LogInformation("Handling SellerCreatedEvent notification for seller: {SellerId}", sellerCreatedEvent.SellerId);
+                var handler = scope.ServiceProvider.GetRequiredService<SellerCreatedNotificationHandler>();
+                await handler.HandleAsync(sellerCreatedEvent);
+                return true;
+            }
+        }
+        catch { }
+
+        // Try TransporterCreatedEvent
+        try
+        {
+            var transporterCreatedEvent = JsonSerializer.Deserialize<TransporterCreatedEvent>(message);
+            if (transporterCreatedEvent != null && transporterCreatedEvent.TransporterId != Guid.Empty
+                && transporterCreatedEvent.TargetAdminUserIds != null && transporterCreatedEvent.TargetAdminUserIds.Count > 0)
+            {
+                _logger.LogInformation("Handling TransporterCreatedEvent notification for transporter: {TransporterId}", transporterCreatedEvent.TransporterId);
+                var handler = scope.ServiceProvider.GetRequiredService<TransporterCreatedNotificationHandler>();
+                await handler.HandleAsync(transporterCreatedEvent);
+                return true;
+            }
+        }
+        catch { }
+
         // Try StudentCreatedEvent
         try
         {

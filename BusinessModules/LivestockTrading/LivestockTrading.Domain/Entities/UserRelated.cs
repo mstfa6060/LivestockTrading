@@ -68,6 +68,8 @@ public enum NotificationType
     ProductApproved = 11,
     ProductRejected = 12,
     ProductPendingApproval = 13,
+    SellerPendingVerification = 14,
+    TransporterPendingVerification = 15,
     System = 99
 }
 
