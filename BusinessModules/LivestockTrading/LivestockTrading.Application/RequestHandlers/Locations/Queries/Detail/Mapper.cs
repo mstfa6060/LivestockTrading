@@ -23,6 +23,7 @@ public class Mapper
 			Type = (int)entity.Type,
 			IsActive = entity.IsActive,
 			UserId = entity.UserId,
+			DistrictId = entity.DistrictId,
 			CreatedAt = entity.CreatedAt,
 			UpdatedAt = entity.UpdatedAt
 		};

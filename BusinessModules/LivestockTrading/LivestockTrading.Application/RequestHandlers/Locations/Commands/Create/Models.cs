@@ -16,6 +16,7 @@ public class RequestModel : IRequestModel
 	public int Type { get; set; }
 	public bool IsActive { get; set; } = true;
 	public Guid? UserId { get; set; }
+	public int? DistrictId { get; set; }
 }
 
 public class ResponseModel : IResponseModel
@@ -35,5 +36,6 @@ public class ResponseModel : IResponseModel
 	public int Type { get; set; }
 	public bool IsActive { get; set; }
 	public Guid? UserId { get; set; }
+	public int? DistrictId { get; set; }
 	public DateTime CreatedAt { get; set; }
 }

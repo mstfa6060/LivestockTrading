@@ -23,6 +23,7 @@ public class Mapper
 			Type = (int)l.Type,
 			IsActive = l.IsActive,
 			UserId = l.UserId,
+			DistrictId = l.DistrictId,
 			CreatedAt = l.CreatedAt
 		}).ToList();
 	}

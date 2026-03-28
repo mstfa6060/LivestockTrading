@@ -27,6 +27,16 @@ public class District
     public string NameTranslations { get; set; }
 
     /// <summary>
+    /// Enlem (GeoNames cities15000 verisinden)
+    /// </summary>
+    public double? Latitude { get; set; }
+
+    /// <summary>
+    /// Boylam (GeoNames cities15000 verisinden)
+    /// </summary>
+    public double? Longitude { get; set; }
+
+    /// <summary>
     /// GeoNames kaynak ID (re-import için)
     /// </summary>
     public int GeoNameId { get; set; }

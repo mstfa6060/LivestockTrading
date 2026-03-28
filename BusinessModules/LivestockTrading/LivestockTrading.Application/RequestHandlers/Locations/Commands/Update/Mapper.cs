@@ -20,6 +20,7 @@ public class Mapper
 		entity.Type = (LocationType)request.Type;
 		entity.IsActive = request.IsActive;
 		entity.UserId = request.UserId;
+		entity.DistrictId = request.DistrictId;
 		entity.UpdatedAt = DateTime.UtcNow;
 	}
 
@@ -42,6 +43,7 @@ public class Mapper
 			Type = (int)entity.Type,
 			IsActive = entity.IsActive,
 			UserId = entity.UserId,
+			DistrictId = entity.DistrictId,
 			UpdatedAt = entity.UpdatedAt
 		};
 	}

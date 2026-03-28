@@ -206,6 +206,15 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext, ILivestockT
             entity.HasIndex(e => e.GeoNameId);
         });
 
+        // Location → District FK (cross-module ilişki)
+        modelBuilder.Entity<LivestockTrading.Domain.Entities.Location>(entity =>
+        {
+            entity.HasOne(e => e.District)
+                .WithMany()
+                .HasForeignKey(e => e.DistrictId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
         // Neighborhood (Mahalle)
         modelBuilder.Entity<Neighborhood>(entity =>
         {

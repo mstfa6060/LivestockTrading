@@ -143,6 +143,8 @@ function parseCities(zipBuffer, countryMap, admin1Lookup) {
       if (parts.length < 15) continue;
       const geonameId = parseInt(parts[0], 10);
       const cityName = parts[1];
+      const latitude = parseFloat(parts[4]) || null;
+      const longitude = parseFloat(parts[5]) || null;
       const cc = parts[8];
       const admin1Code = parts[10];
       const population = parseInt(parts[14], 10) || 0;
@@ -150,7 +152,7 @@ function parseCities(zipBuffer, countryMap, admin1Lookup) {
       if (!countryId) continue;
       const admin1Key = `${cc}.${admin1Code}`;
       if (!admin1Lookup[admin1Key]) continue;
-      districts.push({ geonameId, name: cityName, countryCode: cc, admin1Key, population });
+      districts.push({ geonameId, name: cityName, countryCode: cc, admin1Key, population, latitude, longitude });
     }
   }
   return districts;
@@ -292,6 +294,8 @@ function buildDistrictsJson(rawDistricts, provincesJson, admin1Lookup, translati
       Name: d.name,
       NameTranslations: nameTransJson,
       GeoNameId: d.geonameId,
+      Latitude: d.latitude,
+      Longitude: d.longitude,
       SortOrder: seq,
     });
   }

@@ -16,6 +16,17 @@ public class Handler : IRequestHandler
 
 		var entity = mapper.MapToEntity(request);
 
+		// DistrictId varsa ve koordinat belirtilmemişse, ilçenin koordinatlarını kullan
+		if (entity.DistrictId.HasValue && (entity.Latitude == null || entity.Latitude == 0) && (entity.Longitude == null || entity.Longitude == 0))
+		{
+			var district = await _dataAccessLayer.GetDistrictById(entity.DistrictId.Value, cancellationToken);
+			if (district != null)
+			{
+				entity.Latitude = district.Latitude;
+				entity.Longitude = district.Longitude;
+			}
+		}
+
 		await _dataAccessLayer.AddLocation(entity);
 
 		var response = mapper.MapToResponse(entity);

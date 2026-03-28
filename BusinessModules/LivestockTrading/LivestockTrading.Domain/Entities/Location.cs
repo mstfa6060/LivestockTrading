@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Common.Definitions.Domain.Entities;
 
 namespace LivestockTrading.Domain.Entities;
 
@@ -37,6 +38,10 @@ public class Location : BaseEntity
     public bool IsActive { get; set; }
     /// <summary>Kullanıcı ID (eğer kullanıcı adresiyse)</summary>
     public Guid? UserId { get; set; }
+    /// <summary>Seçilen ilçe/şehir ID (District tablosundan)</summary>
+    public int? DistrictId { get; set; }
+
+    public District District { get; set; }
     
     public ICollection<Product> Products { get; set; }
     public ICollection<Farm> Farms { get; set; }

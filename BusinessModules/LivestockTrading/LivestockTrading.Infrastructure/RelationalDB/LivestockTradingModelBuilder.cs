@@ -382,8 +382,9 @@ public static class LivestockTradingModelBuilder
                 .OnDelete(DeleteBehavior.SetNull);
         });
 
-        // Country is managed by DefinitionDbContext (base class)
+        // Country & District are managed by DefinitionDbContext / ApplicationDbContext
         modelBuilder.Ignore<Country>();
+        modelBuilder.Ignore<Common.Definitions.Domain.Entities.District>();
 
         // ========================================
         // SHIPPING CARRIER

@@ -23,6 +23,7 @@ public class Mapper
 			Type = (LocationType)request.Type,
 			IsActive = request.IsActive,
 			UserId = request.UserId,
+			DistrictId = request.DistrictId,
 			CreatedAt = DateTime.UtcNow
 		};
 	}
@@ -46,6 +47,7 @@ public class Mapper
 			Type = (int)entity.Type,
 			IsActive = entity.IsActive,
 			UserId = entity.UserId,
+			DistrictId = entity.DistrictId,
 			CreatedAt = entity.CreatedAt
 		};
 	}

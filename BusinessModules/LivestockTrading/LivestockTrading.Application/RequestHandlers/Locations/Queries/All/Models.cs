@@ -24,5 +24,6 @@ public class ResponseModel : IResponseModel<Array>
 	public int Type { get; set; }
 	public bool IsActive { get; set; }
 	public Guid? UserId { get; set; }
+	public int? DistrictId { get; set; }
 	public DateTime CreatedAt { get; set; }
 }

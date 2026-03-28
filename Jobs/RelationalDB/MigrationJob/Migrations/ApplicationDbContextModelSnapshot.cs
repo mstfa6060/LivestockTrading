@@ -160,10 +160,7 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
             modelBuilder.Entity("Common.Definitions.Domain.Entities.Country", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Capital")
                         .HasMaxLength(100)
@@ -192,7 +189,9 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
                         .HasColumnType("nvarchar(5)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -216,6 +215,19 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.HasIndex("Code3")
+                        .IsUnique();
+
+                    b.HasIndex("Continent");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Countries");
                 });
 
@@ -226,6 +238,12 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
 
                     b.Property<int>("GeoNameId")
                         .HasColumnType("int");
+
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("float");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -611,20 +629,20 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
                         new
                         {
                             Id = new Guid("a1d5b3e4-8e5a-4b3c-9ef5-d3e5a3b7c1f8"),
-                            CreatedAt = new DateTime(2026, 3, 28, 15, 12, 52, 119, DateTimeKind.Utc).AddTicks(9438),
+                            CreatedAt = new DateTime(2026, 3, 28, 18, 46, 23, 540, DateTimeKind.Utc).AddTicks(4210),
                             IsDeleted = false,
                             IsSystemRole = true,
                             Name = "Admin",
-                            UpdatedAt = new DateTime(2026, 3, 28, 15, 12, 52, 119, DateTimeKind.Utc).AddTicks(9639)
+                            UpdatedAt = new DateTime(2026, 3, 28, 18, 46, 23, 540, DateTimeKind.Utc).AddTicks(4467)
                         },
                         new
                         {
                             Id = new Guid("b3f8a7d1-4e2c-4a3e-8b5a-d3e7b9c5e2f1"),
-                            CreatedAt = new DateTime(2026, 3, 28, 15, 12, 52, 119, DateTimeKind.Utc).AddTicks(9939),
+                            CreatedAt = new DateTime(2026, 3, 28, 18, 46, 23, 540, DateTimeKind.Utc).AddTicks(4875),
                             IsDeleted = false,
                             IsSystemRole = true,
                             Name = "User",
-                            UpdatedAt = new DateTime(2026, 3, 28, 15, 12, 52, 119, DateTimeKind.Utc).AddTicks(9940)
+                            UpdatedAt = new DateTime(2026, 3, 28, 18, 46, 23, 540, DateTimeKind.Utc).AddTicks(4875)
                         });
                 });
 
@@ -661,30 +679,30 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("891c45d2-b776-4399-b0e6-83d8e688ec42"),
-                            CreatedAt = new DateTime(2026, 3, 28, 15, 12, 52, 120, DateTimeKind.Utc).AddTicks(5160),
+                            Id = new Guid("06b3a525-5e3d-42c6-aec7-f473b3981750"),
+                            CreatedAt = new DateTime(2026, 3, 28, 18, 46, 23, 541, DateTimeKind.Utc).AddTicks(2559),
                             IsDeleted = false,
                             Permission = "ManageUsers",
                             RoleId = new Guid("a1d5b3e4-8e5a-4b3c-9ef5-d3e5a3b7c1f8"),
-                            UpdatedAt = new DateTime(2026, 3, 28, 15, 12, 52, 120, DateTimeKind.Utc).AddTicks(5161)
+                            UpdatedAt = new DateTime(2026, 3, 28, 18, 46, 23, 541, DateTimeKind.Utc).AddTicks(2564)
                         },
                         new
                         {
-                            Id = new Guid("39008b97-8a35-44e3-b1f9-65188430c2db"),
-                            CreatedAt = new DateTime(2026, 3, 28, 15, 12, 52, 120, DateTimeKind.Utc).AddTicks(5180),
+                            Id = new Guid("cd0abc1b-5664-4612-9faa-49e3da855174"),
+                            CreatedAt = new DateTime(2026, 3, 28, 18, 46, 23, 541, DateTimeKind.Utc).AddTicks(2570),
                             IsDeleted = false,
                             Permission = "ManageRoles",
                             RoleId = new Guid("a1d5b3e4-8e5a-4b3c-9ef5-d3e5a3b7c1f8"),
-                            UpdatedAt = new DateTime(2026, 3, 28, 15, 12, 52, 120, DateTimeKind.Utc).AddTicks(5180)
+                            UpdatedAt = new DateTime(2026, 3, 28, 18, 46, 23, 541, DateTimeKind.Utc).AddTicks(2570)
                         },
                         new
                         {
-                            Id = new Guid("d3f7fa0d-2078-40c8-8b30-c5abdd185951"),
-                            CreatedAt = new DateTime(2026, 3, 28, 15, 12, 52, 120, DateTimeKind.Utc).AddTicks(5183),
+                            Id = new Guid("34d010cc-a631-42a2-8813-fb753b65b362"),
+                            CreatedAt = new DateTime(2026, 3, 28, 18, 46, 23, 541, DateTimeKind.Utc).AddTicks(2574),
                             IsDeleted = false,
                             Permission = "ViewListings",
                             RoleId = new Guid("b3f8a7d1-4e2c-4a3e-8b5a-d3e7b9c5e2f1"),
-                            UpdatedAt = new DateTime(2026, 3, 28, 15, 12, 52, 120, DateTimeKind.Utc).AddTicks(5184)
+                            UpdatedAt = new DateTime(2026, 3, 28, 18, 46, 23, 541, DateTimeKind.Utc).AddTicks(2574)
                         });
                 });
 
@@ -2127,6 +2145,9 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("DistrictId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
@@ -2164,6 +2185,8 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DistrictId");
 
                     b.ToTable("Locations");
                 });
@@ -4685,6 +4708,16 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("SellerSubscription");
+                });
+
+            modelBuilder.Entity("LivestockTrading.Domain.Entities.Location", b =>
+                {
+                    b.HasOne("Common.Definitions.Domain.Entities.District", "District")
+                        .WithMany()
+                        .HasForeignKey("DistrictId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("District");
                 });
 
             modelBuilder.Entity("LivestockTrading.Domain.Entities.MachineryInfo", b =>
