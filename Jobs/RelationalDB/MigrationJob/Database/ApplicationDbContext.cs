@@ -140,8 +140,29 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext, ILivestockT
             .IsUnique();
 
         // ═══════════════════════════════════════════════════════════════
-        // LOCATION TABLES (İl/İlçe/Mahalle)
+        // LOCATION TABLES (Ülke/İl/İlçe/Mahalle)
         // ═══════════════════════════════════════════════════════════════
+
+        // Country (Ülkeler — ISO 3166-1)
+        modelBuilder.Entity<Common.Definitions.Domain.Entities.Country>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Code).IsRequired().HasMaxLength(2);
+            entity.HasIndex(e => e.Code).IsUnique();
+            entity.Property(e => e.Code3).IsRequired().HasMaxLength(3);
+            entity.HasIndex(e => e.Code3).IsUnique();
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.HasIndex(e => e.Name).IsUnique();
+            entity.Property(e => e.NativeName).HasMaxLength(100);
+            entity.Property(e => e.PhoneCode).HasMaxLength(10);
+            entity.Property(e => e.Capital).HasMaxLength(100);
+            entity.Property(e => e.Continent).HasMaxLength(50);
+            entity.HasIndex(e => e.Continent);
+            entity.Property(e => e.Region).HasMaxLength(100);
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.HasIndex(e => e.IsActive);
+        });
 
         // Province (İl/Eyalet/Bölge — tüm ülkeler)
         modelBuilder.Entity<Province>(entity =>

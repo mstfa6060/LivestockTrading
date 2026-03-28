@@ -42,7 +42,14 @@ public class GeoIpService : IDisposable
         try
         {
             // Localhost ve private IP'leri atla
-            if (ipAddress == "::1" || ipAddress == "127.0.0.1" || ipAddress.StartsWith("192.168.") || ipAddress.StartsWith("10."))
+            if (ipAddress == "::1" || ipAddress == "127.0.0.1"
+                || ipAddress.StartsWith("192.168.") || ipAddress.StartsWith("10.")
+                || ipAddress.StartsWith("172.16.") || ipAddress.StartsWith("172.17.")
+                || ipAddress.StartsWith("172.18.") || ipAddress.StartsWith("172.19.")
+                || ipAddress.StartsWith("172.2") || ipAddress.StartsWith("172.30.")
+                || ipAddress.StartsWith("172.31.")
+                || ipAddress.StartsWith("fc") || ipAddress.StartsWith("fd")
+                || ipAddress.StartsWith("fe80:"))
                 return null;
 
             var response = _reader.Country(ipAddress);
