@@ -101,7 +101,7 @@ public class LocationSeeder
             using var transaction = await _db.Database.BeginTransactionAsync();
             try
             {
-                await _db.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT [Provinces] ON");
+                // Province.Id is ValueGeneratedNever — no IDENTITY_INSERT needed
 
                 foreach (var batch in batches)
                 {
@@ -110,7 +110,7 @@ public class LocationSeeder
                     _db.ChangeTracker.Clear(); // Memory'yi temizle
                 }
 
-                await _db.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT [Provinces] OFF");
+                // No IDENTITY_INSERT OFF needed
 
                 await transaction.CommitAsync();
                 Console.WriteLine($"  OK: {provinces.Count} il/eyalet eklendi ({batches.Count} batch).");
@@ -154,7 +154,7 @@ public class LocationSeeder
             using var transaction = await _db.Database.BeginTransactionAsync();
             try
             {
-                await _db.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT [Districts] ON");
+                // District.Id is ValueGeneratedNever — no IDENTITY_INSERT needed
 
                 foreach (var batch in batches)
                 {
@@ -163,7 +163,7 @@ public class LocationSeeder
                     _db.ChangeTracker.Clear();
                 }
 
-                await _db.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT [Districts] OFF");
+                // No IDENTITY_INSERT OFF needed
 
                 await transaction.CommitAsync();
                 Console.WriteLine($"  OK: {districts.Count} ilçe/şehir eklendi ({batches.Count} batch).");
