@@ -1,5 +1,3 @@
-using System.Text.Json;
-using LivestockTrading.Domain.Entities;
 using LivestockTrading.Domain.Events;
 using LivestockTrading.Workers.NotificationSender.Services;
 
@@ -58,20 +56,6 @@ public class SellerCreatedNotificationHandler
 					if (invalidTokens.Count > 0)
 						await _pushTokenRepository.RevokeTokens(invalidTokens);
 				}
-
-				var actionData = JsonSerializer.Serialize(new
-				{
-					sellerId = sellerEvent.SellerId,
-					businessName = sellerEvent.BusinessName,
-					userId = sellerEvent.UserId
-				});
-
-				await _pushTokenRepository.SaveNotification(
-					adminUserId,
-					title,
-					body,
-					NotificationType.SellerPendingVerification,
-					actionData);
 			}
 		}
 		else
