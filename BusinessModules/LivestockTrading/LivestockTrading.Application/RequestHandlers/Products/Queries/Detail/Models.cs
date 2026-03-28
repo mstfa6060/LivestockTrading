@@ -33,6 +33,12 @@ public class ResponseModel : IResponseModel
 	public Guid SellerId { get; set; }
 	public string SellerName { get; set; }
 	public Guid LocationId { get; set; }
+	public string LocationCity { get; set; }
+	public string LocationState { get; set; }
+	public string LocationCountryCode { get; set; }
+	public double? LocationLatitude { get; set; }
+	public double? LocationLongitude { get; set; }
+	public int? LocationDistrictId { get; set; }
 	public int Status { get; set; }
 	public int Condition { get; set; }
 	public bool IsShippingAvailable { get; set; }
