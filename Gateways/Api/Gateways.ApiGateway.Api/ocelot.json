@@ -126,11 +126,7 @@
 			"UpstreamPathTemplate": "/iam/Provinces/All",
 			"UpstreamHttpMethod": [
 				"POST"
-			],
-			"FileCacheOptions": {
-				"TtlSeconds": 3600,
-				"Region": "provinces"
-			}
+			]
 		},
 		{
 			"DownstreamPathTemplate": "/Districts/ByProvince",
@@ -144,11 +140,7 @@
 			"UpstreamPathTemplate": "/iam/Districts/ByProvince",
 			"UpstreamHttpMethod": [
 				"POST"
-			],
-			"FileCacheOptions": {
-				"TtlSeconds": 3600,
-				"Region": "districts"
-			}
+			]
 		},
 		{
 			"DownstreamPathTemplate": "/{everything}",
