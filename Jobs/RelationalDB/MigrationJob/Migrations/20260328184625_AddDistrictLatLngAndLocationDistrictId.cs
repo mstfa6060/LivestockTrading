@@ -46,24 +46,6 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
                 type: "float",
                 nullable: true);
 
-            migrationBuilder.AlterColumn<bool>(
-                name: "IsActive",
-                table: "Countries",
-                type: "bit",
-                nullable: false,
-                defaultValue: true,
-                oldClrType: typeof(bool),
-                oldType: "bit");
-
-            migrationBuilder.AlterColumn<int>(
-                name: "Id",
-                table: "Countries",
-                type: "int",
-                nullable: false,
-                oldClrType: typeof(int),
-                oldType: "int")
-                .OldAnnotation("SqlServer:Identity", "1, 1");
-
             migrationBuilder.UpdateData(
                 table: "AppRoles",
                 keyColumn: "Id",
@@ -93,34 +75,6 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
                 table: "Locations",
                 column: "DistrictId");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Countries_Code",
-                table: "Countries",
-                column: "Code",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Countries_Code3",
-                table: "Countries",
-                column: "Code3",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Countries_Continent",
-                table: "Countries",
-                column: "Continent");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Countries_IsActive",
-                table: "Countries",
-                column: "IsActive");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Countries_Name",
-                table: "Countries",
-                column: "Name",
-                unique: true);
-
             migrationBuilder.AddForeignKey(
                 name: "FK_Locations_Districts_DistrictId",
                 table: "Locations",
@@ -140,26 +94,6 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
             migrationBuilder.DropIndex(
                 name: "IX_Locations_DistrictId",
                 table: "Locations");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Countries_Code",
-                table: "Countries");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Countries_Code3",
-                table: "Countries");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Countries_Continent",
-                table: "Countries");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Countries_IsActive",
-                table: "Countries");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Countries_Name",
-                table: "Countries");
 
             migrationBuilder.DeleteData(
                 table: "RolePermissions",
@@ -187,24 +121,6 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
             migrationBuilder.DropColumn(
                 name: "Longitude",
                 table: "Districts");
-
-            migrationBuilder.AlterColumn<bool>(
-                name: "IsActive",
-                table: "Countries",
-                type: "bit",
-                nullable: false,
-                oldClrType: typeof(bool),
-                oldType: "bit",
-                oldDefaultValue: true);
-
-            migrationBuilder.AlterColumn<int>(
-                name: "Id",
-                table: "Countries",
-                type: "int",
-                nullable: false,
-                oldClrType: typeof(int),
-                oldType: "int")
-                .Annotation("SqlServer:Identity", "1, 1");
 
             migrationBuilder.UpdateData(
                 table: "AppRoles",
