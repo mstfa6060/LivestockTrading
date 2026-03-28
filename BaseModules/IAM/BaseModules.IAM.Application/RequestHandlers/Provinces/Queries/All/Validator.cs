@@ -25,6 +25,6 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
     {
         RuleFor(x => x.CountryId)
             .GreaterThan(0)
-            .WithMessage("CountryId zorunludur ve 0'dan büyük olmalıdır.");
+            .WithMessage(ErrorCodeGenerator.GetErrorCode(() => DomainErrors.LocationErrors.LocationCountryIdRequired));
     }
 }

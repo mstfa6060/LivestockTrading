@@ -24,6 +24,6 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
     public RequestModel_Validator()
     {
         RuleFor(x => x.ProvinceId)
-            .GreaterThan(0).WithMessage("ProvinceId zorunludur ve 0'dan büyük olmalıdır.");
+            .GreaterThan(0).WithMessage(ErrorCodeGenerator.GetErrorCode(() => DomainErrors.LocationErrors.LocationProvinceIdRequired));
     }
 }

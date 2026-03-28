@@ -189,6 +189,13 @@ public class DomainErrors
 
     }
 
+    public class LocationErrors
+    {
+        public static string LocationCountryIdRequired { get; set; } = "Ülke seçimi zorunludur.";
+        public static string LocationProvinceIdRequired { get; set; } = "İl/eyalet seçimi zorunludur.";
+        public static string LocationDistrictIdRequired { get; set; } = "İlçe/şehir seçimi zorunludur.";
+    }
+
     public class RoleErrors
     {
         public static string NameValid { get; set; } = "Geçersiz rol adı.";
