@@ -143,6 +143,20 @@
 			]
 		},
 		{
+			"DownstreamPathTemplate": "/Neighborhoods/ByDistrict",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "iam-api-container",
+					"Port": 8080
+				}
+			],
+			"UpstreamPathTemplate": "/iam/Neighborhoods/ByDistrict",
+			"UpstreamHttpMethod": [
+				"POST"
+			]
+		},
+		{
 			"DownstreamPathTemplate": "/{everything}",
 			"DownstreamScheme": "http",
 			"DownstreamHostAndPorts": [
