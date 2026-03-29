@@ -172,6 +172,7 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext, ILivestockT
             entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Code).IsRequired().HasMaxLength(10);
             entity.Property(e => e.NameTranslations).HasMaxLength(2000);
+            entity.Property(e => e.Timezone).HasMaxLength(40);
             entity.Property(e => e.GeoNameId);
 
             // CountryId FK
@@ -194,6 +195,7 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext, ILivestockT
             entity.Property(e => e.Id).ValueGeneratedNever(); // Seed data için
             entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
             entity.Property(e => e.NameTranslations).HasMaxLength(2000);
+            entity.Property(e => e.Timezone).HasMaxLength(40);
             entity.Property(e => e.GeoNameId);
 
             entity.HasOne(d => d.Province)
@@ -230,6 +232,7 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext, ILivestockT
 
             entity.HasIndex(e => e.DistrictId);
             entity.HasIndex(e => e.Name);
+            entity.HasIndex(e => e.GeoNameId);
         });
 
         // ═══════════════════════════════════════════════════════════════

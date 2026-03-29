@@ -254,11 +254,18 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
+                    b.Property<long?>("Population")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("ProvinceId")
                         .HasColumnType("int");
 
                     b.Property<int>("SortOrder")
                         .HasColumnType("int");
+
+                    b.Property<string>("Timezone")
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
 
                     b.HasKey("Id");
 
@@ -352,6 +359,15 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
                     b.Property<int>("DistrictId")
                         .HasColumnType("int");
 
+                    b.Property<int>("GeoNameId")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("float");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -367,6 +383,8 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("DistrictId");
+
+                    b.HasIndex("GeoNameId");
 
                     b.HasIndex("Name");
 
@@ -462,6 +480,12 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
                     b.Property<int>("GeoNameId")
                         .HasColumnType("int");
 
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("float");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -471,8 +495,15 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
+                    b.Property<long?>("Population")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("SortOrder")
                         .HasColumnType("int");
+
+                    b.Property<string>("Timezone")
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
 
                     b.HasKey("Id");
 
@@ -629,20 +660,20 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
                         new
                         {
                             Id = new Guid("a1d5b3e4-8e5a-4b3c-9ef5-d3e5a3b7c1f8"),
-                            CreatedAt = new DateTime(2026, 3, 28, 18, 46, 23, 540, DateTimeKind.Utc).AddTicks(4210),
+                            CreatedAt = new DateTime(2026, 3, 29, 0, 33, 3, 953, DateTimeKind.Utc).AddTicks(6213),
                             IsDeleted = false,
                             IsSystemRole = true,
                             Name = "Admin",
-                            UpdatedAt = new DateTime(2026, 3, 28, 18, 46, 23, 540, DateTimeKind.Utc).AddTicks(4467)
+                            UpdatedAt = new DateTime(2026, 3, 29, 0, 33, 3, 953, DateTimeKind.Utc).AddTicks(6443)
                         },
                         new
                         {
                             Id = new Guid("b3f8a7d1-4e2c-4a3e-8b5a-d3e7b9c5e2f1"),
-                            CreatedAt = new DateTime(2026, 3, 28, 18, 46, 23, 540, DateTimeKind.Utc).AddTicks(4875),
+                            CreatedAt = new DateTime(2026, 3, 29, 0, 33, 3, 953, DateTimeKind.Utc).AddTicks(6790),
                             IsDeleted = false,
                             IsSystemRole = true,
                             Name = "User",
-                            UpdatedAt = new DateTime(2026, 3, 28, 18, 46, 23, 540, DateTimeKind.Utc).AddTicks(4875)
+                            UpdatedAt = new DateTime(2026, 3, 29, 0, 33, 3, 953, DateTimeKind.Utc).AddTicks(6791)
                         });
                 });
 
@@ -679,30 +710,30 @@ namespace Jobs.RelationalDB.MigrationJob.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("06b3a525-5e3d-42c6-aec7-f473b3981750"),
-                            CreatedAt = new DateTime(2026, 3, 28, 18, 46, 23, 541, DateTimeKind.Utc).AddTicks(2559),
+                            Id = new Guid("9f6eb95f-d17a-4289-a8b3-021bea718130"),
+                            CreatedAt = new DateTime(2026, 3, 29, 0, 33, 3, 954, DateTimeKind.Utc).AddTicks(2736),
                             IsDeleted = false,
                             Permission = "ManageUsers",
                             RoleId = new Guid("a1d5b3e4-8e5a-4b3c-9ef5-d3e5a3b7c1f8"),
-                            UpdatedAt = new DateTime(2026, 3, 28, 18, 46, 23, 541, DateTimeKind.Utc).AddTicks(2564)
+                            UpdatedAt = new DateTime(2026, 3, 29, 0, 33, 3, 954, DateTimeKind.Utc).AddTicks(2740)
                         },
                         new
                         {
-                            Id = new Guid("cd0abc1b-5664-4612-9faa-49e3da855174"),
-                            CreatedAt = new DateTime(2026, 3, 28, 18, 46, 23, 541, DateTimeKind.Utc).AddTicks(2570),
+                            Id = new Guid("99c06299-0b44-4dc0-b008-5937919862c6"),
+                            CreatedAt = new DateTime(2026, 3, 29, 0, 33, 3, 954, DateTimeKind.Utc).AddTicks(2749),
                             IsDeleted = false,
                             Permission = "ManageRoles",
                             RoleId = new Guid("a1d5b3e4-8e5a-4b3c-9ef5-d3e5a3b7c1f8"),
-                            UpdatedAt = new DateTime(2026, 3, 28, 18, 46, 23, 541, DateTimeKind.Utc).AddTicks(2570)
+                            UpdatedAt = new DateTime(2026, 3, 29, 0, 33, 3, 954, DateTimeKind.Utc).AddTicks(2750)
                         },
                         new
                         {
-                            Id = new Guid("34d010cc-a631-42a2-8813-fb753b65b362"),
-                            CreatedAt = new DateTime(2026, 3, 28, 18, 46, 23, 541, DateTimeKind.Utc).AddTicks(2574),
+                            Id = new Guid("4f7e24fa-2773-41df-93f6-e169f4a2aee8"),
+                            CreatedAt = new DateTime(2026, 3, 29, 0, 33, 3, 954, DateTimeKind.Utc).AddTicks(2753),
                             IsDeleted = false,
                             Permission = "ViewListings",
                             RoleId = new Guid("b3f8a7d1-4e2c-4a3e-8b5a-d3e7b9c5e2f1"),
-                            UpdatedAt = new DateTime(2026, 3, 28, 18, 46, 23, 541, DateTimeKind.Utc).AddTicks(2574)
+                            UpdatedAt = new DateTime(2026, 3, 29, 0, 33, 3, 954, DateTimeKind.Utc).AddTicks(2753)
                         });
                 });
 

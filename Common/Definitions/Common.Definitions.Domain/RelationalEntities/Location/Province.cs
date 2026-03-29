@@ -32,6 +32,26 @@ public class Province
     public string NameTranslations { get; set; }
 
     /// <summary>
+    /// Enlem (GeoNames allCountries verisinden)
+    /// </summary>
+    public double? Latitude { get; set; }
+
+    /// <summary>
+    /// Boylam (GeoNames allCountries verisinden)
+    /// </summary>
+    public double? Longitude { get; set; }
+
+    /// <summary>
+    /// Nüfus (GeoNames allCountries verisinden)
+    /// </summary>
+    public long? Population { get; set; }
+
+    /// <summary>
+    /// Zaman dilimi (IANA format, ör: "Europe/Istanbul")
+    /// </summary>
+    public string Timezone { get; set; }
+
+    /// <summary>
     /// GeoNames kaynak ID (re-import için)
     /// </summary>
     public int GeoNameId { get; set; }

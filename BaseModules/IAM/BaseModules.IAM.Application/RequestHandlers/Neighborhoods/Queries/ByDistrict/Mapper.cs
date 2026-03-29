@@ -9,7 +9,9 @@ public class Mapper
             Id = n.Id,
             Name = n.Name,
             DistrictId = n.DistrictId,
-            PostalCode = n.PostalCode
+            PostalCode = n.PostalCode,
+            Latitude = n.Latitude,
+            Longitude = n.Longitude
         }).ToList();
     }
 }

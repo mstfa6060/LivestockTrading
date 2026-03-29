@@ -47,6 +47,11 @@ nginx/ssl/
 *.tmp
 *.log
 
+# GeoNames büyük veri dosyaları (sunucuda generate edilir)
+Jobs/RelationalDB/MigrationJob/SeedData/neighborhoods.json
+Jobs/RelationalDB/MigrationJob/SeedData/_tmp_*.zip
+Jobs/RelationalDB/MigrationJob/SeedData/_tmp_*
+
 # Node modules
 node_modules/
 _doc/excel/node_modules/

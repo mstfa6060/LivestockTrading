@@ -9,7 +9,11 @@ public class Mapper
             Id = d.Id,
             Name = d.Name,
             ProvinceId = d.ProvinceId,
-            NameTranslations = d.NameTranslations
+            NameTranslations = d.NameTranslations,
+            Latitude = d.Latitude,
+            Longitude = d.Longitude,
+            Population = d.Population,
+            Timezone = d.Timezone
         }).ToList();
     }
 }

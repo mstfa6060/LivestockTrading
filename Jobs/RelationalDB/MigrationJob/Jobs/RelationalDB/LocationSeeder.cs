@@ -5,8 +5,9 @@ using Common.Definitions.Domain.Entities;
 namespace MigrationJob.SeedData;
 
 /// <summary>
-/// GeoNames verilerinden Province ve District seed verilerini yükler.
-/// provinces.json ve districts.json dosyalarını okur.
+/// GeoNames verilerinden Province, District ve Neighborhood seed verilerini yükler.
+/// provinces.json, districts.json ve neighborhoods.json dosyalarını okur.
+/// neighborhoods.json 640MB+ olabilir — streaming JSON reader ile okunur.
 /// </summary>
 public class LocationSeeder
 {
@@ -41,6 +42,7 @@ public class LocationSeeder
         Console.WriteLine("Seeding location data from GeoNames...");
         await SeedProvincesAsync();
         await SeedDistrictsAsync();
+        await SeedNeighborhoodsAsync();
         Console.WriteLine("Location seed completed!");
     }
 
@@ -91,40 +93,7 @@ public class LocationSeeder
             return;
         }
 
-        var strategy = _db.Database.CreateExecutionStrategy();
-        await strategy.ExecuteAsync(async () =>
-        {
-            // Büyük veri setini batch'ler halinde ekle (SQL Server parametre limiti)
-            const int batchSize = 500;
-            var batches = provinces
-                .Select((item, index) => new { item, index })
-                .GroupBy(x => x.index / batchSize)
-                .Select(g => g.Select(x => x.item).ToList())
-                .ToList();
-
-            using var transaction = await _db.Database.BeginTransactionAsync();
-            try
-            {
-                // Province.Id is ValueGeneratedNever — no IDENTITY_INSERT needed
-
-                foreach (var batch in batches)
-                {
-                    await _db.Set<Province>().AddRangeAsync(batch);
-                    await _db.SaveChangesAsync();
-                    _db.ChangeTracker.Clear(); // Memory'yi temizle
-                }
-
-                // No IDENTITY_INSERT OFF needed
-
-                await transaction.CommitAsync();
-                Console.WriteLine($"  OK: {provinces.Count} il/eyalet eklendi ({batches.Count} batch).");
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
-        });
+        await SeedBatchAsync(_db.Set<Province>(), provinces, "il/eyalet");
     }
 
     private async Task SeedDistrictsAsync()
@@ -145,11 +114,83 @@ public class LocationSeeder
             return;
         }
 
+        await SeedBatchAsync(_db.Set<District>(), districts, "ilçe/şehir");
+    }
+
+    private async Task SeedNeighborhoodsAsync()
+    {
+        var filePath = Path.Combine("SeedData", "neighborhoods.json");
+        if (!File.Exists(filePath))
+        {
+            Console.WriteLine($"  INFO: {filePath} not found. Skipping neighborhoods.");
+            return;
+        }
+
+        Console.WriteLine("  Neighborhoods seed başlıyor (streaming)...");
+
+        var strategy = _db.Database.CreateExecutionStrategy();
+        await strategy.ExecuteAsync(async () =>
+        {
+            const int batchSize = 1000; // Büyük veri için daha büyük batch
+            var batch = new List<Neighborhood>(batchSize);
+            var totalCount = 0;
+            var batchCount = 0;
+
+            using var transaction = await _db.Database.BeginTransactionAsync();
+            try
+            {
+                await using var stream = File.OpenRead(filePath);
+                var neighborhoods = JsonSerializer.DeserializeAsyncEnumerable<Neighborhood>(stream, _jsonOptions);
+
+                await foreach (var n in neighborhoods)
+                {
+                    if (n == null) continue;
+                    batch.Add(n);
+                    totalCount++;
+
+                    if (batch.Count >= batchSize)
+                    {
+                        await _db.Set<Neighborhood>().AddRangeAsync(batch);
+                        await _db.SaveChangesAsync();
+                        _db.ChangeTracker.Clear();
+                        batchCount++;
+                        batch.Clear();
+
+                        if (batchCount % 100 == 0)
+                            Console.Write($"\r  {totalCount:N0} mahalle eklendi ({batchCount} batch)...");
+                    }
+                }
+
+                // Kalan batch
+                if (batch.Count > 0)
+                {
+                    await _db.Set<Neighborhood>().AddRangeAsync(batch);
+                    await _db.SaveChangesAsync();
+                    _db.ChangeTracker.Clear();
+                    batchCount++;
+                }
+
+                await transaction.CommitAsync();
+                Console.WriteLine($"\r  OK: {totalCount:N0} mahalle eklendi ({batchCount} batch).");
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        });
+    }
+
+    /// <summary>
+    /// Genel batch seed helper (Province, District gibi küçük veri setleri için)
+    /// </summary>
+    private async Task SeedBatchAsync<T>(DbSet<T> dbSet, List<T> items, string label) where T : class
+    {
         var strategy = _db.Database.CreateExecutionStrategy();
         await strategy.ExecuteAsync(async () =>
         {
             const int batchSize = 500;
-            var batches = districts
+            var batches = items
                 .Select((item, index) => new { item, index })
                 .GroupBy(x => x.index / batchSize)
                 .Select(g => g.Select(x => x.item).ToList())
@@ -158,19 +199,15 @@ public class LocationSeeder
             using var transaction = await _db.Database.BeginTransactionAsync();
             try
             {
-                // District.Id is ValueGeneratedNever — no IDENTITY_INSERT needed
-
                 foreach (var batch in batches)
                 {
-                    await _db.Set<District>().AddRangeAsync(batch);
+                    await dbSet.AddRangeAsync(batch);
                     await _db.SaveChangesAsync();
                     _db.ChangeTracker.Clear();
                 }
 
-                // No IDENTITY_INSERT OFF needed
-
                 await transaction.CommitAsync();
-                Console.WriteLine($"  OK: {districts.Count} ilçe/şehir eklendi ({batches.Count} batch).");
+                Console.WriteLine($"  OK: {items.Count:N0} {label} eklendi ({batches.Count} batch).");
             }
             catch
             {

@@ -10,7 +10,11 @@ public class Mapper
             CountryId = p.CountryId,
             Name = p.Name,
             Code = p.Code,
-            NameTranslations = p.NameTranslations
+            NameTranslations = p.NameTranslations,
+            Latitude = p.Latitude,
+            Longitude = p.Longitude,
+            Population = p.Population,
+            Timezone = p.Timezone
         }).ToList();
     }
 }

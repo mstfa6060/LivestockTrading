@@ -26,6 +26,21 @@ public class Neighborhood
     public string PostalCode { get; set; }
 
     /// <summary>
+    /// Enlem
+    /// </summary>
+    public double? Latitude { get; set; }
+
+    /// <summary>
+    /// Boylam
+    /// </summary>
+    public double? Longitude { get; set; }
+
+    /// <summary>
+    /// GeoNames kaynak ID (re-import için)
+    /// </summary>
+    public int GeoNameId { get; set; }
+
+    /// <summary>
     /// Sıralama
     /// </summary>
     public int SortOrder { get; set; }

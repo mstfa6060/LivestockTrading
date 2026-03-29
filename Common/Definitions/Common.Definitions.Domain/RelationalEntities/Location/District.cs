@@ -37,6 +37,16 @@ public class District
     public double? Longitude { get; set; }
 
     /// <summary>
+    /// Nüfus (GeoNames allCountries verisinden)
+    /// </summary>
+    public long? Population { get; set; }
+
+    /// <summary>
+    /// Zaman dilimi (IANA format, ör: "Europe/Istanbul")
+    /// </summary>
+    public string Timezone { get; set; }
+
+    /// <summary>
     /// GeoNames kaynak ID (re-import için)
     /// </summary>
     public int GeoNameId { get; set; }

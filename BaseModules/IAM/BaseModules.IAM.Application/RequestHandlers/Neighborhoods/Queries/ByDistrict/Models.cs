@@ -6,6 +6,8 @@ public class ResponseModel : IResponseModel<Array>
     public string Name { get; set; }
     public int DistrictId { get; set; }
     public string PostalCode { get; set; }
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
 }
 
 public class RequestModel : IRequestModel
