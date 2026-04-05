@@ -29,6 +29,11 @@ public class ProductApprovedSocialMediaHandler
         _logger = logger;
     }
 
+    // Hard cap on delayed posting: posts whose target time is farther in the future
+    // than this are published immediately instead, to keep fire-and-forget Task
+    // memory bounded and limit damage from worker restarts losing pending posts.
+    private static readonly TimeSpan MaxPostingDelay = TimeSpan.FromHours(24);
+
     public async Task HandleAsync(ProductApprovedEvent evt)
     {
         _logger.LogInformation(
@@ -60,14 +65,61 @@ public class ProductApprovedSocialMediaHandler
             return;
         }
 
-        // Post to Instagram
-        var mediaId = await _instagramService.PostImageAsync(imageUrl, caption);
+        // Decide whether to post now or delay until the region's peak engagement window.
+        var nowUtc = DateTime.UtcNow;
+        var targetUtc = SocialMediaTiming.ComputeNextPostTimeUtc(evt.CountryCode, nowUtc);
+        var delay = targetUtc - nowUtc;
 
-        if (mediaId != null)
+        if (delay > MaxPostingDelay)
+        {
+            _logger.LogWarning(
+                "Computed delay {DelayHours}h exceeds cap, posting product {ProductId} immediately (country {Country})",
+                delay.TotalHours, evt.ProductId, evt.CountryCode);
+            delay = TimeSpan.Zero;
+        }
+
+        if (delay > TimeSpan.FromMinutes(1))
+        {
+            _logger.LogInformation(
+                "Scheduling Instagram post for product {ProductId} at {TargetUtc} UTC (delay {Delay}, country {Country})",
+                evt.ProductId, targetUtc, delay, evt.CountryCode);
+
+            // Fire-and-forget delayed publish. Worker restart before the target time
+            // loses the pending post; acceptable trade-off until a durable scheduler
+            // (Hangfire) is wired into this worker.
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(delay);
+                    var mediaId = await _instagramService.PostImageAsync(imageUrl, caption);
+                    if (mediaId != null)
+                    {
+                        _logger.LogInformation(
+                            "Posted scheduled product {ProductId} to Instagram. MediaId: {MediaId}",
+                            evt.ProductId, mediaId);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Failed to post scheduled product {ProductId} to Instagram", evt.ProductId);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Delayed Instagram post failed for product {ProductId}", evt.ProductId);
+                }
+            });
+            return;
+        }
+
+        // In active window — post immediately
+        var immediateMediaId = await _instagramService.PostImageAsync(imageUrl, caption);
+
+        if (immediateMediaId != null)
         {
             _logger.LogInformation(
                 "Successfully posted product {ProductId} to Instagram. MediaId: {MediaId}",
-                evt.ProductId, mediaId);
+                evt.ProductId, immediateMediaId);
         }
         else
         {
