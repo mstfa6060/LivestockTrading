@@ -49,7 +49,7 @@ public class ProductCreatedNotificationHandler
 
 			foreach (var adminUserId in adminUserIds)
 			{
-				if (!await _pushTokenRepository.IsPushEnabled(adminUserId))
+				if (!await _pushTokenRepository.ShouldSendPushNow(adminUserId))
 					continue;
 
 				if (tokensByUser.TryGetValue(adminUserId, out var tokens) && tokens.Count > 0)

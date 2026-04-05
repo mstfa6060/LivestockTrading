@@ -98,17 +98,50 @@ public class PushTokenRepository
             userId, type, title);
     }
 
+    // Gece sessiz saatler: kullanicinin yerel saatine gore 21:00 ile 08:00 arasinda push gonderilmez.
+    private const int QuietHoursStartLocal = 21; // 21:00 sonrasi sessiz
+    private const int QuietHoursEndLocal = 8;    // 08:00 oncesi sessiz
+
     /// <summary>
-    /// Kullanicinin push bildirim tercihini kontrol eder
+    /// Push bildirimin simdi gonderilip gonderilemeyecegini dondurur:
+    /// - Kullanici push bildirimleri kapatmis mi?
+    /// - Kullanicinin yerel saatine gore gece sessiz saatlerinde miyiz (21:00-08:00)?
+    /// Sessiz saatlerde in-app bildirim yine kaydedilir; sadece push bastirilir.
     /// </summary>
-    public async Task<bool> IsPushEnabled(Guid userId, CancellationToken ct = default)
+    public async Task<bool> ShouldSendPushNow(Guid userId, CancellationToken ct = default)
     {
         var preferences = await _dbContext.UserPreferences
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.UserId == userId && !p.IsDeleted, ct);
 
-        // Tercih yoksa varsayilan olarak aktif kabul et
-        return preferences?.PushNotificationsEnabled ?? true;
+        if (preferences != null && !preferences.PushNotificationsEnabled)
+            return false;
+
+        var timeZoneId = preferences?.TimeZone;
+        return !IsInQuietHours(DateTime.UtcNow, timeZoneId);
+    }
+
+    private static bool IsInQuietHours(DateTime utcNow, string? timeZoneId)
+    {
+        TimeZoneInfo tz;
+        try
+        {
+            tz = string.IsNullOrWhiteSpace(timeZoneId)
+                ? TimeZoneInfo.Utc
+                : TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+        }
+        catch (TimeZoneNotFoundException)
+        {
+            tz = TimeZoneInfo.Utc;
+        }
+        catch (InvalidTimeZoneException)
+        {
+            tz = TimeZoneInfo.Utc;
+        }
+
+        var localHour = TimeZoneInfo.ConvertTimeFromUtc(utcNow, tz).Hour;
+        // 21:00 (inclusive) – 08:00 (exclusive) → sessiz
+        return localHour >= QuietHoursStartLocal || localHour < QuietHoursEndLocal;
     }
 
     /// <summary>

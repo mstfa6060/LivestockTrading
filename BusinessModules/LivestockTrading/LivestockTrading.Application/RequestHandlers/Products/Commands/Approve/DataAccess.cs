@@ -29,6 +29,18 @@ public class DataAccess : IDataAccess
 			.FirstOrDefaultAsync(p => p.Id == productId && !p.IsDeleted);
 	}
 
+	/// <summary>
+	/// Lookup seller's timezone preference (via UserPreferences keyed on Seller.UserId).
+	/// Returns null when no preference is set.
+	/// </summary>
+	public async Task<string> GetSellerTimeZone(Guid sellerUserId)
+	{
+		return await _dbContext.UserPreferences
+			.Where(up => up.UserId == sellerUserId && !up.IsDeleted)
+			.Select(up => up.TimeZone)
+			.FirstOrDefaultAsync();
+	}
+
 	public async Task<string> GetCoverImagePath(string coverImageFileId)
 	{
 		if (string.IsNullOrWhiteSpace(coverImageFileId) || !Guid.TryParse(coverImageFileId, out _))

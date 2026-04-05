@@ -51,10 +51,10 @@ public class ConversationCreatedNotificationHandler
             data["productId"] = conversationEvent.ProductId.Value.ToString();
         }
 
-        // Push bildirim tercihi kontrolu
-        if (!await _pushTokenRepository.IsPushEnabled(conversationEvent.RecipientUserId))
+        // Push bildirim tercihi + sessiz saatler (21:00-08:00 local) kontrolu
+        if (!await _pushTokenRepository.ShouldSendPushNow(conversationEvent.RecipientUserId))
         {
-            _logger.LogInformation("Push notifications disabled for user {UserId}, skipping", conversationEvent.RecipientUserId);
+            _logger.LogInformation("Push suppressed for user {UserId} (disabled or quiet hours)", conversationEvent.RecipientUserId);
         }
         else
         {

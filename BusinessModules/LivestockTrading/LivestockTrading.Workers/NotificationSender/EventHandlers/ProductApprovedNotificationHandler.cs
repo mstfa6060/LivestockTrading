@@ -47,10 +47,10 @@ public class ProductApprovedNotificationHandler
 			{ "slug", productEvent.Slug ?? "" }
 		};
 
-		// Push bildirim tercihi kontrolu
-		if (!await _pushTokenRepository.IsPushEnabled(sellerUserId.Value))
+		// Push bildirim tercihi + sessiz saatler (21:00-08:00 local) kontrolu
+		if (!await _pushTokenRepository.ShouldSendPushNow(sellerUserId.Value))
 		{
-			_logger.LogInformation("Push notifications disabled for seller user {UserId}, skipping", sellerUserId.Value);
+			_logger.LogInformation("Push suppressed for seller user {UserId} (disabled or quiet hours)", sellerUserId.Value);
 		}
 		else
 		{

@@ -363,6 +363,20 @@
 			]
 		},
 		{
+			"DownstreamPathTemplate": "/Sellers/Nearby",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "livestocktrading-api-container",
+					"Port": 8080
+				}
+			],
+			"UpstreamPathTemplate": "/livestocktrading/Sellers/Nearby",
+			"UpstreamHttpMethod": [
+				"POST"
+			]
+		},
+		{
 			"DownstreamPathTemplate": "/Banners/All",
 			"DownstreamScheme": "http",
 			"DownstreamHostAndPorts": [
