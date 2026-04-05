@@ -377,6 +377,20 @@
 			]
 		},
 		{
+			"DownstreamPathTemplate": "/UserPreferences/GetTimeZone",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "livestocktrading-api-container",
+					"Port": 8080
+				}
+			],
+			"UpstreamPathTemplate": "/livestocktrading/UserPreferences/GetTimeZone",
+			"UpstreamHttpMethod": [
+				"POST"
+			]
+		},
+		{
 			"DownstreamPathTemplate": "/Banners/All",
 			"DownstreamScheme": "http",
 			"DownstreamHostAndPorts": [
