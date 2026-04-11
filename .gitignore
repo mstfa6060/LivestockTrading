@@ -40,6 +40,10 @@ secrets/
 # Local development overrides
 docker-compose.override.yml
 
+# Claude Code personal overrides
+CLAUDE.local.md
+.claude/settings.local.json
+
 # SSL certificates
 nginx/ssl/
 
