@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Current Priority: TASKS.md (Birlesik Gorev Listesi)
 
-When starting a new chat without a specific task, refer to `../TASKS.md` in the parent directory (`d:\Projects\GlobalLivestock\TASKS.md`). This is the **unified task list** across all three projects (web, mobil, backend). Work through the unchecked items in priority order.
+When starting a new chat without a specific task, refer to `../TASKS.md` in the parent workspace (`C:\workspace\GlobalLivestock\TASKS.md` — create if missing). This is the **unified task list** across all three projects (livestock-frontend, livestock-mobile, LivestockTrading backend). Work through the unchecked items in priority order.
 
 Additional project-specific reference:
 - `CHANGELOG.md` — All features, fixes, and improvements log (58 commits in revenue strategy)
@@ -258,15 +258,15 @@ No traditional controllers - ArfBlocks middleware discovers handlers based on re
 
 ## Frontend Entegrasyonu
 
-Frontend projesi (`D:\Projects\GlobalLivestock\web`) backend API'lerini `arf-cli` ile olusturulan TypeScript client uzerinden tuketir.
+Frontend projesi (`../livestock-frontend` → `C:\workspace\GlobalLivestock\livestock-frontend`) backend API'lerini `arf-cli` ile olusturulan TypeScript client uzerinden tuketir.
 
 ## Mobil Uygulama
 
-Mobil uygulama projesi: `D:\Projects\GlobalLivestock\mobil`
+Mobil uygulama projesi: `../livestock-mobile` → `C:\workspace\GlobalLivestock\livestock-mobile` (React Native bare workflow, bkz. projenin kendi `CLAUDE.md` ve `MOBILE-DEVELOPMENT.md`)
 
 ### Frontend API Dokumantasyonu
 
-Frontend gelisitiriciler icin API kullanim dokumani: `D:\Projects\GlobalLivestock\web\common\API-INTEGRATION.md`
+Frontend gelisitiriciler icin API kullanim dokumani: `../livestock-frontend/common/API-INTEGRATION.md`
 
 **Bu dokuman asagidaki konulari kapsar:**
 - Kimlik dogrulama (Login, Register, Logout, Token yonetimi)
@@ -301,7 +301,7 @@ Backend'de endpoint degisikligi yapildiginda frontend API client'i guncellenmeli
 
 ```bash
 # arf-cli ile TypeScript client olustur
-arf-cli generate --output D:\Projects\GlobalLivestock\web\common\livestock-api
+arf-cli generate --output ../livestock-frontend/common/livestock-api
 ```
 
 Bu komut asagidaki dosyalari gunceller:
@@ -314,7 +314,7 @@ Bu komut asagidaki dosyalari gunceller:
 
 Frontend ekibinden gelen backend gelistirme talepleri asagidaki dosyada dokumante edilir:
 
-**Dosya:** `D:\Projects\GlobalLivestock\web\common\API-INTEGRATION.md`
+**Dosya:** `../livestock-frontend/common/API-INTEGRATION.md`
 
 Bu dosyanin "Backend Gelistirme Talimatlari" bolumunde:
 - Kritik buglar ve cozum onerileri
