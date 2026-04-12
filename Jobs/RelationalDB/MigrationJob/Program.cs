@@ -31,9 +31,40 @@ class Program
             throw;
         }
 
-        // Migration
-        await dbContext.Database.MigrateAsync();
-        Console.WriteLine("Migration completed successfully.");
+        // Migration (--skip-migrations ile atlanabilir)
+        if (args.Contains("--skip-migrations"))
+        {
+            Console.WriteLine("Migration skipped (--skip-migrations flag).");
+        }
+        else
+        {
+            await dbContext.Database.MigrateAsync();
+            Console.WriteLine("Migration completed successfully.");
+        }
+
+        // Atıl İlanları Yeniden Yayına Alma (seed'lerden önce çalışır, bitince çıkar)
+        var reviveDryRun = args.Contains("--revive-idle-listings");
+        var reviveCommit = args.Contains("--revive-idle-listings-commit");
+        if (reviveDryRun || reviveCommit)
+        {
+            try
+            {
+                Console.WriteLine();
+                Console.WriteLine(reviveCommit
+                    ? "=== Atıl İlanları Yeniden Yayına Alma (COMMIT MODE) ==="
+                    : "=== Atıl İlanları Yeniden Yayına Alma (DRY-RUN) ===");
+                var reviver = new IdleListingReviver(dbContext);
+                await reviver.RunAsync(commit: reviveCommit);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Revive idle listings FAILED: {ex.Message}");
+                Console.WriteLine(ex.StackTrace);
+                throw;
+            }
+            Console.WriteLine("Revive operation completed. Skipping seeders.");
+            return;
+        }
 
         // Seed Data - Ulkeler
         // --force-country-reseed argümani ile mevcut veriler silinip yeniden seed edilir
