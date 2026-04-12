@@ -16,12 +16,14 @@ public class EmailWorker : BackgroundService
     private IConnection _connection;
     private IModel _channel;
     private readonly ForgotPasswordEmailHandler _handler;
+    private readonly IEmailService _emailService;
     private readonly IConfiguration _configuration;
     private readonly ILogger<EmailWorker> _logger;
 
-    public EmailWorker(ForgotPasswordEmailHandler handler, IConfiguration configuration, ILogger<EmailWorker> logger)
+    public EmailWorker(ForgotPasswordEmailHandler handler, IEmailService emailService, IConfiguration configuration, ILogger<EmailWorker> logger)
     {
         _handler = handler;
+        _emailService = emailService;
         _configuration = configuration;
         _logger = logger;
     }
@@ -76,11 +78,27 @@ public class EmailWorker : BackgroundService
                     return;
                 }
 
-                var forgotEvent = JsonSerializer.Deserialize<ForgotPasswordEvent>(message);
-                if (forgotEvent is not null)
+                // Route by event type
+                using var doc = JsonDocument.Parse(message);
+                var hasEventType = doc.RootElement.TryGetProperty("EventType", out var eventTypeProp);
+                var eventType = hasEventType ? eventTypeProp.GetString() : null;
+
+                if (eventType == "EmailOtp")
                 {
-                    Console.WriteLine($"[IAM EmailWorker] 📥 Mesaj alındı: {forgotEvent.Email} / {forgotEvent.Token}");
-                    await _handler.HandleAsync(forgotEvent);
+                    var email = doc.RootElement.GetProperty("Email").GetString();
+                    var subject = doc.RootElement.GetProperty("Subject").GetString();
+                    var emailBody = doc.RootElement.GetProperty("Body").GetString();
+                    Console.WriteLine($"[IAM EmailWorker] 📥 EmailOtp mesaj alindi: {email}");
+                    await _emailService.SendEmailAsync(email!, subject!, emailBody!);
+                }
+                else
+                {
+                    var forgotEvent = JsonSerializer.Deserialize<ForgotPasswordEvent>(message);
+                    if (forgotEvent is not null)
+                    {
+                        Console.WriteLine($"[IAM EmailWorker] 📥 Mesaj alındı: {forgotEvent.Email} / {forgotEvent.Token}");
+                        await _handler.HandleAsync(forgotEvent);
+                    }
                 }
 
                 _channel.BasicAck(ea.DeliveryTag, false);

@@ -246,6 +246,12 @@ public class DomainErrors
         public static string UserUserNameAlreadyExists { get; set; } = "Bu kullanıcı adı zaten kullanılıyor.";
         public static string UserCountryIdRequired { get; set; } = "Ülke seçimi zorunludur.";
 
+        // E-posta dogrulama hata kodlari
+        public static string UserEmailRequired { get; set; } = "E-posta adresi zorunludur.";
+        public static string UserEmailInvalid { get; set; } = "Geçersiz e-posta adresi formatı.";
+        public static string UserOtpCodeInvalid { get; set; } = "Doğrulama kodu hatalı.";
+        public static string UserOtpCodeExpired { get; set; } = "Doğrulama kodunun süresi dolmuş.";
+
         // Hesap silme hata kodları
         public static string UserDeletePasswordRequired { get; set; } = "Hesap silme için şifre onayı zorunludur.";
         public static string UserDeletePasswordIncorrect { get; set; } = "Şifre doğrulaması başarısız. Hesap silinemedi.";
