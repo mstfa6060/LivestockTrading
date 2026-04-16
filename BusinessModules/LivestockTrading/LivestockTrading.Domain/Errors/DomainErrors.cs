@@ -439,6 +439,17 @@ public class LivestockTradingDomainErrors
         public static string ProductReportAlreadyExists { get; set; } = "Bu ürün için zaten bir rapor gönderdiniz.";
     }
 
+    public static class AppVersionErrors
+    {
+        public static string AppVersionNotFound { get; set; } = "Uygulama sürüm kaydı bulunamadı.";
+        public static string AppVersionPlatformRequired { get; set; } = "Platform bilgisi zorunludur.";
+        public static string AppVersionMinVersionRequired { get; set; } = "Minimum desteklenen sürüm zorunludur.";
+        public static string AppVersionLatestVersionRequired { get; set; } = "En güncel sürüm zorunludur.";
+        public static string AppVersionInvalidVersionFormat { get; set; } = "Sürüm formatı geçersiz. (Beklenen: 1.0.0)";
+        public static string AppVersionPlatformAlreadyExists { get; set; } = "Bu platform için zaten bir sürüm kaydı mevcut.";
+        public static string AppVersionCurrentVersionRequired { get; set; } = "Mevcut sürüm bilgisi zorunludur.";
+    }
+
     public static class AuthorizationErrors
     {
         public static string InsufficientPermission { get; set; } = "Bu islem icin yetkiniz yok.";

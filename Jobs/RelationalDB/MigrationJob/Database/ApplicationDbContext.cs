@@ -108,6 +108,9 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext, ILivestockT
     // Contact
     public DbSet<ContactForm> ContactForms { get; set; }
 
+    // App Configuration
+    public DbSet<AppVersionConfig> AppVersionConfigs { get; set; }
+
     // Deals & Transport
     public DbSet<Deal> Deals { get; set; }
     public DbSet<Transporter> Transporters { get; set; }

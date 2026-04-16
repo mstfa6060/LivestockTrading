@@ -31,10 +31,10 @@ $livestockCliConfigPath = "$backendPath\_devops\arfblocks-cli\livestock.arfblock
 $iamCliConfigPath = "$backendPath\_devops\arfblocks-cli\livestock-iam.arfblocks-cli.json"
 $fileProviderCliConfigPath = "$backendPath\_devops\arfblocks-cli\livestock-fileprovider.arfblocks-cli.json"
 
-$webPath = "$projectRoot\web"
+$webPath = "$projectRoot\livestock-frontend"
 $webBranch = "main"
 
-$mobilePath = "$projectRoot\mobil"
+$mobilePath = "$projectRoot\livestock-mobile"
 $mobileBranch = "main"
 
 # === arfblocks-cli'yi bul (tam yol ile cagiracagiz) ===

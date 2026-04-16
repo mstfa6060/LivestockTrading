@@ -63,6 +63,9 @@ public interface ILivestockTradingModuleDbContext
     // Contact
     DbSet<ContactForm> ContactForms { get; set; }
 
+    // App Configuration
+    DbSet<AppVersionConfig> AppVersionConfigs { get; set; }
+
     // Deals & Transport
     DbSet<Deal> Deals { get; set; }
     DbSet<Transporter> Transporters { get; set; }

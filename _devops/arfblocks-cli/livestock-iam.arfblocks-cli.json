@@ -13,7 +13,7 @@
                 },
                 {
                     "key": "output",
-                    "value": "../web/common/livestock-api/src/api/base_modules/iam"
+                    "value": "../livestock-frontend/common/livestock-api/src/api/base_modules/iam"
                 },
                 {
                     "key": "outputImports",
@@ -46,7 +46,7 @@
                 },
                 {
                     "key": "output",
-                    "value": "../mobil/common/livestock-api/src/api/base_modules/iam"
+                    "value": "../livestock-mobile/common/livestock-api/src/api/base_modules/iam"
                 },
                 {
                     "key": "outputImports",

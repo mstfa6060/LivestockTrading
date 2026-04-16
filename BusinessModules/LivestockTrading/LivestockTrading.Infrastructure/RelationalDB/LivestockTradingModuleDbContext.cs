@@ -79,6 +79,9 @@ public class LivestockTradingModuleDbContext : DefinitionDbContext, ILivestockTr
     public DbSet<BoostPackage> BoostPackages { get; set; }
     public DbSet<ProductBoost> ProductBoosts { get; set; }
 
+    // App Configuration
+    public DbSet<AppVersionConfig> AppVersionConfigs { get; set; }
+
     // Deals & Transport
     public DbSet<Deal> Deals { get; set; }
     public DbSet<Transporter> Transporters { get; set; }

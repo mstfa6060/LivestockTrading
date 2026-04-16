@@ -1,0 +1,103 @@
+@BaseUrl = http://localhost:5221
+
+### Create
+POST {{BaseUrl}}/AppVersions/Create
+Content-Type: application/json
+
+{
+    "platform": 1,
+    "minSupportedVersion": "1.0.0",
+    "latestVersion": "1.2.0",
+    "storeUrl": "https://play.google.com/store/apps/details?id=com.livestocktrading.app",
+    "updateMessage": "Yeni surumumuz yayinda!",
+    "isActive": true
+}
+
+### All
+POST {{BaseUrl}}/AppVersions/All
+Content-Type: application/json
+
+{
+    "platform": null,
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### All - filter by Android platform
+POST {{BaseUrl}}/AppVersions/All
+Content-Type: application/json
+
+{
+    "platform": 1,
+    "sorting": null,
+    "filters": [],
+    "pageRequest": { "page": 1, "pageSize": 10 }
+}
+
+### Detail
+POST {{BaseUrl}}/AppVersions/Detail
+Content-Type: application/json
+
+{
+    "id": "c1000000-0000-0000-0000-000000000001"
+}
+
+### Pick
+POST {{BaseUrl}}/AppVersions/Pick
+Content-Type: application/json
+
+{
+    "selectedIds": [],
+    "keyword": "",
+    "limit": 10
+}
+
+### Update
+POST {{BaseUrl}}/AppVersions/Update
+Content-Type: application/json
+
+{
+    "id": "c1000000-0000-0000-0000-000000000001",
+    "platform": 1,
+    "minSupportedVersion": "1.0.0",
+    "latestVersion": "1.3.0",
+    "storeUrl": "https://play.google.com/store/apps/details?id=com.livestocktrading.app",
+    "updateMessage": "Lutfen yeni surume guncelleyin.",
+    "isActive": true
+}
+
+### Delete
+POST {{BaseUrl}}/AppVersions/Delete
+Content-Type: application/json
+
+{
+    "id": "c1000000-0000-0000-0000-000000000001"
+}
+
+### Check (PUBLIC - no auth) - OK
+POST {{BaseUrl}}/AppVersions/Check
+Content-Type: application/json
+
+{
+    "platform": 1,
+    "currentVersion": "1.3.0"
+}
+
+### Check (PUBLIC) - SoftUpdate
+POST {{BaseUrl}}/AppVersions/Check
+Content-Type: application/json
+
+{
+    "platform": 1,
+    "currentVersion": "1.1.0"
+}
+
+### Check (PUBLIC) - ForceUpdate
+POST {{BaseUrl}}/AppVersions/Check
+Content-Type: application/json
+
+{
+    "platform": 1,
+    "currentVersion": "0.9.0"
+}

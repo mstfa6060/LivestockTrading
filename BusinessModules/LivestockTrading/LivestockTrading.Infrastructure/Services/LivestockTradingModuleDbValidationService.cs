@@ -515,4 +515,20 @@ public class LivestockTradingModuleDbValidationService : DefinitionDbValidationS
 		if (!exists)
 			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.SubscriptionPlanErrors.SubscriptionPlanNotFound));
 	}
+
+	// AppVersion
+	public async Task ValidateAppVersionExists(Guid id, CancellationToken ct = default)
+	{
+		var exists = await _dbContext.AppVersionConfigs.AsNoTracking().AnyAsync(e => e.Id == id && !e.IsDeleted, ct);
+		if (!exists)
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.AppVersionErrors.AppVersionNotFound));
+	}
+
+	public async Task ValidateAppVersionPlatformUnique(int platform, Guid? excludeId = null, CancellationToken ct = default)
+	{
+		var query = _dbContext.AppVersionConfigs.AsNoTracking().Where(e => e.Platform == platform && !e.IsDeleted);
+		if (excludeId.HasValue) query = query.Where(e => e.Id != excludeId.Value);
+		if (await query.AnyAsync(ct))
+			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.AppVersionErrors.AppVersionPlatformAlreadyExists));
+	}
 }

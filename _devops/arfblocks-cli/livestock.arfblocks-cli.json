@@ -13,7 +13,7 @@
                 },
                 {
                     "key": "output",
-                    "value": "../web/common/livestock-api/src/api/business_modules/livestocktrading"
+                    "value": "../livestock-frontend/common/livestock-api/src/api/business_modules/livestocktrading"
                 },
                 {
                     "key": "endpointBaseRoute",
@@ -54,7 +54,7 @@
                 },
                 {
                     "key": "output",
-                    "value": "../mobil/common/livestock-api/src/api/business_modules/livestocktrading"
+                    "value": "../livestock-mobile/common/livestock-api/src/api/business_modules/livestocktrading"
                 },
                 {
                     "key": "endpointBaseRoute",

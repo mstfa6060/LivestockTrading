@@ -161,6 +161,19 @@ class Program
             throw;
         }
 
+        // Seed Data - App Version
+        try
+        {
+            var forceAppVersionReseed = args.Contains("--force-appversion-reseed");
+            var appVersionSeeder = new AppVersionSeeder(dbContext);
+            await appVersionSeeder.SeedAsync(forceAppVersionReseed);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"App version seed FAILED: {ex.Message}");
+            throw;
+        }
+
         Console.WriteLine("All operations completed successfully.");
     }
 }

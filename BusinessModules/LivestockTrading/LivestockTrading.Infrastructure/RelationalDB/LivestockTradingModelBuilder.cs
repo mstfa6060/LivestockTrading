@@ -386,6 +386,19 @@ public static class LivestockTradingModelBuilder
         modelBuilder.Ignore<Country>();
 
         // ========================================
+        // APP VERSION CONFIG
+        // ========================================
+        modelBuilder.Entity<AppVersionConfig>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.MinSupportedVersion).HasMaxLength(20).IsRequired();
+            entity.Property(e => e.LatestVersion).HasMaxLength(20).IsRequired();
+            entity.Property(e => e.StoreUrl).HasMaxLength(500);
+            entity.Property(e => e.UpdateMessage).HasMaxLength(500);
+            entity.HasIndex(e => e.Platform);
+        });
+
+        // ========================================
         // SHIPPING CARRIER
         // ========================================
         modelBuilder.Entity<ShippingCarrier>(entity =>
