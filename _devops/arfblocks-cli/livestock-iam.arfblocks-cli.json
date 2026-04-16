@@ -21,7 +21,7 @@
                 },
                 {
                     "key": "outputTypes",
-                    "value": "// Custom Types \ntype Guid = string; \ntype Double = number; \ntype Decimal = number; \ntype DecimalNullable = number | null; \ntype Int64 = number; \ntype Int32 = number; \ntype int = number; \ntype long = number;"
+                    "value": "// Custom Types \ntype Guid = string; \ntype Double = number; \ntype Decimal = number; \ntype DecimalNullable = number | null; \ntype Int64 = number; \ntype Int32 = number; \ntype int = number; \ntype long = number; \ntype __ERROR_TYPE_NOT_HANDLED__ = number;"
                 },
                 {
                     "key": "outputSettings",
@@ -54,7 +54,7 @@
                 },
                 {
                     "key": "outputTypes",
-                    "value": "// Custom Types \ntype Guid = string; \ntype Double = number; \ntype Decimal = number; \ntype DecimalNullable = number | null; \ntype Int64 = number; \ntype Int32 = number; \ntype int = number; \ntype long = number;"
+                    "value": "// Custom Types \ntype Guid = string; \ntype Double = number; \ntype Decimal = number; \ntype DecimalNullable = number | null; \ntype Int64 = number; \ntype Int32 = number; \ntype int = number; \ntype long = number; \ntype __ERROR_TYPE_NOT_HANDLED__ = number;"
                 },
                 {
                     "key": "outputSettings",
