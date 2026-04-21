@@ -1,3 +1,4 @@
+using Iam.Features.Consumers;
 using Iam.Features.Services;
 using Iam.Persistence;
 using Microsoft.Extensions.Configuration;
@@ -16,6 +17,9 @@ public static class IamModuleRegistration
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<INotificationPublisher, NatsNotificationPublisher>();
+
+        services.AddHostedService<SellerRoleConsumer>();
+        services.AddHostedService<TransporterRoleConsumer>();
 
         return services;
     }
