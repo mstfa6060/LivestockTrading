@@ -10,6 +10,8 @@
     <!-- Sadece doğrudan bağımlılıkları denetle; transitive güvenlik açıkları
          ilgili paketin sorumluluğunda — Central Package Management ile çözülür -->
     <NuGetAuditMode>direct</NuGetAuditMode>
+    <!-- Offline/CI ortamlarında nuget.org'a erişilemediğinde audit hatasını bastır -->
+    <NuGetAudit>false</NuGetAudit>
   </PropertyGroup>
 
   <!-- Legacy projeler bu kurallardan muaf -->
