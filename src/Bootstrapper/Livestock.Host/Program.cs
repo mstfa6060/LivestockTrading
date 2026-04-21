@@ -1,6 +1,7 @@
 using FastEndpoints;
 using FastEndpoints.Security;
 using FastEndpoints.Swagger;
+using Iam.Features;
 using Shared.Abstractions.Identity;
 using Shared.Infrastructure.Extensions;
 using Shared.Infrastructure.Identity;
@@ -42,6 +43,9 @@ builder.Services.SwaggerDocument(o =>
         s.Version = "v1";
     };
 });
+
+// ── Modules ───────────────────────────────────────────────────────────────────
+builder.Services.AddIamModule(builder.Configuration);
 
 // ── Health Checks ─────────────────────────────────────────────────────────────
 builder.Services.AddHealthChecks();
