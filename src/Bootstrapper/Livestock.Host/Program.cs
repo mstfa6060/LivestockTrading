@@ -3,6 +3,7 @@ using FastEndpoints.Security;
 using FastEndpoints.Swagger;
 using Files.Features;
 using Iam.Features;
+using Livestock.Features;
 using Shared.Abstractions.Identity;
 using Shared.Infrastructure.Extensions;
 using Shared.Infrastructure.Identity;
@@ -48,6 +49,7 @@ builder.Services.SwaggerDocument(o =>
 // ── Modules ───────────────────────────────────────────────────────────────────
 builder.Services.AddIamModule(builder.Configuration);
 builder.Services.AddFilesModule(builder.Configuration);
+builder.Services.AddLivestockModule(builder.Configuration);
 
 // ── Health Checks ─────────────────────────────────────────────────────────────
 builder.Services.AddHealthChecks();

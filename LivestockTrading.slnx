@@ -17,6 +17,7 @@
   <Folder Name="/src/Modules/Livestock/">
     <Project Path="src/Modules/Livestock/Livestock.Domain/Livestock.Domain.csproj" />
     <Project Path="src/Modules/Livestock/Livestock.Features/Livestock.Features.csproj" />
+    <Project Path="src/Modules/Livestock/Livestock.Persistence/Livestock.Persistence.csproj" />
   </Folder>
   <Folder Name="/src/Shared/">
     <Project Path="src/Shared/Shared.Abstractions/Shared.Abstractions.csproj" />
