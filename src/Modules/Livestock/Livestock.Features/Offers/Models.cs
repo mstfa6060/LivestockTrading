@@ -9,3 +9,5 @@ public record CounterOfferRequest(Guid Id, decimal CounterPrice, string? Counter
 public record AcceptOfferRequest(Guid Id);
 public record RejectOfferRequest(Guid Id);
 public record GetOfferRequest(Guid Id);
+public record WithdrawOfferRequest(Guid Id);
+public record GetAllOffersRequest(int Page = 1, int PageSize = 20);

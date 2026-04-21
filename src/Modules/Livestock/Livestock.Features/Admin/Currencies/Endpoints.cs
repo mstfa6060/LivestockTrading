@@ -140,3 +140,83 @@ public class DeleteCurrencyEndpoint(LivestockDbContext db) : Endpoint<DeleteCurr
         await SendNoContentAsync(ct);
     }
 }
+
+public class GetPublicCurrenciesEndpoint(LivestockDbContext db) : EndpointWithoutRequest<List<CurrencyPublicItem>>
+{
+    public override void Configure()
+    {
+        Get("/Currencies");
+        AllowAnonymous();
+        Tags("Currencies");
+    }
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        var currencies = await db.Currencies
+            .AsNoTracking()
+            .Where(c => c.IsActive)
+            .OrderBy(c => c.Code)
+            .Select(c => new CurrencyPublicItem(c.Id, c.Code, c.Name, c.Symbol, c.ExchangeRateToUsd))
+            .ToListAsync(ct);
+
+        await SendAsync(currencies, 200, ct);
+    }
+}
+
+public class ConvertCurrencyEndpoint(LivestockDbContext db) : Endpoint<CurrencyConvertRequest, CurrencyConvertResponse>
+{
+    public override void Configure()
+    {
+        Get("/Currencies/Convert");
+        AllowAnonymous();
+        Tags("Currencies");
+    }
+
+    public override async Task HandleAsync(CurrencyConvertRequest req, CancellationToken ct)
+    {
+        var fromCode = req.From.ToUpperInvariant();
+        var toCode = req.To.ToUpperInvariant();
+
+        var currencies = await db.Currencies
+            .AsNoTracking()
+            .Where(c => c.Code == fromCode || c.Code == toCode)
+            .ToListAsync(ct);
+
+        var from = currencies.FirstOrDefault(c => c.Code == fromCode);
+        var to = currencies.FirstOrDefault(c => c.Code == toCode);
+
+        if (from is null || to is null)
+        {
+            AddError(LivestockErrors.CurrencyErrors.CurrencyNotFound);
+            await SendErrorsAsync(404, ct);
+            return;
+        }
+
+        // Convert via USD as base
+        var amountInUsd = req.Amount / from.ExchangeRateToUsd;
+        var convertedAmount = amountInUsd * to.ExchangeRateToUsd;
+        var exchangeRate = to.ExchangeRateToUsd / from.ExchangeRateToUsd;
+
+        await SendAsync(new CurrencyConvertResponse(fromCode, toCode, req.Amount, Math.Round(convertedAmount, 6), Math.Round(exchangeRate, 6)), 200, ct);
+    }
+}
+
+public class UpdateCurrencyRatesEndpoint(LivestockDbContext db) : EndpointWithoutRequest<EmptyResponse>
+{
+    public override void Configure()
+    {
+        Post("/Admin/Currencies/UpdateRates");
+        Roles("LivestockTrading.Admin");
+        Tags("Admin", "Currencies");
+    }
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        // Mark all currencies as having rates updated — actual rate fetch is external
+        await db.Currencies
+            .Where(c => c.IsActive)
+            .ExecuteUpdateAsync(s => s.SetProperty(c => c.LastUpdatedAt, DateTime.UtcNow), ct);
+
+        await SendNoContentAsync(ct);
+    }
+}

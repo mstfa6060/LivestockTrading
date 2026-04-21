@@ -10,3 +10,4 @@ public enum MachineryType { Tractor = 0, Harvester = 1, Plow = 2, Seeder = 3, Sp
 public enum SeedType { VegetableSeeds = 0, FruitSeeds = 1, GrainSeeds = 2, HerbSeeds = 3, FlowerSeeds = 4, GrassSeed = 5, TreeSeedlings = 6, Transplants = 7, Bulbs = 8, Tubers = 9, CoverCropSeeds = 10, Other = 99 }
 public enum VeterinaryProductType { Antibiotic = 0, Antiparasitic = 1, Vaccine = 2, AntiInflammatory = 3, Analgesic = 4, Vitamin = 5, Hormone = 6, Anesthetic = 7, Antiseptic = 8, Bandage = 9, MedicalEquipment = 10, DiagnosticKit = 11, Disinfectant = 12, WoundCare = 13, Other = 99 }
 public enum AdministrationRoute { Oral = 0, Injection = 1, Topical = 2, Intravenous = 3, Intramuscular = 4, Subcutaneous = 5, Inhalation = 6, Ophthalmic = 7, Otic = 8, Rectal = 9, Other = 99 }
+public enum TaxType { VAT = 0, SalesTax = 1, GST = 2, ImportDuty = 3, CustomsDuty = 4, Other = 99 }

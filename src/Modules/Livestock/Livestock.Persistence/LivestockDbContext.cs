@@ -55,6 +55,18 @@ public class LivestockDbContext(DbContextOptions<LivestockDbContext> options) : 
     public DbSet<SearchHistory> SearchHistories => Set<SearchHistory>();
     public DbSet<UserPreference> UserPreferences => Set<UserPreference>();
 
+    public DbSet<ProductImage> ProductImages => Set<ProductImage>();
+    public DbSet<ProductPrice> ProductPrices => Set<ProductPrice>();
+
+    public DbSet<ShippingCarrier> ShippingCarriers => Set<ShippingCarrier>();
+    public DbSet<ShippingZone> ShippingZones => Set<ShippingZone>();
+    public DbSet<ShippingRate> ShippingRates => Set<ShippingRate>();
+
+    public DbSet<PaymentMethod> PaymentMethods => Set<PaymentMethod>();
+    public DbSet<Language> Languages => Set<Language>();
+    public DbSet<TaxRate> TaxRates => Set<TaxRate>();
+    public DbSet<ContactForm> ContactForms => Set<ContactForm>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

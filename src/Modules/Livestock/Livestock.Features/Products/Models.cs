@@ -105,3 +105,6 @@ public record ProductSearchRequest(
     ProductCondition? Condition,
     int Page = 1,
     int PageSize = 20);
+
+public record GetProductBySlugRequest(string Slug);
+public record GetMyProductsRequest(int Page = 1, int PageSize = 20);

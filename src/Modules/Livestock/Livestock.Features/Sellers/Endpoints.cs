@@ -152,6 +152,67 @@ public class UpdateSellerEndpoint(LivestockDbContext db, IUserContext user) : En
     }
 }
 
+public class GetSellerByUserIdEndpoint(LivestockDbContext db) : Endpoint<GetSellerByUserIdRequest, SellerDetail>
+{
+    public override void Configure()
+    {
+        Get("/Sellers/User/{UserId}");
+        AllowAnonymous();
+        Tags("Sellers");
+    }
+
+    public override async Task HandleAsync(GetSellerByUserIdRequest req, CancellationToken ct)
+    {
+        var s = await db.Sellers.AsNoTracking().FirstOrDefaultAsync(x => x.UserId == req.UserId, ct);
+        if (s is null)
+        {
+            AddError(LivestockErrors.SellerErrors.SellerNotFound);
+            await SendErrorsAsync(404, ct);
+            return;
+        }
+
+        await SendAsync(new SellerDetail(s.Id, s.UserId, s.BusinessName, s.Description, s.PhoneNumber, s.Email, s.WebsiteUrl, s.TaxNumber, s.LogoUrl, s.Status, s.AverageRating, s.ReviewCount, s.VerifiedAt, s.CreatedAt), 200, ct);
+    }
+}
+
+public class GetNearbySellersEndpoint(LivestockDbContext db) : Endpoint<GetNearbySellersRequest, List<SellerListItem>>
+{
+    public override void Configure()
+    {
+        Get("/Sellers/Nearby");
+        AllowAnonymous();
+        Tags("Sellers");
+    }
+
+    public override async Task HandleAsync(GetNearbySellersRequest req, CancellationToken ct)
+    {
+        // Approximate degree-based bounding box filter (1 degree ≈ 111km)
+        var degreeRadius = req.RadiusKm / 111.0;
+        var minLat = req.Latitude - degreeRadius;
+        var maxLat = req.Latitude + degreeRadius;
+        var minLng = req.Longitude - degreeRadius;
+        var maxLng = req.Longitude + degreeRadius;
+
+        var sellerIds = await db.Locations
+            .AsNoTracking()
+            .Where(l => l.Latitude.HasValue && l.Longitude.HasValue
+                && l.Latitude >= minLat && l.Latitude <= maxLat
+                && l.Longitude >= minLng && l.Longitude <= maxLng)
+            .Select(l => l.Id)
+            .ToListAsync(ct);
+
+        var sellers = await db.Sellers
+            .AsNoTracking()
+            .Where(s => s.Status == SellerStatus.Active)
+            .OrderByDescending(s => s.AverageRating)
+            .Take(req.Limit > 0 ? req.Limit : 20)
+            .Select(s => new SellerListItem(s.Id, s.UserId, s.BusinessName, s.Status, s.AverageRating, s.ReviewCount, s.CreatedAt))
+            .ToListAsync(ct);
+
+        await SendAsync(sellers, 200, ct);
+    }
+}
+
 public class VerifySellerEndpoint(LivestockDbContext db, IEventPublisher publisher) : Endpoint<VerifySellerRequest, EmptyResponse>
 {
     public override void Configure()

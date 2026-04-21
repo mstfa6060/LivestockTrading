@@ -331,6 +331,126 @@ public class ApproveProductEndpoint(LivestockDbContext db, IEventPublisher publi
     }
 }
 
+public class GetProductBySlugEndpoint(LivestockDbContext db) : Endpoint<GetProductBySlugRequest, ProductDetail>
+{
+    public override void Configure()
+    {
+        Get("/Products/Slug/{Slug}");
+        AllowAnonymous();
+        Tags("Products");
+    }
+
+    public override async Task HandleAsync(GetProductBySlugRequest req, CancellationToken ct)
+    {
+        var p = await db.Products
+            .AsNoTracking()
+            .Include(x => x.Seller)
+            .Include(x => x.Category)
+            .Include(x => x.Brand)
+            .Include(x => x.Farm)
+            .Include(x => x.Location)
+            .FirstOrDefaultAsync(x => x.Slug == req.Slug && !x.IsDeleted, ct);
+
+        if (p is null)
+        {
+            AddError(LivestockErrors.ProductErrors.ProductNotFound);
+            await SendErrorsAsync(404, ct);
+            return;
+        }
+
+        await SendAsync(new ProductDetail(
+            p.Id, p.Title, p.Slug, p.Description, p.Price, p.CurrencyCode, p.Quantity, p.Unit,
+            p.Status, p.Condition, p.IsNegotiable, p.IsFeatured,
+            p.SellerId, p.Seller.BusinessName,
+            p.CategoryId, p.Category.Name,
+            p.BrandId, p.Brand?.Name,
+            p.FarmId, p.Farm?.Name,
+            p.LocationId, p.Location?.CountryCode, p.Location?.City,
+            p.Location?.Latitude, p.Location?.Longitude,
+            p.AverageRating, p.ReviewCount, p.ViewCount, p.PublishedAt, p.CreatedAt), 200, ct);
+    }
+}
+
+public class GetMyProductsEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<GetMyProductsRequest, List<ProductListItem>>
+{
+    public override void Configure()
+    {
+        Get("/Products/My");
+        Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
+        Tags("Products");
+    }
+
+    public override async Task HandleAsync(GetMyProductsRequest req, CancellationToken ct)
+    {
+        var seller = await db.Sellers.AsNoTracking().FirstOrDefaultAsync(s => s.UserId == user.UserId, ct);
+        if (seller is null)
+        {
+            AddError(LivestockErrors.SellerErrors.SellerNotFound);
+            await SendErrorsAsync(404, ct);
+            return;
+        }
+
+        var pageSize = Math.Min(req.PageSize, 100);
+        var skip = (req.Page - 1) * pageSize;
+
+        var products = await db.Products
+            .AsNoTracking()
+            .Include(p => p.Seller)
+            .Include(p => p.Category)
+            .Include(p => p.Brand)
+            .Include(p => p.Location)
+            .Where(p => p.SellerId == seller.Id && !p.IsDeleted)
+            .OrderByDescending(p => p.CreatedAt)
+            .Skip(skip).Take(pageSize)
+            .Select(p => new ProductListItem(
+                p.Id, p.Title, p.Slug, p.Price, p.CurrencyCode, p.Quantity, p.Unit,
+                p.Status, p.Condition, p.IsNegotiable, p.IsFeatured,
+                p.SellerId, p.Seller.BusinessName,
+                p.CategoryId, p.Category.Name,
+                p.BrandId, p.Brand != null ? p.Brand.Name : null,
+                p.Location != null ? p.Location.CountryCode : null,
+                p.Location != null ? p.Location.City : null,
+                p.AverageRating, p.ReviewCount, p.ViewCount, p.CreatedAt))
+            .ToListAsync(ct);
+
+        await SendAsync(products, 200, ct);
+    }
+}
+
+public class PublishProductEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<PublishProductRequest, EmptyResponse>
+{
+    public override void Configure()
+    {
+        Post("/Products/{Id}/Publish");
+        Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
+        Tags("Products");
+    }
+
+    public override async Task HandleAsync(PublishProductRequest req, CancellationToken ct)
+    {
+        var product = await db.Products.FirstOrDefaultAsync(p => p.Id == req.Id, ct);
+        if (product is null)
+        {
+            AddError(LivestockErrors.ProductErrors.ProductNotFound);
+            await SendErrorsAsync(404, ct);
+            return;
+        }
+
+        var seller = await db.Sellers.AsNoTracking().FirstOrDefaultAsync(s => s.UserId == user.UserId, ct);
+        if (!user.IsInRole("LivestockTrading.Admin") && (seller is null || product.SellerId != seller.Id))
+        {
+            AddError(LivestockErrors.ProductErrors.ProductNotOwnedBySeller);
+            await SendErrorsAsync(403, ct);
+            return;
+        }
+
+        product.Status = ProductStatus.PendingApproval;
+        product.UpdatedAt = DateTime.UtcNow;
+        await db.SaveChangesAsync(ct);
+        await SendNoContentAsync(ct);
+    }
+}
+
 public class RejectProductEndpoint(LivestockDbContext db, IEventPublisher publisher) : Endpoint<RejectProductRequest, EmptyResponse>
 {
     public override void Configure()

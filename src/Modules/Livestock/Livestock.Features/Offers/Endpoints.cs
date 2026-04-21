@@ -177,6 +177,88 @@ public class AcceptOfferEndpoint(LivestockDbContext db, IUserContext user, IEven
     }
 }
 
+public class CounterOfferEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<CounterOfferRequest, OfferDetail>
+{
+    public override void Configure()
+    {
+        Post("/Offers/{Id}/Counter");
+        Tags("Offers");
+    }
+
+    public override async Task HandleAsync(CounterOfferRequest req, CancellationToken ct)
+    {
+        var offer = await db.Offers.Include(o => o.Product).FirstOrDefaultAsync(o => o.Id == req.Id, ct);
+        if (offer is null)
+        {
+            AddError(LivestockErrors.OfferErrors.OfferNotFound);
+            await SendErrorsAsync(404, ct);
+            return;
+        }
+
+        var seller = await db.Sellers.FirstOrDefaultAsync(s => s.UserId == user.UserId, ct);
+        if (seller is null || offer.SellerId != seller.Id)
+        {
+            AddError(LivestockErrors.Common.Unauthorized);
+            await SendErrorsAsync(403, ct);
+            return;
+        }
+
+        if (offer.Status != OfferStatus.Pending)
+        {
+            AddError(LivestockErrors.OfferErrors.OfferAlreadyProcessed);
+            await SendErrorsAsync(409, ct);
+            return;
+        }
+
+        offer.Status = OfferStatus.Countered;
+        offer.CounterPrice = req.CounterPrice;
+        offer.CounterNote = req.CounterNote;
+        offer.UpdatedAt = DateTime.UtcNow;
+        await db.SaveChangesAsync(ct);
+
+        await SendAsync(new OfferDetail(offer.Id, offer.ProductId, offer.Product.Title, offer.BuyerUserId, offer.SellerId, offer.OfferedPrice, offer.CurrencyCode, offer.Quantity, offer.Note, offer.Status, offer.CounterPrice, offer.CounterNote, offer.ExpiresAt, offer.CreatedAt), 200, ct);
+    }
+}
+
+public class WithdrawOfferEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<WithdrawOfferRequest, EmptyResponse>
+{
+    public override void Configure()
+    {
+        Delete("/Offers/{Id}");
+        Tags("Offers");
+    }
+
+    public override async Task HandleAsync(WithdrawOfferRequest req, CancellationToken ct)
+    {
+        var offer = await db.Offers.FirstOrDefaultAsync(o => o.Id == req.Id, ct);
+        if (offer is null)
+        {
+            AddError(LivestockErrors.OfferErrors.OfferNotFound);
+            await SendErrorsAsync(404, ct);
+            return;
+        }
+
+        if (offer.BuyerUserId != user.UserId)
+        {
+            AddError(LivestockErrors.Common.Unauthorized);
+            await SendErrorsAsync(403, ct);
+            return;
+        }
+
+        if (offer.Status != OfferStatus.Pending && offer.Status != OfferStatus.Countered)
+        {
+            AddError(LivestockErrors.OfferErrors.OfferAlreadyProcessed);
+            await SendErrorsAsync(409, ct);
+            return;
+        }
+
+        offer.Status = OfferStatus.Withdrawn;
+        offer.UpdatedAt = DateTime.UtcNow;
+        await db.SaveChangesAsync(ct);
+        await SendNoContentAsync(ct);
+    }
+}
+
 public class RejectOfferEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<RejectOfferRequest, EmptyResponse>
 {
     public override void Configure()

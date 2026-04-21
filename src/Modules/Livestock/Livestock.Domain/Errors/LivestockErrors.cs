@@ -225,4 +225,50 @@ public static class LivestockErrors
     {
         public const string ProductViewHistoryNotFound = "Product view history not found.";
     }
+
+    public static class ProductImageErrors
+    {
+        public const string ProductImageNotFound = "Product image not found.";
+        public const string ProductImageNotOwnedBySeller = "This image does not belong to you.";
+    }
+
+    public static class ProductPriceErrors
+    {
+        public const string ProductPriceNotFound = "Product price not found.";
+        public const string ProductPriceNotOwnedBySeller = "This price does not belong to you.";
+        public const string ProductPriceCurrencyRequired = "Currency code is required.";
+    }
+
+    public static class ShippingErrors
+    {
+        public const string ShippingCarrierNotFound = "Shipping carrier not found.";
+        public const string ShippingCarrierCodeAlreadyExists = "A carrier with this code already exists.";
+        public const string ShippingZoneNotFound = "Shipping zone not found.";
+        public const string ShippingRateNotFound = "Shipping rate not found.";
+    }
+
+    public static class PaymentMethodErrors
+    {
+        public const string PaymentMethodNotFound = "Payment method not found.";
+        public const string PaymentMethodCodeAlreadyExists = "A payment method with this code already exists.";
+    }
+
+    public static class LanguageErrors
+    {
+        public const string LanguageNotFound = "Language not found.";
+        public const string LanguageCodeAlreadyExists = "A language with this code already exists.";
+    }
+
+    public static class TaxRateErrors
+    {
+        public const string TaxRateNotFound = "Tax rate not found.";
+    }
+
+    public static class ContactFormErrors
+    {
+        public const string ContactFormNotFound = "Contact form submission not found.";
+        public const string ContactFormNameRequired = "Name is required.";
+        public const string ContactFormEmailRequired = "Email is required.";
+        public const string ContactFormMessageRequired = "Message is required.";
+    }
 }

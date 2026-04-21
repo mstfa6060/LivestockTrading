@@ -28,3 +28,5 @@ public record UpdateAppVersionRequest(
 
 public record GetAppVersionRequest(Guid Id);
 public record DeleteAppVersionRequest(Guid Id);
+public record CheckAppVersionRequest(int Platform);
+public record AppVersionCheckResult(string MinSupportedVersion, string LatestVersion, string StoreUrl, string? UpdateMessage, bool IsActive);

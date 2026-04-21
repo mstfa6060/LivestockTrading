@@ -140,3 +140,29 @@ public class DeleteAppVersionEndpoint(LivestockDbContext db) : Endpoint<DeleteAp
         await SendNoContentAsync(ct);
     }
 }
+
+public class CheckAppVersionEndpoint(LivestockDbContext db) : Endpoint<CheckAppVersionRequest, AppVersionCheckResult>
+{
+    public override void Configure()
+    {
+        Get("/AppVersions/Check");
+        AllowAnonymous();
+        Tags("AppVersions");
+    }
+
+    public override async Task HandleAsync(CheckAppVersionRequest req, CancellationToken ct)
+    {
+        var config = await db.AppVersionConfigs
+            .AsNoTracking()
+            .FirstOrDefaultAsync(v => v.Platform == req.Platform && v.IsActive, ct);
+
+        if (config is null)
+        {
+            AddError(LivestockErrors.AppVersionErrors.AppVersionNotFound);
+            await SendErrorsAsync(404, ct);
+            return;
+        }
+
+        await SendAsync(new AppVersionCheckResult(config.MinSupportedVersion, config.LatestVersion, config.StoreUrl, config.UpdateMessage, config.IsActive), 200, ct);
+    }
+}
