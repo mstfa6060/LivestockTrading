@@ -49,6 +49,7 @@ public class LivestockDbContext(DbContextOptions<LivestockDbContext> options) : 
     public DbSet<IAPTransaction> IAPTransactions => Set<IAPTransaction>();
 
     public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<AppVersionConfig> AppVersionConfigs => Set<AppVersionConfig>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

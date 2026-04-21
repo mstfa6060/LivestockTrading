@@ -123,4 +123,31 @@ public static class LivestockErrors
         public const string LocationNotFound = "Location not found.";
         public const string LocationCountryRequired = "Country code is required.";
     }
+
+    public static class AppVersionErrors
+    {
+        public const string AppVersionNotFound = "App version config not found.";
+        public const string AppVersionPlatformRequired = "Platform is required.";
+        public const string AppVersionAlreadyExists = "App version config for this platform already exists.";
+    }
+
+    public static class CurrencyErrors
+    {
+        public const string CurrencyNotFound = "Currency not found.";
+        public const string CurrencyCodeRequired = "Currency code is required.";
+        public const string CurrencyCodeAlreadyExists = "A currency with this code already exists.";
+    }
+
+    public static class ReportErrors
+    {
+        public const string ReportNotFound = "Report not found.";
+        public const string ReportAlreadyResolved = "This report is already resolved.";
+    }
+
+    public static class AdminErrors
+    {
+        public const string UserNotFound = "User not found.";
+        public const string UserAlreadyBanned = "User is already banned.";
+        public const string UserAlreadyActive = "User is already active.";
+    }
 }
