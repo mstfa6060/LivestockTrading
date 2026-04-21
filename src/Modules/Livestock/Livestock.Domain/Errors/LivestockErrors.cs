@@ -110,7 +110,7 @@ public static class LivestockErrors
         public const string SubscriptionNotFound = "Subscription not found.";
         public const string BoostPackageNotFound = "Boost package not found.";
         public const string AlreadyHasActiveSubscription = "You already have an active subscription.";
-        public const string ListingLimitReached = "You have reached the listing limit for your subscription plan.";
+        public const string ListingLimitReached = "You have reached your listing limit. Upgrade your subscription to create more listings.";
     }
 
     public static class NotificationErrors

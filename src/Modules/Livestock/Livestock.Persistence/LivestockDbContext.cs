@@ -17,6 +17,7 @@ public class LivestockDbContext(DbContextOptions<LivestockDbContext> options) : 
     public DbSet<Transporter> Transporters => Set<Transporter>();
 
     public DbSet<Product> Products => Set<Product>();
+    public DbSet<ProductPrice> ProductPrices => Set<ProductPrice>();
     public DbSet<ProductVariant> ProductVariants => Set<ProductVariant>();
     public DbSet<FavoriteProduct> FavoriteProducts => Set<FavoriteProduct>();
     public DbSet<ProductReport> ProductReports => Set<ProductReport>();

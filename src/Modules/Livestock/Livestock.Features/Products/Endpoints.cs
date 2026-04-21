@@ -170,23 +170,25 @@ public class CreateProductEndpoint(LivestockDbContext db, IUserContext user, IEv
             return;
         }
 
-        var activeSub = await db.SellerSubscriptions
+        // Enforce subscription listing limits
+        var subscription = await db.SellerSubscriptions
             .Include(s => s.Plan)
-            .Where(s => s.SubscriberId == seller.Id && s.Status == SubscriptionStatus.Active && s.ExpiresAt > DateTime.UtcNow)
+            .Where(s => s.SubscriberId == seller.Id &&
+                (s.Status == SubscriptionStatus.Active || s.Status == SubscriptionStatus.GracePeriod))
             .OrderByDescending(s => s.ExpiresAt)
             .FirstOrDefaultAsync(ct);
 
-        if (activeSub is not null && activeSub.Plan.MaxListings > 0)
-        {
-            var productCount = await db.Products
-                .CountAsync(p => p.SellerId == seller.Id && !p.IsDeleted, ct);
+        const int defaultFreeListings = 5;
+        var maxListings = subscription?.Plan?.MaxListings ?? defaultFreeListings;
 
-            if (productCount >= activeSub.Plan.MaxListings)
-            {
-                AddError(LivestockErrors.SubscriptionErrors.ListingLimitReached);
-                await SendErrorsAsync(403, ct);
-                return;
-            }
+        var activeListingCount = await db.Products.CountAsync(p =>
+            p.SellerId == seller.Id && !p.IsDeleted && p.Status != ProductStatus.Rejected, ct);
+
+        if (activeListingCount >= maxListings)
+        {
+            AddError(LivestockErrors.SubscriptionErrors.ListingLimitReached);
+            await SendErrorsAsync(403, ct);
+            return;
         }
 
         var slugExists = await db.Products.AnyAsync(p => p.Slug == req.Slug, ct);
@@ -217,6 +219,35 @@ public class CreateProductEndpoint(LivestockDbContext db, IUserContext user, IEv
 
         db.Products.Add(product);
         await db.SaveChangesAsync(ct);
+
+        // Create automatic price conversions for all active currencies
+        var sourceCurrency = await db.Currencies
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Code == product.CurrencyCode && c.IsActive, ct);
+
+        if (sourceCurrency != null && sourceCurrency.ExchangeRateToUsd > 0)
+        {
+            var targetCurrencies = await db.Currencies
+                .AsNoTracking()
+                .Where(c => c.IsActive && c.Code != product.CurrencyCode && c.ExchangeRateToUsd > 0)
+                .ToListAsync(ct);
+
+            if (targetCurrencies.Count > 0)
+            {
+                var priceInUsd = product.Price / sourceCurrency.ExchangeRateToUsd;
+                var conversions = targetCurrencies.Select(tc => new ProductPrice
+                {
+                    ProductId = product.Id,
+                    CurrencyCode = tc.Code,
+                    Price = Math.Round(priceInUsd * tc.ExchangeRateToUsd, 2),
+                    IsActive = true,
+                    IsAutomaticConversion = true
+                }).ToList();
+
+                db.ProductPrices.AddRange(conversions);
+                await db.SaveChangesAsync(ct);
+            }
+        }
 
         await publisher.PublishAsync(ProductCreatedEvent.Subject, new ProductCreatedEvent
         {
