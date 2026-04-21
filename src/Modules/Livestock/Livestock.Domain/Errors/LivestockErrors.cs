@@ -150,4 +150,79 @@ public static class LivestockErrors
         public const string UserAlreadyBanned = "User is already banned.";
         public const string UserAlreadyActive = "User is already active.";
     }
+
+    public static class AnimalInfoErrors
+    {
+        public const string AnimalInfoNotFound = "Animal info not found.";
+        public const string AnimalInfoNotOwnedBySeller = "This animal info does not belong to you.";
+        public const string AnimalInfoAlreadyExists = "Animal info for this product already exists.";
+    }
+
+    public static class HealthRecordErrors
+    {
+        public const string HealthRecordNotFound = "Health record not found.";
+        public const string HealthRecordNotOwnedBySeller = "This health record does not belong to you.";
+    }
+
+    public static class VaccinationErrors
+    {
+        public const string VaccinationNotFound = "Vaccination record not found.";
+        public const string VaccinationNotOwnedBySeller = "This vaccination record does not belong to you.";
+    }
+
+    public static class FeedInfoErrors
+    {
+        public const string FeedInfoNotFound = "Feed info not found.";
+        public const string FeedInfoNotOwnedBySeller = "This feed info does not belong to you.";
+        public const string FeedInfoAlreadyExists = "Feed info for this product already exists.";
+    }
+
+    public static class ChemicalInfoErrors
+    {
+        public const string ChemicalInfoNotFound = "Chemical info not found.";
+        public const string ChemicalInfoNotOwnedBySeller = "This chemical info does not belong to you.";
+        public const string ChemicalInfoAlreadyExists = "Chemical info for this product already exists.";
+    }
+
+    public static class MachineryInfoErrors
+    {
+        public const string MachineryInfoNotFound = "Machinery info not found.";
+        public const string MachineryInfoNotOwnedBySeller = "This machinery info does not belong to you.";
+        public const string MachineryInfoAlreadyExists = "Machinery info for this product already exists.";
+    }
+
+    public static class SeedInfoErrors
+    {
+        public const string SeedInfoNotFound = "Seed info not found.";
+        public const string SeedInfoNotOwnedBySeller = "This seed info does not belong to you.";
+        public const string SeedInfoAlreadyExists = "Seed info for this product already exists.";
+    }
+
+    public static class VeterinaryInfoErrors
+    {
+        public const string VeterinaryInfoNotFound = "Veterinary info not found.";
+        public const string VeterinaryInfoNotOwnedBySeller = "This veterinary info does not belong to you.";
+        public const string VeterinaryInfoAlreadyExists = "Veterinary info for this product already exists.";
+    }
+
+    public static class ProductVariantErrors
+    {
+        public const string ProductVariantNotFound = "Product variant not found.";
+        public const string ProductVariantNotOwnedBySeller = "This variant does not belong to you.";
+    }
+
+    public static class UserPreferenceErrors
+    {
+        public const string UserPreferenceNotFound = "User preferences not found.";
+    }
+
+    public static class SearchHistoryErrors
+    {
+        public const string SearchHistoryNotFound = "Search history not found.";
+    }
+
+    public static class ProductViewHistoryErrors
+    {
+        public const string ProductViewHistoryNotFound = "Product view history not found.";
+    }
 }

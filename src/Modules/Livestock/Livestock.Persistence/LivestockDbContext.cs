@@ -51,6 +51,10 @@ public class LivestockDbContext(DbContextOptions<LivestockDbContext> options) : 
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<AppVersionConfig> AppVersionConfigs => Set<AppVersionConfig>();
 
+    public DbSet<ProductViewHistory> ProductViewHistories => Set<ProductViewHistory>();
+    public DbSet<SearchHistory> SearchHistories => Set<SearchHistory>();
+    public DbSet<UserPreference> UserPreferences => Set<UserPreference>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
