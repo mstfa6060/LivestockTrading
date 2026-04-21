@@ -145,16 +145,48 @@ public class CreateProductEndpoint(LivestockDbContext db, IUserContext user, IEv
         var seller = await db.Sellers.FirstOrDefaultAsync(s => s.UserId == user.UserId, ct);
         if (seller is null)
         {
-            AddError(LivestockErrors.SellerErrors.SellerNotFound);
-            await SendErrorsAsync(403, ct);
-            return;
+            seller = new Seller
+            {
+                UserId = user.UserId,
+                BusinessName = user.Email,
+                Email = user.Email,
+                Status = SellerStatus.Active
+            };
+            db.Sellers.Add(seller);
+            await db.SaveChangesAsync(ct);
+
+            await publisher.PublishAsync(SellerRegisteredEvent.Subject, new SellerRegisteredEvent
+            {
+                SellerId = seller.Id,
+                UserId = seller.UserId,
+                BusinessName = seller.BusinessName
+            }, ct);
         }
 
-        if (seller.Status != Domain.Enums.SellerStatus.Active)
+        if (seller.Status != SellerStatus.Active)
         {
             AddError(LivestockErrors.SellerErrors.SellerNotVerified);
             await SendErrorsAsync(403, ct);
             return;
+        }
+
+        var activeSub = await db.SellerSubscriptions
+            .Include(s => s.Plan)
+            .Where(s => s.SubscriberId == seller.Id && s.Status == SubscriptionStatus.Active && s.ExpiresAt > DateTime.UtcNow)
+            .OrderByDescending(s => s.ExpiresAt)
+            .FirstOrDefaultAsync(ct);
+
+        if (activeSub is not null && activeSub.Plan.MaxListings > 0)
+        {
+            var productCount = await db.Products
+                .CountAsync(p => p.SellerId == seller.Id && !p.IsDeleted, ct);
+
+            if (productCount >= activeSub.Plan.MaxListings)
+            {
+                AddError(LivestockErrors.SubscriptionErrors.ListingLimitReached);
+                await SendErrorsAsync(403, ct);
+                return;
+            }
         }
 
         var slugExists = await db.Products.AnyAsync(p => p.Slug == req.Slug, ct);
@@ -315,8 +347,13 @@ public class ApproveProductEndpoint(LivestockDbContext db, IEventPublisher publi
             return;
         }
 
+        var sellerLocation = await db.Locations
+            .AsNoTracking()
+            .FirstOrDefaultAsync(l => l.OwnerId == product.SellerId && l.OwnerType == "Seller", ct);
+
         product.Status = ProductStatus.Active;
         product.PublishedAt ??= DateTime.UtcNow;
+        product.ExpiresAt = ComputeExpiry(sellerLocation?.CountryCode);
         product.RejectionReason = null;
         product.UpdatedAt = DateTime.UtcNow;
         await db.SaveChangesAsync(ct);
@@ -329,6 +366,42 @@ public class ApproveProductEndpoint(LivestockDbContext db, IEventPublisher publi
 
         await SendNoContentAsync(ct);
     }
+
+    private static DateTime ComputeExpiry(string? countryCode)
+    {
+        var tzId = GetTimezoneForCountry(countryCode);
+        try
+        {
+            var tz = TimeZoneInfo.FindSystemTimeZoneById(tzId);
+            var nowInTz = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, tz);
+            var expiryDateInTz = nowInTz.Date.AddDays(30);
+            var expiryInTz = new DateTime(expiryDateInTz.Year, expiryDateInTz.Month, expiryDateInTz.Day, 23, 59, 59, DateTimeKind.Unspecified);
+            return TimeZoneInfo.ConvertTimeToUtc(expiryInTz, tz);
+        }
+        catch
+        {
+            return DateTime.UtcNow.Date.AddDays(30).AddHours(23).AddMinutes(59).AddSeconds(59);
+        }
+    }
+
+    private static string GetTimezoneForCountry(string? countryCode) => countryCode switch
+    {
+        "TR" => "Europe/Istanbul",
+        "DE" => "Europe/Berlin",
+        "FR" => "Europe/Paris",
+        "GB" => "Europe/London",
+        "RU" => "Europe/Moscow",
+        "US" => "America/New_York",
+        "CN" => "Asia/Shanghai",
+        "JP" => "Asia/Tokyo",
+        "AU" => "Australia/Sydney",
+        "AE" => "Asia/Dubai",
+        "SA" => "Asia/Riyadh",
+        "KZ" => "Asia/Almaty",
+        "PL" => "Europe/Warsaw",
+        "UA" => "Europe/Kyiv",
+        _ => "UTC"
+    };
 }
 
 public class RejectProductEndpoint(LivestockDbContext db, IEventPublisher publisher) : Endpoint<RejectProductRequest, EmptyResponse>
