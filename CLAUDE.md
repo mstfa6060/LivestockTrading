@@ -2,6 +2,126 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+> **MİMARİ GEÇİŞ DURUMU (PR#1 tamamlandı):** Proje Vertical Slice + Modüler Monolit mimarisine geçiş yapıyor.
+> - **YENİ KOD:** `src/` altında, `LivestockTrading.slnx` ile yönetilir
+> - **ESKİ KOD (referans):** `legacy/` altında, ArfBlocks framework'ü ile çalışır — build'e girmez
+> - Aktif geliştirme `src/` altında yapılır
+
+## Yeni Mimari (PR#1 İskeleti)
+
+### Solution & Build
+
+```bash
+# Yeni solution
+dotnet build LivestockTrading.slnx
+dotnet test LivestockTrading.slnx
+
+# Sadece host'u çalıştır
+dotnet run --project src/Bootstrapper/Livestock.Host
+
+# Dev stack (Postgres, Redis, NATS, Jaeger, Seq, MinIO)
+cd deploy/docker/compose
+docker compose -f docker-compose.dev.yml up -d
+```
+
+### Yeni Proje Yapısı
+
+```
+src/
+  Shared/
+    Shared.Abstractions/   ← IEndpoint, Result<T>, Error, IUserContext (sadece .NET runtime bağımlılığı)
+    Shared.Contracts/      ← IIntegrationEvent (cross-module NATS event'leri)
+    Shared.Infrastructure/ ← FastEndpoints, EF Core, FusionCache, NATS, Serilog, OTel extension'ları
+  Modules/
+    Iam/
+      Iam.Domain/          ← Entity'ler, domain event'ler (sadece Shared.Abstractions referans alır)
+      Iam.Features/        ← Vertical slice endpoint'leri (FastEndpoints Endpoint<Req,Res>)
+      Iam.Persistence/     ← IamDbContext + migrations (Npgsql)
+    Files/
+      Files.Domain/
+      Files.Features/      ← Minio SDK
+    Livestock/
+      Livestock.Domain/
+      Livestock.Features/
+  Bootstrapper/
+    Livestock.Host/        ← TEK Program.cs: tüm modülleri mount eder, /health endpoint'i
+tests/
+  Architecture.Tests/      ← NetArchTest ile bağımlılık kuralları (5 test, tümü geçiyor)
+deploy/docker/compose/
+  docker-compose.dev.yml   ← Postgres 17, Redis 8, NATS 2.11, Jaeger, Seq, MinIO
+```
+
+### Teknoloji Stack
+
+| Alan | Kütüphane |
+|------|-----------|
+| Endpoint framework | FastEndpoints 5.x |
+| Validation | FluentValidation (FastEndpoints entegre) |
+| ORM | EF Core 10 + Npgsql (PostgreSQL) |
+| Cache | FusionCache (L1 memory + L2 Redis backplane) |
+| Messaging | NATS JetStream (NATS.Net 2.x) |
+| Logging | Serilog → Seq + OTLP |
+| Observability | OpenTelemetry (traces + metrics) → Jaeger |
+| File Storage | MinIO (Minio SDK) |
+| Tests | xUnit + NetArchTest.Rules |
+
+### Endpoint Geliştirme Paterni (Vertical Slice, 4 dosya)
+
+```
+Iam.Features/Auth/Login/
+  LoginEndpoint.cs   ← FastEndpoints Endpoint<LoginRequest, LoginResponse>
+  LoginRequest.cs    ← Request + Response modelleri + inline ToEntity() mapping
+  LoginValidator.cs  ← FluentValidation AbstractValidator<LoginRequest>
+  LoginHandler.cs    ← is mantığı (gerekiyorsa; küçük endpoint'lerde Endpoint içinde kalır)
+```
+
+**Bağımlılık Kuralları (NetArchTest ile korunuyor):**
+- `*.Domain` projeleri → sadece `Shared.Abstractions`'a bağımlı olabilir
+- `*.Domain` projeleri → birbirini referans alamaz (Iam.Domain, Files.Domain, Livestock.Domain arası referans yasak)
+- `Shared.Abstractions` → sadece .NET runtime (FastEndpoints, EF Core, NATS referans alamaz)
+- Modüller arası iletişim → sadece `Shared.Contracts` üzerinden `IIntegrationEvent` ile
+
+### Shared Extension Metodları
+
+```csharp
+// Program.cs'de kullanılır
+builder.AddSharedSerilog("livestock-host");                           // Serilog
+builder.Services.AddSharedOpenTelemetry(builder.Configuration, ".."); // OTel
+builder.Services.AddSharedCache(builder.Configuration);               // FusionCache
+builder.Services.AddSharedNats(builder.Configuration);                // NATS
+```
+
+### Configuration (appsettings.json)
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=...;Database=livestock;Username=...;Password=...",
+    "Redis": "localhost:6379",
+    "Nats": "nats://localhost:4222"
+  },
+  "Jwt": { "SigningKey": "..." },
+  "Seq": { "ServerUrl": "http://localhost:5341" },
+  "OpenTelemetry": { "OtlpEndpoint": "http://localhost:4317" }
+}
+```
+
+### Sonraki PR'lar
+
+- **PR#2** — Iam modülü: Auth (Login/Register/Refresh/Logout) + Users CRUD + Roles + testler
+- **PR#3** — Files modülü: Upload/Download/Delete + MinIO integration
+- **PR#4** — Livestock Core: Category/Brand/Product + FavoriteProducts
+- **PR#5** — Livestock Messaging: Conversations/Messages + SignalR Hub + NATS event'ler
+- **PR#6** — Workers: Notification/Email/Sms consumer'ları
+- **PR#7** — Admin/Moderation: Approve/Reject/Verify/Suspend
+
+---
+
+## Eski Mimari (Legacy — `legacy/` klasöründe)
+
+> Aşağıdaki bölüm `legacy/` altındaki ArfBlocks mimarisini belgeler.
+> Yeni geliştirme için **yukarıdaki** "Yeni Mimari" bölümünü kullan.
+
 ## Current Priority: TASKS.md (Birlesik Gorev Listesi)
 
 When starting a new chat without a specific task, refer to `../TASKS.md` in the parent directory (`d:\Projects\GlobalLivestock\TASKS.md`). This is the **unified task list** across all three projects (web, mobil, backend). Work through the unchecked items in priority order.

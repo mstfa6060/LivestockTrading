@@ -1,0 +1,28 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Bootstrapper/">
+    <Project Path="src/Bootstrapper/Livestock.Host/Livestock.Host.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Files/">
+    <Project Path="src/Modules/Files/Files.Domain/Files.Domain.csproj" />
+    <Project Path="src/Modules/Files/Files.Features/Files.Features.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Iam/">
+    <Project Path="src/Modules/Iam/Iam.Domain/Iam.Domain.csproj" />
+    <Project Path="src/Modules/Iam/Iam.Features/Iam.Features.csproj" />
+    <Project Path="src/Modules/Iam/Iam.Persistence/Iam.Persistence.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Livestock/">
+    <Project Path="src/Modules/Livestock/Livestock.Domain/Livestock.Domain.csproj" />
+    <Project Path="src/Modules/Livestock/Livestock.Features/Livestock.Features.csproj" />
+  </Folder>
+  <Folder Name="/src/Shared/">
+    <Project Path="src/Shared/Shared.Abstractions/Shared.Abstractions.csproj" />
+    <Project Path="src/Shared/Shared.Contracts/Shared.Contracts.csproj" />
+    <Project Path="src/Shared/Shared.Infrastructure/Shared.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Architecture.Tests/Architecture.Tests.csproj" />
+  </Folder>
+</Solution>
