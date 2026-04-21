@@ -1,6 +1,7 @@
 using FastEndpoints;
 using FastEndpoints.Security;
 using FastEndpoints.Swagger;
+using Files.Features;
 using Iam.Features;
 using Shared.Abstractions.Identity;
 using Shared.Infrastructure.Extensions;
@@ -46,6 +47,7 @@ builder.Services.SwaggerDocument(o =>
 
 // ── Modules ───────────────────────────────────────────────────────────────────
 builder.Services.AddIamModule(builder.Configuration);
+builder.Services.AddFilesModule(builder.Configuration);
 
 // ── Health Checks ─────────────────────────────────────────────────────────────
 builder.Services.AddHealthChecks();

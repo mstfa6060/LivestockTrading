@@ -7,6 +7,7 @@
   <Folder Name="/src/Modules/Files/">
     <Project Path="src/Modules/Files/Files.Domain/Files.Domain.csproj" />
     <Project Path="src/Modules/Files/Files.Features/Files.Features.csproj" />
+    <Project Path="src/Modules/Files/Files.Persistence/Files.Persistence.csproj" />
   </Folder>
   <Folder Name="/src/Modules/Iam/">
     <Project Path="src/Modules/Iam/Iam.Domain/Iam.Domain.csproj" />

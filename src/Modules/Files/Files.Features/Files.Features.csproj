@@ -4,6 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Files.Domain\Files.Domain.csproj" />
+    <ProjectReference Include="..\Files.Persistence\Files.Persistence.csproj" />
     <ProjectReference Include="..\..\..\Shared\Shared.Infrastructure\Shared.Infrastructure.csproj" />
     <PackageReference Include="Minio" />
   </ItemGroup>
