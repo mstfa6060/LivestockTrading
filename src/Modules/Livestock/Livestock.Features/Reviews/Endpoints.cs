@@ -169,3 +169,49 @@ public class GetTransporterReviewsEndpoint(LivestockDbContext db) : Endpoint<Get
         await SendAsync(reviews, 200, ct);
     }
 }
+
+public class CreateTransporterReviewEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<CreateTransporterReviewRequest, TransporterReviewItem>
+{
+    public override void Configure()
+    {
+        Post("/Transporters/{TransporterId}/Reviews");
+        Tags("Reviews");
+    }
+
+    public override async Task HandleAsync(CreateTransporterReviewRequest req, CancellationToken ct)
+    {
+        var transporter = await db.Transporters.FirstOrDefaultAsync(t => t.Id == req.TransporterId, ct);
+        if (transporter is null)
+        {
+            AddError(LivestockErrors.TransportErrors.TransporterNotFound);
+            await SendErrorsAsync(404, ct);
+            return;
+        }
+
+        var existing = await db.TransporterReviews.AnyAsync(r => r.TransporterId == req.TransporterId && r.ReviewerUserId == user.UserId, ct);
+        if (existing)
+        {
+            AddError(LivestockErrors.ReviewErrors.ReviewAlreadySubmitted);
+            await SendErrorsAsync(409, ct);
+            return;
+        }
+
+        var review = new TransporterReview
+        {
+            TransporterId = req.TransporterId,
+            ReviewerUserId = user.UserId,
+            Rating = req.Rating,
+            Comment = req.Comment,
+            TransportRequestId = req.TransportRequestId
+        };
+        db.TransporterReviews.Add(review);
+
+        var count = await db.TransporterReviews.CountAsync(r => r.TransporterId == req.TransporterId, ct);
+        transporter.AverageRating = ((transporter.AverageRating * count) + req.Rating) / (count + 1);
+        transporter.ReviewCount = count + 1;
+
+        await db.SaveChangesAsync(ct);
+
+        await SendAsync(new TransporterReviewItem(review.Id, review.TransporterId, review.ReviewerUserId, review.Rating, review.Comment, review.CreatedAt), 201, ct);
+    }
+}

@@ -296,6 +296,88 @@ public class DeleteProductEndpoint(LivestockDbContext db, IUserContext user) : E
     }
 }
 
+public class GetMyProductsEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<MyProductsRequest, List<ProductListItem>>
+{
+    public override void Configure()
+    {
+        Get("/Products/My");
+        Tags("Products");
+    }
+
+    public override async Task HandleAsync(MyProductsRequest req, CancellationToken ct)
+    {
+        var seller = await db.Sellers.AsNoTracking().FirstOrDefaultAsync(s => s.UserId == user.UserId, ct);
+        if (seller is null)
+        {
+            AddError(LivestockErrors.SellerErrors.SellerNotFound);
+            await SendErrorsAsync(404, ct);
+            return;
+        }
+
+        var query = db.Products
+            .AsNoTracking()
+            .Include(p => p.Seller)
+            .Include(p => p.Category)
+            .Include(p => p.Brand)
+            .Include(p => p.Location)
+            .Where(p => p.SellerId == seller.Id && !p.IsDeleted);
+
+        if (req.Status.HasValue)
+        {
+            query = query.Where(p => p.Status == req.Status.Value);
+        }
+
+        var pageSize = Math.Min(req.PageSize, 100);
+        var products = await query
+            .OrderByDescending(p => p.CreatedAt)
+            .Skip((req.Page - 1) * pageSize).Take(pageSize)
+            .Select(p => new ProductListItem(
+                p.Id, p.Title, p.Slug, p.Price, p.CurrencyCode, p.Quantity, p.Unit,
+                p.Status, p.Condition, p.IsNegotiable, p.IsFeatured,
+                p.SellerId, p.Seller.BusinessName,
+                p.CategoryId, p.Category.Name,
+                p.BrandId, p.Brand != null ? p.Brand.Name : null,
+                p.Location != null ? p.Location.CountryCode : null,
+                p.Location != null ? p.Location.City : null,
+                p.AverageRating, p.ReviewCount, p.ViewCount, p.CreatedAt))
+            .ToListAsync(ct);
+
+        await SendAsync(products, 200, ct);
+    }
+}
+
+public class CreateProductReportEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<CreateProductReportRequest, EmptyResponse>
+{
+    public override void Configure()
+    {
+        Post("/Products/{ProductId}/Report");
+        Tags("Products");
+    }
+
+    public override async Task HandleAsync(CreateProductReportRequest req, CancellationToken ct)
+    {
+        var product = await db.Products.FirstOrDefaultAsync(p => p.Id == req.ProductId, ct);
+        if (product is null)
+        {
+            AddError(LivestockErrors.ProductErrors.ProductNotFound);
+            await SendErrorsAsync(404, ct);
+            return;
+        }
+
+        var report = new ProductReport
+        {
+            ProductId = req.ProductId,
+            ReporterUserId = user.UserId,
+            Reason = req.Reason,
+            Details = req.Details
+        };
+        db.ProductReports.Add(report);
+        await db.SaveChangesAsync(ct);
+
+        await SendNoContentAsync(ct);
+    }
+}
+
 public class ApproveProductEndpoint(LivestockDbContext db, IEventPublisher publisher) : Endpoint<ApproveProductRequest, EmptyResponse>
 {
     public override void Configure()

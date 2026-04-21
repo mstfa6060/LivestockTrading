@@ -94,6 +94,9 @@ public record ApproveProductRequest(Guid Id);
 public record RejectProductRequest(Guid Id, string Reason);
 public record PublishProductRequest(Guid Id);
 
+public record MyProductsRequest(ProductStatus? Status = null, int Page = 1, int PageSize = 20);
+public record CreateProductReportRequest(Guid ProductId, string Reason, string? Details);
+
 public record ProductSearchRequest(
     string? Keyword,
     Guid? CategoryId,
