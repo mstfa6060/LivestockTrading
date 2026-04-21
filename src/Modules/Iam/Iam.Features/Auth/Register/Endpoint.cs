@@ -4,12 +4,15 @@ using Iam.Domain.Errors;
 using Iam.Features.Services;
 using Iam.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Shared.Contracts.Events.Iam;
+using Shared.Infrastructure.Messaging;
 
 namespace Iam.Features.Auth.Register;
 
 public sealed class RegisterEndpoint(
     IamDbContext db,
-    IPasswordService passwordService) : Endpoint<RegisterRequest, RegisterResponse>
+    IPasswordService passwordService,
+    IEventPublisher publisher) : Endpoint<RegisterRequest, RegisterResponse>
 {
     public override void Configure()
     {
@@ -65,6 +68,15 @@ public sealed class RegisterEndpoint(
         });
 
         await db.SaveChangesAsync(ct);
+
+        await publisher.PublishAsync(UserRegisteredEvent.Subject, new UserRegisteredEvent
+        {
+            UserId = user.Id,
+            Email = user.Email,
+            UserName = user.UserName,
+            FirstName = user.FirstName,
+            Surname = user.Surname
+        }, ct);
 
         await SendAsync(new RegisterResponse(user.Id, user.Email, user.UserName), 201, ct);
     }

@@ -5,6 +5,8 @@ using Livestock.Domain.Errors;
 using Livestock.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Shared.Abstractions.Identity;
+using Shared.Contracts.Events.Livestock;
+using Shared.Infrastructure.Messaging;
 
 namespace Livestock.Features.Conversations;
 
@@ -61,7 +63,7 @@ public class GetConversationEndpoint(LivestockDbContext db, IUserContext user) :
     }
 }
 
-public class CreateConversationEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<CreateConversationRequest, ConversationDetail>
+public class CreateConversationEndpoint(LivestockDbContext db, IUserContext user, IEventPublisher publisher) : Endpoint<CreateConversationRequest, ConversationDetail>
 {
     public override void Configure()
     {
@@ -77,6 +79,7 @@ public class CreateConversationEndpoint(LivestockDbContext db, IUserContext user
              (c.InitiatorUserId == req.RecipientUserId && c.RecipientUserId == user.UserId)), ct);
 
         Conversation conversation;
+        var isNew = false;
         if (existing is not null)
         {
             conversation = existing;
@@ -93,6 +96,7 @@ public class CreateConversationEndpoint(LivestockDbContext db, IUserContext user
             };
             db.Conversations.Add(conversation);
             await db.SaveChangesAsync(ct);
+            isNew = true;
         }
 
         var message = new Message
@@ -106,6 +110,26 @@ public class CreateConversationEndpoint(LivestockDbContext db, IUserContext user
         conversation.LastMessageAt = DateTime.UtcNow;
         conversation.UnreadCountRecipient++;
         await db.SaveChangesAsync(ct);
+
+        if (isNew)
+        {
+            await publisher.PublishAsync(ConversationCreatedEvent.Subject, new ConversationCreatedEvent
+            {
+                ConversationId = conversation.Id,
+                InitiatorUserId = conversation.InitiatorUserId,
+                RecipientUserId = conversation.RecipientUserId,
+                ProductId = conversation.ProductId
+            }, ct);
+        }
+
+        await publisher.PublishAsync(MessageSentEvent.Subject, new MessageSentEvent
+        {
+            MessageId = message.Id,
+            ConversationId = conversation.Id,
+            SenderUserId = message.SenderUserId,
+            RecipientUserId = message.RecipientUserId,
+            Content = message.Content
+        }, ct);
 
         await SendAsync(new ConversationDetail(conversation.Id, conversation.InitiatorUserId, conversation.RecipientUserId, conversation.ProductId, conversation.Status, conversation.LastMessageAt, conversation.CreatedAt), 201, ct);
     }
@@ -144,7 +168,7 @@ public class GetConversationMessagesEndpoint(LivestockDbContext db, IUserContext
     }
 }
 
-public class SendMessageEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<SendMessageRequest, MessageItem>
+public class SendMessageEndpoint(LivestockDbContext db, IUserContext user, IEventPublisher publisher) : Endpoint<SendMessageRequest, MessageItem>
 {
     public override void Configure()
     {
@@ -187,6 +211,16 @@ public class SendMessageEndpoint(LivestockDbContext db, IUserContext user) : End
         }
 
         await db.SaveChangesAsync(ct);
+
+        await publisher.PublishAsync(MessageSentEvent.Subject, new MessageSentEvent
+        {
+            MessageId = message.Id,
+            ConversationId = message.ConversationId,
+            SenderUserId = message.SenderUserId,
+            RecipientUserId = message.RecipientUserId,
+            Content = message.Content,
+            AttachmentUrl = message.AttachmentUrl
+        }, ct);
 
         await SendAsync(new MessageItem(message.Id, message.ConversationId, message.SenderUserId, message.RecipientUserId, message.Content, false, null, message.AttachmentUrl, message.CreatedAt), 201, ct);
     }

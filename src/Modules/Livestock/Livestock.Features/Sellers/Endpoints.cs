@@ -5,6 +5,8 @@ using Livestock.Domain.Errors;
 using Livestock.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Shared.Abstractions.Identity;
+using Shared.Contracts.Events.Livestock;
+using Shared.Infrastructure.Messaging;
 
 namespace Livestock.Features.Sellers;
 
@@ -75,7 +77,7 @@ public class GetMySellerEndpoint(LivestockDbContext db, IUserContext user) : End
     }
 }
 
-public class BecomeSellerEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<BecomeSellerRequest, SellerDetail>
+public class BecomeSellerEndpoint(LivestockDbContext db, IUserContext user, IEventPublisher publisher) : Endpoint<BecomeSellerRequest, SellerDetail>
 {
     public override void Configure()
     {
@@ -107,6 +109,13 @@ public class BecomeSellerEndpoint(LivestockDbContext db, IUserContext user) : En
 
         db.Sellers.Add(seller);
         await db.SaveChangesAsync(ct);
+
+        await publisher.PublishAsync(SellerRegisteredEvent.Subject, new SellerRegisteredEvent
+        {
+            SellerId = seller.Id,
+            UserId = seller.UserId,
+            BusinessName = seller.BusinessName
+        }, ct);
 
         await SendAsync(new SellerDetail(seller.Id, seller.UserId, seller.BusinessName, seller.Description, seller.PhoneNumber, seller.Email, seller.WebsiteUrl, seller.TaxNumber, seller.LogoUrl, seller.Status, 0, 0, null, seller.CreatedAt), 201, ct);
     }
@@ -143,7 +152,7 @@ public class UpdateSellerEndpoint(LivestockDbContext db, IUserContext user) : En
     }
 }
 
-public class VerifySellerEndpoint(LivestockDbContext db) : Endpoint<VerifySellerRequest, EmptyResponse>
+public class VerifySellerEndpoint(LivestockDbContext db, IEventPublisher publisher) : Endpoint<VerifySellerRequest, EmptyResponse>
 {
     public override void Configure()
     {
@@ -173,6 +182,13 @@ public class VerifySellerEndpoint(LivestockDbContext db) : Endpoint<VerifySeller
         seller.VerifiedAt = DateTime.UtcNow;
         seller.UpdatedAt = DateTime.UtcNow;
         await db.SaveChangesAsync(ct);
+
+        await publisher.PublishAsync(SellerVerifiedEvent.Subject, new SellerVerifiedEvent
+        {
+            SellerId = seller.Id,
+            UserId = seller.UserId
+        }, ct);
+
         await SendNoContentAsync(ct);
     }
 }

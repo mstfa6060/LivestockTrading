@@ -5,6 +5,8 @@ using Livestock.Domain.Errors;
 using Livestock.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Shared.Abstractions.Identity;
+using Shared.Contracts.Events.Livestock;
+using Shared.Infrastructure.Messaging;
 
 namespace Livestock.Features.Transport;
 
@@ -72,7 +74,7 @@ public class GetTransportRequestEndpoint(LivestockDbContext db) : Endpoint<GetTr
     }
 }
 
-public class CreateTransportRequestEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<CreateTransportRequestRequest, TransportRequestDetail>
+public class CreateTransportRequestEndpoint(LivestockDbContext db, IUserContext user, IEventPublisher publisher) : Endpoint<CreateTransportRequestRequest, TransportRequestDetail>
 {
     public override void Configure()
     {
@@ -114,6 +116,16 @@ public class CreateTransportRequestEndpoint(LivestockDbContext db, IUserContext 
         db.TransportRequests.Add(request);
         await db.SaveChangesAsync(ct);
 
+        await publisher.PublishAsync(TransportRequestCreatedEvent.Subject, new TransportRequestCreatedEvent
+        {
+            TransportRequestId = request.Id,
+            RequesterUserId = request.RequesterUserId,
+            PickupCountryCode = request.PickupCountryCode,
+            PickupCity = request.PickupCity,
+            DeliveryCountryCode = request.DeliveryCountryCode,
+            DeliveryCity = request.DeliveryCity
+        }, ct);
+
         await SendAsync(new TransportRequestDetail(request.Id, request.RequesterUserId, request.SellerId, request.ProductId, null, request.PickupCountryCode, request.PickupCity, request.PickupAddress, request.DeliveryCountryCode, request.DeliveryCity, request.DeliveryAddress, request.TransportType, request.Status, request.CargoDescription, request.AnimalCount, request.EstimatedWeightKg, request.PickupDate, request.SpecialRequirements, request.Budget, request.CurrencyCode, request.CreatedAt), 201, ct);
     }
 }
@@ -140,7 +152,7 @@ public class GetTransportOffersEndpoint(LivestockDbContext db) : Endpoint<GetTra
     }
 }
 
-public class CreateTransportOfferEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<CreateTransportOfferRequest, TransportOfferListItem>
+public class CreateTransportOfferEndpoint(LivestockDbContext db, IUserContext user, IEventPublisher publisher) : Endpoint<CreateTransportOfferRequest, TransportOfferListItem>
 {
     public override void Configure()
     {
@@ -196,11 +208,21 @@ public class CreateTransportOfferEndpoint(LivestockDbContext db, IUserContext us
         db.TransportOffers.Add(offer);
         await db.SaveChangesAsync(ct);
 
+        await publisher.PublishAsync(TransportOfferCreatedEvent.Subject, new TransportOfferCreatedEvent
+        {
+            TransportOfferId = offer.Id,
+            TransportRequestId = offer.TransportRequestId,
+            TransporterId = offer.TransporterId,
+            RequesterUserId = request.RequesterUserId,
+            Price = offer.Price,
+            CurrencyCode = offer.CurrencyCode
+        }, ct);
+
         await SendAsync(new TransportOfferListItem(offer.Id, offer.TransportRequestId, offer.TransporterId, transporter.CompanyName, offer.Price, offer.CurrencyCode, offer.EstimatedDaysMin, offer.EstimatedDaysMax, offer.Status, offer.CreatedAt), 201, ct);
     }
 }
 
-public class AcceptTransportOfferEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<AcceptTransportOfferRequest, EmptyResponse>
+public class AcceptTransportOfferEndpoint(LivestockDbContext db, IUserContext user, IEventPublisher publisher) : Endpoint<AcceptTransportOfferRequest, EmptyResponse>
 {
     public override void Configure()
     {
@@ -230,6 +252,15 @@ public class AcceptTransportOfferEndpoint(LivestockDbContext db, IUserContext us
         offer.TransportRequest.AssignedTransporterId = offer.TransporterId;
         offer.UpdatedAt = DateTime.UtcNow;
         await db.SaveChangesAsync(ct);
+
+        await publisher.PublishAsync(TransportOfferAcceptedEvent.Subject, new TransportOfferAcceptedEvent
+        {
+            TransportOfferId = offer.Id,
+            TransportRequestId = offer.TransportRequestId,
+            TransporterId = offer.TransporterId,
+            RequesterUserId = offer.TransportRequest.RequesterUserId
+        }, ct);
+
         await SendNoContentAsync(ct);
     }
 }

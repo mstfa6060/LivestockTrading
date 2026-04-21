@@ -15,7 +15,7 @@ public static class IamModuleRegistration
 
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IPasswordService, PasswordService>();
-        services.AddScoped<INotificationPublisher, LoggingNotificationPublisher>();
+        services.AddScoped<INotificationPublisher, NatsNotificationPublisher>();
 
         return services;
     }

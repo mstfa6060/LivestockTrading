@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NATS.Extensions.Microsoft.DependencyInjection;
+using Shared.Infrastructure.Messaging;
 
 namespace Shared.Infrastructure.Extensions;
 
@@ -15,6 +16,8 @@ public static class NatsExtensions
 
         services.AddNatsClient(builder =>
             builder.ConfigureOptions(opts => opts with { Url = natsUrl }));
+
+        services.AddSingleton<IEventPublisher, NatsEventPublisher>();
 
         return services;
     }

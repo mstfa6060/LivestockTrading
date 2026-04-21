@@ -5,6 +5,8 @@ using Livestock.Domain.Errors;
 using Livestock.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Shared.Abstractions.Identity;
+using Shared.Contracts.Events.Livestock;
+using Shared.Infrastructure.Messaging;
 
 namespace Livestock.Features.Transporters;
 
@@ -75,7 +77,7 @@ public class GetMyTransporterEndpoint(LivestockDbContext db, IUserContext user) 
     }
 }
 
-public class BecomeTransporterEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<BecomeTransporterRequest, TransporterDetail>
+public class BecomeTransporterEndpoint(LivestockDbContext db, IUserContext user, IEventPublisher publisher) : Endpoint<BecomeTransporterRequest, TransporterDetail>
 {
     public override void Configure()
     {
@@ -102,6 +104,13 @@ public class BecomeTransporterEndpoint(LivestockDbContext db, IUserContext user)
 
         db.Transporters.Add(transporter);
         await db.SaveChangesAsync(ct);
+
+        await publisher.PublishAsync(TransporterRegisteredEvent.Subject, new TransporterRegisteredEvent
+        {
+            TransporterId = transporter.Id,
+            UserId = transporter.UserId,
+            CompanyName = transporter.CompanyName
+        }, ct);
 
         await SendAsync(new TransporterDetail(transporter.Id, transporter.UserId, transporter.CompanyName, transporter.Description, transporter.PhoneNumber, transporter.Email, transporter.WebsiteUrl, transporter.LicenseNumber, null, transporter.Status, 0, 0, null, transporter.CreatedAt), 201, ct);
     }
@@ -135,7 +144,7 @@ public class UpdateTransporterEndpoint(LivestockDbContext db, IUserContext user)
     }
 }
 
-public class VerifyTransporterEndpoint(LivestockDbContext db) : Endpoint<VerifyTransporterRequest, EmptyResponse>
+public class VerifyTransporterEndpoint(LivestockDbContext db, IEventPublisher publisher) : Endpoint<VerifyTransporterRequest, EmptyResponse>
 {
     public override void Configure()
     {
@@ -165,6 +174,13 @@ public class VerifyTransporterEndpoint(LivestockDbContext db) : Endpoint<VerifyT
         transporter.VerifiedAt = DateTime.UtcNow;
         transporter.UpdatedAt = DateTime.UtcNow;
         await db.SaveChangesAsync(ct);
+
+        await publisher.PublishAsync(TransporterVerifiedEvent.Subject, new TransporterVerifiedEvent
+        {
+            TransporterId = transporter.Id,
+            UserId = transporter.UserId
+        }, ct);
+
         await SendNoContentAsync(ct);
     }
 }

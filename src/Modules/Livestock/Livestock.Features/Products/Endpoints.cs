@@ -5,6 +5,8 @@ using Livestock.Domain.Errors;
 using Livestock.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Shared.Abstractions.Identity;
+using Shared.Contracts.Events.Livestock;
+using Shared.Infrastructure.Messaging;
 
 namespace Livestock.Features.Products;
 
@@ -129,7 +131,7 @@ public class GetProductEndpoint(LivestockDbContext db) : Endpoint<GetProductRequ
     }
 }
 
-public class CreateProductEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<CreateProductRequest, ProductDetail>
+public class CreateProductEndpoint(LivestockDbContext db, IUserContext user, IEventPublisher publisher) : Endpoint<CreateProductRequest, ProductDetail>
 {
     public override void Configure()
     {
@@ -183,6 +185,16 @@ public class CreateProductEndpoint(LivestockDbContext db, IUserContext user) : E
 
         db.Products.Add(product);
         await db.SaveChangesAsync(ct);
+
+        await publisher.PublishAsync(ProductCreatedEvent.Subject, new ProductCreatedEvent
+        {
+            ProductId = product.Id,
+            SellerId = seller.Id,
+            Title = product.Title,
+            Slug = product.Slug,
+            Price = product.Price,
+            CurrencyCode = product.CurrencyCode
+        }, ct);
 
         await SendAsync(new ProductDetail(
             product.Id, product.Title, product.Slug, product.Description, product.Price,
@@ -284,7 +296,7 @@ public class DeleteProductEndpoint(LivestockDbContext db, IUserContext user) : E
     }
 }
 
-public class ApproveProductEndpoint(LivestockDbContext db) : Endpoint<ApproveProductRequest, EmptyResponse>
+public class ApproveProductEndpoint(LivestockDbContext db, IEventPublisher publisher) : Endpoint<ApproveProductRequest, EmptyResponse>
 {
     public override void Configure()
     {
@@ -308,11 +320,18 @@ public class ApproveProductEndpoint(LivestockDbContext db) : Endpoint<ApprovePro
         product.RejectionReason = null;
         product.UpdatedAt = DateTime.UtcNow;
         await db.SaveChangesAsync(ct);
+
+        await publisher.PublishAsync(ProductApprovedEvent.Subject, new ProductApprovedEvent
+        {
+            ProductId = product.Id,
+            SellerId = product.SellerId
+        }, ct);
+
         await SendNoContentAsync(ct);
     }
 }
 
-public class RejectProductEndpoint(LivestockDbContext db) : Endpoint<RejectProductRequest, EmptyResponse>
+public class RejectProductEndpoint(LivestockDbContext db, IEventPublisher publisher) : Endpoint<RejectProductRequest, EmptyResponse>
 {
     public override void Configure()
     {
@@ -335,6 +354,14 @@ public class RejectProductEndpoint(LivestockDbContext db) : Endpoint<RejectProdu
         product.RejectionReason = req.Reason;
         product.UpdatedAt = DateTime.UtcNow;
         await db.SaveChangesAsync(ct);
+
+        await publisher.PublishAsync(ProductRejectedEvent.Subject, new ProductRejectedEvent
+        {
+            ProductId = product.Id,
+            SellerId = product.SellerId,
+            Reason = req.Reason
+        }, ct);
+
         await SendNoContentAsync(ct);
     }
 }

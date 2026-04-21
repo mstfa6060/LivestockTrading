@@ -5,6 +5,8 @@ using Livestock.Domain.Errors;
 using Livestock.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Shared.Abstractions.Identity;
+using Shared.Contracts.Events.Livestock;
+using Shared.Infrastructure.Messaging;
 
 namespace Livestock.Features.Offers;
 
@@ -60,7 +62,7 @@ public class GetOfferEndpoint(LivestockDbContext db, IUserContext user) : Endpoi
     }
 }
 
-public class CreateOfferEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<CreateOfferRequest, OfferDetail>
+public class CreateOfferEndpoint(LivestockDbContext db, IUserContext user, IEventPublisher publisher) : Endpoint<CreateOfferRequest, OfferDetail>
 {
     public override void Configure()
     {
@@ -94,11 +96,22 @@ public class CreateOfferEndpoint(LivestockDbContext db, IUserContext user) : End
         db.Offers.Add(offer);
         await db.SaveChangesAsync(ct);
 
+        await publisher.PublishAsync(OfferCreatedEvent.Subject, new OfferCreatedEvent
+        {
+            OfferId = offer.Id,
+            ProductId = offer.ProductId,
+            BuyerUserId = offer.BuyerUserId,
+            SellerId = offer.SellerId,
+            OfferedPrice = offer.OfferedPrice,
+            CurrencyCode = offer.CurrencyCode,
+            Quantity = offer.Quantity
+        }, ct);
+
         await SendAsync(new OfferDetail(offer.Id, offer.ProductId, product.Title, offer.BuyerUserId, offer.SellerId, offer.OfferedPrice, offer.CurrencyCode, offer.Quantity, offer.Note, offer.Status, null, null, offer.ExpiresAt, offer.CreatedAt), 201, ct);
     }
 }
 
-public class AcceptOfferEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<AcceptOfferRequest, EmptyResponse>
+public class AcceptOfferEndpoint(LivestockDbContext db, IUserContext user, IEventPublisher publisher) : Endpoint<AcceptOfferRequest, EmptyResponse>
 {
     public override void Configure()
     {
@@ -148,6 +161,18 @@ public class AcceptOfferEndpoint(LivestockDbContext db, IUserContext user) : End
         db.Deals.Add(deal);
 
         await db.SaveChangesAsync(ct);
+
+        await publisher.PublishAsync(OfferAcceptedEvent.Subject, new OfferAcceptedEvent
+        {
+            OfferId = offer.Id,
+            DealId = deal.Id,
+            ProductId = offer.ProductId,
+            BuyerUserId = offer.BuyerUserId,
+            SellerId = offer.SellerId,
+            AgreePrice = deal.AgreePrice,
+            CurrencyCode = deal.CurrencyCode
+        }, ct);
+
         await SendNoContentAsync(ct);
     }
 }
