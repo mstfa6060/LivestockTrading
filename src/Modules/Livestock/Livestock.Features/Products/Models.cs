@@ -90,6 +90,7 @@ public record UpdateProductRequest(
 
 public record DeleteProductRequest(Guid Id);
 public record GetProductRequest(Guid Id);
+public record GetProductBySlugRequest(string Slug);
 public record ApproveProductRequest(Guid Id);
 public record RejectProductRequest(Guid Id, string Reason);
 public record PublishProductRequest(Guid Id);
@@ -103,5 +104,6 @@ public record ProductSearchRequest(
     decimal? MaxPrice,
     bool? IsNegotiable,
     ProductCondition? Condition,
+    string? ViewerCurrencyCode,
     int Page = 1,
     int PageSize = 20);

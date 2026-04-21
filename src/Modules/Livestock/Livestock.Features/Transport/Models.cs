@@ -15,3 +15,5 @@ public record GetTransportOffersByRequestRequest(Guid TransportRequestId);
 
 public record TrackingUpdateItem(Guid Id, TrackingStatus Status, string? Note, string? Location, DateTime OccurredAt);
 public record AddTrackingUpdateRequest(Guid TransportRequestId, TrackingStatus Status, string? Note, string? Location, double? Latitude, double? Longitude);
+public record UpdateTransportRequestRequest(Guid Id, string? PickupAddress, double? PickupLatitude, double? PickupLongitude, string? DeliveryAddress, double? DeliveryLatitude, double? DeliveryLongitude, string? CargoDescription, int? AnimalCount, decimal? EstimatedWeightKg, DateTime? PickupDate, string? SpecialRequirements, decimal? Budget, string? CurrencyCode);
+public record DeleteTransportRequestRequest(Guid Id);

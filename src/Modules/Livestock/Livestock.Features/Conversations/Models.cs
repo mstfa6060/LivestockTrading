@@ -11,3 +11,9 @@ public record SendMessageRequest(Guid ConversationId, string Content, string? At
 public record GetConversationRequest(Guid Id);
 public record GetConversationMessagesRequest(Guid ConversationId, int Page = 1, int PageSize = 50);
 public record MarkMessagesReadRequest(Guid ConversationId);
+public record SendTypingIndicatorRequest(Guid ConversationId, bool IsTyping);
+public record DeleteConversationRequest(Guid Id);
+public record DeleteMessageRequest(Guid Id);
+
+public record UnreadCountResponse(int TotalUnreadCount, List<ConversationUnreadCountItem> Conversations);
+public record ConversationUnreadCountItem(Guid ConversationId, int UnreadCount);

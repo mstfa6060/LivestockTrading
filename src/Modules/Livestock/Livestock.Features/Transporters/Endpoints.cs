@@ -218,3 +218,29 @@ public class SuspendTransporterEndpoint(LivestockDbContext db) : Endpoint<Suspen
         await SendNoContentAsync(ct);
     }
 }
+
+public class DeleteTransporterEndpoint(LivestockDbContext db) : Endpoint<DeleteTransporterRequest, EmptyResponse>
+{
+    public override void Configure()
+    {
+        Delete("/Transporters/{Id}");
+        Roles("LivestockTrading.Admin");
+        Tags("Transporters");
+    }
+
+    public override async Task HandleAsync(DeleteTransporterRequest req, CancellationToken ct)
+    {
+        var transporter = await db.Transporters.FirstOrDefaultAsync(t => t.Id == req.Id, ct);
+        if (transporter is null)
+        {
+            AddError(LivestockErrors.TransportErrors.TransporterNotFound);
+            await SendErrorsAsync(404, ct);
+            return;
+        }
+
+        transporter.IsDeleted = true;
+        transporter.DeletedAt = DateTime.UtcNow;
+        await db.SaveChangesAsync(ct);
+        await SendNoContentAsync(ct);
+    }
+}

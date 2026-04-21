@@ -72,20 +72,46 @@ public class GetAllProductsEndpoint(LivestockDbContext db) : Endpoint<ProductSea
         var pageSize = Math.Min(req.PageSize, 100);
         var skip = (req.Page - 1) * pageSize;
 
-        var products = await query
+        var rawProducts = await query
             .OrderByDescending(p => p.IsFeatured)
             .ThenByDescending(p => p.CreatedAt)
             .Skip(skip).Take(pageSize)
-            .Select(p => new ProductListItem(
+            .Select(p => new
+            {
                 p.Id, p.Title, p.Slug, p.Price, p.CurrencyCode, p.Quantity, p.Unit,
                 p.Status, p.Condition, p.IsNegotiable, p.IsFeatured,
-                p.SellerId, p.Seller.BusinessName,
-                p.CategoryId, p.Category.Name,
-                p.BrandId, p.Brand != null ? p.Brand.Name : null,
-                p.Location != null ? p.Location.CountryCode : null,
-                p.Location != null ? p.Location.City : null,
-                p.AverageRating, p.ReviewCount, p.ViewCount, p.CreatedAt))
+                p.SellerId, SellerBusinessName = p.Seller.BusinessName,
+                p.CategoryId, CategoryName = p.Category.Name,
+                p.BrandId, BrandName = p.Brand != null ? p.Brand.Name : null,
+                CountryCode = p.Location != null ? p.Location.CountryCode : null,
+                City = p.Location != null ? p.Location.City : null,
+                p.AverageRating, p.ReviewCount, p.ViewCount, p.CreatedAt
+            })
             .ToListAsync(ct);
+
+        Dictionary<Guid, decimal> convertedPrices = new();
+        if (!string.IsNullOrWhiteSpace(req.ViewerCurrencyCode))
+        {
+            var productIds = rawProducts.Select(p => p.Id).ToList();
+            convertedPrices = await db.ProductPrices
+                .AsNoTracking()
+                .Where(pp => productIds.Contains(pp.ProductId) && pp.CurrencyCode == req.ViewerCurrencyCode && pp.IsActive)
+                .ToDictionaryAsync(pp => pp.ProductId, pp => pp.Price, ct);
+        }
+
+        var products = rawProducts.Select(p =>
+        {
+            var displayPrice = convertedPrices.TryGetValue(p.Id, out var cp) ? cp : p.Price;
+            var displayCurrency = convertedPrices.ContainsKey(p.Id) ? req.ViewerCurrencyCode! : p.CurrencyCode;
+            return new ProductListItem(
+                p.Id, p.Title, p.Slug, displayPrice, displayCurrency, p.Quantity, p.Unit,
+                p.Status, p.Condition, p.IsNegotiable, p.IsFeatured,
+                p.SellerId, p.SellerBusinessName,
+                p.CategoryId, p.CategoryName,
+                p.BrandId, p.BrandName,
+                p.CountryCode, p.City,
+                p.AverageRating, p.ReviewCount, p.ViewCount, p.CreatedAt);
+        }).ToList();
 
         await SendAsync(products, 200, ct);
     }
@@ -110,6 +136,46 @@ public class GetProductEndpoint(LivestockDbContext db) : Endpoint<GetProductRequ
             .Include(x => x.Farm)
             .Include(x => x.Location)
             .FirstOrDefaultAsync(x => x.Id == req.Id, ct);
+
+        if (p is null)
+        {
+            AddError(LivestockErrors.ProductErrors.ProductNotFound);
+            await SendErrorsAsync(404, ct);
+            return;
+        }
+
+        await SendAsync(new ProductDetail(
+            p.Id, p.Title, p.Slug, p.Description, p.Price, p.CurrencyCode, p.Quantity, p.Unit,
+            p.Status, p.Condition, p.IsNegotiable, p.IsFeatured,
+            p.SellerId, p.Seller.BusinessName,
+            p.CategoryId, p.Category.Name,
+            p.BrandId, p.Brand?.Name,
+            p.FarmId, p.Farm?.Name,
+            p.LocationId, p.Location?.CountryCode, p.Location?.City,
+            p.Location?.Latitude, p.Location?.Longitude,
+            p.AverageRating, p.ReviewCount, p.ViewCount, p.PublishedAt, p.CreatedAt), 200, ct);
+    }
+}
+
+public class GetProductBySlugEndpoint(LivestockDbContext db) : Endpoint<GetProductBySlugRequest, ProductDetail>
+{
+    public override void Configure()
+    {
+        Get("/Products/Slug/{Slug}");
+        AllowAnonymous();
+        Tags("Products");
+    }
+
+    public override async Task HandleAsync(GetProductBySlugRequest req, CancellationToken ct)
+    {
+        var p = await db.Products
+            .AsNoTracking()
+            .Include(x => x.Seller)
+            .Include(x => x.Category)
+            .Include(x => x.Brand)
+            .Include(x => x.Farm)
+            .Include(x => x.Location)
+            .FirstOrDefaultAsync(x => x.Slug == req.Slug && !x.IsDeleted, ct);
 
         if (p is null)
         {
@@ -393,6 +459,16 @@ public class ApproveProductEndpoint(LivestockDbContext db, IEventPublisher publi
         {
             ProductId = product.Id,
             SellerId = product.SellerId
+        }, ct);
+
+        await publisher.PublishAsync(ProductApprovedForSocialMediaEvent.Subject, new ProductApprovedForSocialMediaEvent
+        {
+            ProductId = product.Id,
+            SellerId = product.SellerId,
+            Title = product.Title,
+            Slug = product.Slug,
+            Price = product.Price,
+            CurrencyCode = product.CurrencyCode
         }, ct);
 
         await SendNoContentAsync(ct);

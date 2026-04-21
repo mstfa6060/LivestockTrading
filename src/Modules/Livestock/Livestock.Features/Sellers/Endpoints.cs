@@ -193,6 +193,65 @@ public class VerifySellerEndpoint(LivestockDbContext db, IEventPublisher publish
     }
 }
 
+public class GetNearbySellersEndpoint(LivestockDbContext db) : Endpoint<GetNearbySellersRequest, List<NearbySeller>>
+{
+    public override void Configure()
+    {
+        Get("/Sellers/Nearby");
+        AllowAnonymous();
+        Tags("Sellers");
+    }
+
+    public override async Task HandleAsync(GetNearbySellersRequest req, CancellationToken ct)
+    {
+        var sellerLocations = await db.Locations
+            .AsNoTracking()
+            .Where(l => l.OwnerType == "Seller" && l.Latitude.HasValue && l.Longitude.HasValue)
+            .Select(l => new { l.OwnerId, l.Latitude, l.Longitude })
+            .ToListAsync(ct);
+
+        var sellerIds = sellerLocations
+            .Where(l => Haversine(req.Lat, req.Lng, l.Latitude!.Value, l.Longitude!.Value) <= req.RadiusKm)
+            .Select(l => l.OwnerId)
+            .ToList();
+
+        if (sellerIds.Count == 0)
+        {
+            await SendAsync([], 200, ct);
+            return;
+        }
+
+        var sellers = await db.Sellers
+            .AsNoTracking()
+            .Where(s => sellerIds.Contains(s.Id) && s.Status == SellerStatus.Active)
+            .ToListAsync(ct);
+
+        var result = sellers.Select(s =>
+        {
+            var loc = sellerLocations.First(l => l.OwnerId == s.Id);
+            var dist = Haversine(req.Lat, req.Lng, loc.Latitude!.Value, loc.Longitude!.Value);
+            return new NearbySeller(s.Id, s.UserId, s.BusinessName, s.Status, s.AverageRating, s.ReviewCount, Math.Round(dist, 2), loc.Latitude!.Value, loc.Longitude!.Value, s.CreatedAt);
+        })
+        .OrderBy(s => s.DistanceKm)
+        .ToList();
+
+        await SendAsync(result, 200, ct);
+    }
+
+    private static double Haversine(double lat1, double lon1, double lat2, double lon2)
+    {
+        const double R = 6371.0;
+        var dLat = ToRad(lat2 - lat1);
+        var dLon = ToRad(lon2 - lon1);
+        var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2)
+              + Math.Cos(ToRad(lat1)) * Math.Cos(ToRad(lat2))
+              * Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+        return R * 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+    }
+
+    private static double ToRad(double deg) => deg * Math.PI / 180.0;
+}
+
 public class SuspendSellerEndpoint(LivestockDbContext db) : Endpoint<SuspendSellerRequest, EmptyResponse>
 {
     public override void Configure()
@@ -222,6 +281,32 @@ public class SuspendSellerEndpoint(LivestockDbContext db) : Endpoint<SuspendSell
         seller.Status = SellerStatus.Suspended;
         seller.SuspensionReason = req.Reason;
         seller.UpdatedAt = DateTime.UtcNow;
+        await db.SaveChangesAsync(ct);
+        await SendNoContentAsync(ct);
+    }
+}
+
+public class DeleteSellerEndpoint(LivestockDbContext db) : Endpoint<DeleteSellerRequest, EmptyResponse>
+{
+    public override void Configure()
+    {
+        Delete("/Sellers/{Id}");
+        Roles("LivestockTrading.Admin");
+        Tags("Sellers");
+    }
+
+    public override async Task HandleAsync(DeleteSellerRequest req, CancellationToken ct)
+    {
+        var seller = await db.Sellers.FirstOrDefaultAsync(s => s.Id == req.Id, ct);
+        if (seller is null)
+        {
+            AddError(LivestockErrors.SellerErrors.SellerNotFound);
+            await SendErrorsAsync(404, ct);
+            return;
+        }
+
+        seller.IsDeleted = true;
+        seller.DeletedAt = DateTime.UtcNow;
         await db.SaveChangesAsync(ct);
         await SendNoContentAsync(ct);
     }

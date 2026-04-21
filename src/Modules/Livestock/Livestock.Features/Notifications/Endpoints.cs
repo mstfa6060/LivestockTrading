@@ -79,3 +79,35 @@ public class MarkAllNotificationsReadEndpoint(LivestockDbContext db, IUserContex
         await SendNoContentAsync(ct);
     }
 }
+
+public class DeleteNotificationEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<DeleteNotificationRequest, EmptyResponse>
+{
+    public override void Configure()
+    {
+        Delete("/Notifications/{Id}");
+        Tags("Notifications");
+    }
+
+    public override async Task HandleAsync(DeleteNotificationRequest req, CancellationToken ct)
+    {
+        var notification = await db.Notifications.FirstOrDefaultAsync(n => n.Id == req.Id, ct);
+        if (notification is null)
+        {
+            AddError(LivestockErrors.NotificationErrors.NotificationNotFound);
+            await SendErrorsAsync(404, ct);
+            return;
+        }
+
+        if (notification.RecipientUserId != user.UserId)
+        {
+            AddError(LivestockErrors.NotificationErrors.NotificationNotOwned);
+            await SendErrorsAsync(403, ct);
+            return;
+        }
+
+        notification.IsDeleted = true;
+        notification.DeletedAt = DateTime.UtcNow;
+        await db.SaveChangesAsync(ct);
+        await SendNoContentAsync(ct);
+    }
+}

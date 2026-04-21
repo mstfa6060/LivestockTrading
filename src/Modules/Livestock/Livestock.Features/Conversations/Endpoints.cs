@@ -226,7 +226,7 @@ public class SendMessageEndpoint(LivestockDbContext db, IUserContext user, IEven
     }
 }
 
-public class MarkMessagesReadEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<MarkMessagesReadRequest, EmptyResponse>
+public class MarkMessagesReadEndpoint(LivestockDbContext db, IUserContext user, IEventPublisher publisher) : Endpoint<MarkMessagesReadRequest, EmptyResponse>
 {
     public override void Configure()
     {
@@ -244,11 +244,12 @@ public class MarkMessagesReadEndpoint(LivestockDbContext db, IUserContext user) 
             return;
         }
 
+        var readAt = DateTime.UtcNow;
         await db.Messages
             .Where(m => m.ConversationId == req.ConversationId && m.RecipientUserId == user.UserId && !m.IsRead)
             .ExecuteUpdateAsync(s => s
                 .SetProperty(m => m.IsRead, true)
-                .SetProperty(m => m.ReadAt, DateTime.UtcNow), ct);
+                .SetProperty(m => m.ReadAt, readAt), ct);
 
         if (conversation.InitiatorUserId == user.UserId)
         {
@@ -259,6 +260,140 @@ public class MarkMessagesReadEndpoint(LivestockDbContext db, IUserContext user) 
             conversation.UnreadCountRecipient = 0;
         }
 
+        await db.SaveChangesAsync(ct);
+
+        await publisher.PublishAsync(MessageReadEvent.Subject, new MessageReadEvent
+        {
+            ConversationId = req.ConversationId,
+            ReadByUserId = user.UserId,
+            ReadAt = readAt
+        }, ct);
+
+        await SendNoContentAsync(ct);
+    }
+}
+
+public class SendTypingIndicatorEndpoint(LivestockDbContext db, IUserContext user, IEventPublisher publisher) : Endpoint<SendTypingIndicatorRequest, EmptyResponse>
+{
+    public override void Configure()
+    {
+        Post("/Conversations/{ConversationId}/TypingIndicator");
+        Tags("Conversations");
+    }
+
+    public override async Task HandleAsync(SendTypingIndicatorRequest req, CancellationToken ct)
+    {
+        var conversation = await db.Conversations.AsNoTracking().FirstOrDefaultAsync(c => c.Id == req.ConversationId, ct);
+        if (conversation is null || (conversation.InitiatorUserId != user.UserId && conversation.RecipientUserId != user.UserId))
+        {
+            AddError(LivestockErrors.ConversationErrors.ConversationNotFound);
+            await SendErrorsAsync(404, ct);
+            return;
+        }
+
+        var recipientId = conversation.InitiatorUserId == user.UserId
+            ? conversation.RecipientUserId
+            : conversation.InitiatorUserId;
+
+        await publisher.PublishAsync(TypingIndicatorEvent.Subject, new TypingIndicatorEvent
+        {
+            ConversationId = req.ConversationId,
+            SenderUserId = user.UserId,
+            RecipientUserId = recipientId,
+            IsTyping = req.IsTyping
+        }, ct);
+
+        await SendNoContentAsync(ct);
+    }
+}
+
+public class GetUnreadCountEndpoint(LivestockDbContext db, IUserContext user) : EndpointWithoutRequest<UnreadCountResponse>
+{
+    public override void Configure()
+    {
+        Get("/Conversations/UnreadCount");
+        Tags("Conversations");
+    }
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        var conversations = await db.Conversations
+            .AsNoTracking()
+            .Where(c => (c.InitiatorUserId == user.UserId || c.RecipientUserId == user.UserId) && !c.IsDeleted)
+            .Select(c => new
+            {
+                c.Id,
+                UnreadCount = c.InitiatorUserId == user.UserId ? c.UnreadCountInitiator : c.UnreadCountRecipient
+            })
+            .Where(x => x.UnreadCount > 0)
+            .ToListAsync(ct);
+
+        var total = conversations.Sum(x => x.UnreadCount);
+        var breakdown = conversations.Select(x => new ConversationUnreadCountItem(x.Id, x.UnreadCount)).ToList();
+
+        await SendAsync(new UnreadCountResponse(total, breakdown), 200, ct);
+    }
+}
+
+public class DeleteConversationEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<DeleteConversationRequest, EmptyResponse>
+{
+    public override void Configure()
+    {
+        Delete("/Conversations/{Id}");
+        Tags("Conversations");
+    }
+
+    public override async Task HandleAsync(DeleteConversationRequest req, CancellationToken ct)
+    {
+        var conversation = await db.Conversations.FirstOrDefaultAsync(c => c.Id == req.Id, ct);
+        if (conversation is null)
+        {
+            AddError(LivestockErrors.ConversationErrors.ConversationNotFound);
+            await SendErrorsAsync(404, ct);
+            return;
+        }
+
+        if (conversation.InitiatorUserId != user.UserId && conversation.RecipientUserId != user.UserId)
+        {
+            AddError(LivestockErrors.ConversationErrors.ConversationNotParticipant);
+            await SendErrorsAsync(403, ct);
+            return;
+        }
+
+        conversation.IsDeleted = true;
+        conversation.DeletedAt = DateTime.UtcNow;
+        await db.SaveChangesAsync(ct);
+        await SendNoContentAsync(ct);
+    }
+}
+
+public class DeleteMessageEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<DeleteMessageRequest, EmptyResponse>
+{
+    public override void Configure()
+    {
+        Delete("/Messages/{Id}");
+        Tags("Conversations");
+    }
+
+    public override async Task HandleAsync(DeleteMessageRequest req, CancellationToken ct)
+    {
+        var message = await db.Messages.FirstOrDefaultAsync(m => m.Id == req.Id, ct);
+        if (message is null)
+        {
+            AddError(LivestockErrors.MessageErrors.MessageNotFound);
+            await SendErrorsAsync(404, ct);
+            return;
+        }
+
+        if (message.SenderUserId != user.UserId)
+        {
+            AddError(LivestockErrors.Common.Unauthorized);
+            await SendErrorsAsync(403, ct);
+            return;
+        }
+
+        message.IsDeleted = true;
+        message.DeletedAt = DateTime.UtcNow;
         await db.SaveChangesAsync(ct);
         await SendNoContentAsync(ct);
     }

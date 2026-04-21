@@ -9,3 +9,6 @@ public record UpdateSellerRequest(string BusinessName, string? Description, stri
 public record GetSellerRequest(Guid Id);
 public record VerifySellerRequest(Guid Id);
 public record SuspendSellerRequest(Guid Id, string Reason);
+public record DeleteSellerRequest(Guid Id);
+public record GetNearbySellersRequest(double Lat, double Lng, double RadiusKm = 50);
+public record NearbySeller(Guid Id, Guid UserId, string BusinessName, SellerStatus Status, double AverageRating, int ReviewCount, double DistanceKm, double Latitude, double Longitude, DateTime CreatedAt);

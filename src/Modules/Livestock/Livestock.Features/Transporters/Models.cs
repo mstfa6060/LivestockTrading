@@ -9,3 +9,4 @@ public record UpdateTransporterRequest(string CompanyName, string? Description, 
 public record GetTransporterRequest(Guid Id);
 public record VerifyTransporterRequest(Guid Id);
 public record SuspendTransporterRequest(Guid Id, string Reason);
+public record DeleteTransporterRequest(Guid Id);

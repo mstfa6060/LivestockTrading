@@ -265,6 +265,91 @@ public class AcceptTransportOfferEndpoint(LivestockDbContext db, IUserContext us
     }
 }
 
+public class UpdateTransportRequestEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<UpdateTransportRequestRequest, TransportRequestDetail>
+{
+    public override void Configure()
+    {
+        Put("/TransportRequests/{Id}");
+        Tags("Transport");
+    }
+
+    public override async Task HandleAsync(UpdateTransportRequestRequest req, CancellationToken ct)
+    {
+        var request = await db.TransportRequests.FirstOrDefaultAsync(r => r.Id == req.Id, ct);
+        if (request is null)
+        {
+            AddError(LivestockErrors.TransportErrors.TransportRequestNotFound);
+            await SendErrorsAsync(404, ct);
+            return;
+        }
+
+        if (request.RequesterUserId != user.UserId)
+        {
+            AddError(LivestockErrors.Common.Unauthorized);
+            await SendErrorsAsync(403, ct);
+            return;
+        }
+
+        if (request.Status != TransportRequestStatus.InPool && request.Status != TransportRequestStatus.ReceivingOffers)
+        {
+            AddError(LivestockErrors.TransportErrors.TransportRequestNotOpen);
+            await SendErrorsAsync(409, ct);
+            return;
+        }
+
+        if (req.PickupAddress is not null) { request.PickupAddress = req.PickupAddress; }
+        if (req.PickupLatitude.HasValue) { request.PickupLatitude = req.PickupLatitude; }
+        if (req.PickupLongitude.HasValue) { request.PickupLongitude = req.PickupLongitude; }
+        if (req.DeliveryAddress is not null) { request.DeliveryAddress = req.DeliveryAddress; }
+        if (req.DeliveryLatitude.HasValue) { request.DeliveryLatitude = req.DeliveryLatitude; }
+        if (req.DeliveryLongitude.HasValue) { request.DeliveryLongitude = req.DeliveryLongitude; }
+        if (req.CargoDescription is not null) { request.CargoDescription = req.CargoDescription; }
+        if (req.AnimalCount.HasValue) { request.AnimalCount = req.AnimalCount; }
+        if (req.EstimatedWeightKg.HasValue) { request.EstimatedWeightKg = req.EstimatedWeightKg; }
+        if (req.PickupDate.HasValue) { request.PickupDate = req.PickupDate; }
+        if (req.SpecialRequirements is not null) { request.SpecialRequirements = req.SpecialRequirements; }
+        if (req.Budget.HasValue) { request.Budget = req.Budget; }
+        if (req.CurrencyCode is not null) { request.CurrencyCode = req.CurrencyCode; }
+        request.UpdatedAt = DateTime.UtcNow;
+
+        await db.SaveChangesAsync(ct);
+
+        await SendAsync(new TransportRequestDetail(request.Id, request.RequesterUserId, request.SellerId, request.ProductId, request.AssignedTransporterId, request.PickupCountryCode, request.PickupCity, request.PickupAddress, request.DeliveryCountryCode, request.DeliveryCity, request.DeliveryAddress, request.TransportType, request.Status, request.CargoDescription, request.AnimalCount, request.EstimatedWeightKg, request.PickupDate, request.SpecialRequirements, request.Budget, request.CurrencyCode, request.CreatedAt), 200, ct);
+    }
+}
+
+public class DeleteTransportRequestEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<DeleteTransportRequestRequest, EmptyResponse>
+{
+    public override void Configure()
+    {
+        Delete("/TransportRequests/{Id}");
+        Tags("Transport");
+    }
+
+    public override async Task HandleAsync(DeleteTransportRequestRequest req, CancellationToken ct)
+    {
+        var request = await db.TransportRequests.FirstOrDefaultAsync(r => r.Id == req.Id, ct);
+        if (request is null)
+        {
+            AddError(LivestockErrors.TransportErrors.TransportRequestNotFound);
+            await SendErrorsAsync(404, ct);
+            return;
+        }
+
+        if (request.RequesterUserId != user.UserId)
+        {
+            AddError(LivestockErrors.Common.Unauthorized);
+            await SendErrorsAsync(403, ct);
+            return;
+        }
+
+        request.IsDeleted = true;
+        request.DeletedAt = DateTime.UtcNow;
+        await db.SaveChangesAsync(ct);
+        await SendNoContentAsync(ct);
+    }
+}
+
 public class AddTrackingUpdateEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<AddTrackingUpdateRequest, TrackingUpdateItem>
 {
     public override void Configure()
