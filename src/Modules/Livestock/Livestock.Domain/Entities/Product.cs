@@ -35,6 +35,7 @@ public class Product : BaseEntity
     public Farm? Farm { get; set; }
     public Location? Location { get; set; }
 
+    public ICollection<ProductPrice> Prices { get; set; } = [];
     public ICollection<ProductVariant> Variants { get; set; } = [];
     public ICollection<FavoriteProduct> Favorites { get; set; } = [];
     public ICollection<ProductReview> Reviews { get; set; } = [];

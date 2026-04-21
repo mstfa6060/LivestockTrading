@@ -160,6 +160,14 @@ public class AcceptOfferEndpoint(LivestockDbContext db, IUserContext user, IEven
         };
         db.Deals.Add(deal);
 
+        // Reduce stock; mark as out of stock when quantity reaches zero
+        offer.Product.Quantity = Math.Max(0, offer.Product.Quantity - deal.Quantity);
+        if (offer.Product.Quantity == 0)
+        {
+            offer.Product.Status = ProductStatus.OutOfStock;
+        }
+        offer.Product.UpdatedAt = DateTime.UtcNow;
+
         await db.SaveChangesAsync(ct);
 
         await publisher.PublishAsync(OfferAcceptedEvent.Subject, new OfferAcceptedEvent
