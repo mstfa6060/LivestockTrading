@@ -11,6 +11,7 @@ public class IamDbContext : DbContext
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<UserRole> UserRoles => Set<UserRole>();
     public DbSet<AppRefreshToken> RefreshTokens => Set<AppRefreshToken>();
+    public DbSet<UserPushToken> UserPushTokens => Set<UserPushToken>();
     public DbSet<Country> Countries => Set<Country>();
     public DbSet<IamModule> Modules => Set<IamModule>();
 

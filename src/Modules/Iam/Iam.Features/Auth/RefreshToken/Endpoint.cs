@@ -15,7 +15,7 @@ public sealed class RefreshTokenEndpoint(
 
     public override void Configure()
     {
-        Post("/Auth/RefreshToken");
+        Post("/iam/Auth/RefreshToken");
         AllowAnonymous();
         Tags("Auth");
     }

@@ -1,8 +1,15 @@
 namespace Iam.Features.Auth.Login;
 
 public sealed record LoginRequest(
-    string Email,
-    string Password,
+    string? Provider,
+    string? UserName,
+    string? Email,
+    string? Password,
+    string? ExternalProviderUserId,
+    string? FirstName,
+    string? Surname,
+    string? PhoneNumber,
+    DateTime? BirthDate,
     int Platform
 );
 
@@ -14,5 +21,6 @@ public sealed record LoginResponse(
     string Email,
     string UserName,
     string FirstName,
-    string Surname
+    string Surname,
+    string AuthProvider
 );

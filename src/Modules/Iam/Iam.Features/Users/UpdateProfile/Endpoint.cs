@@ -9,7 +9,7 @@ public sealed class UpdateProfileEndpoint(IamDbContext db) : Endpoint<UpdateProf
 {
     public override void Configure()
     {
-        Put("/Users/Me");
+        Post("/iam/Users/UpdateMe");
         Tags("Users");
     }
 

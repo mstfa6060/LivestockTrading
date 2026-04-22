@@ -12,7 +12,7 @@ public sealed class ResetPasswordEndpoint(
 {
     public override void Configure()
     {
-        Post("/Auth/ResetPassword");
+        Post("/iam/Auth/ResetPassword");
         AllowAnonymous();
         Tags("Auth");
     }

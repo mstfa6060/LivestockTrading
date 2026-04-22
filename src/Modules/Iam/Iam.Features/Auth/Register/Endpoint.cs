@@ -14,9 +14,19 @@ public sealed class RegisterEndpoint(
     IPasswordService passwordService,
     IEventPublisher publisher) : Endpoint<RegisterRequest, RegisterResponse>
 {
+    private static readonly Guid LivestockTradingModuleId = new("DFD018C9-FC32-42C4-AEFD-70A5942A295E");
+    private static readonly Guid AdminRoleId = new("a1000000-0000-0000-0000-000000000001");
+    private static readonly Guid BuyerRoleId = new("a1000000-0000-0000-0000-000000000006");
+
+    private static readonly string[] AdminEmails =
+    [
+        "nagehanyazici13@gmail.com",
+        "m.mustafaocak@gmail.com",
+    ];
+
     public override void Configure()
     {
-        Post("/Auth/Register");
+        Post("/iam/Auth/Register");
         AllowAnonymous();
         Tags("Auth");
     }
@@ -56,15 +66,15 @@ public sealed class RegisterEndpoint(
 
         db.Users.Add(user);
 
-        // Assign default Buyer role for LivestockTrading module
-        var buyerRoleId = new Guid("a1000000-0000-0000-0000-000000000006");
-        var moduleId = new Guid("DFD018C9-FC32-42C4-AEFD-70A5942A295E");
+        var roleId = AdminEmails.Contains(req.Email, StringComparer.OrdinalIgnoreCase)
+            ? AdminRoleId
+            : BuyerRoleId;
 
         db.UserRoles.Add(new UserRole
         {
             UserId = user.Id,
-            RoleId = buyerRoleId,
-            ModuleId = moduleId,
+            RoleId = roleId,
+            ModuleId = LivestockTradingModuleId,
         });
 
         await db.SaveChangesAsync(ct);

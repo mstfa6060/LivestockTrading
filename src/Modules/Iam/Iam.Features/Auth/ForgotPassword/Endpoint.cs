@@ -12,7 +12,7 @@ public sealed class ForgotPasswordEndpoint(
 {
     public override void Configure()
     {
-        Post("/Auth/ForgotPassword");
+        Post("/iam/Auth/ForgotPassword");
         AllowAnonymous();
         Tags("Auth");
     }

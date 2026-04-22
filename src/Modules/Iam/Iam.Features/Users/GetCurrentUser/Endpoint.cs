@@ -9,7 +9,7 @@ public sealed class GetCurrentUserEndpoint(IamDbContext db) : Endpoint<GetCurren
 {
     public override void Configure()
     {
-        Get("/Users/Me");
+        Post("/iam/Users/Me");
         Tags("Users");
     }
 

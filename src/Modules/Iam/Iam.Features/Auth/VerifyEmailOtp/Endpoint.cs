@@ -11,7 +11,7 @@ public sealed class VerifyEmailOtpEndpoint(IamDbContext db) : Endpoint<VerifyEma
 
     public override void Configure()
     {
-        Post("/Auth/VerifyEmailOtp");
+        Post("/iam/Auth/VerifyEmailOtp");
         AllowAnonymous();
         Tags("Auth");
     }

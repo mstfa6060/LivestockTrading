@@ -8,7 +8,7 @@ public sealed class LogoutEndpoint(IamDbContext db) : Endpoint<LogoutRequest, Lo
 {
     public override void Configure()
     {
-        Post("/Auth/Logout");
+        Post("/iam/Auth/Logout");
         AllowAnonymous();
         Tags("Auth");
     }

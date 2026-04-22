@@ -12,7 +12,7 @@ public sealed class SendEmailOtpEndpoint(
 {
     public override void Configure()
     {
-        Post("/Auth/SendEmailOtp");
+        Post("/iam/Auth/SendEmailOtp");
         AllowAnonymous();
         Tags("Auth");
     }

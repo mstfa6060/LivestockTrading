@@ -8,7 +8,7 @@ public class ListUsersEndpoint(IamDbContext db) : EndpointWithoutRequest<List<Ad
 {
     public override void Configure()
     {
-        Get("/Admin/Users");
+        Post("/iam/Admin/Users/All");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }
@@ -31,7 +31,7 @@ public class BanUserEndpoint(IamDbContext db) : Endpoint<BanUserRequest, EmptyRe
 {
     public override void Configure()
     {
-        Post("/Admin/Users/{Id}/Ban");
+        Post("/iam/Admin/Users/Ban");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }
@@ -62,7 +62,7 @@ public class UnbanUserEndpoint(IamDbContext db) : Endpoint<UnbanUserRequest, Emp
 {
     public override void Configure()
     {
-        Post("/Admin/Users/{Id}/Unban");
+        Post("/iam/Admin/Users/Unban");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }
