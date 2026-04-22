@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Iam.Features.Users.GetCurrentUser;
 
-public sealed class GetCurrentUserEndpoint(IamDbContext db) : Endpoint<GetCurrentUserRequest, GetCurrentUserResponse>
+public sealed class GetCurrentUserEndpoint(IamDbContext db) : EndpointWithoutRequest<GetCurrentUserResponse>
 {
     public override void Configure()
     {
@@ -13,7 +13,7 @@ public sealed class GetCurrentUserEndpoint(IamDbContext db) : Endpoint<GetCurren
         Tags("Users");
     }
 
-    public override async Task HandleAsync(GetCurrentUserRequest req, CancellationToken ct)
+    public override async Task HandleAsync(CancellationToken ct)
     {
         var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(userIdStr, out var userId))

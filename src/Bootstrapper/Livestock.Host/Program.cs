@@ -7,8 +7,18 @@ using Livestock.Features;
 using Shared.Abstractions.Identity;
 using Shared.Infrastructure.Extensions;
 using Shared.Infrastructure.Identity;
+using Shared.Infrastructure.Messaging;
+using Shared.Infrastructure.Swagger;
+using ZiggyCreatures.Caching.Fusion;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// NSwag CLI boots the app to discover endpoint metadata; in that mode no
+// real broker/cache is reachable, so swap heavyweight infra registrations
+// for in-memory / no-op stubs. Triggered by `NSWAG_GENERATE=true`.
+var isCodegen = string.Equals(
+    Environment.GetEnvironmentVariable("NSWAG_GENERATE"), "true",
+    StringComparison.OrdinalIgnoreCase);
 
 // ── Logging ───────────────────────────────────────────────────────────────────
 builder.AddSharedSerilog("livestock-host");
@@ -41,10 +51,24 @@ builder.Services
     .AddAuthorization();
 
 // ── Cache (FusionCache L1+L2) ─────────────────────────────────────────────────
-builder.Services.AddSharedCache(builder.Configuration);
+if (isCodegen)
+{
+    builder.Services.AddFusionCache(); // in-memory only
+}
+else
+{
+    builder.Services.AddSharedCache(builder.Configuration);
+}
 
 // ── Messaging (NATS JetStream) ────────────────────────────────────────────────
-builder.Services.AddSharedNats(builder.Configuration);
+if (isCodegen)
+{
+    builder.Services.AddSingleton<IEventPublisher, NoopEventPublisher>();
+}
+else
+{
+    builder.Services.AddSharedNats(builder.Configuration);
+}
 
 // ── HTTP Context / User Context ───────────────────────────────────────────────
 builder.Services.AddHttpContextAccessor();
@@ -61,7 +85,11 @@ builder.Services.SwaggerDocument(o =>
     {
         s.Title = "GlobalLivestock API";
         s.Version = "v1";
+        s.OperationProcessors.Add(new RouteBasedOperationIdProcessor());
     };
+    // /livestocktrading/Sellers/Nearby → tag = "Sellers" → AuthClient/SellersClient/etc.
+    o.AutoTagPathSegmentIndex = 2;
+    o.ShortSchemaNames = true;
 });
 
 // ── Modules ───────────────────────────────────────────────────────────────────

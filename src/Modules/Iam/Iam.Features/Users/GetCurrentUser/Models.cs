@@ -1,7 +1,5 @@
 namespace Iam.Features.Users.GetCurrentUser;
 
-public sealed record GetCurrentUserRequest;
-
 public sealed record GetCurrentUserResponse(
     Guid Id,
     string UserName,

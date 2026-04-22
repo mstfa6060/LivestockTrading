@@ -69,6 +69,13 @@
     <PackageVersion Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.116.1" />
   </ItemGroup>
 
+  <!-- NSwag — for OpenAPI document generation + TS client codegen.
+       Pinned to 14.7 to match the globally-installed NSwag CLI version
+       (FastEndpoints.Swagger 5.33 transitively pulls 14.2 which is too old). -->
+  <ItemGroup>
+    <PackageVersion Include="NSwag.AspNetCore" Version="14.7.0" />
+  </ItemGroup>
+
   <!-- Testing -->
   <ItemGroup>
     <PackageVersion Include="xunit" Version="2.9.3" />
