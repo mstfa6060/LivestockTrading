@@ -52,7 +52,7 @@ services:
 
   # ── Jaeger (Distributed Tracing) ──────────────────────────────────────────────
   jaeger:
-    image: jaegertracing/all-in-one:2
+    image: jaegertracing/all-in-one:latest
     container_name: livestock-jaeger
     environment:
       COLLECTOR_OTLP_ENABLED: "true"
