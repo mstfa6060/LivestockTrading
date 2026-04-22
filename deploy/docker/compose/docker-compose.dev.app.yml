@@ -38,7 +38,7 @@ services:
       Minio__AccessKey: "minioadmin"
       Minio__SecretKey: "minioadmin123"
       Minio__UseSSL: "false"
-      Minio__BucketName: "livestocktrading"
+      Minio__BucketName: "${MINIO_BUCKET:-livestocktrading-dev}"
     ports:
       - "5300:8080"
     restart: unless-stopped

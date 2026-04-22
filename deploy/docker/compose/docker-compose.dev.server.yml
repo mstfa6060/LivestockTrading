@@ -32,7 +32,10 @@ services:
     ports: !reset []
 
   minio:
-    ports: !reset []
+    # Expose S3 API on 9011 (loopback only) so nginx can proxy
+    # /file-storage/ to it. 9000 is already taken on the host.
+    ports: !override
+      - "127.0.0.1:9011:9000"
 
   # The host stays exposed — nginx upstream points at 127.0.0.1:5310.
   # (5300 hit a stuck docker-proxy reservation on this host; 5310 is free.)
