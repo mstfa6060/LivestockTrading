@@ -4,6 +4,7 @@ using FastEndpoints.Swagger;
 using Files.Features;
 using Iam.Features;
 using Livestock.Features;
+using Microsoft.EntityFrameworkCore;
 using Shared.Abstractions.Identity;
 using Shared.Infrastructure.Extensions;
 using Shared.Infrastructure.Identity;
@@ -102,6 +103,19 @@ builder.Services.AddHealthChecks();
 
 // ── Build ─────────────────────────────────────────────────────────────────────
 var app = builder.Build();
+
+// ── EF Migrations on startup (Development only) ──────────────────────────────
+// Production should use a dedicated migration job (init container or Jenkins
+// step) so app pods don't race the DB during rolling deploys. For dev/staging
+// this convenience makes `compose up` self-contained.
+if (app.Environment.IsDevelopment() && !isCodegen)
+{
+    using var scope = app.Services.CreateScope();
+    var sp = scope.ServiceProvider;
+    await sp.GetRequiredService<Iam.Persistence.IamDbContext>().Database.MigrateAsync();
+    await sp.GetRequiredService<Files.Persistence.FilesDbContext>().Database.MigrateAsync();
+    await sp.GetRequiredService<Livestock.Persistence.LivestockDbContext>().Database.MigrateAsync();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();

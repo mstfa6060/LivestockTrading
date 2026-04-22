@@ -50,10 +50,11 @@ services:
       timeout: 5s
       retries: 5
 
-  # ── Jaeger (Distributed Tracing) ──────────────────────────────────────────────
+  # ── Jaeger (Distributed Tracing) — opt-in via `--profile tracing` ────────────
   jaeger:
     image: jaegertracing/all-in-one:latest
     container_name: livestock-jaeger
+    profiles: ["tracing"]
     environment:
       COLLECTOR_OTLP_ENABLED: "true"
     ports:
