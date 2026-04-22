@@ -21,3 +21,14 @@ public class SuspendSellerValidator : Validator<SuspendSellerRequest>
         RuleFor(x => x.Reason).NotEmpty().MaximumLength(1000);
     }
 }
+
+public class NearbySellersValidator : Validator<NearbySellersRequest>
+{
+    public NearbySellersValidator()
+    {
+        RuleFor(x => x.Latitude).InclusiveBetween(-90, 90);
+        RuleFor(x => x.Longitude).InclusiveBetween(-180, 180);
+        RuleFor(x => x.Limit).InclusiveBetween(1, 50);
+        RuleFor(x => x.CountryCode).Length(2).When(x => !string.IsNullOrEmpty(x.CountryCode));
+    }
+}

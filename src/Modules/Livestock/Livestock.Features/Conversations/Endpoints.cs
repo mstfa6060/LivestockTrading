@@ -226,6 +226,30 @@ public class SendMessageEndpoint(LivestockDbContext db, IUserContext user, IEven
     }
 }
 
+public class GetUnreadCountEndpoint(LivestockDbContext db, IUserContext user) : EndpointWithoutRequest<UnreadCountResponse>
+{
+    public override void Configure()
+    {
+        Post("/livestocktrading/Conversations/UnreadCount");
+        Tags("Conversations");
+    }
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        var items = await db.Conversations
+            .AsNoTracking()
+            .Where(c => (c.InitiatorUserId == user.UserId && c.UnreadCountInitiator > 0)
+                     || (c.RecipientUserId == user.UserId && c.UnreadCountRecipient > 0))
+            .Select(c => new UnreadCountItem(
+                c.Id,
+                c.InitiatorUserId == user.UserId ? c.UnreadCountInitiator : c.UnreadCountRecipient))
+            .ToListAsync(ct);
+
+        var total = items.Sum(i => i.UnreadCount);
+        await SendAsync(new UnreadCountResponse(total, items), 200, ct);
+    }
+}
+
 public class MarkMessagesReadEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<MarkMessagesReadRequest, EmptyResponse>
 {
     public override void Configure()

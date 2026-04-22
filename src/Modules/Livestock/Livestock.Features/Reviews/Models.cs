@@ -10,3 +10,9 @@ public record CreateTransporterReviewRequest(Guid TransporterId, int Rating, str
 public record GetProductReviewsRequest(Guid ProductId, int Page = 1, int PageSize = 20);
 public record GetSellerReviewsRequest(Guid SellerId, int Page = 1, int PageSize = 20);
 public record GetTransporterReviewsRequest(Guid TransporterId, int Page = 1, int PageSize = 20);
+
+public record UpdateProductReviewRequest(Guid Id, int Rating, string? Comment);
+public record UpdateSellerReviewRequest(Guid Id, int Rating, string? Comment);
+public record UpdateTransporterReviewRequest(Guid Id, int Rating, string? Comment);
+
+public record DeleteReviewRequest(Guid Id);

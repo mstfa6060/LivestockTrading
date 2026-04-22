@@ -9,6 +9,7 @@ public class CreateProductReviewValidator : Validator<CreateProductReviewRequest
     {
         RuleFor(x => x.ProductId).NotEmpty();
         RuleFor(x => x.Rating).InclusiveBetween(1, 5);
+        RuleFor(x => x.Comment).MaximumLength(2000);
     }
 }
 
@@ -18,6 +19,7 @@ public class CreateSellerReviewValidator : Validator<CreateSellerReviewRequest>
     {
         RuleFor(x => x.SellerId).NotEmpty();
         RuleFor(x => x.Rating).InclusiveBetween(1, 5);
+        RuleFor(x => x.Comment).MaximumLength(2000);
     }
 }
 
@@ -27,5 +29,44 @@ public class CreateTransporterReviewValidator : Validator<CreateTransporterRevie
     {
         RuleFor(x => x.TransporterId).NotEmpty();
         RuleFor(x => x.Rating).InclusiveBetween(1, 5);
+        RuleFor(x => x.Comment).MaximumLength(2000);
+    }
+}
+
+public class UpdateProductReviewValidator : Validator<UpdateProductReviewRequest>
+{
+    public UpdateProductReviewValidator()
+    {
+        RuleFor(x => x.Id).NotEmpty();
+        RuleFor(x => x.Rating).InclusiveBetween(1, 5);
+        RuleFor(x => x.Comment).MaximumLength(2000);
+    }
+}
+
+public class UpdateSellerReviewValidator : Validator<UpdateSellerReviewRequest>
+{
+    public UpdateSellerReviewValidator()
+    {
+        RuleFor(x => x.Id).NotEmpty();
+        RuleFor(x => x.Rating).InclusiveBetween(1, 5);
+        RuleFor(x => x.Comment).MaximumLength(2000);
+    }
+}
+
+public class UpdateTransporterReviewValidator : Validator<UpdateTransporterReviewRequest>
+{
+    public UpdateTransporterReviewValidator()
+    {
+        RuleFor(x => x.Id).NotEmpty();
+        RuleFor(x => x.Rating).InclusiveBetween(1, 5);
+        RuleFor(x => x.Comment).MaximumLength(2000);
+    }
+}
+
+public class DeleteReviewValidator : Validator<DeleteReviewRequest>
+{
+    public DeleteReviewValidator()
+    {
+        RuleFor(x => x.Id).NotEmpty();
     }
 }

@@ -197,6 +197,90 @@ public class VerifySellerEndpoint(LivestockDbContext db, IEventPublisher publish
     }
 }
 
+public class GetNearbySellersEndpoint(LivestockDbContext db) : Endpoint<NearbySellersRequest, List<NearbySellerItem>>
+{
+    public override void Configure()
+    {
+        Post("/livestocktrading/Sellers/Nearby");
+        AllowAnonymous();
+        Tags("Sellers");
+    }
+
+    public override async Task HandleAsync(NearbySellersRequest req, CancellationToken ct)
+    {
+        var query = db.Products
+            .AsNoTracking()
+            .Where(p => !p.IsDeleted
+                     && p.Status == ProductStatus.Active
+                     && p.LocationId != null
+                     && p.Location!.Latitude != null
+                     && p.Location.Longitude != null
+                     && p.Seller.Status == SellerStatus.Active);
+
+        if (!string.IsNullOrWhiteSpace(req.CountryCode))
+        {
+            query = query.Where(p => p.Location!.CountryCode == req.CountryCode);
+        }
+
+        var rows = await query
+            .OrderByDescending(p => p.CreatedAt)
+            .Take(5000)
+            .Select(p => new
+            {
+                p.SellerId,
+                p.Seller.UserId,
+                p.Seller.BusinessName,
+                p.Seller.LogoUrl,
+                p.Seller.Status,
+                p.Seller.VerifiedAt,
+                p.Seller.AverageRating,
+                p.Seller.ReviewCount,
+                p.Location!.City,
+                p.Location.CountryCode,
+                Latitude = p.Location.Latitude!.Value,
+                Longitude = p.Location.Longitude!.Value,
+            })
+            .ToListAsync(ct);
+
+        var nearby = rows
+            .GroupBy(r => r.SellerId)
+            .Select(g => g.First())
+            .Select(s => new NearbySellerItem(
+                s.SellerId,
+                s.UserId,
+                s.BusinessName,
+                s.LogoUrl,
+                s.Status == SellerStatus.Active && s.VerifiedAt != null,
+                s.Status,
+                s.AverageRating,
+                s.ReviewCount,
+                s.City,
+                s.CountryCode,
+                s.Latitude,
+                s.Longitude,
+                HaversineKm(req.Latitude, req.Longitude, s.Latitude, s.Longitude)))
+            .OrderBy(s => s.DistanceKm)
+            .Take(req.Limit)
+            .ToList();
+
+        await SendAsync(nearby, 200, ct);
+    }
+
+    private static double HaversineKm(double lat1, double lon1, double lat2, double lon2)
+    {
+        const double earthRadiusKm = 6371.0;
+        var dLat = ToRadians(lat2 - lat1);
+        var dLon = ToRadians(lon2 - lon1);
+        var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2)
+              + Math.Cos(ToRadians(lat1)) * Math.Cos(ToRadians(lat2))
+              * Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+        var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+        return earthRadiusKm * c;
+    }
+
+    private static double ToRadians(double degrees) => degrees * Math.PI / 180.0;
+}
+
 public class SuspendSellerEndpoint(LivestockDbContext db) : Endpoint<SuspendSellerRequest, EmptyResponse>
 {
     public override void Configure()
