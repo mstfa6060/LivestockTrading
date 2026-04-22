@@ -1,0 +1,196 @@
+// Jenkins pipeline — backend dev branch.
+//
+// Triggered by push to `dev`. Builds two images (host + workers),
+// pushes to Docker Hub, copies compose files to the server, and
+// rolls the dev stack via compose pull + up. EF migrations are
+// applied automatically at host startup (Program.cs).
+//
+// Required Jenkins credentials:
+//   dockerhub-credentials  (username/password)
+//   maden-server-key       (ssh private key + username)
+//   dev-server-host        (string with the server hostname/IP)
+
+pipeline {
+    agent any
+
+    parameters {
+        booleanParam(name: 'NO_CACHE', defaultValue: false, description: 'Docker build cache kullanma')
+        booleanParam(name: 'DEPLOY_TO_DEV', defaultValue: true, description: 'Build sonrası dev sunucuya deploy yap')
+        booleanParam(name: 'SMOKE_TEST', defaultValue: true, description: 'Deploy sonrası /health smoke test')
+    }
+
+    environment {
+        REGISTRY = 'docker.io'
+        HOST_IMAGE = 'mstfaock/livestocktrading-backend'
+        WORKERS_IMAGE = 'mstfaock/livestocktrading-backend-workers'
+        TAG_LATEST = 'dev-latest'
+        TAG_IMMUTABLE = "dev-${BUILD_ID}-${GIT_COMMIT.take(8)}"
+        DOCKER_BUILDKIT = '1'
+
+        DOCKERHUB_CREDENTIAL_ID = 'dockerhub-credentials'
+        SERVER_SSH_KEY_ID       = 'maden-server-key'
+        SERVER_HOST_ID          = 'dev-server-host'
+        REMOTE_APP_DIR          = '/opt/livestocktrading/dev-app'
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '20'))
+        timeout(time: 1, unit: 'HOURS')
+        timestamps()
+        ansiColor('xterm')
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                echo "Branch: ${env.GIT_BRANCH}"
+                echo "Commit: ${env.GIT_COMMIT}"
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: env.DOCKERHUB_CREDENTIAL_ID,
+                    usernameVariable: 'DOCKER_USERNAME',
+                    passwordVariable: 'DOCKER_PASSWORD'
+                )]) {
+                    sh '''
+                        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin >/dev/null
+                        echo "Docker Hub login OK"
+                    '''
+                }
+            }
+        }
+
+        stage('Build & Push') {
+            steps {
+                script {
+                    def cacheArg = params.NO_CACHE ? '--no-cache' : ''
+                    [
+                        [name: 'host',    image: env.HOST_IMAGE,    df: 'deploy/docker/Dockerfile.host'],
+                        [name: 'workers', image: env.WORKERS_IMAGE, df: 'deploy/docker/Dockerfile.workers'],
+                    ].each { m ->
+                        echo "Building ${m.name} → ${m.image}"
+                        timeout(time: 30, unit: 'MINUTES') {
+                            sh """
+                                docker buildx build ${cacheArg} \\
+                                    --progress=auto \\
+                                    --file ${m.df} \\
+                                    --tag ${m.image}:${TAG_LATEST} \\
+                                    --tag ${m.image}:${TAG_IMMUTABLE} \\
+                                    --label org.opencontainers.image.revision=${GIT_COMMIT} \\
+                                    --label org.opencontainers.image.version=${TAG_IMMUTABLE} \\
+                                    --provenance=false --sbom=false \\
+                                    --pull --push .
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Sync compose files') {
+            when { expression { return params.DEPLOY_TO_DEV } }
+            steps {
+                withCredentials([
+                    sshUserPrivateKey(credentialsId: env.SERVER_SSH_KEY_ID, keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER'),
+                    string(credentialsId: env.SERVER_HOST_ID, variable: 'SERVER_HOST')
+                ]) {
+                    sh '''
+                        chmod 600 "$SSH_KEY"
+                        ssh -o StrictHostKeyChecking=no -i "$SSH_KEY" "$SSH_USER@$SERVER_HOST" "mkdir -p $REMOTE_APP_DIR"
+                        scp -o StrictHostKeyChecking=no -i "$SSH_KEY" \
+                            deploy/docker/compose/docker-compose.dev.yml \
+                            deploy/docker/compose/docker-compose.dev.app.yml \
+                            deploy/docker/compose/docker-compose.dev.server.yml \
+                            "$SSH_USER@$SERVER_HOST:$REMOTE_APP_DIR/"
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to DEV') {
+            when { expression { return params.DEPLOY_TO_DEV } }
+            steps {
+                withCredentials([
+                    sshUserPrivateKey(credentialsId: env.SERVER_SSH_KEY_ID, keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER'),
+                    string(credentialsId: env.SERVER_HOST_ID, variable: 'SERVER_HOST'),
+                    usernamePassword(credentialsId: env.DOCKERHUB_CREDENTIAL_ID, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')
+                ]) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no -i "$SSH_KEY" "$SSH_USER@$SERVER_HOST" bash <<ENDSSH
+set -e
+cd "$REMOTE_APP_DIR"
+
+echo "==> Docker login"
+echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin >/dev/null
+
+echo "==> Pulling new images"
+docker compose -p livestock_dev \\
+    -f docker-compose.dev.yml \\
+    -f docker-compose.dev.app.yml \\
+    -f docker-compose.dev.server.yml \\
+    pull livestocktrading-host livestocktrading-workers
+
+echo "==> Recreating app containers"
+docker compose -p livestock_dev \\
+    -f docker-compose.dev.yml \\
+    -f docker-compose.dev.app.yml \\
+    -f docker-compose.dev.server.yml \\
+    up -d --no-deps livestocktrading-host livestocktrading-workers
+
+echo "==> Pruning dangling images"
+docker image prune -f >/dev/null
+docker logout >/dev/null
+ENDSSH
+                    '''
+                }
+            }
+        }
+
+        stage('Smoke test') {
+            when { expression { return params.DEPLOY_TO_DEV && params.SMOKE_TEST } }
+            steps {
+                withCredentials([
+                    sshUserPrivateKey(credentialsId: env.SERVER_SSH_KEY_ID, keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER'),
+                    string(credentialsId: env.SERVER_HOST_ID, variable: 'SERVER_HOST')
+                ]) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no -i "$SSH_KEY" "$SSH_USER@$SERVER_HOST" bash -s <<'ENDSSH'
+set -e
+echo "==> Waiting for /health (up to 60s)"
+for i in $(seq 1 30); do
+    body=$(curl -fsS http://127.0.0.1:5310/health || true)
+    if [ "$body" = "Healthy" ]; then
+        echo "  /health = Healthy after ${i}*2s"
+        break
+    fi
+    sleep 2
+    if [ "$i" = "30" ]; then echo "  /health did not become Healthy in 60s"; exit 1; fi
+done
+
+echo "==> Endpoint count"
+COUNT=$(curl -fsS http://127.0.0.1:5310/swagger/v1/swagger.json | python3 -c "import sys,json; print(len(json.load(sys.stdin)['paths']))")
+echo "  endpoints: $COUNT"
+[ "$COUNT" -ge 200 ] || { echo "  Expected >=200 endpoints"; exit 1; }
+ENDSSH
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "DEV deploy OK — ${TAG_IMMUTABLE}"
+        }
+        failure {
+            echo "DEV deploy FAILED — ${TAG_IMMUTABLE}"
+        }
+        always {
+            sh 'docker logout >/dev/null 2>&1 || true'
+        }
+    }
+}

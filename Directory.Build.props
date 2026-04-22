@@ -14,13 +14,6 @@
     <NuGetAudit>false</NuGetAudit>
   </PropertyGroup>
 
-  <!-- Legacy projeler bu kurallardan muaf -->
-  <PropertyGroup Condition="$(MSBuildProjectFullPath.Contains('\legacy\'))">
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
-    <Nullable>disable</Nullable>
-  </PropertyGroup>
-
   <!-- EF Core auto-generated migration files: skip code style enforcement
        (file-scoped namespace, etc.). They are overwritten by `dotnet ef`. -->
   <ItemGroup>

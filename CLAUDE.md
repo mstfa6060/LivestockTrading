@@ -70,11 +70,18 @@ src/
                                Services/   →  EmailService, SmsService, PushService, PriceConversionService
 
 tests/
-  Architecture.Tests/        ← NetArchTest bağımlılık kuralları (5 test)
+  Architecture.Tests/        ← NetArchTest bağımlılık kuralları (6 test)
 
-legacy/                      ← ESKİ ArfBlocks kodu — DOKUNMA, sadece oku
-deploy/docker/compose/
-  docker-compose.dev.yml     ← Postgres 17, Redis 8, NATS 2.11, Jaeger, Seq, MinIO
+deploy/docker/
+  Dockerfile.host            ← Livestock.Host image (multi-stage, aspnet runtime)
+  Dockerfile.workers         ← Livestock.Workers image
+  compose/
+    docker-compose.dev.yml       ← Postgres 17, Redis 8, NATS 2.11, MinIO, Seq
+                                   (Jaeger profile: tracing — opt-in)
+    docker-compose.dev.app.yml   ← host + workers overlay (build veya pull)
+    docker-compose.dev.server.yml ← server-side overlay: portları daraltır
+
+Jenkinsfile.dev              ← dev branch push → image build + push + deploy + smoke
 ```
 
 ---
@@ -237,11 +244,11 @@ olduğunu derleme zamanı koruyucusu olarak doğrular.
 
 ### Kesin Kurallar
 
-- **`legacy/` klasörüne DOKUNMA** — sadece referans için oku. Build'e girmez.
 - Her endpoint **FastEndpoints** `Endpoint<TReq, TRes>` kullanmalı — controller yok
 - Request doğrulama **FluentValidation** ile (`AbstractValidator<T>`)
 - Silme işlemleri **soft delete**: `entity.IsDeleted = true; entity.DeletedAt = DateTime.UtcNow`
 - Architecture testleri her değişiklikte geçmeli: `dotnet test tests/Architecture.Tests`
+- Eski ArfBlocks koduna ihtiyacın olursa `main` branch'ine bak (bu branch'te yok)
 
 ### Build ve Test Komutları
 
@@ -424,9 +431,7 @@ Server → Client: `ReceiveMessage`, `TypingIndicator`, `MessageRead`, `UserOnli
 
 ## 10. Bilinen Limitasyonlar / TODO
 
-- **Production Jenkinsfile**: `deploy/` altındaki Dockerfile'lar ve compose dosyaları eski mimari için (`api-gateway`, `iam-api`, `fileprovider-api` ayrı container'lar). Yeni tek-host (`Livestock.Host` + `Livestock.Workers`) için Dockerfile + compose + Jenkins pipeline güncellenmeli.
-- **Sunucu deploy**: Backend dev branch'te hazır ama hiçbir ortama deploy edilmedi. `dev-api.livestock-trading.com` hâlâ eski stack çalıştırıyor.
-- **EF migration uygulama**: 3 modül (`Iam`, `Files`, `Livestock`) `InitialCreate` baseline migration'ları üretildi; production DB'de (eski tablolar varsa) `dotnet ef migrations script --idempotent` ile guarded SQL gerekir.
+- **Production deploy**: Dev sunucu (`dev-api.livestock-trading.com`) yeni mimaride çalışıyor (Jenkinsfile.dev → otomatik deploy). Production için ayrı `Jenkinsfile.prod` + production compose overlay henüz yok.
 - **E2E testler**: Henüz yok. Architecture testleri var (`tests/Architecture.Tests` — 6 test: 5 dependency + 1 route convention), integration/E2E altyapısı eksik.
 - **IAP receipt verification**: Apple App Store / Google Play receipt'i Subscribe endpoint'inde sadece kayıt + duplicate check; gerçek doğrulama API çağrısı henüz yok (P2'de planlandı).
 - **OAuth provider verification**: Login Google/Apple `ExternalProviderUserId`'yi doğrulanmış kabul ediyor — gerçek JWT verification eklenmeli.
@@ -442,17 +447,29 @@ Aynı strateji `livestock-frontend` ve `livestock-mobile` repo'larında geçerli
 
 ## 12. Migration Gaps Raporu
 
-`_doc/MIGRATION_GAPS.md` legacy ArfBlocks ile yeni FastEndpoints arasındaki
-endpoint kapsamı + davranış delta'sını listeler. Her yeni feature başlamadan
-önce bu raporu kontrol et — P1/P2 listesinde hâlâ açık maddeler var
-(Banners, FAQs, Languages, PaymentMethods, TaxRates, ContactForms,
+`_doc/MIGRATION_GAPS.md` ESKİ ArfBlocks (artık `main` branch'te durur — bu repo'da silindi)
+ile yeni FastEndpoints arasındaki endpoint kapsamı + davranış delta'sını listeler.
+Her yeni feature başlamadan önce bu raporu kontrol et — P2 listesinde hâlâ açık
+maddeler var (Banners, FAQs, Languages, PaymentMethods, TaxRates, ContactForms,
 GeoIp/Geolocation, Audit log altyapısı, FusionCache referans veriler için).
 
----
+## 13. CI/CD
 
-## Eski Mimari Referansı (legacy/)
+- **`Jenkinsfile.dev`** (repo root) — `dev` branch'e push tetikler:
+  1. `mstfaock/livestocktrading-backend:dev-latest` (host) ve
+     `mstfaock/livestocktrading-backend-workers:dev-latest` (workers)
+     image'larını build edip Docker Hub'a push eder
+  2. Compose dosyalarını sunucuda `/opt/livestocktrading/dev-app/`'e scp eder
+  3. `docker compose pull + up` ile uygulama container'larını yeniden başlatır
+     (infra container'larına dokunmaz)
+  4. `/health` ve `/swagger/v1/swagger.json` smoke test
+- Gerekli Jenkins credential'ları:
+  `dockerhub-credentials`, `maden-server-key`, `dev-server-host`.
+- Production için ayrı `Jenkinsfile.prod` henüz yok.
 
-> `legacy/` klasörü ArfBlocks framework'ü ile çalışan eski kodu içerir.
-> Yeni geliştirme için **yukarıdaki** bölümleri kullan; `legacy/` sadece iş mantığı referansı için okunabilir.
+## Eski Mimari Notu
 
-Eski stack: SQL Server, RabbitMQ, Ocelot Gateway, ArfBlocks CQRS, FluentValidation, Redis, Serilog.
+ArfBlocks tabanlı eski kod (`BaseModules/`, `BusinessModules/`, `Common/`,
+`Gateways/`, `Jobs/`, eski `_devops/`) bu branch'ten temizlendi. Tarihsel
+referans için `main` branch'inde (`ab0b0d1`) saf eski hali korunuyor —
+SQL Server, RabbitMQ, Ocelot Gateway, ArfBlocks CQRS, Redis, Serilog stack'i.
