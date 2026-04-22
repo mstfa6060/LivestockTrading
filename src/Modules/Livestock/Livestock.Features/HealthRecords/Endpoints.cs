@@ -11,7 +11,7 @@ public class GetHealthRecordsEndpoint(LivestockDbContext db) : Endpoint<GetHealt
 {
     public override void Configure()
     {
-        Get("/HealthRecords/ByAnimal/{AnimalInfoId}");
+        Post("/livestocktrading/HealthRecords/ByAnimal");
         AllowAnonymous();
         Tags("HealthRecords");
     }
@@ -31,7 +31,7 @@ public class GetHealthRecordEndpoint(LivestockDbContext db) : Endpoint<GetHealth
 {
     public override void Configure()
     {
-        Get("/HealthRecords/{Id}");
+        Post("/livestocktrading/HealthRecords/Detail");
         AllowAnonymous();
         Tags("HealthRecords");
     }
@@ -48,7 +48,7 @@ public class CreateHealthRecordEndpoint(LivestockDbContext db, IUserContext user
 {
     public override void Configure()
     {
-        Post("/HealthRecords");
+        Post("/livestocktrading/HealthRecords/Create");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("HealthRecords");
     }
@@ -78,7 +78,7 @@ public class UpdateHealthRecordEndpoint(LivestockDbContext db, IUserContext user
 {
     public override void Configure()
     {
-        Put("/HealthRecords/{Id}");
+        Post("/livestocktrading/HealthRecords/Update");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("HealthRecords");
     }
@@ -106,7 +106,7 @@ public class DeleteHealthRecordEndpoint(LivestockDbContext db, IUserContext user
 {
     public override void Configure()
     {
-        Delete("/HealthRecords/{Id}");
+        Post("/livestocktrading/HealthRecords/Delete");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("HealthRecords");
     }

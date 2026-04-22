@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using Livestock.Domain.Enums;
 
 namespace Livestock.Domain.Entities;
@@ -18,6 +19,12 @@ public class Seller : BaseEntity
     public Guid? BucketId { get; set; }
     public double AverageRating { get; set; }
     public int ReviewCount { get; set; }
+
+    [NotMapped]
+    public bool IsVerified => Status == SellerStatus.Active && VerifiedAt is not null;
+
+    [NotMapped]
+    public bool IsActive => Status is not (SellerStatus.Suspended or SellerStatus.Banned or SellerStatus.Inactive);
 
     public ICollection<Farm> Farms { get; set; } = [];
     public ICollection<Product> Products { get; set; } = [];

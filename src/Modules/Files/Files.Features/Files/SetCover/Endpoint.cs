@@ -10,7 +10,7 @@ public sealed class SetCoverEndpoint(FilesDbContext db) : Endpoint<SetCoverReque
 {
     public override void Configure()
     {
-        Post("/Files/SetCover");
+        Post("/fileprovider/Files/SetCover");
         Tags("Files");
     }
 

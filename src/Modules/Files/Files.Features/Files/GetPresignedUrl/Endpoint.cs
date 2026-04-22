@@ -12,7 +12,7 @@ public sealed class GetPresignedUrlEndpoint(
 {
     public override void Configure()
     {
-        Post("/Files/PresignedUrl");
+        Post("/fileprovider/Files/PresignedUrl");
         Tags("Files");
     }
 

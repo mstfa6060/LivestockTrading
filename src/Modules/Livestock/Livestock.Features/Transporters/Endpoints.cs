@@ -14,7 +14,7 @@ public class GetAllTransportersEndpoint(LivestockDbContext db) : EndpointWithout
 {
     public override void Configure()
     {
-        Get("/Transporters");
+        Post("/livestocktrading/Transporters/All");
         AllowAnonymous();
         Tags("Transporters");
     }
@@ -25,7 +25,11 @@ public class GetAllTransportersEndpoint(LivestockDbContext db) : EndpointWithout
             .AsNoTracking()
             .Where(t => t.Status == TransporterStatus.Active)
             .OrderByDescending(t => t.AverageRating)
-            .Select(t => new TransporterListItem(t.Id, t.UserId, t.CompanyName, t.Status, t.AverageRating, t.ReviewCount, t.CreatedAt))
+            .Select(t => new TransporterListItem(
+                t.Id, t.UserId, t.CompanyName, t.Status,
+                t.Status != TransporterStatus.Suspended && t.Status != TransporterStatus.Banned && t.Status != TransporterStatus.Inactive,
+                t.Status == TransporterStatus.Active && t.VerifiedAt != null,
+                t.AverageRating, t.ReviewCount, t.CreatedAt))
             .ToListAsync(ct);
 
         await SendAsync(transporters, 200, ct);
@@ -36,7 +40,7 @@ public class GetTransporterEndpoint(LivestockDbContext db) : Endpoint<GetTranspo
 {
     public override void Configure()
     {
-        Get("/Transporters/{Id}");
+        Post("/livestocktrading/Transporters/Detail");
         AllowAnonymous();
         Tags("Transporters");
     }
@@ -51,7 +55,7 @@ public class GetTransporterEndpoint(LivestockDbContext db) : Endpoint<GetTranspo
             return;
         }
 
-        await SendAsync(new TransporterDetail(t.Id, t.UserId, t.CompanyName, t.Description, t.PhoneNumber, t.Email, t.WebsiteUrl, t.LicenseNumber, t.LogoUrl, t.Status, t.AverageRating, t.ReviewCount, t.VerifiedAt, t.CreatedAt), 200, ct);
+        await SendAsync(new TransporterDetail(t.Id, t.UserId, t.CompanyName, t.Description, t.PhoneNumber, t.Email, t.WebsiteUrl, t.LicenseNumber, t.LogoUrl, t.Status, t.IsActive, t.IsVerified, t.AverageRating, t.ReviewCount, t.VerifiedAt, t.CreatedAt), 200, ct);
     }
 }
 
@@ -59,7 +63,7 @@ public class GetMyTransporterEndpoint(LivestockDbContext db, IUserContext user) 
 {
     public override void Configure()
     {
-        Get("/Transporters/Me");
+        Post("/livestocktrading/Transporters/Me");
         Tags("Transporters");
     }
 
@@ -73,7 +77,7 @@ public class GetMyTransporterEndpoint(LivestockDbContext db, IUserContext user) 
             return;
         }
 
-        await SendAsync(new TransporterDetail(t.Id, t.UserId, t.CompanyName, t.Description, t.PhoneNumber, t.Email, t.WebsiteUrl, t.LicenseNumber, t.LogoUrl, t.Status, t.AverageRating, t.ReviewCount, t.VerifiedAt, t.CreatedAt), 200, ct);
+        await SendAsync(new TransporterDetail(t.Id, t.UserId, t.CompanyName, t.Description, t.PhoneNumber, t.Email, t.WebsiteUrl, t.LicenseNumber, t.LogoUrl, t.Status, t.IsActive, t.IsVerified, t.AverageRating, t.ReviewCount, t.VerifiedAt, t.CreatedAt), 200, ct);
     }
 }
 
@@ -81,7 +85,7 @@ public class BecomeTransporterEndpoint(LivestockDbContext db, IUserContext user,
 {
     public override void Configure()
     {
-        Post("/Transporters/Register");
+        Post("/livestocktrading/Transporters/Register");
         Tags("Transporters");
     }
 
@@ -112,7 +116,7 @@ public class BecomeTransporterEndpoint(LivestockDbContext db, IUserContext user,
             CompanyName = transporter.CompanyName
         }, ct);
 
-        await SendAsync(new TransporterDetail(transporter.Id, transporter.UserId, transporter.CompanyName, transporter.Description, transporter.PhoneNumber, transporter.Email, transporter.WebsiteUrl, transporter.LicenseNumber, null, transporter.Status, 0, 0, null, transporter.CreatedAt), 201, ct);
+        await SendAsync(new TransporterDetail(transporter.Id, transporter.UserId, transporter.CompanyName, transporter.Description, transporter.PhoneNumber, transporter.Email, transporter.WebsiteUrl, transporter.LicenseNumber, null, transporter.Status, transporter.IsActive, transporter.IsVerified, 0, 0, null, transporter.CreatedAt), 201, ct);
     }
 }
 
@@ -120,7 +124,7 @@ public class UpdateTransporterEndpoint(LivestockDbContext db, IUserContext user)
 {
     public override void Configure()
     {
-        Put("/Transporters/Me");
+        Post("/livestocktrading/Transporters/UpdateMe");
         Tags("Transporters");
     }
 
@@ -140,7 +144,7 @@ public class UpdateTransporterEndpoint(LivestockDbContext db, IUserContext user)
         transporter.UpdatedAt = DateTime.UtcNow;
         await db.SaveChangesAsync(ct);
 
-        await SendAsync(new TransporterDetail(transporter.Id, transporter.UserId, transporter.CompanyName, transporter.Description, transporter.PhoneNumber, transporter.Email, transporter.WebsiteUrl, transporter.LicenseNumber, transporter.LogoUrl, transporter.Status, transporter.AverageRating, transporter.ReviewCount, transporter.VerifiedAt, transporter.CreatedAt), 200, ct);
+        await SendAsync(new TransporterDetail(transporter.Id, transporter.UserId, transporter.CompanyName, transporter.Description, transporter.PhoneNumber, transporter.Email, transporter.WebsiteUrl, transporter.LicenseNumber, transporter.LogoUrl, transporter.Status, transporter.IsActive, transporter.IsVerified, transporter.AverageRating, transporter.ReviewCount, transporter.VerifiedAt, transporter.CreatedAt), 200, ct);
     }
 }
 
@@ -148,7 +152,7 @@ public class VerifyTransporterEndpoint(LivestockDbContext db, IEventPublisher pu
 {
     public override void Configure()
     {
-        Post("/Transporters/{Id}/Verify");
+        Post("/livestocktrading/Transporters/Verify");
         Roles("LivestockTrading.Admin", "LivestockTrading.Moderator");
         Tags("Transporters");
     }
@@ -189,7 +193,7 @@ public class SuspendTransporterEndpoint(LivestockDbContext db) : Endpoint<Suspen
 {
     public override void Configure()
     {
-        Post("/Transporters/{Id}/Suspend");
+        Post("/livestocktrading/Transporters/Suspend");
         Roles("LivestockTrading.Admin", "LivestockTrading.Moderator");
         Tags("Transporters");
     }

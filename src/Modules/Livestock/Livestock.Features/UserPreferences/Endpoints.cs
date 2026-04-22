@@ -10,7 +10,7 @@ public class GetUserPreferencesEndpoint(LivestockDbContext db, IUserContext user
 {
     public override void Configure()
     {
-        Get("/UserPreferences");
+        Post("/livestocktrading/UserPreferences/Get");
         Tags("UserPreferences");
     }
 
@@ -34,7 +34,7 @@ public class UpsertUserPreferencesEndpoint(LivestockDbContext db, IUserContext u
 {
     public override void Configure()
     {
-        Put("/UserPreferences");
+        Post("/livestocktrading/UserPreferences/Update");
         Tags("UserPreferences");
     }
 

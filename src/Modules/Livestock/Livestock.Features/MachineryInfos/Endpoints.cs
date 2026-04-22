@@ -11,7 +11,7 @@ public class GetMachineryInfoByProductEndpoint(LivestockDbContext db) : Endpoint
 {
     public override void Configure()
     {
-        Get("/MachineryInfos/ByProduct/{ProductId}");
+        Post("/livestocktrading/MachineryInfos/ByProduct");
         AllowAnonymous();
         Tags("MachineryInfos");
     }
@@ -28,7 +28,7 @@ public class GetMachineryInfoEndpoint(LivestockDbContext db) : Endpoint<GetMachi
 {
     public override void Configure()
     {
-        Get("/MachineryInfos/{Id}");
+        Post("/livestocktrading/MachineryInfos/Detail");
         AllowAnonymous();
         Tags("MachineryInfos");
     }
@@ -45,7 +45,7 @@ public class CreateMachineryInfoEndpoint(LivestockDbContext db, IUserContext use
 {
     public override void Configure()
     {
-        Post("/MachineryInfos");
+        Post("/livestocktrading/MachineryInfos/Create");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("MachineryInfos");
     }
@@ -80,7 +80,7 @@ public class UpdateMachineryInfoEndpoint(LivestockDbContext db, IUserContext use
 {
     public override void Configure()
     {
-        Put("/MachineryInfos/{Id}");
+        Post("/livestocktrading/MachineryInfos/Update");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("MachineryInfos");
     }
@@ -109,7 +109,7 @@ public class DeleteMachineryInfoEndpoint(LivestockDbContext db, IUserContext use
 {
     public override void Configure()
     {
-        Delete("/MachineryInfos/{Id}");
+        Post("/livestocktrading/MachineryInfos/Delete");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("MachineryInfos");
     }

@@ -9,7 +9,7 @@ public class ListPendingProductsEndpoint(LivestockDbContext db) : EndpointWithou
 {
     public override void Configure()
     {
-        Get("/Admin/Products/Pending");
+        Post("/livestocktrading/Admin/Products/Pending");
         Roles("LivestockTrading.Admin", "LivestockTrading.Moderator");
         Tags("Admin");
     }

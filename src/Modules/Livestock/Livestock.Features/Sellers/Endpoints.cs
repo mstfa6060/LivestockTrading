@@ -14,7 +14,7 @@ public class GetAllSellersEndpoint(LivestockDbContext db) : EndpointWithoutReque
 {
     public override void Configure()
     {
-        Get("/Sellers");
+        Post("/livestocktrading/Sellers/All");
         AllowAnonymous();
         Tags("Sellers");
     }
@@ -25,7 +25,11 @@ public class GetAllSellersEndpoint(LivestockDbContext db) : EndpointWithoutReque
             .AsNoTracking()
             .Where(s => s.Status == SellerStatus.Active)
             .OrderByDescending(s => s.AverageRating)
-            .Select(s => new SellerListItem(s.Id, s.UserId, s.BusinessName, s.Status, s.AverageRating, s.ReviewCount, s.CreatedAt))
+            .Select(s => new SellerListItem(
+                s.Id, s.UserId, s.BusinessName, s.Status,
+                s.Status != SellerStatus.Suspended && s.Status != SellerStatus.Banned && s.Status != SellerStatus.Inactive,
+                s.Status == SellerStatus.Active && s.VerifiedAt != null,
+                s.AverageRating, s.ReviewCount, s.CreatedAt))
             .ToListAsync(ct);
 
         await SendAsync(sellers, 200, ct);
@@ -36,7 +40,7 @@ public class GetSellerEndpoint(LivestockDbContext db) : Endpoint<GetSellerReques
 {
     public override void Configure()
     {
-        Get("/Sellers/{Id}");
+        Post("/livestocktrading/Sellers/Detail");
         AllowAnonymous();
         Tags("Sellers");
     }
@@ -51,7 +55,7 @@ public class GetSellerEndpoint(LivestockDbContext db) : Endpoint<GetSellerReques
             return;
         }
 
-        await SendAsync(new SellerDetail(s.Id, s.UserId, s.BusinessName, s.Description, s.PhoneNumber, s.Email, s.WebsiteUrl, s.TaxNumber, s.LogoUrl, s.Status, s.AverageRating, s.ReviewCount, s.VerifiedAt, s.CreatedAt), 200, ct);
+        await SendAsync(new SellerDetail(s.Id, s.UserId, s.BusinessName, s.Description, s.PhoneNumber, s.Email, s.WebsiteUrl, s.TaxNumber, s.LogoUrl, s.Status, s.IsActive, s.IsVerified, s.AverageRating, s.ReviewCount, s.VerifiedAt, s.CreatedAt), 200, ct);
     }
 }
 
@@ -59,7 +63,7 @@ public class GetMySellerEndpoint(LivestockDbContext db, IUserContext user) : End
 {
     public override void Configure()
     {
-        Get("/Sellers/Me");
+        Post("/livestocktrading/Sellers/Me");
         Tags("Sellers");
     }
 
@@ -73,7 +77,7 @@ public class GetMySellerEndpoint(LivestockDbContext db, IUserContext user) : End
             return;
         }
 
-        await SendAsync(new SellerDetail(s.Id, s.UserId, s.BusinessName, s.Description, s.PhoneNumber, s.Email, s.WebsiteUrl, s.TaxNumber, s.LogoUrl, s.Status, s.AverageRating, s.ReviewCount, s.VerifiedAt, s.CreatedAt), 200, ct);
+        await SendAsync(new SellerDetail(s.Id, s.UserId, s.BusinessName, s.Description, s.PhoneNumber, s.Email, s.WebsiteUrl, s.TaxNumber, s.LogoUrl, s.Status, s.IsActive, s.IsVerified, s.AverageRating, s.ReviewCount, s.VerifiedAt, s.CreatedAt), 200, ct);
     }
 }
 
@@ -81,7 +85,7 @@ public class BecomeSellerEndpoint(LivestockDbContext db, IUserContext user, IEve
 {
     public override void Configure()
     {
-        Post("/Sellers/Register");
+        Post("/livestocktrading/Sellers/Register");
         Tags("Sellers");
     }
 
@@ -117,7 +121,7 @@ public class BecomeSellerEndpoint(LivestockDbContext db, IUserContext user, IEve
             BusinessName = seller.BusinessName
         }, ct);
 
-        await SendAsync(new SellerDetail(seller.Id, seller.UserId, seller.BusinessName, seller.Description, seller.PhoneNumber, seller.Email, seller.WebsiteUrl, seller.TaxNumber, seller.LogoUrl, seller.Status, 0, 0, null, seller.CreatedAt), 201, ct);
+        await SendAsync(new SellerDetail(seller.Id, seller.UserId, seller.BusinessName, seller.Description, seller.PhoneNumber, seller.Email, seller.WebsiteUrl, seller.TaxNumber, seller.LogoUrl, seller.Status, seller.IsActive, seller.IsVerified, 0, 0, null, seller.CreatedAt), 201, ct);
     }
 }
 
@@ -125,7 +129,7 @@ public class UpdateSellerEndpoint(LivestockDbContext db, IUserContext user) : En
 {
     public override void Configure()
     {
-        Put("/Sellers/Me");
+        Post("/livestocktrading/Sellers/UpdateMe");
         Tags("Sellers");
     }
 
@@ -148,7 +152,7 @@ public class UpdateSellerEndpoint(LivestockDbContext db, IUserContext user) : En
         seller.UpdatedAt = DateTime.UtcNow;
         await db.SaveChangesAsync(ct);
 
-        await SendAsync(new SellerDetail(seller.Id, seller.UserId, seller.BusinessName, seller.Description, seller.PhoneNumber, seller.Email, seller.WebsiteUrl, seller.TaxNumber, seller.LogoUrl, seller.Status, seller.AverageRating, seller.ReviewCount, seller.VerifiedAt, seller.CreatedAt), 200, ct);
+        await SendAsync(new SellerDetail(seller.Id, seller.UserId, seller.BusinessName, seller.Description, seller.PhoneNumber, seller.Email, seller.WebsiteUrl, seller.TaxNumber, seller.LogoUrl, seller.Status, seller.IsActive, seller.IsVerified, seller.AverageRating, seller.ReviewCount, seller.VerifiedAt, seller.CreatedAt), 200, ct);
     }
 }
 
@@ -156,7 +160,7 @@ public class VerifySellerEndpoint(LivestockDbContext db, IEventPublisher publish
 {
     public override void Configure()
     {
-        Post("/Sellers/{Id}/Verify");
+        Post("/livestocktrading/Sellers/Verify");
         Roles("LivestockTrading.Admin", "LivestockTrading.Moderator");
         Tags("Sellers");
     }
@@ -197,7 +201,7 @@ public class SuspendSellerEndpoint(LivestockDbContext db) : Endpoint<SuspendSell
 {
     public override void Configure()
     {
-        Post("/Sellers/{Id}/Suspend");
+        Post("/livestocktrading/Sellers/Suspend");
         Roles("LivestockTrading.Admin", "LivestockTrading.Moderator");
         Tags("Sellers");
     }

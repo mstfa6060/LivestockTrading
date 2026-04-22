@@ -9,7 +9,7 @@ public class ListReportsEndpoint(LivestockDbContext db) : EndpointWithoutRequest
 {
     public override void Configure()
     {
-        Get("/Admin/Reports");
+        Post("/livestocktrading/Admin/Reports/All");
         Roles("LivestockTrading.Admin", "LivestockTrading.Moderator");
         Tags("Admin");
     }
@@ -34,7 +34,7 @@ public class ResolveReportEndpoint(LivestockDbContext db) : Endpoint<ResolveRepo
 {
     public override void Configure()
     {
-        Post("/Admin/Reports/{Id}/Resolve");
+        Post("/livestocktrading/Admin/Reports/Resolve");
         Roles("LivestockTrading.Admin", "LivestockTrading.Moderator");
         Tags("Admin");
     }

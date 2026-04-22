@@ -10,7 +10,7 @@ public class GetSearchHistoryEndpoint(LivestockDbContext db, IUserContext user) 
 {
     public override void Configure()
     {
-        Get("/SearchHistories");
+        Post("/livestocktrading/SearchHistories/All");
         Tags("SearchHistories");
     }
 
@@ -34,7 +34,7 @@ public class RecordSearchEndpoint(LivestockDbContext db, IUserContext user) : En
 {
     public override void Configure()
     {
-        Post("/SearchHistories");
+        Post("/livestocktrading/SearchHistories/Record");
         Tags("SearchHistories");
     }
 
@@ -58,7 +58,7 @@ public class ClearSearchHistoryEndpoint(LivestockDbContext db, IUserContext user
 {
     public override void Configure()
     {
-        Delete("/SearchHistories");
+        Post("/livestocktrading/SearchHistories/Clear");
         Tags("SearchHistories");
     }
 

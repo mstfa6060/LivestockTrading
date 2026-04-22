@@ -11,7 +11,7 @@ public class GetSeedInfoByProductEndpoint(LivestockDbContext db) : Endpoint<GetS
 {
     public override void Configure()
     {
-        Get("/SeedInfos/ByProduct/{ProductId}");
+        Post("/livestocktrading/SeedInfos/ByProduct");
         AllowAnonymous();
         Tags("SeedInfos");
     }
@@ -28,7 +28,7 @@ public class GetSeedInfoEndpoint(LivestockDbContext db) : Endpoint<GetSeedInfoRe
 {
     public override void Configure()
     {
-        Get("/SeedInfos/{Id}");
+        Post("/livestocktrading/SeedInfos/Detail");
         AllowAnonymous();
         Tags("SeedInfos");
     }
@@ -45,7 +45,7 @@ public class CreateSeedInfoEndpoint(LivestockDbContext db, IUserContext user) : 
 {
     public override void Configure()
     {
-        Post("/SeedInfos");
+        Post("/livestocktrading/SeedInfos/Create");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("SeedInfos");
     }
@@ -82,7 +82,7 @@ public class UpdateSeedInfoEndpoint(LivestockDbContext db, IUserContext user) : 
 {
     public override void Configure()
     {
-        Put("/SeedInfos/{Id}");
+        Post("/livestocktrading/SeedInfos/Update");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("SeedInfos");
     }
@@ -112,7 +112,7 @@ public class DeleteSeedInfoEndpoint(LivestockDbContext db, IUserContext user) : 
 {
     public override void Configure()
     {
-        Delete("/SeedInfos/{Id}");
+        Post("/livestocktrading/SeedInfos/Delete");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("SeedInfos");
     }

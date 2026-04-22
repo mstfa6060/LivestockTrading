@@ -14,7 +14,7 @@ public class GetAllProductsEndpoint(LivestockDbContext db) : Endpoint<ProductSea
 {
     public override void Configure()
     {
-        Post("/Products/Search");
+        Post("/livestocktrading/Products/All");
         AllowAnonymous();
         Tags("Products");
     }
@@ -95,7 +95,7 @@ public class GetProductEndpoint(LivestockDbContext db) : Endpoint<GetProductRequ
 {
     public override void Configure()
     {
-        Get("/Products/{Id}");
+        Post("/livestocktrading/Products/Detail");
         AllowAnonymous();
         Tags("Products");
     }
@@ -135,7 +135,7 @@ public class CreateProductEndpoint(LivestockDbContext db, IUserContext user, IEv
 {
     public override void Configure()
     {
-        Post("/Products");
+        Post("/livestocktrading/Products/Create");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("Products");
     }
@@ -275,7 +275,7 @@ public class UpdateProductEndpoint(LivestockDbContext db, IUserContext user) : E
 {
     public override void Configure()
     {
-        Put("/Products/{Id}");
+        Post("/livestocktrading/Products/Update");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("Products");
     }
@@ -330,7 +330,7 @@ public class DeleteProductEndpoint(LivestockDbContext db, IUserContext user) : E
 {
     public override void Configure()
     {
-        Delete("/Products/{Id}");
+        Post("/livestocktrading/Products/Delete");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("Products");
     }
@@ -363,7 +363,7 @@ public class ApproveProductEndpoint(LivestockDbContext db, IEventPublisher publi
 {
     public override void Configure()
     {
-        Post("/Products/{Id}/Approve");
+        Post("/livestocktrading/Products/Approve");
         Roles("LivestockTrading.Admin", "LivestockTrading.Moderator");
         Tags("Products");
     }
@@ -439,7 +439,7 @@ public class RejectProductEndpoint(LivestockDbContext db, IEventPublisher publis
 {
     public override void Configure()
     {
-        Post("/Products/{Id}/Reject");
+        Post("/livestocktrading/Products/Reject");
         Roles("LivestockTrading.Admin", "LivestockTrading.Moderator");
         Tags("Products");
     }

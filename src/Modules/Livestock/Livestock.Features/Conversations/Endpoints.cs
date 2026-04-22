@@ -14,7 +14,7 @@ public class GetMyConversationsEndpoint(LivestockDbContext db, IUserContext user
 {
     public override void Configure()
     {
-        Get("/Conversations");
+        Post("/livestocktrading/Conversations/My");
         Tags("Conversations");
     }
 
@@ -38,7 +38,7 @@ public class GetConversationEndpoint(LivestockDbContext db, IUserContext user) :
 {
     public override void Configure()
     {
-        Get("/Conversations/{Id}");
+        Post("/livestocktrading/Conversations/Detail");
         Tags("Conversations");
     }
 
@@ -67,7 +67,7 @@ public class CreateConversationEndpoint(LivestockDbContext db, IUserContext user
 {
     public override void Configure()
     {
-        Post("/Conversations");
+        Post("/livestocktrading/Conversations/Create");
         Tags("Conversations");
     }
 
@@ -139,7 +139,7 @@ public class GetConversationMessagesEndpoint(LivestockDbContext db, IUserContext
 {
     public override void Configure()
     {
-        Get("/Conversations/{ConversationId}/Messages");
+        Post("/livestocktrading/Conversations/Messages");
         Tags("Conversations");
     }
 
@@ -172,7 +172,7 @@ public class SendMessageEndpoint(LivestockDbContext db, IUserContext user, IEven
 {
     public override void Configure()
     {
-        Post("/Conversations/{ConversationId}/Messages");
+        Post("/livestocktrading/Conversations/SendMessage");
         Tags("Conversations");
     }
 
@@ -230,7 +230,7 @@ public class MarkMessagesReadEndpoint(LivestockDbContext db, IUserContext user) 
 {
     public override void Configure()
     {
-        Post("/Conversations/{ConversationId}/MarkRead");
+        Post("/livestocktrading/Conversations/MarkRead");
         Tags("Conversations");
     }
 

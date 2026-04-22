@@ -11,7 +11,7 @@ public class GetVeterinaryInfoByProductEndpoint(LivestockDbContext db) : Endpoin
 {
     public override void Configure()
     {
-        Get("/VeterinaryInfos/ByProduct/{ProductId}");
+        Post("/livestocktrading/VeterinaryInfos/ByProduct");
         AllowAnonymous();
         Tags("VeterinaryInfos");
     }
@@ -28,7 +28,7 @@ public class GetVeterinaryInfoEndpoint(LivestockDbContext db) : Endpoint<GetVete
 {
     public override void Configure()
     {
-        Get("/VeterinaryInfos/{Id}");
+        Post("/livestocktrading/VeterinaryInfos/Detail");
         AllowAnonymous();
         Tags("VeterinaryInfos");
     }
@@ -45,7 +45,7 @@ public class CreateVeterinaryInfoEndpoint(LivestockDbContext db, IUserContext us
 {
     public override void Configure()
     {
-        Post("/VeterinaryInfos");
+        Post("/livestocktrading/VeterinaryInfos/Create");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("VeterinaryInfos");
     }
@@ -81,7 +81,7 @@ public class UpdateVeterinaryInfoEndpoint(LivestockDbContext db, IUserContext us
 {
     public override void Configure()
     {
-        Put("/VeterinaryInfos/{Id}");
+        Post("/livestocktrading/VeterinaryInfos/Update");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("VeterinaryInfos");
     }
@@ -111,7 +111,7 @@ public class DeleteVeterinaryInfoEndpoint(LivestockDbContext db, IUserContext us
 {
     public override void Configure()
     {
-        Delete("/VeterinaryInfos/{Id}");
+        Post("/livestocktrading/VeterinaryInfos/Delete");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("VeterinaryInfos");
     }

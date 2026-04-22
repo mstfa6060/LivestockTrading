@@ -10,7 +10,7 @@ public class GetMyNotificationsEndpoint(LivestockDbContext db, IUserContext user
 {
     public override void Configure()
     {
-        Get("/Notifications");
+        Post("/livestocktrading/Notifications/All");
         Tags("Notifications");
     }
 
@@ -32,7 +32,7 @@ public class MarkNotificationReadEndpoint(LivestockDbContext db, IUserContext us
 {
     public override void Configure()
     {
-        Post("/Notifications/{Id}/Read");
+        Post("/livestocktrading/Notifications/MarkRead");
         Tags("Notifications");
     }
 
@@ -64,7 +64,7 @@ public class MarkAllNotificationsReadEndpoint(LivestockDbContext db, IUserContex
 {
     public override void Configure()
     {
-        Post("/Notifications/ReadAll");
+        Post("/livestocktrading/Notifications/MarkAllRead");
         Tags("Notifications");
     }
 

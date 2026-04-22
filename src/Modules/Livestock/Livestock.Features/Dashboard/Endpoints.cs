@@ -10,7 +10,7 @@ public class GetAdminDashboardEndpoint(LivestockDbContext db) : EndpointWithoutR
 {
     public override void Configure()
     {
-        Get("/Dashboard/Stats");
+        Post("/livestocktrading/Dashboard/Stats");
         Roles("LivestockTrading.Admin", "LivestockTrading.Moderator");
         Tags("Dashboard");
     }
@@ -40,7 +40,7 @@ public class GetSellerDashboardEndpoint(LivestockDbContext db, IUserContext user
 {
     public override void Configure()
     {
-        Get("/Dashboard/SellerStats");
+        Post("/livestocktrading/Dashboard/SellerStats");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("Dashboard");
     }

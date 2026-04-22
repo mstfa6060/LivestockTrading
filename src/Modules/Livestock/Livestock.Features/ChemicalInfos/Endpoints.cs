@@ -11,7 +11,7 @@ public class GetChemicalInfoByProductEndpoint(LivestockDbContext db) : Endpoint<
 {
     public override void Configure()
     {
-        Get("/ChemicalInfos/ByProduct/{ProductId}");
+        Post("/livestocktrading/ChemicalInfos/ByProduct");
         AllowAnonymous();
         Tags("ChemicalInfos");
     }
@@ -28,7 +28,7 @@ public class GetChemicalInfoEndpoint(LivestockDbContext db) : Endpoint<GetChemic
 {
     public override void Configure()
     {
-        Get("/ChemicalInfos/{Id}");
+        Post("/livestocktrading/ChemicalInfos/Detail");
         AllowAnonymous();
         Tags("ChemicalInfos");
     }
@@ -45,7 +45,7 @@ public class CreateChemicalInfoEndpoint(LivestockDbContext db, IUserContext user
 {
     public override void Configure()
     {
-        Post("/ChemicalInfos");
+        Post("/livestocktrading/ChemicalInfos/Create");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("ChemicalInfos");
     }
@@ -82,7 +82,7 @@ public class UpdateChemicalInfoEndpoint(LivestockDbContext db, IUserContext user
 {
     public override void Configure()
     {
-        Put("/ChemicalInfos/{Id}");
+        Post("/livestocktrading/ChemicalInfos/Update");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("ChemicalInfos");
     }
@@ -113,7 +113,7 @@ public class DeleteChemicalInfoEndpoint(LivestockDbContext db, IUserContext user
 {
     public override void Configure()
     {
-        Delete("/ChemicalInfos/{Id}");
+        Post("/livestocktrading/ChemicalInfos/Delete");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("ChemicalInfos");
     }

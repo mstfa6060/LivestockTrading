@@ -10,7 +10,7 @@ public class GetProductViewHistoryEndpoint(LivestockDbContext db, IUserContext u
 {
     public override void Configure()
     {
-        Get("/ProductViewHistories");
+        Post("/livestocktrading/ProductViewHistories/All");
         Tags("ProductViewHistories");
     }
 
@@ -35,7 +35,7 @@ public class RecordProductViewEndpoint(LivestockDbContext db, IUserContext user)
 {
     public override void Configure()
     {
-        Post("/ProductViewHistories");
+        Post("/livestocktrading/ProductViewHistories/Record");
         Tags("ProductViewHistories");
     }
 
@@ -58,7 +58,7 @@ public class ClearProductViewHistoryEndpoint(LivestockDbContext db, IUserContext
 {
     public override void Configure()
     {
-        Delete("/ProductViewHistories");
+        Post("/livestocktrading/ProductViewHistories/Clear");
         Tags("ProductViewHistories");
     }
 

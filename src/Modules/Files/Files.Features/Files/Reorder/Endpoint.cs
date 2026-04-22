@@ -10,7 +10,7 @@ public sealed class ReorderEndpoint(FilesDbContext db) : Endpoint<ReorderRequest
 {
     public override void Configure()
     {
-        Post("/Files/Reorder");
+        Post("/fileprovider/Files/Reorder");
         Tags("Files");
     }
 

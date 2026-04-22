@@ -9,7 +9,7 @@ public sealed class CreateBucketEndpoint(FilesDbContext db) : Endpoint<CreateBuc
 {
     public override void Configure()
     {
-        Post("/Buckets/Create");
+        Post("/fileprovider/Buckets/Create");
         Tags("Buckets");
     }
 

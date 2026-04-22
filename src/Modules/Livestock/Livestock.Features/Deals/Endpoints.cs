@@ -11,7 +11,7 @@ public class GetMyDealsEndpoint(LivestockDbContext db, IUserContext user) : Endp
 {
     public override void Configure()
     {
-        Get("/Deals/My");
+        Post("/livestocktrading/Deals/My");
         Tags("Deals");
     }
 
@@ -36,7 +36,7 @@ public class GetDealEndpoint(LivestockDbContext db, IUserContext user) : Endpoin
 {
     public override void Configure()
     {
-        Get("/Deals/{Id}");
+        Post("/livestocktrading/Deals/Detail");
         Tags("Deals");
     }
 
@@ -66,7 +66,7 @@ public class UpdateDealStatusEndpoint(LivestockDbContext db, IUserContext user) 
 {
     public override void Configure()
     {
-        Patch("/Deals/{Id}/Status");
+        Post("/livestocktrading/Deals/UpdateStatus");
         Tags("Deals");
     }
 

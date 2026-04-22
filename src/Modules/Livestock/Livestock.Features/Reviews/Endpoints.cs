@@ -11,7 +11,7 @@ public class GetProductReviewsEndpoint(LivestockDbContext db) : Endpoint<GetProd
 {
     public override void Configure()
     {
-        Get("/Products/{ProductId}/Reviews");
+        Post("/livestocktrading/Reviews/ByProduct");
         AllowAnonymous();
         Tags("Reviews");
     }
@@ -35,7 +35,7 @@ public class CreateProductReviewEndpoint(LivestockDbContext db, IUserContext use
 {
     public override void Configure()
     {
-        Post("/Products/{ProductId}/Reviews");
+        Post("/livestocktrading/Reviews/CreateForProduct");
         Tags("Reviews");
     }
 
@@ -80,7 +80,7 @@ public class GetSellerReviewsEndpoint(LivestockDbContext db) : Endpoint<GetSelle
 {
     public override void Configure()
     {
-        Get("/Sellers/{SellerId}/Reviews");
+        Post("/livestocktrading/Reviews/BySeller");
         AllowAnonymous();
         Tags("Reviews");
     }
@@ -104,7 +104,7 @@ public class CreateSellerReviewEndpoint(LivestockDbContext db, IUserContext user
 {
     public override void Configure()
     {
-        Post("/Sellers/{SellerId}/Reviews");
+        Post("/livestocktrading/Reviews/CreateForSeller");
         Tags("Reviews");
     }
 
@@ -150,7 +150,7 @@ public class GetTransporterReviewsEndpoint(LivestockDbContext db) : Endpoint<Get
 {
     public override void Configure()
     {
-        Get("/Transporters/{TransporterId}/Reviews");
+        Post("/livestocktrading/Reviews/ByTransporter");
         AllowAnonymous();
         Tags("Reviews");
     }

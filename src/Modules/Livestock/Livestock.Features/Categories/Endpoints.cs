@@ -10,7 +10,7 @@ public class GetAllCategoriesEndpoint(LivestockDbContext db) : EndpointWithoutRe
 {
     public override void Configure()
     {
-        Get("/Categories");
+        Post("/livestocktrading/Categories/All");
         AllowAnonymous();
         Tags("Categories");
     }
@@ -38,7 +38,7 @@ public class GetCategoryEndpoint(LivestockDbContext db) : Endpoint<GetCategoryRe
 {
     public override void Configure()
     {
-        Get("/Categories/{Id}");
+        Post("/livestocktrading/Categories/Detail");
         AllowAnonymous();
         Tags("Categories");
     }
@@ -68,7 +68,7 @@ public class CreateCategoryEndpoint(LivestockDbContext db) : Endpoint<CreateCate
 {
     public override void Configure()
     {
-        Post("/Categories");
+        Post("/livestocktrading/Categories/Create");
         Roles("LivestockTrading.Admin", "LivestockTrading.Moderator");
         Tags("Categories");
     }
@@ -109,7 +109,7 @@ public class UpdateCategoryEndpoint(LivestockDbContext db) : Endpoint<UpdateCate
 {
     public override void Configure()
     {
-        Put("/Categories/{Id}");
+        Post("/livestocktrading/Categories/Update");
         Roles("LivestockTrading.Admin", "LivestockTrading.Moderator");
         Tags("Categories");
     }
@@ -155,7 +155,7 @@ public class DeleteCategoryEndpoint(LivestockDbContext db) : Endpoint<DeleteCate
 {
     public override void Configure()
     {
-        Delete("/Categories/{Id}");
+        Post("/livestocktrading/Categories/Delete");
         Roles("LivestockTrading.Admin");
         Tags("Categories");
     }

@@ -11,7 +11,7 @@ public class GetMyFavoritesEndpoint(LivestockDbContext db, IUserContext user) : 
 {
     public override void Configure()
     {
-        Get("/Favorites");
+        Post("/livestocktrading/Favorites/All");
         Tags("Favorites");
     }
 
@@ -33,7 +33,7 @@ public class AddFavoriteEndpoint(LivestockDbContext db, IUserContext user) : End
 {
     public override void Configure()
     {
-        Post("/Favorites");
+        Post("/livestocktrading/Favorites/Add");
         Tags("Favorites");
     }
 
@@ -66,7 +66,7 @@ public class RemoveFavoriteEndpoint(LivestockDbContext db, IUserContext user) : 
 {
     public override void Configure()
     {
-        Delete("/Favorites/{ProductId}");
+        Post("/livestocktrading/Favorites/Remove");
         Tags("Favorites");
     }
 

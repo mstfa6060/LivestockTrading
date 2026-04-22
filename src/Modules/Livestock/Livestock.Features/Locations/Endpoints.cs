@@ -11,7 +11,7 @@ public class GetLocationsByOwnerEndpoint(LivestockDbContext db) : Endpoint<GetLo
 {
     public override void Configure()
     {
-        Get("/Locations/ByOwner");
+        Post("/livestocktrading/Locations/ByOwner");
         AllowAnonymous();
         Tags("Locations");
     }
@@ -30,7 +30,7 @@ public class GetLocationEndpoint(LivestockDbContext db) : Endpoint<GetLocationRe
 {
     public override void Configure()
     {
-        Get("/Locations/{Id}");
+        Post("/livestocktrading/Locations/Detail");
         AllowAnonymous();
         Tags("Locations");
     }
@@ -47,7 +47,7 @@ public class CreateLocationEndpoint(LivestockDbContext db) : Endpoint<CreateLoca
 {
     public override void Configure()
     {
-        Post("/Locations");
+        Post("/livestocktrading/Locations/Create");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin", "LivestockTrading.Buyer", "LivestockTrading.Transporter");
         Tags("Locations");
     }
@@ -72,7 +72,7 @@ public class UpdateLocationEndpoint(LivestockDbContext db, IUserContext user) : 
 {
     public override void Configure()
     {
-        Put("/Locations/{Id}");
+        Post("/livestocktrading/Locations/Update");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin", "LivestockTrading.Buyer", "LivestockTrading.Transporter");
         Tags("Locations");
     }
@@ -100,7 +100,7 @@ public class DeleteLocationEndpoint(LivestockDbContext db, IUserContext user) : 
 {
     public override void Configure()
     {
-        Delete("/Locations/{Id}");
+        Post("/livestocktrading/Locations/Delete");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin", "LivestockTrading.Buyer", "LivestockTrading.Transporter");
         Tags("Locations");
     }

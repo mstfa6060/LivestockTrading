@@ -10,7 +10,7 @@ public class ListAppVersionsEndpoint(LivestockDbContext db) : EndpointWithoutReq
 {
     public override void Configure()
     {
-        Get("/Admin/AppVersions");
+        Post("/livestocktrading/Admin/AppVersions/All");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }
@@ -31,7 +31,7 @@ public class GetAppVersionEndpoint(LivestockDbContext db) : Endpoint<GetAppVersi
 {
     public override void Configure()
     {
-        Get("/Admin/AppVersions/{Id}");
+        Post("/livestocktrading/Admin/AppVersions/Detail");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }
@@ -54,7 +54,7 @@ public class CreateAppVersionEndpoint(LivestockDbContext db) : Endpoint<CreateAp
 {
     public override void Configure()
     {
-        Post("/Admin/AppVersions");
+        Post("/livestocktrading/Admin/AppVersions/Create");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }
@@ -89,7 +89,7 @@ public class UpdateAppVersionEndpoint(LivestockDbContext db) : Endpoint<UpdateAp
 {
     public override void Configure()
     {
-        Put("/Admin/AppVersions/{Id}");
+        Post("/livestocktrading/Admin/AppVersions/Update");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }
@@ -120,7 +120,7 @@ public class DeleteAppVersionEndpoint(LivestockDbContext db) : Endpoint<DeleteAp
 {
     public override void Configure()
     {
-        Delete("/Admin/AppVersions/{Id}");
+        Post("/livestocktrading/Admin/AppVersions/Delete");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }

@@ -7,5 +7,10 @@ public record MySubscriptionItem(Guid Id, Guid PlanId, string PlanName, Subscrip
 public record BoostPackageItem(Guid Id, string Name, string? Description, BoostType BoostType, int DurationDays, decimal Price, string CurrencyCode, bool IsActive);
 
 public record GetSubscriptionPlansRequest(SubscriptionTargetType TargetType);
-public record SubscribeRequest(Guid PlanId, SubscriptionPlatform Platform, string? ExternalSubscriptionId);
+public record SubscribeRequest(
+    Guid PlanId,
+    SubscriptionPlatform Platform,
+    string Receipt,
+    string StoreTransactionId,
+    string? ExternalSubscriptionId);
 public record PurchaseBoostRequest(Guid ProductId, Guid PackageId, SubscriptionPlatform Platform);

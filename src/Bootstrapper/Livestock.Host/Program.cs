@@ -18,11 +18,26 @@ builder.Services.AddSharedOpenTelemetry(builder.Configuration, "livestock-host")
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 builder.Services
-    .AddAuthenticationJwtBearer(s =>
-    {
-        s.SigningKey = builder.Configuration["Jwt:SigningKey"]
-            ?? throw new InvalidOperationException("Jwt:SigningKey is required.");
-    })
+    .AddAuthenticationJwtBearer(
+        s =>
+        {
+            s.SigningKey = builder.Configuration["Jwt:SigningKey"]
+                ?? throw new InvalidOperationException("Jwt:SigningKey is required.");
+        },
+        b => b.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+        {
+            // SignalR WebSocket cannot send Authorization header; read JWT from query string
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            },
+        })
     .AddAuthorization();
 
 // ── Cache (FusionCache L1+L2) ─────────────────────────────────────────────────
@@ -34,6 +49,9 @@ builder.Services.AddSharedNats(builder.Configuration);
 // ── HTTP Context / User Context ───────────────────────────────────────────────
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IUserContext, HttpUserContext>();
+
+// ── SignalR ───────────────────────────────────────────────────────────────────
+builder.Services.AddSignalR();
 
 // ── FastEndpoints ─────────────────────────────────────────────────────────────
 builder.Services.AddFastEndpoints();
@@ -68,5 +86,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapHealthChecks("/health");
+app.MapHub<Livestock.Features.Hubs.ChatHub>("/hubs/chat");
 
 app.Run();

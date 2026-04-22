@@ -12,7 +12,7 @@ public class GetSubscriptionPlansEndpoint(LivestockDbContext db) : Endpoint<GetS
 {
     public override void Configure()
     {
-        Get("/Subscriptions/Plans");
+        Post("/livestocktrading/Subscriptions/Plans");
         AllowAnonymous();
         Tags("Subscriptions");
     }
@@ -34,7 +34,7 @@ public class GetMySubscriptionEndpoint(LivestockDbContext db, IUserContext user)
 {
     public override void Configure()
     {
-        Get("/Subscriptions/My");
+        Post("/livestocktrading/Subscriptions/My");
         Tags("Subscriptions");
     }
 
@@ -70,7 +70,8 @@ public class SubscribeEndpoint(LivestockDbContext db, IUserContext user) : Endpo
 {
     public override void Configure()
     {
-        Post("/Subscriptions/Subscribe");
+        Post("/livestocktrading/Subscriptions/Subscribe");
+        Roles("LivestockTrading.Seller", "LivestockTrading.Transporter");
         Tags("Subscriptions");
     }
 
@@ -98,6 +99,27 @@ public class SubscribeEndpoint(LivestockDbContext db, IUserContext user) : Endpo
             subscriberId = transporter.Id;
         }
 
+        var hasActive = await db.SellerSubscriptions
+            .AnyAsync(s => s.SubscriberId == subscriberId
+                        && s.Status == SubscriptionStatus.Active
+                        && s.ExpiresAt > DateTime.UtcNow, ct);
+        if (hasActive)
+        {
+            AddError(LivestockErrors.SubscriptionErrors.AlreadyHasActiveSubscription);
+            await SendErrorsAsync(409, ct);
+            return;
+        }
+
+        var duplicateTx = await db.IAPTransactions
+            .AnyAsync(t => t.Platform == req.Platform
+                        && t.ExternalTransactionId == req.StoreTransactionId, ct);
+        if (duplicateTx)
+        {
+            AddError(LivestockErrors.SubscriptionErrors.AlreadyHasActiveSubscription);
+            await SendErrorsAsync(409, ct);
+            return;
+        }
+
         var expiresAt = plan.Period == SubscriptionPeriod.Monthly
             ? DateTime.UtcNow.AddMonths(1)
             : DateTime.UtcNow.AddYears(1);
@@ -118,6 +140,21 @@ public class SubscribeEndpoint(LivestockDbContext db, IUserContext user) : Endpo
         };
 
         db.SellerSubscriptions.Add(subscription);
+
+        db.IAPTransactions.Add(new IAPTransaction
+        {
+            UserId = user.UserId,
+            TransactionType = IAPTransactionType.Subscription,
+            Status = IAPTransactionStatus.Pending,
+            Platform = req.Platform,
+            ExternalTransactionId = req.StoreTransactionId,
+            ProductId = req.ExternalSubscriptionId,
+            ReceiptData = req.Receipt,
+            Amount = plan.Price,
+            CurrencyCode = plan.CurrencyCode,
+            SubscriptionId = subscription.Id
+        });
+
         await db.SaveChangesAsync(ct);
 
         await SendAsync(new MySubscriptionItem(subscription.Id, plan.Id, plan.Name, plan.Tier, subscription.Status, subscription.Period, subscription.StartedAt, subscription.ExpiresAt, subscription.PaidAmount, subscription.CurrencyCode), 201, ct);
@@ -128,7 +165,7 @@ public class GetBoostPackagesEndpoint(LivestockDbContext db) : EndpointWithoutRe
 {
     public override void Configure()
     {
-        Get("/Boosts/Packages");
+        Post("/livestocktrading/Boosts/Packages");
         AllowAnonymous();
         Tags("Subscriptions");
     }
@@ -150,7 +187,7 @@ public class PurchaseBoostEndpoint(LivestockDbContext db, IUserContext user) : E
 {
     public override void Configure()
     {
-        Post("/Boosts/Purchase");
+        Post("/livestocktrading/Boosts/Purchase");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("Subscriptions");
     }

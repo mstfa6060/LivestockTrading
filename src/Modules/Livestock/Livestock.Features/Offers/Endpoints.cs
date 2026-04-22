@@ -14,7 +14,7 @@ public class GetMyOffersEndpoint(LivestockDbContext db, IUserContext user) : End
 {
     public override void Configure()
     {
-        Get("/Offers/My");
+        Post("/livestocktrading/Offers/My");
         Tags("Offers");
     }
 
@@ -36,7 +36,7 @@ public class GetOfferEndpoint(LivestockDbContext db, IUserContext user) : Endpoi
 {
     public override void Configure()
     {
-        Get("/Offers/{Id}");
+        Post("/livestocktrading/Offers/Detail");
         Tags("Offers");
     }
 
@@ -66,7 +66,7 @@ public class CreateOfferEndpoint(LivestockDbContext db, IUserContext user, IEven
 {
     public override void Configure()
     {
-        Post("/Offers");
+        Post("/livestocktrading/Offers/Create");
         Tags("Offers");
     }
 
@@ -115,7 +115,7 @@ public class AcceptOfferEndpoint(LivestockDbContext db, IUserContext user, IEven
 {
     public override void Configure()
     {
-        Post("/Offers/{Id}/Accept");
+        Post("/livestocktrading/Offers/Accept");
         Tags("Offers");
     }
 
@@ -189,7 +189,7 @@ public class RejectOfferEndpoint(LivestockDbContext db, IUserContext user) : End
 {
     public override void Configure()
     {
-        Post("/Offers/{Id}/Reject");
+        Post("/livestocktrading/Offers/Reject");
         Tags("Offers");
     }
 

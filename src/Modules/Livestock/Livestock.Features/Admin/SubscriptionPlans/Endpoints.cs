@@ -10,7 +10,7 @@ public class ListSubscriptionPlansAdminEndpoint(LivestockDbContext db) : Endpoin
 {
     public override void Configure()
     {
-        Get("/Admin/SubscriptionPlans");
+        Post("/livestocktrading/Admin/SubscriptionPlans/All");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }
@@ -31,7 +31,7 @@ public class GetSubscriptionPlanAdminEndpoint(LivestockDbContext db) : Endpoint<
 {
     public override void Configure()
     {
-        Get("/Admin/SubscriptionPlans/{Id}");
+        Post("/livestocktrading/Admin/SubscriptionPlans/Detail");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }
@@ -54,7 +54,7 @@ public class CreateSubscriptionPlanEndpoint(LivestockDbContext db) : Endpoint<Cr
 {
     public override void Configure()
     {
-        Post("/Admin/SubscriptionPlans");
+        Post("/livestocktrading/Admin/SubscriptionPlans/Create");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }
@@ -89,7 +89,7 @@ public class UpdateSubscriptionPlanEndpoint(LivestockDbContext db) : Endpoint<Up
 {
     public override void Configure()
     {
-        Put("/Admin/SubscriptionPlans/{Id}");
+        Post("/livestocktrading/Admin/SubscriptionPlans/Update");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }
@@ -126,7 +126,7 @@ public class DeleteSubscriptionPlanEndpoint(LivestockDbContext db) : Endpoint<De
 {
     public override void Configure()
     {
-        Delete("/Admin/SubscriptionPlans/{Id}");
+        Post("/livestocktrading/Admin/SubscriptionPlans/Delete");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }

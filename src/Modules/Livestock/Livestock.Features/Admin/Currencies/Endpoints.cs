@@ -10,7 +10,7 @@ public class ListCurrenciesAdminEndpoint(LivestockDbContext db) : EndpointWithou
 {
     public override void Configure()
     {
-        Get("/Admin/Currencies");
+        Post("/livestocktrading/Admin/Currencies/All");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }
@@ -31,7 +31,7 @@ public class GetCurrencyAdminEndpoint(LivestockDbContext db) : Endpoint<GetCurre
 {
     public override void Configure()
     {
-        Get("/Admin/Currencies/{Id}");
+        Post("/livestocktrading/Admin/Currencies/Detail");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }
@@ -54,7 +54,7 @@ public class CreateCurrencyEndpoint(LivestockDbContext db) : Endpoint<CreateCurr
 {
     public override void Configure()
     {
-        Post("/Admin/Currencies");
+        Post("/livestocktrading/Admin/Currencies/Create");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }
@@ -89,7 +89,7 @@ public class UpdateCurrencyEndpoint(LivestockDbContext db) : Endpoint<UpdateCurr
 {
     public override void Configure()
     {
-        Put("/Admin/Currencies/{Id}");
+        Post("/livestocktrading/Admin/Currencies/Update");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }
@@ -120,7 +120,7 @@ public class DeleteCurrencyEndpoint(LivestockDbContext db) : Endpoint<DeleteCurr
 {
     public override void Configure()
     {
-        Delete("/Admin/Currencies/{Id}");
+        Post("/livestocktrading/Admin/Currencies/Delete");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }

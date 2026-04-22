@@ -11,7 +11,7 @@ public class GetAllFarmsEndpoint(LivestockDbContext db, IUserContext user) : End
 {
     public override void Configure()
     {
-        Get("/Farms");
+        Post("/livestocktrading/Farms/All");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("Farms");
     }
@@ -40,7 +40,7 @@ public class GetFarmEndpoint(LivestockDbContext db, IUserContext user) : Endpoin
 {
     public override void Configure()
     {
-        Get("/Farms/{Id}");
+        Post("/livestocktrading/Farms/Detail");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("Farms");
     }
@@ -71,7 +71,7 @@ public class CreateFarmEndpoint(LivestockDbContext db, IUserContext user) : Endp
 {
     public override void Configure()
     {
-        Post("/Farms");
+        Post("/livestocktrading/Farms/Create");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("Farms");
     }
@@ -105,7 +105,7 @@ public class UpdateFarmEndpoint(LivestockDbContext db, IUserContext user) : Endp
 {
     public override void Configure()
     {
-        Put("/Farms/{Id}");
+        Post("/livestocktrading/Farms/Update");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("Farms");
     }
@@ -143,7 +143,7 @@ public class DeleteFarmEndpoint(LivestockDbContext db, IUserContext user) : Endp
 {
     public override void Configure()
     {
-        Delete("/Farms/{Id}");
+        Post("/livestocktrading/Farms/Delete");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("Farms");
     }

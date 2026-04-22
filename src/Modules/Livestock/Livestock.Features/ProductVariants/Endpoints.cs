@@ -11,7 +11,7 @@ public class GetProductVariantsEndpoint(LivestockDbContext db) : Endpoint<GetPro
 {
     public override void Configure()
     {
-        Get("/ProductVariants/ByProduct/{ProductId}");
+        Post("/livestocktrading/ProductVariants/ByProduct");
         AllowAnonymous();
         Tags("ProductVariants");
     }
@@ -30,7 +30,7 @@ public class GetProductVariantEndpoint(LivestockDbContext db) : Endpoint<GetProd
 {
     public override void Configure()
     {
-        Get("/ProductVariants/{Id}");
+        Post("/livestocktrading/ProductVariants/Detail");
         AllowAnonymous();
         Tags("ProductVariants");
     }
@@ -47,7 +47,7 @@ public class CreateProductVariantEndpoint(LivestockDbContext db, IUserContext us
 {
     public override void Configure()
     {
-        Post("/ProductVariants");
+        Post("/livestocktrading/ProductVariants/Create");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("ProductVariants");
     }
@@ -77,7 +77,7 @@ public class UpdateProductVariantEndpoint(LivestockDbContext db, IUserContext us
 {
     public override void Configure()
     {
-        Put("/ProductVariants/{Id}");
+        Post("/livestocktrading/ProductVariants/Update");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("ProductVariants");
     }
@@ -103,7 +103,7 @@ public class DeleteProductVariantEndpoint(LivestockDbContext db, IUserContext us
 {
     public override void Configure()
     {
-        Delete("/ProductVariants/{Id}");
+        Post("/livestocktrading/ProductVariants/Delete");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("ProductVariants");
     }

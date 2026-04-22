@@ -13,7 +13,7 @@ public sealed class DeleteBucketEndpoint(
 {
     public override void Configure()
     {
-        Delete("/Buckets/{BucketId}");
+        Post("/fileprovider/Buckets/Delete");
         Tags("Buckets");
     }
 

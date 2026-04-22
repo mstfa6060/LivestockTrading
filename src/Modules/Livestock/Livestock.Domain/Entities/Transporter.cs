@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using Livestock.Domain.Enums;
 
 namespace Livestock.Domain.Entities;
@@ -19,6 +20,12 @@ public class Transporter : BaseEntity
     public double AverageRating { get; set; }
     public int ReviewCount { get; set; }
     public string? ServiceCountryCodes { get; set; }
+
+    [NotMapped]
+    public bool IsVerified => Status == TransporterStatus.Active && VerifiedAt is not null;
+
+    [NotMapped]
+    public bool IsActive => Status is not (TransporterStatus.Suspended or TransporterStatus.Banned or TransporterStatus.Inactive);
 
     public ICollection<TransportRequest> TransportRequests { get; set; } = [];
     public ICollection<TransportOffer> TransportOffers { get; set; } = [];

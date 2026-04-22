@@ -17,7 +17,7 @@ public sealed class UploadEndpoint(
 
     public override void Configure()
     {
-        Post("/Files/Upload");
+        Post("/fileprovider/Files/Upload");
         AllowFileUploads();
         Tags("Files");
     }

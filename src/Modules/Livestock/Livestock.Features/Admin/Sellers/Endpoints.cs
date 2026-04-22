@@ -10,7 +10,7 @@ public class ListPendingSellersEndpoint(LivestockDbContext db) : EndpointWithout
 {
     public override void Configure()
     {
-        Get("/Admin/Sellers/Pending");
+        Post("/livestocktrading/Admin/Sellers/Pending");
         Roles("LivestockTrading.Admin", "LivestockTrading.Moderator");
         Tags("Admin");
     }
@@ -32,7 +32,7 @@ public class RejectSellerEndpoint(LivestockDbContext db) : Endpoint<RejectSeller
 {
     public override void Configure()
     {
-        Post("/Admin/Sellers/{Id}/Reject");
+        Post("/livestocktrading/Admin/Sellers/Reject");
         Roles("LivestockTrading.Admin", "LivestockTrading.Moderator");
         Tags("Admin");
     }

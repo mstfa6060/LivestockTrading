@@ -14,7 +14,7 @@ public class GetMyTransportRequestsEndpoint(LivestockDbContext db, IUserContext 
 {
     public override void Configure()
     {
-        Get("/TransportRequests/My");
+        Post("/livestocktrading/TransportRequests/My");
         Tags("Transport");
     }
 
@@ -35,7 +35,7 @@ public class GetAllOpenTransportRequestsEndpoint(LivestockDbContext db) : Endpoi
 {
     public override void Configure()
     {
-        Get("/TransportRequests/Open");
+        Post("/livestocktrading/TransportRequests/Open");
         Tags("Transport");
     }
 
@@ -56,7 +56,7 @@ public class GetTransportRequestEndpoint(LivestockDbContext db) : Endpoint<GetTr
 {
     public override void Configure()
     {
-        Get("/TransportRequests/{Id}");
+        Post("/livestocktrading/TransportRequests/Detail");
         Tags("Transport");
     }
 
@@ -78,7 +78,7 @@ public class CreateTransportRequestEndpoint(LivestockDbContext db, IUserContext 
 {
     public override void Configure()
     {
-        Post("/TransportRequests");
+        Post("/livestocktrading/TransportRequests/Create");
         Tags("Transport");
     }
 
@@ -134,7 +134,7 @@ public class GetTransportOffersEndpoint(LivestockDbContext db) : Endpoint<GetTra
 {
     public override void Configure()
     {
-        Get("/TransportRequests/{TransportRequestId}/Offers");
+        Post("/livestocktrading/TransportRequests/Offers");
         Tags("Transport");
     }
 
@@ -156,7 +156,7 @@ public class CreateTransportOfferEndpoint(LivestockDbContext db, IUserContext us
 {
     public override void Configure()
     {
-        Post("/TransportRequests/{TransportRequestId}/Offers");
+        Post("/livestocktrading/TransportRequests/CreateOffer");
         Roles("LivestockTrading.Transporter", "LivestockTrading.Admin");
         Tags("Transport");
     }
@@ -226,7 +226,7 @@ public class AcceptTransportOfferEndpoint(LivestockDbContext db, IUserContext us
 {
     public override void Configure()
     {
-        Post("/Transport/Offers/{Id}/Accept");
+        Post("/livestocktrading/Transport/AcceptOffer");
         Tags("Transport");
     }
 
@@ -269,7 +269,7 @@ public class AddTrackingUpdateEndpoint(LivestockDbContext db, IUserContext user)
 {
     public override void Configure()
     {
-        Post("/TransportRequests/{TransportRequestId}/Tracking");
+        Post("/livestocktrading/TransportRequests/AddTracking");
         Roles("LivestockTrading.Transporter", "LivestockTrading.Admin");
         Tags("Transport");
     }

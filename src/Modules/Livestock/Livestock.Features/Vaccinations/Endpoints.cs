@@ -11,7 +11,7 @@ public class GetVaccinationsEndpoint(LivestockDbContext db) : Endpoint<GetVaccin
 {
     public override void Configure()
     {
-        Get("/Vaccinations/ByAnimal/{AnimalInfoId}");
+        Post("/livestocktrading/Vaccinations/ByAnimal");
         AllowAnonymous();
         Tags("Vaccinations");
     }
@@ -31,7 +31,7 @@ public class GetVaccinationEndpoint(LivestockDbContext db) : Endpoint<GetVaccina
 {
     public override void Configure()
     {
-        Get("/Vaccinations/{Id}");
+        Post("/livestocktrading/Vaccinations/Detail");
         AllowAnonymous();
         Tags("Vaccinations");
     }
@@ -48,7 +48,7 @@ public class CreateVaccinationEndpoint(LivestockDbContext db, IUserContext user)
 {
     public override void Configure()
     {
-        Post("/Vaccinations");
+        Post("/livestocktrading/Vaccinations/Create");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("Vaccinations");
     }
@@ -79,7 +79,7 @@ public class UpdateVaccinationEndpoint(LivestockDbContext db, IUserContext user)
 {
     public override void Configure()
     {
-        Put("/Vaccinations/{Id}");
+        Post("/livestocktrading/Vaccinations/Update");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("Vaccinations");
     }
@@ -107,7 +107,7 @@ public class DeleteVaccinationEndpoint(LivestockDbContext db, IUserContext user)
 {
     public override void Configure()
     {
-        Delete("/Vaccinations/{Id}");
+        Post("/livestocktrading/Vaccinations/Delete");
         Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
         Tags("Vaccinations");
     }

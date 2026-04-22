@@ -10,7 +10,7 @@ public class ListBoostPackagesAdminEndpoint(LivestockDbContext db) : EndpointWit
 {
     public override void Configure()
     {
-        Get("/Admin/BoostPackages");
+        Post("/livestocktrading/Admin/BoostPackages/All");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }
@@ -31,7 +31,7 @@ public class GetBoostPackageAdminEndpoint(LivestockDbContext db) : Endpoint<GetB
 {
     public override void Configure()
     {
-        Get("/Admin/BoostPackages/{Id}");
+        Post("/livestocktrading/Admin/BoostPackages/Detail");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }
@@ -54,7 +54,7 @@ public class CreateBoostPackageEndpoint(LivestockDbContext db) : Endpoint<Create
 {
     public override void Configure()
     {
-        Post("/Admin/BoostPackages");
+        Post("/livestocktrading/Admin/BoostPackages/Create");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }
@@ -85,7 +85,7 @@ public class UpdateBoostPackageEndpoint(LivestockDbContext db) : Endpoint<Update
 {
     public override void Configure()
     {
-        Put("/Admin/BoostPackages/{Id}");
+        Post("/livestocktrading/Admin/BoostPackages/Update");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }
@@ -120,7 +120,7 @@ public class DeleteBoostPackageEndpoint(LivestockDbContext db) : Endpoint<Delete
 {
     public override void Configure()
     {
-        Delete("/Admin/BoostPackages/{Id}");
+        Post("/livestocktrading/Admin/BoostPackages/Delete");
         Roles("LivestockTrading.Admin");
         Tags("Admin");
     }

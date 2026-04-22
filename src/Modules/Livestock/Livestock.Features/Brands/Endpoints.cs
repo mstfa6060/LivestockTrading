@@ -10,7 +10,7 @@ public class GetAllBrandsEndpoint(LivestockDbContext db) : EndpointWithoutReques
 {
     public override void Configure()
     {
-        Get("/Brands");
+        Post("/livestocktrading/Brands/All");
         AllowAnonymous();
         Tags("Brands");
     }
@@ -31,7 +31,7 @@ public class GetBrandEndpoint(LivestockDbContext db) : Endpoint<GetBrandRequest,
 {
     public override void Configure()
     {
-        Get("/Brands/{Id}");
+        Post("/livestocktrading/Brands/Detail");
         AllowAnonymous();
         Tags("Brands");
     }
@@ -54,7 +54,7 @@ public class CreateBrandEndpoint(LivestockDbContext db) : Endpoint<CreateBrandRe
 {
     public override void Configure()
     {
-        Post("/Brands");
+        Post("/livestocktrading/Brands/Create");
         Roles("LivestockTrading.Admin", "LivestockTrading.Moderator");
         Tags("Brands");
     }
@@ -86,7 +86,7 @@ public class UpdateBrandEndpoint(LivestockDbContext db) : Endpoint<UpdateBrandRe
 {
     public override void Configure()
     {
-        Put("/Brands/{Id}");
+        Post("/livestocktrading/Brands/Update");
         Roles("LivestockTrading.Admin", "LivestockTrading.Moderator");
         Tags("Brands");
     }
@@ -123,7 +123,7 @@ public class DeleteBrandEndpoint(LivestockDbContext db) : Endpoint<DeleteBrandRe
 {
     public override void Configure()
     {
-        Delete("/Brands/{Id}");
+        Post("/livestocktrading/Brands/Delete");
         Roles("LivestockTrading.Admin");
         Tags("Brands");
     }
