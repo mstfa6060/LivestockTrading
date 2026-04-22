@@ -152,6 +152,15 @@ Tüm ticaret domain'i. Feature klasörleri:
    ```bash
    dotnet test tests/Architecture.Tests
    ```
+8. **TypeScript client'ı yeniden üret** (web + mobile için):
+   ```bash
+   bash scripts/generate-api-client.sh
+   ```
+   Bu komut `Livestock.Host`'u build eder, `generated/openapi.json` ve
+   `generated/api-client.ts` üretir, ardından client'ı
+   `livestock-frontend/src/api/generated/` ve
+   `livestock-mobile/src/api/generated/` altına kopyalar. Frontend dev
+   yeni endpoint'i IDE autocomplete'inde tipli olarak görür.
 
 ### Endpoint Dosya Yapısı (Vertical Slice)
 
@@ -184,7 +193,7 @@ public class CreateCategoryEndpoint(LivestockDbContext db)
 {
     public override void Configure()
     {
-        Post("/Categories/Create");
+        Post("/livestocktrading/Categories/Create");  // module prefix zorunlu
         Roles("Admin", "Moderator");      // JWT role-based auth
         Tags("Categories");
     }
@@ -201,15 +210,26 @@ public class CreateCategoryEndpoint(LivestockDbContext db)
 
 ### Route Convention
 
-`POST /Entity/Action` — legacy uyumluluk için tüm endpoint'ler POST kullanır.
+`POST /{modulePrefix}/{Entity}/{Action}` — legacy Ocelot gateway uyumluluğu
+için tüm endpoint'ler POST + module prefix kullanır. Tek prefix:
+- `iam` — IAM modülü endpoint'leri
+- `fileprovider` — Files modülü endpoint'leri
+- `livestocktrading` — Livestock modülü endpoint'leri (en yoğun, tüm ticaret)
 
 Örnekler:
-- `POST /Products/Search` — ürün listele/filtrele
-- `POST /Products/Detail` — tekil ürün
-- `POST /Products/Create` — oluştur
-- `POST /Products/Update` — güncelle
-- `POST /Products/Delete` — sil (soft delete)
-- `POST /Admin/Products/Approve` — onayla
+- `POST /iam/Auth/Login` — kullanıcı girişi
+- `POST /iam/Push/RegisterToken` — mobil push token kaydı
+- `POST /fileprovider/Files/Upload` — dosya yükleme
+- `POST /livestocktrading/Products/All` — ürün listele/filtrele
+- `POST /livestocktrading/Products/Detail` — tekil ürün
+- `POST /livestocktrading/Products/Create` — oluştur
+- `POST /livestocktrading/Products/Update` — güncelle (id body'de)
+- `POST /livestocktrading/Products/Delete` — soft delete (id body'de)
+- `POST /livestocktrading/Sellers/Nearby` — Haversine geo-search
+- `POST /livestocktrading/Admin/Products/Approve` — admin onayı
+
+`tests/Architecture.Tests/RouteConventionTests` her endpoint'in bu kalıpta
+olduğunu derleme zamanı koruyucusu olarak doğrular.
 
 ---
 
@@ -241,6 +261,13 @@ dotnet run --project src/Bootstrapper/Livestock.Host
 # Dev stack (Postgres, Redis, NATS, Jaeger, Seq, MinIO)
 cd deploy/docker/compose
 docker compose -f docker-compose.dev.yml up -d
+
+# TypeScript client üret + web ve mobile'a kopyala
+bash scripts/generate-api-client.sh
+
+# EF migration ekle (örn: Iam modülü)
+cd src/Modules/Iam/Iam.Persistence
+dotnet ef migrations add MyMigration --startup-project ../../../Bootstrapper/Livestock.Host
 ```
 
 ### Configuration (appsettings.json)
@@ -355,7 +382,7 @@ public class ProductCreatedConsumer(IEmailService email)
 
 ## 9. Mevcut Durum
 
-### Tamamlanan PR'lar (7 adet)
+### Tamamlanan PR'lar (10+ adet)
 
 | PR | İçerik |
 |----|--------|
@@ -366,6 +393,11 @@ public class ProductCreatedConsumer(IEmailService email)
 | #5 | Livestock Messaging — Conversations, Messages, SignalR Hub, NATS event'ler |
 | #6 | Workers — Email/SMS/Push notification consumer'ları, PriceConversionService |
 | #7 | Admin/Moderation — Approve/Reject/Verify/Suspend + tüm admin endpoint'leri |
+| #8 | **Route refactor** — tüm 209 endpoint `POST /{prefix}/{Entity}/{Action}` kalıbına; RouteConventionTests guard testi eklendi |
+| #9 | **P0 düzeltmeleri** — Subscribe IAP receipt + duplicate guard, Sellers/Transporters IsActive/IsVerified flag'leri (NotMapped computed), `/iam/Push/RegisterToken+RevokeToken`, Login UserName + Google/Apple OAuth, Register admin email whitelist, SignalR `/hubs/chat` (FusionCache presence) |
+| #10 | **P1 düzeltmeleri** — `/livestocktrading/Conversations/UnreadCount`, `/livestocktrading/Sellers/Nearby` (Haversine), Reviews CRUD (Update + Delete + TransporterReview Create), SkiaSharp image processing pipeline (WebP + thumbnail), Shipping domain (Carriers + Zones + Rates, 3 entity + 15 endpoint) |
+| #11 | **EF migrations** — `Iam.Persistence`, `Files.Persistence`, `Livestock.Persistence` için `InitialCreate` baseline migration'ları + `IDesignTimeDbContextFactory`'ler |
+| #12 | **NSwag pipeline** — `nswag.json` + `scripts/generate-api-client.sh` + `RouteBasedOperationIdProcessor` + `NoopEventPublisher` (codegen guard); 39 typed client class + 209 method `generated/api-client.ts`'de, web ve mobile'a otomatik kopyalanır |
 
 ### Business Logic Düzeltmeleri (Son merge)
 
@@ -392,10 +424,29 @@ Server → Client: `ReceiveMessage`, `TypingIndicator`, `MessageRead`, `UserOnli
 
 ## 10. Bilinen Limitasyonlar / TODO
 
-- **Frontend API client**: Eski `arf-cli` tabanlı client yeni route pattern'e (`POST /Entity/Action`) uyarlanmadı. NSwag / OpenAPI tabanlı client üretimi planlanıyor.
-- **Production Jenkinsfile**: `deploy/` altındaki Dockerfile'lar ve compose dosyaları mevcut; ancak Jenkins pipeline yeni `src/` yapısına güncellenmeli.
-- **E2E testler**: Henüz yok. Architecture testleri var (`tests/Architecture.Tests`), integration/E2E test altyapısı eksik.
-- **Database migrations**: Her modülün ayrı `DbContext`'i var; migration'lar modül Persistence projesinden çalıştırılır.
+- **Production Jenkinsfile**: `deploy/` altındaki Dockerfile'lar ve compose dosyaları eski mimari için (`api-gateway`, `iam-api`, `fileprovider-api` ayrı container'lar). Yeni tek-host (`Livestock.Host` + `Livestock.Workers`) için Dockerfile + compose + Jenkins pipeline güncellenmeli.
+- **Sunucu deploy**: Backend dev branch'te hazır ama hiçbir ortama deploy edilmedi. `dev-api.livestock-trading.com` hâlâ eski stack çalıştırıyor.
+- **EF migration uygulama**: 3 modül (`Iam`, `Files`, `Livestock`) `InitialCreate` baseline migration'ları üretildi; production DB'de (eski tablolar varsa) `dotnet ef migrations script --idempotent` ile guarded SQL gerekir.
+- **E2E testler**: Henüz yok. Architecture testleri var (`tests/Architecture.Tests` — 6 test: 5 dependency + 1 route convention), integration/E2E altyapısı eksik.
+- **IAP receipt verification**: Apple App Store / Google Play receipt'i Subscribe endpoint'inde sadece kayıt + duplicate check; gerçek doğrulama API çağrısı henüz yok (P2'de planlandı).
+- **OAuth provider verification**: Login Google/Apple `ExternalProviderUserId`'yi doğrulanmış kabul ediyor — gerçek JWT verification eklenmeli.
+
+## 11. Branch Stratejisi
+
+- **`main`** — `ab0b0d1` commit'inde (eski ArfBlocks mimarisi, canlıdaki stack'in karşılığı). Yeni geliştirme için ASLA kullanılmaz.
+- **`dev`** — `331253c` ve sonrası (Vertical Slice + FastEndpoints + tüm yeni geliştirme). Tüm feature work burada.
+- Yeni feature için: `git checkout dev && git checkout -b feat/X` → PR `dev`'e açılır.
+- Hazır olunca `dev → main` merge tek bir büyük review oturumunda yapılır.
+
+Aynı strateji `livestock-frontend` ve `livestock-mobile` repo'larında geçerli — üç repo da `dev` branch'inde paralel ilerler.
+
+## 12. Migration Gaps Raporu
+
+`_doc/MIGRATION_GAPS.md` legacy ArfBlocks ile yeni FastEndpoints arasındaki
+endpoint kapsamı + davranış delta'sını listeler. Her yeni feature başlamadan
+önce bu raporu kontrol et — P1/P2 listesinde hâlâ açık maddeler var
+(Banners, FAQs, Languages, PaymentMethods, TaxRates, ContactForms,
+GeoIp/Geolocation, Audit log altyapısı, FusionCache referans veriler için).
 
 ---
 
