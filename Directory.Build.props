@@ -20,4 +20,15 @@
     <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
     <Nullable>disable</Nullable>
   </PropertyGroup>
+
+  <!-- EF Core auto-generated migration files: skip code style enforcement
+       (file-scoped namespace, etc.). They are overwritten by `dotnet ef`. -->
+  <ItemGroup>
+    <Compile Update="Migrations\**\*.cs">
+      <ExcludeFromCodeCoverage>true</ExcludeFromCodeCoverage>
+    </Compile>
+  </ItemGroup>
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);IDE0161;IDE0090;IDE0028;IDE0300;IDE0305</NoWarn>
+  </PropertyGroup>
 </Project>
