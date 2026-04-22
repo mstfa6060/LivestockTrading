@@ -78,6 +78,34 @@ builder.Services.AddScoped<IUserContext, HttpUserContext>();
 // ── SignalR ───────────────────────────────────────────────────────────────────
 builder.Services.AddSignalR();
 
+// ── CORS ──────────────────────────────────────────────────────────────────────
+// Browser clients (web + mobile WebView) call the API from a different origin.
+// Allowed origins come from Cors:AllowedOrigins (array) so prod can lock down,
+// while dev keeps a permissive list inline. Credentials are required for the
+// SignalR cookie/JWT path, which forbids '*' — origins must be explicit.
+var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+    ?? new[]
+    {
+        "https://dev.livestock-trading.com",
+        "https://livestock-trading.com",
+        "https://www.livestock-trading.com",
+        "http://localhost:3000",
+        "http://localhost:3099",
+        "http://localhost:5173",
+        "http://localhost:8081",
+    };
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins(corsOrigins)
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials()
+              .SetPreflightMaxAge(TimeSpan.FromMinutes(10));
+    });
+});
+
 // ── FastEndpoints ─────────────────────────────────────────────────────────────
 builder.Services.AddFastEndpoints();
 builder.Services.SwaggerDocument(o =>
@@ -116,6 +144,8 @@ if (app.Environment.IsDevelopment() && !isCodegen)
     await sp.GetRequiredService<Files.Persistence.FilesDbContext>().Database.MigrateAsync();
     await sp.GetRequiredService<Livestock.Persistence.LivestockDbContext>().Database.MigrateAsync();
 }
+
+app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();
