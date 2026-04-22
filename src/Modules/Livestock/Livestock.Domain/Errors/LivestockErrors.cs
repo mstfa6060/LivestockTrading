@@ -104,6 +104,15 @@ public static class LivestockErrors
         public const string ReviewAlreadySubmitted = "You have already submitted a review.";
     }
 
+    public static class ShippingErrors
+    {
+        public const string CarrierNotFound = "Shipping carrier not found.";
+        public const string CarrierCodeAlreadyExists = "A shipping carrier with this code already exists.";
+        public const string ZoneNotFound = "Shipping zone not found.";
+        public const string RateNotFound = "Shipping rate not found.";
+        public const string RateInvalidWeightRange = "MinWeight must be less than or equal to MaxWeight.";
+    }
+
     public static class SubscriptionErrors
     {
         public const string SubscriptionPlanNotFound = "Subscription plan not found.";

@@ -56,6 +56,10 @@ public class LivestockDbContext(DbContextOptions<LivestockDbContext> options) : 
     public DbSet<SearchHistory> SearchHistories => Set<SearchHistory>();
     public DbSet<UserPreference> UserPreferences => Set<UserPreference>();
 
+    public DbSet<ShippingCarrier> ShippingCarriers => Set<ShippingCarrier>();
+    public DbSet<ShippingZone> ShippingZones => Set<ShippingZone>();
+    public DbSet<ShippingRate> ShippingRates => Set<ShippingRate>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
