@@ -1,6 +1,6 @@
 // Jenkins pipeline — backend dev branch.
 //
-// Triggered by push to `dev`. Builds two images (host + workers),
+// Triggered by push to `dev` (rev 1776897103).
 // pushes to Docker Hub, copies compose files to the server, and
 // rolls the dev stack via compose pull + up. EF migrations are
 // applied automatically at host startup (Program.cs).
