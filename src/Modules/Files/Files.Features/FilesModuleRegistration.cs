@@ -23,6 +23,7 @@ public static class FilesModuleRegistration
             .WithSSL(settings.UseSSL));
 
         services.AddScoped<IStorageService, MinioStorageService>();
+        services.AddSingleton<IImageProcessingService, SkiaImageProcessingService>();
 
         return services;
     }

@@ -6,6 +6,7 @@ public sealed record UploadResponse(
     Guid FileId,
     Guid BucketId,
     string ObjectKey,
+    string? ThumbnailObjectKey,
     string OriginalName,
     string ContentType,
     string Extension,
@@ -14,5 +15,6 @@ public sealed record UploadResponse(
     int SortOrder,
     int? Width,
     int? Height,
+    bool IsImage,
     DateTime CreatedAt
 );

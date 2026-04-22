@@ -12,6 +12,7 @@ internal sealed class FileRecordConfiguration : IEntityTypeConfiguration<FileRec
         builder.HasKey(f => f.Id);
 
         builder.Property(f => f.ObjectKey).IsRequired().HasMaxLength(512);
+        builder.Property(f => f.ThumbnailObjectKey).HasMaxLength(512);
         builder.Property(f => f.OriginalName).IsRequired().HasMaxLength(512);
         builder.Property(f => f.ContentType).IsRequired().HasMaxLength(128);
         builder.Property(f => f.Extension).IsRequired().HasMaxLength(20);

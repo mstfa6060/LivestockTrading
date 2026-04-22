@@ -11,9 +11,11 @@ namespace Files.Features.Files.Upload;
 
 public sealed class UploadEndpoint(
     FilesDbContext db,
-    IStorageService storage) : Endpoint<UploadRequest, UploadResponse>
+    IStorageService storage,
+    IImageProcessingService imageProcessing) : Endpoint<UploadRequest, UploadResponse>
 {
     private const long MaxFileSizeBytes = 75 * 1024 * 1024; // 75 MB
+    private const int ThumbnailMaxSize = 300;
 
     public override void Configure()
     {
@@ -74,14 +76,56 @@ public sealed class UploadEndpoint(
             return;
         }
 
-        var extension = Path.GetExtension(formFile.FileName).TrimStart('.').ToLowerInvariant();
-        var fileId = Guid.NewGuid();
-        var objectKey = $"{bucket.Module}/{bucket.Id}/{fileId}.{extension}";
-
         await storage.EnsureBucketExistsAsync(ct);
 
-        using var stream = formFile.OpenReadStream();
-        await storage.UploadAsync(stream, objectKey, formFile.ContentType, formFile.Length, ct);
+        var fileId = Guid.NewGuid();
+        var isImage = imageProcessing.IsImageContentType(formFile.ContentType);
+
+        string objectKey;
+        string contentType;
+        string extension;
+        long sizeBytes;
+        int? width = null;
+        int? height = null;
+        string? thumbnailObjectKey = null;
+
+        if (isImage)
+        {
+            using var sourceMem = new MemoryStream();
+            using (var src = formFile.OpenReadStream())
+            {
+                await src.CopyToAsync(sourceMem, ct);
+            }
+            var sourceBytes = sourceMem.ToArray();
+
+            var encoded = await imageProcessing.EncodeWebpAsync(sourceBytes, ct);
+            extension = encoded.Extension;
+            contentType = encoded.ContentType;
+            sizeBytes = encoded.Bytes.LongLength;
+            width = encoded.Width;
+            height = encoded.Height;
+            objectKey = $"{bucket.Module}/{bucket.Id}/{fileId}.{extension}";
+
+            using (var encodedStream = new MemoryStream(encoded.Bytes))
+            {
+                await storage.UploadAsync(encodedStream, objectKey, contentType, sizeBytes, ct);
+            }
+
+            var thumbnail = await imageProcessing.CreateThumbnailAsync(sourceBytes, ThumbnailMaxSize, ct);
+            thumbnailObjectKey = $"{bucket.Module}/{bucket.Id}/{fileId}_thumb.{thumbnail.Extension}";
+            using var thumbStream = new MemoryStream(thumbnail.Bytes);
+            await storage.UploadAsync(thumbStream, thumbnailObjectKey, thumbnail.ContentType, thumbnail.Bytes.LongLength, ct);
+        }
+        else
+        {
+            extension = Path.GetExtension(formFile.FileName).TrimStart('.').ToLowerInvariant();
+            contentType = formFile.ContentType;
+            sizeBytes = formFile.Length;
+            objectKey = $"{bucket.Module}/{bucket.Id}/{fileId}.{extension}";
+
+            using var stream = formFile.OpenReadStream();
+            await storage.UploadAsync(stream, objectKey, contentType, sizeBytes, ct);
+        }
 
         var isFirst = activeFils.Count == 0;
         var sortOrder = activeFils.Count > 0 ? activeFils.Max(f => f.SortOrder) + 1 : 0;
@@ -91,12 +135,17 @@ public sealed class UploadEndpoint(
             Id = fileId,
             BucketId = bucket.Id,
             ObjectKey = objectKey,
+            ThumbnailObjectKey = thumbnailObjectKey,
             OriginalName = formFile.FileName,
-            ContentType = formFile.ContentType,
+            ContentType = contentType,
             Extension = extension,
-            SizeBytes = formFile.Length,
+            SizeBytes = sizeBytes,
             IsCover = isFirst,
             SortOrder = sortOrder,
+            Width = width,
+            Height = height,
+            IsImage = isImage,
+            IsProcessed = isImage,
         };
 
         db.Files.Add(record);
@@ -106,6 +155,7 @@ public sealed class UploadEndpoint(
             record.Id,
             record.BucketId,
             record.ObjectKey,
+            record.ThumbnailObjectKey,
             record.OriginalName,
             record.ContentType,
             record.Extension,
@@ -114,6 +164,7 @@ public sealed class UploadEndpoint(
             record.SortOrder,
             record.Width,
             record.Height,
+            record.IsImage,
             record.CreatedAt
         ), 201, ct);
     }
