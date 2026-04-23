@@ -1,5 +1,6 @@
 using FastEndpoints;
 using Livestock.Domain.Entities;
+using Livestock.Domain.Enums;
 using Livestock.Domain.Errors;
 using Livestock.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -43,7 +44,7 @@ public class GetLocationEndpoint(LivestockDbContext db) : Endpoint<GetLocationRe
     }
 }
 
-public class CreateLocationEndpoint(LivestockDbContext db) : Endpoint<CreateLocationRequest, LocationDetail>
+public class CreateLocationEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<CreateLocationRequest, LocationDetail>
 {
     public override void Configure()
     {
@@ -54,13 +55,51 @@ public class CreateLocationEndpoint(LivestockDbContext db) : Endpoint<CreateLoca
 
     public override async Task HandleAsync(CreateLocationRequest req, CancellationToken ct)
     {
+        // Normalize legacy field names the old frontend client still ships.
+        var addressLine = !string.IsNullOrWhiteSpace(req.AddressLine)
+            ? req.AddressLine
+            : string.Join(", ",
+                new[] { req.AddressLine1, req.AddressLine2 }
+                    .Where(s => !string.IsNullOrWhiteSpace(s)));
+
+        var district = !string.IsNullOrWhiteSpace(req.District)
+            ? req.District
+            : req.DistrictId?.ToString();
+
+        var locationType = req.Type ?? req.LocationType;
+
+        // OwnerId is NOT trusted from the body — the caller always owns the
+        // row they create. OwnerType defaults to "Seller" for ProductLocation
+        // (the listing-create flow); for other LocationTypes require the
+        // caller to supply it explicitly.
+        var ownerId = user.UserId;
+        var ownerType = !string.IsNullOrWhiteSpace(req.OwnerType)
+            ? req.OwnerType
+            : locationType switch
+            {
+                LocationType.ProductLocation => "Seller",
+                LocationType.FarmLocation => "Seller",
+                LocationType.WarehouseLocation => "Seller",
+                LocationType.ShippingAddress => "User",
+                LocationType.BillingAddress => "User",
+                LocationType.UserAddress => "User",
+                _ => "User",
+            };
+
         var l = new Location
         {
-            CountryCode = req.CountryCode, CountryName = req.CountryName,
-            State = req.State, City = req.City, District = req.District,
-            PostalCode = req.PostalCode, AddressLine = req.AddressLine,
-            Latitude = req.Latitude, Longitude = req.Longitude,
-            LocationType = req.LocationType, OwnerId = req.OwnerId, OwnerType = req.OwnerType
+            CountryCode = req.CountryCode,
+            CountryName = req.CountryName,
+            State = req.State,
+            City = req.City,
+            District = district,
+            PostalCode = req.PostalCode,
+            AddressLine = addressLine,
+            Latitude = req.Latitude,
+            Longitude = req.Longitude,
+            LocationType = locationType,
+            OwnerId = ownerId,
+            OwnerType = ownerType,
         };
         db.Locations.Add(l);
         await db.SaveChangesAsync(ct);
