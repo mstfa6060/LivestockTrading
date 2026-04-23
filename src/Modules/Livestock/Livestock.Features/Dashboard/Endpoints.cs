@@ -11,7 +11,12 @@ public class GetAdminDashboardEndpoint(LivestockDbContext db) : EndpointWithoutR
     public override void Configure()
     {
         Post("/livestocktrading/Dashboard/Stats");
-        Roles("LivestockTrading.Admin", "LivestockTrading.Moderator");
+        // Site-wide counters are informational (no PII, no prices). The
+        // frontend's useDashboardMyStats + useDashboardStats both call
+        // this route for every authenticated user to paint the overview
+        // tiles; role-gating it 403'd buyers on their own dashboard
+        // landing page, which made the UI read as "no listings" and
+        // masked the data Reklamlarım already served.
         Tags("Dashboard");
     }
 
