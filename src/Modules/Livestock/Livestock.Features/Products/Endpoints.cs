@@ -136,7 +136,11 @@ public class CreateProductEndpoint(LivestockDbContext db, IUserContext user, IEv
     public override void Configure()
     {
         Post("/livestocktrading/Products/Create");
-        Roles("LivestockTrading.Seller", "LivestockTrading.Admin");
+        // No role gate: the handler auto-creates an Active seller profile
+        // for a caller who doesn't have one yet, then enforces subscription
+        // limits and the Active-status rule. A JWT-level Roles() check
+        // would 403 fresh buyers whose token still carries "Buyer" even
+        // after Sellers/Create ran — forcing a pointless re-login.
         Tags("Products");
     }
 
