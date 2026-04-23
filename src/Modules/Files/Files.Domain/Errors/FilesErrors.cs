@@ -1,19 +1,20 @@
 namespace Files.Domain.Errors;
 
+// Symbolic codes — see IamErrors.cs for rationale.
 public static class FilesErrors
 {
     public static class Buckets
     {
-        public const string NotFound = "Bucket bulunamadı.";
-        public const string NotOwned = "Bu bucket'a erişim yetkiniz yok.";
+        public const string NotFound = "FILES_BUCKET_NOT_FOUND";
+        public const string NotOwned = "FILES_BUCKET_NOT_OWNED";
     }
 
     public static class Files
     {
-        public const string NotFound = "Dosya bulunamadı.";
-        public const string TooLarge = "Dosya boyutu çok büyük (max 75 MB).";
-        public const string InvalidType = "Desteklenmeyen dosya türü.";
-        public const string SingleBucketFull = "Bu bucket yalnızca bir dosya destekler.";
-        public const string OrderInvalid = "Sıralama listesi geçersiz.";
+        public const string NotFound = "FILES_FILE_NOT_FOUND";
+        public const string TooLarge = "FILES_FILE_TOO_LARGE";
+        public const string InvalidType = "FILES_FILE_INVALID_TYPE";
+        public const string SingleBucketFull = "FILES_BUCKET_SINGLE_FULL";
+        public const string OrderInvalid = "FILES_ORDER_INVALID";
     }
 }
