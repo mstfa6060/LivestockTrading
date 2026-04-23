@@ -127,7 +127,8 @@ public class GetProductEndpoint(LivestockDbContext db) : Endpoint<GetProductRequ
             p.FarmId, p.Farm?.Name,
             p.LocationId, p.Location?.CountryCode, p.Location?.City,
             p.Location?.Latitude, p.Location?.Longitude,
-            p.AverageRating, p.ReviewCount, p.ViewCount, p.PublishedAt, p.CreatedAt), 200, ct);
+            p.AverageRating, p.ReviewCount, p.ViewCount, p.PublishedAt, p.CreatedAt,
+            p.BucketId), 200, ct);
     }
 }
 
@@ -283,7 +284,8 @@ public class CreateProductEndpoint(LivestockDbContext db, IUserContext user, IEv
             product.CategoryId, string.Empty,
             product.BrandId, null, product.FarmId, null,
             null, null, null, null, null,
-            0, 0, 0, null, product.CreatedAt), 201, ct);
+            0, 0, 0, null, product.CreatedAt,
+            product.BucketId), 201, ct);
     }
 }
 
@@ -338,7 +340,8 @@ public class UpdateProductEndpoint(LivestockDbContext db, IUserContext user) : E
             product.CategoryId, product.Category.Name,
             product.BrandId, null, product.FarmId, null,
             null, null, null, null, null,
-            product.AverageRating, product.ReviewCount, product.ViewCount, product.PublishedAt, product.CreatedAt), 200, ct);
+            product.AverageRating, product.ReviewCount, product.ViewCount, product.PublishedAt, product.CreatedAt,
+            product.BucketId), 200, ct);
     }
 }
 

@@ -57,7 +57,10 @@ public record ProductDetail(
     int ReviewCount,
     int ViewCount,
     DateTime? PublishedAt,
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    // Frontend reads `mediaBucketId` to query the Files bucket for the
+    // product's images; without it the detail page shows no gallery.
+    Guid? MediaBucketId);
 
 // Handler normalizes legacy aliases from the old frontend client:
 //   BasePrice -> Price, Currency -> CurrencyCode, StockQuantity -> Quantity,
