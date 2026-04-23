@@ -25,7 +25,18 @@ public record ProductListItem(
     double AverageRating,
     int ReviewCount,
     int ViewCount,
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    // Legacy aliases for the frontend my-listings/product-card consumers:
+    decimal BasePrice,
+    string Currency,
+    int StockQuantity,
+    bool IsInStock,
+    string? ShortDescription,
+    Guid? LocationId,
+    string? LocationCountryCode,
+    string? LocationCity,
+    decimal? DiscountedPrice,
+    Guid? MediaBucketId);
 
 public record ProductDetail(
     Guid Id,
@@ -135,4 +146,23 @@ public record ProductSearchRequest(
     bool? IsNegotiable,
     ProductCondition? Condition,
     int Page = 1,
-    int PageSize = 20);
+    int PageSize = 20,
+    // Legacy frontend shape: flat SellerId, plus a generic query-builder
+    // payload `{filters:[{key,values,...}], sorting, pageRequest}`. Handler
+    // reads SellerId top-level first, falls back to the filters array.
+    Guid? SellerId = null,
+    List<ProductFilterItem>? Filters = null,
+    ProductPageRequest? PageRequest = null,
+    string? Slug = null);
+
+public record ProductFilterItem(
+    string? Key,
+    string? Type,
+    bool? IsUsed,
+    List<object>? Values,
+    string? ConditionType);
+
+public record ProductPageRequest(
+    int? CurrentPage,
+    int? PerPageCount,
+    bool? ListAll);

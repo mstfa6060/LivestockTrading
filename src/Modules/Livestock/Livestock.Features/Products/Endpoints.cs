@@ -10,7 +10,7 @@ using Shared.Infrastructure.Messaging;
 
 namespace Livestock.Features.Products;
 
-public class GetAllProductsEndpoint(LivestockDbContext db) : Endpoint<ProductSearchRequest, List<ProductListItem>>
+public class GetAllProductsEndpoint(LivestockDbContext db, IUserContext user) : Endpoint<ProductSearchRequest, List<ProductListItem>>
 {
     public override void Configure()
     {
@@ -21,13 +21,54 @@ public class GetAllProductsEndpoint(LivestockDbContext db) : Endpoint<ProductSea
 
     public override async Task HandleAsync(ProductSearchRequest req, CancellationToken ct)
     {
+        // Resolve the seller filter from the flat SellerId OR the legacy
+        // `filters: [{ key:"sellerId", values:[...] }]` shape.
+        var sellerId = req.SellerId;
+        if (sellerId is null && req.Filters is { Count: > 0 })
+        {
+            var sellerFilter = req.Filters.FirstOrDefault(f =>
+                string.Equals(f.Key, "sellerId", StringComparison.OrdinalIgnoreCase));
+            if (sellerFilter?.Values is { Count: > 0 } vals
+                && Guid.TryParse(vals[0]?.ToString(), out var sid))
+            {
+                sellerId = sid;
+            }
+        }
+
+        // Seller's own my-listings view must see Draft/Pending/Active, not
+        // just Active. Detect "I am this seller" by matching the current
+        // authenticated user to the seller's UserId.
+        var currentUserId = user.UserId;
+        var isOwnerView = false;
+        if (sellerId.HasValue && currentUserId != Guid.Empty)
+        {
+            isOwnerView = await db.Sellers
+                .AsNoTracking()
+                .AnyAsync(s => s.Id == sellerId.Value && s.UserId == currentUserId, ct);
+        }
+
         var query = db.Products
             .AsNoTracking()
             .Include(p => p.Seller)
             .Include(p => p.Category)
             .Include(p => p.Brand)
             .Include(p => p.Location)
-            .Where(p => p.Status == ProductStatus.Active);
+            .Where(p => !p.IsDeleted);
+
+        if (!isOwnerView)
+        {
+            query = query.Where(p => p.Status == ProductStatus.Active);
+        }
+
+        if (sellerId.HasValue)
+        {
+            query = query.Where(p => p.SellerId == sellerId.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(req.Slug))
+        {
+            query = query.Where(p => p.Slug == req.Slug);
+        }
 
         if (!string.IsNullOrWhiteSpace(req.Keyword))
         {
@@ -69,8 +110,13 @@ public class GetAllProductsEndpoint(LivestockDbContext db) : Endpoint<ProductSea
             query = query.Where(p => p.Condition == req.Condition.Value);
         }
 
-        var pageSize = Math.Min(req.PageSize, 100);
-        var skip = (req.Page - 1) * pageSize;
+        // Accept both the flat {Page,PageSize} and the legacy nested
+        // {pageRequest:{currentPage,perPageCount,listAll}} shapes.
+        var pageRaw = req.PageRequest?.CurrentPage ?? req.Page;
+        var pageSizeRaw = req.PageRequest?.PerPageCount ?? req.PageSize;
+        var page = pageRaw > 0 ? pageRaw : 1;
+        var pageSize = Math.Min(pageSizeRaw > 0 ? pageSizeRaw : 20, 100);
+        var skip = (page - 1) * pageSize;
 
         var products = await query
             .OrderByDescending(p => p.IsFeatured)
@@ -84,7 +130,18 @@ public class GetAllProductsEndpoint(LivestockDbContext db) : Endpoint<ProductSea
                 p.BrandId, p.Brand != null ? p.Brand.Name : null,
                 p.Location != null ? p.Location.CountryCode : null,
                 p.Location != null ? p.Location.City : null,
-                p.AverageRating, p.ReviewCount, p.ViewCount, p.CreatedAt))
+                p.AverageRating, p.ReviewCount, p.ViewCount, p.CreatedAt,
+                // Legacy aliases the frontend maps against.
+                p.Price,                   // BasePrice
+                p.CurrencyCode,            // Currency
+                p.Quantity,                // StockQuantity
+                p.Quantity > 0,            // IsInStock
+                (string?)null,             // ShortDescription — not on entity yet
+                p.LocationId,
+                p.Location != null ? p.Location.CountryCode : null,
+                p.Location != null ? p.Location.City : null,
+                (decimal?)null,            // DiscountedPrice — not on entity yet
+                p.BucketId))
             .ToListAsync(ct);
 
         await SendAsync(products, 200, ct);
