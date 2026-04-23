@@ -152,6 +152,11 @@ public sealed class SellersCreateLegacyEndpoint(
             return;
         }
 
+        // Match the auto-create path in Products/Create: the first seller
+        // profile for a user is Active immediately. Forcing PendingVerification
+        // here would block the listing-create flow on its very first call
+        // ("SELLER_NOT_VERIFIED" 403) even though the Products endpoint
+        // happily auto-activates when it has to create the seller itself.
         var seller = new Seller
         {
             UserId = ownerId,
@@ -162,7 +167,7 @@ public sealed class SellersCreateLegacyEndpoint(
             WebsiteUrl = req.Website,
             TaxNumber = req.TaxNumber,
             LogoUrl = req.LogoUrl,
-            Status = SellerStatus.PendingVerification,
+            Status = SellerStatus.Active,
         };
 
         db.Sellers.Add(seller);
