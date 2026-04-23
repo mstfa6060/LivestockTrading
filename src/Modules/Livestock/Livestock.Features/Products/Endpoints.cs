@@ -199,19 +199,31 @@ public class CreateProductEndpoint(LivestockDbContext db, IUserContext user, IEv
             return;
         }
 
+        // Normalize legacy aliases (BasePrice/Currency/StockQuantity/StockUnit/
+        // MediaBucketId) the old frontend client still sends, and persist
+        // LocationId / BucketId from the request body.
+        var price = req.Price > 0 ? req.Price : (req.BasePrice ?? 0m);
+        var currencyCode = !string.IsNullOrWhiteSpace(req.CurrencyCode)
+            ? req.CurrencyCode
+            : (req.Currency ?? "USD");
+        var quantity = req.Quantity > 0 ? req.Quantity : (req.StockQuantity ?? 0);
+        var unit = !string.IsNullOrWhiteSpace(req.Unit) ? req.Unit : req.StockUnit;
+
         var product = new Product
         {
             SellerId = seller.Id,
             CategoryId = req.CategoryId,
             BrandId = req.BrandId,
             FarmId = req.FarmId,
+            LocationId = req.LocationId,
+            BucketId = req.MediaBucketId,
             Title = req.Title,
             Slug = req.Slug,
             Description = req.Description,
-            Price = req.Price,
-            CurrencyCode = req.CurrencyCode,
-            Quantity = req.Quantity,
-            Unit = req.Unit,
+            Price = price,
+            CurrencyCode = currencyCode,
+            Quantity = quantity,
+            Unit = unit,
             Condition = req.Condition,
             IsNegotiable = req.IsNegotiable,
             Status = ProductStatus.PendingApproval
