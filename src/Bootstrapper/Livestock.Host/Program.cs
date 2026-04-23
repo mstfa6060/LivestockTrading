@@ -143,6 +143,10 @@ if (app.Environment.IsDevelopment() && !isCodegen)
     await sp.GetRequiredService<Iam.Persistence.IamDbContext>().Database.MigrateAsync();
     await sp.GetRequiredService<Files.Persistence.FilesDbContext>().Database.MigrateAsync();
     await sp.GetRequiredService<Livestock.Persistence.LivestockDbContext>().Database.MigrateAsync();
+
+    // Load Countries/Provinces/Districts from bundled JSON if the tables are
+    // empty. Runs only on first boot after the AddGeography migration lands.
+    await sp.GetRequiredService<Iam.Features.Services.GeographySeeder>().SeedAsync();
 }
 
 app.UseCors();

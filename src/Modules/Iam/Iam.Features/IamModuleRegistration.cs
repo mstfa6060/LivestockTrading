@@ -17,6 +17,7 @@ public static class IamModuleRegistration
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<INotificationPublisher, NatsNotificationPublisher>();
+        services.AddScoped<GeographySeeder>();
 
         services.AddHostedService<SellerRoleConsumer>();
         services.AddHostedService<TransporterRoleConsumer>();

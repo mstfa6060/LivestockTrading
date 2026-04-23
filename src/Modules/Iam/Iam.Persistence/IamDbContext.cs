@@ -13,6 +13,9 @@ public class IamDbContext : DbContext
     public DbSet<AppRefreshToken> RefreshTokens => Set<AppRefreshToken>();
     public DbSet<UserPushToken> UserPushTokens => Set<UserPushToken>();
     public DbSet<Country> Countries => Set<Country>();
+    public DbSet<Province> Provinces => Set<Province>();
+    public DbSet<District> Districts => Set<District>();
+    public DbSet<Neighborhood> Neighborhoods => Set<Neighborhood>();
     public DbSet<IamModule> Modules => Set<IamModule>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

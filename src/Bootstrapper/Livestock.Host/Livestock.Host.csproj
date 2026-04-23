@@ -22,4 +22,12 @@
          so the in-process OpenAPI generation matches the NSwag CLI. -->
     <PackageReference Include="NSwag.AspNetCore" />
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- Geography seed data (Countries/Provinces/Districts). Copied to
+         output so GeographySeeder can read them at startup. -->
+    <Content Update="SeedData\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

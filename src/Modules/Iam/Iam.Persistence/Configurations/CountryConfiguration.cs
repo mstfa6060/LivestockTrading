@@ -13,6 +13,9 @@ internal sealed class CountryConfiguration : IEntityTypeConfiguration<Country>
 
         builder.Property(c => c.Name).IsRequired().HasMaxLength(100);
         builder.Property(c => c.Code).IsRequired().HasMaxLength(3);
+        builder.Property(c => c.Code3).HasMaxLength(3);
+        builder.Property(c => c.NativeName).HasMaxLength(100);
+        builder.Property(c => c.PhoneCode).HasMaxLength(10);
         builder.Property(c => c.CurrencyCode).IsRequired().HasMaxLength(10);
         builder.Property(c => c.CurrencySymbol).HasMaxLength(10);
 
