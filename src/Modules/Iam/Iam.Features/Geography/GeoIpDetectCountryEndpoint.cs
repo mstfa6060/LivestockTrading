@@ -4,8 +4,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Iam.Features.Geography;
 
-public sealed record GeoIpDetectCountryRequest();
-
 public sealed record GeoIpDetectCountryResponse(
     string CountryCode,
     int? CountryId,
@@ -17,7 +15,7 @@ public sealed record GeoIpDetectCountryResponse(
 // ArfBlocks code; for now the frontend only uses this to prefill the
 // register country picker, so the fallback is acceptable.
 public sealed class GeoIpDetectCountryEndpoint(IamDbContext db)
-    : Endpoint<GeoIpDetectCountryRequest, GeoIpDetectCountryResponse>
+    : EndpointWithoutRequest<GeoIpDetectCountryResponse>
 {
     public override void Configure()
     {
@@ -26,7 +24,7 @@ public sealed class GeoIpDetectCountryEndpoint(IamDbContext db)
         Tags("Geography");
     }
 
-    public override async Task HandleAsync(GeoIpDetectCountryRequest req, CancellationToken ct)
+    public override async Task HandleAsync(CancellationToken ct)
     {
         var tr = await db.Countries
             .AsNoTracking()
