@@ -49,22 +49,45 @@ public sealed class UploadEndpoint(
             return;
         }
 
-        var bucket = await db.Buckets
-            .Include(b => b.Files)
-            .FirstOrDefaultAsync(b => b.Id == req.BucketId, ct);
-
-        if (bucket is null)
+        MediaBucket bucket;
+        if (req.BucketId == Guid.Empty)
         {
-            AddError(FilesErrors.Buckets.NotFound);
-            await SendErrorsAsync(404, ct);
-            return;
+            // First upload on a fresh form — validator guarantees ModuleName
+            // and BucketType are present. Spin up a bucket inline so the
+            // frontend doesn't have to make a separate Buckets/Create round
+            // trip before every listing-create flow.
+            bucket = new MediaBucket
+            {
+                OwnerId = userId,
+                Module = req.ModuleName!,
+                EntityId = req.EntityId,
+                BucketType = req.BucketType!.Value,
+            };
+            db.Buckets.Add(bucket);
+            await db.SaveChangesAsync(ct);
+            bucket.Files = new List<FileRecord>();
         }
-
-        if (bucket.OwnerId != userId)
+        else
         {
-            AddError(FilesErrors.Buckets.NotOwned);
-            await SendErrorsAsync(403, ct);
-            return;
+            var existing = await db.Buckets
+                .Include(b => b.Files)
+                .FirstOrDefaultAsync(b => b.Id == req.BucketId, ct);
+
+            if (existing is null)
+            {
+                AddError(FilesErrors.Buckets.NotFound);
+                await SendErrorsAsync(404, ct);
+                return;
+            }
+
+            if (existing.OwnerId != userId)
+            {
+                AddError(FilesErrors.Buckets.NotOwned);
+                await SendErrorsAsync(403, ct);
+                return;
+            }
+
+            bucket = existing;
         }
 
         var activeFils = bucket.Files.Where(f => !f.IsDeleted).ToList();
