@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Livestock.Features</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Livestock.Domain\Livestock.Domain.csproj" />
+    <ProjectReference Include="..\Livestock.Persistence\Livestock.Persistence.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Shared.Infrastructure\Shared.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

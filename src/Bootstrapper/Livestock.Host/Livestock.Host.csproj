@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <RootNamespace>Livestock.Host</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Shared -->
+    <ProjectReference Include="..\..\Shared\Shared.Infrastructure\Shared.Infrastructure.csproj" />
+
+    <!-- Modules -->
+    <ProjectReference Include="..\..\Modules\Iam\Iam.Features\Iam.Features.csproj" />
+    <ProjectReference Include="..\..\Modules\Files\Files.Features\Files.Features.csproj" />
+    <ProjectReference Include="..\..\Modules\Livestock\Livestock.Features\Livestock.Features.csproj" />
+  </ItemGroup>
+</Project>
