@@ -21,6 +21,12 @@ public class TransportRequestConfiguration : IEntityTypeConfiguration<TransportR
         builder.Property(x => x.CurrencyCode).HasMaxLength(10);
         builder.Property(x => x.EstimatedWeightKg).HasPrecision(10, 2);
 
+        // PostGIS: pickup + delivery points for route/distance calculations.
+        builder.Property(x => x.PickupGeo).HasColumnType("geography(Point, 4326)");
+        builder.HasIndex(x => x.PickupGeo).HasMethod("GIST").HasDatabaseName("ix_transport_requests_pickup_geo");
+        builder.Property(x => x.DeliveryGeo).HasColumnType("geography(Point, 4326)");
+        builder.HasIndex(x => x.DeliveryGeo).HasMethod("GIST").HasDatabaseName("ix_transport_requests_delivery_geo");
+
         builder.HasOne(x => x.AssignedTransporter).WithMany(x => x.TransportRequests).HasForeignKey(x => x.AssignedTransporterId).OnDelete(DeleteBehavior.SetNull);
         builder.HasMany(x => x.Offers).WithOne(x => x.TransportRequest).HasForeignKey(x => x.TransportRequestId).OnDelete(DeleteBehavior.Cascade);
         builder.HasMany(x => x.TrackingUpdates).WithOne(x => x.TransportRequest).HasForeignKey(x => x.TransportRequestId).OnDelete(DeleteBehavior.Cascade);

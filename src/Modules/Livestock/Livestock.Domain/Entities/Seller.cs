@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Livestock.Domain.Enums;
+using NetTopologySuite.Geometries;
 
 namespace Livestock.Domain.Entities;
 
@@ -19,6 +20,12 @@ public class Seller : BaseEntity
     public Guid? BucketId { get; set; }
     public double AverageRating { get; set; }
     public int ReviewCount { get; set; }
+
+    /// <summary>
+    /// PostGIS geography(Point, 4326) of the seller's primary business
+    /// location. Feeds GIST-backed /Sellers/Nearby ST_DWithin search.
+    /// </summary>
+    public Point? Geo { get; set; }
 
     [NotMapped]
     public bool IsVerified => Status == SellerStatus.Active && VerifiedAt is not null;

@@ -12,7 +12,7 @@ public static class LivestockPersistenceExtensions
             ?? throw new InvalidOperationException("DefaultConnection is not configured.");
 
         services.AddDbContext<LivestockDbContext>(options =>
-            options.UseNpgsql(connectionString));
+            options.UseNpgsql(connectionString, npgsql => npgsql.UseNetTopologySuite()));
 
         return services;
     }
