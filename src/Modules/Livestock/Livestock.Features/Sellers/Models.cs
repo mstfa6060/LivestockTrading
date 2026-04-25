@@ -14,7 +14,8 @@ public record NearbySellersRequest(
     double Latitude,
     double Longitude,
     string? CountryCode,
-    int Limit = 10);
+    int Limit = 10,
+    double RadiusKm = 50.0);
 
 public record NearbySellerItem(
     Guid SellerId,

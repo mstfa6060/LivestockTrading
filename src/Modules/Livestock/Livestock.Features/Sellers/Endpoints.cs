@@ -4,6 +4,7 @@ using Livestock.Domain.Enums;
 using Livestock.Domain.Errors;
 using Livestock.Persistence;
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
 using Shared.Abstractions.Identity;
 using Shared.Contracts.Events.Livestock;
 using Shared.Infrastructure.Messaging;
@@ -208,45 +209,66 @@ public class GetNearbySellersEndpoint(LivestockDbContext db) : Endpoint<NearbySe
 
     public override async Task HandleAsync(NearbySellersRequest req, CancellationToken ct)
     {
-        var query = db.Products
-            .AsNoTracking()
-            .Where(p => !p.IsDeleted
-                     && p.Status == ProductStatus.Active
-                     && p.LocationId != null
-                     && p.Location!.Latitude != null
-                     && p.Location.Longitude != null
-                     && p.Seller.Status == SellerStatus.Active);
+        // PostGIS expects (X=lon, Y=lat) and SRID 4326 for geography. Center
+        // built once and reused so EF emits a single parameter binding.
+        var center = new Point(req.Longitude, req.Latitude) { SRID = 4326 };
+        var radiusMeters = req.RadiusKm * 1000;
 
+        // Querying Sellers directly so the GIST index on Sellers.Geo can drive
+        // the plan via ST_DWithin / <-> (KNN). Note: the LINQ form matters —
+        // EF maps `IsWithinDistance` → `ST_DWithin` and `Distance(...)` in
+        // ORDER BY → the `<->` KNN operator. Anything else (e.g. comparing
+        // ST_Distance to a literal in WHERE) would force a Seq Scan.
+        var query = db.Sellers
+            .AsNoTracking()
+            .Where(s => !s.IsDeleted
+                     && s.Status == SellerStatus.Active
+                     && s.VerifiedAt != null
+                     && s.Geo != null
+                     && s.Geo!.IsWithinDistance(center, radiusMeters));
+
+        // City / CountryCode aren't on Seller — LEFT JOIN the seller's primary
+        // Location row (OwnerId = Seller.Id, OwnerType = "Seller"). Picking
+        // the first match keeps the projection EF-translatable; if a seller
+        // has multiple locations the response just shows one.
+        // Geo itself is selected (not .X/.Y) because ST_X/ST_Y aren't defined
+        // for `geography` — we read the Point's coordinates client-side.
+        var projected = query
+            .Select(s => new
+            {
+                s.Id,
+                s.UserId,
+                s.BusinessName,
+                s.LogoUrl,
+                s.Status,
+                s.VerifiedAt,
+                s.AverageRating,
+                s.ReviewCount,
+                Loc = db.Locations
+                    .Where(l => !l.IsDeleted
+                             && l.OwnerId == s.Id
+                             && l.OwnerType == "Seller")
+                    .OrderByDescending(l => l.CreatedAt)
+                    .Select(l => new { l.City, l.CountryCode })
+                    .FirstOrDefault(),
+                Geo = s.Geo!,
+                DistanceMeters = s.Geo!.Distance(center),
+            });
+
+        // Optional country filter: prefer the matched Location's CountryCode.
         if (!string.IsNullOrWhiteSpace(req.CountryCode))
         {
-            query = query.Where(p => p.Location!.CountryCode == req.CountryCode);
+            projected = projected.Where(x => x.Loc != null && x.Loc.CountryCode == req.CountryCode);
         }
 
-        var rows = await query
-            .OrderByDescending(p => p.CreatedAt)
-            .Take(5000)
-            .Select(p => new
-            {
-                p.SellerId,
-                p.Seller.UserId,
-                p.Seller.BusinessName,
-                p.Seller.LogoUrl,
-                p.Seller.Status,
-                p.Seller.VerifiedAt,
-                p.Seller.AverageRating,
-                p.Seller.ReviewCount,
-                p.Location!.City,
-                p.Location.CountryCode,
-                Latitude = p.Location.Latitude!.Value,
-                Longitude = p.Location.Longitude!.Value,
-            })
+        var rows = await projected
+            .OrderBy(x => x.DistanceMeters)  // <-> KNN ordering
+            .Take(req.Limit)
             .ToListAsync(ct);
 
         var nearby = rows
-            .GroupBy(r => r.SellerId)
-            .Select(g => g.First())
             .Select(s => new NearbySellerItem(
-                s.SellerId,
+                s.Id,
                 s.UserId,
                 s.BusinessName,
                 s.LogoUrl,
@@ -254,18 +276,19 @@ public class GetNearbySellersEndpoint(LivestockDbContext db) : Endpoint<NearbySe
                 s.Status,
                 s.AverageRating,
                 s.ReviewCount,
-                s.City,
-                s.CountryCode,
-                s.Latitude,
-                s.Longitude,
-                HaversineKm(req.Latitude, req.Longitude, s.Latitude, s.Longitude)))
-            .OrderBy(s => s.DistanceKm)
-            .Take(req.Limit)
+                s.Loc?.City,
+                s.Loc?.CountryCode ?? string.Empty,
+                s.Geo.Y,    // latitude  (NTS Point: X=lon, Y=lat)
+                s.Geo.X,    // longitude
+                s.DistanceMeters / 1000.0))
             .ToList();
 
         await SendAsync(nearby, 200, ct);
     }
 
+    [Obsolete("Replaced by PostGIS ST_DWithin / KNN — kept for one release window so callers " +
+              "comparing distance values aren't surprised by tiny rounding differences. " +
+              "Remove two releases after MST-72 ships.", error: false)]
     private static double HaversineKm(double lat1, double lon1, double lat2, double lon2)
     {
         const double earthRadiusKm = 6371.0;
@@ -278,6 +301,7 @@ public class GetNearbySellersEndpoint(LivestockDbContext db) : Endpoint<NearbySe
         return earthRadiusKm * c;
     }
 
+    [Obsolete("Helper for the obsolete HaversineKm — see that method.", error: false)]
     private static double ToRadians(double degrees) => degrees * Math.PI / 180.0;
 }
 
