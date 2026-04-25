@@ -13183,11 +13183,15 @@ export interface ICategoriesClient {
     /**
      * @return Success
      */
-    all( cancelToken?: CancelToken): Promise<CategoryListItem[]>;
+    update(updateCategoryRequest: UpdateCategoryRequest,  cancelToken?: CancelToken): Promise<CategoryDetail>;
     /**
      * @return Success
      */
     detail(getCategoryRequest: GetCategoryRequest,  cancelToken?: CancelToken): Promise<CategoryDetail>;
+    /**
+     * @return No Content
+     */
+    delete(deleteCategoryRequest: DeleteCategoryRequest,  cancelToken?: CancelToken): Promise<void>;
     /**
      * @return Success
      */
@@ -13195,11 +13199,7 @@ export interface ICategoriesClient {
     /**
      * @return Success
      */
-    update(updateCategoryRequest: UpdateCategoryRequest,  cancelToken?: CancelToken): Promise<CategoryDetail>;
-    /**
-     * @return No Content
-     */
-    delete(deleteCategoryRequest: DeleteCategoryRequest,  cancelToken?: CancelToken): Promise<void>;
+    all( cancelToken?: CancelToken): Promise<CategoryListItem[]>;
 }
 
 export class CategoriesClient implements ICategoriesClient {
@@ -13218,14 +13218,18 @@ export class CategoriesClient implements ICategoriesClient {
     /**
      * @return Success
      */
-    all( cancelToken?: CancelToken): Promise<CategoryListItem[]> {
-        let url_ = this.baseUrl + "/livestocktrading/Categories/All";
+    update(updateCategoryRequest: UpdateCategoryRequest, cancelToken?: CancelToken): Promise<CategoryDetail> {
+        let url_ = this.baseUrl + "/livestocktrading/Categories/Update";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(updateCategoryRequest);
+
         let options_: AxiosRequestConfig = {
+            data: content_,
             method: "POST",
             url: url_,
             headers: {
+                "Content-Type": "application/json",
                 "Accept": "application/json"
             },
             cancelToken
@@ -13238,11 +13242,11 @@ export class CategoriesClient implements ICategoriesClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processAll(_response);
+            return this.processUpdate(_response);
         });
     }
 
-    protected processAll(response: AxiosResponse): Promise<CategoryListItem[]> {
+    protected processUpdate(response: AxiosResponse): Promise<CategoryDetail> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -13257,13 +13261,28 @@ export class CategoriesClient implements ICategoriesClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = resultData200;
-            return Promise.resolve<CategoryListItem[]>(result200);
+            return Promise.resolve<CategoryDetail>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = resultData400;
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            return throwException("Unauthorized", status, _responseText, _headers);
+
+        } else if (status === 403) {
+            const _responseText = response.data;
+            return throwException("Forbidden", status, _responseText, _headers);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<CategoryListItem[]>(null as any);
+        return Promise.resolve<CategoryDetail>(null as any);
     }
 
     /**
@@ -13319,6 +13338,65 @@ export class CategoriesClient implements ICategoriesClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<CategoryDetail>(null as any);
+    }
+
+    /**
+     * @return No Content
+     */
+    delete(deleteCategoryRequest: DeleteCategoryRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/livestocktrading/Categories/Delete";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(deleteCategoryRequest);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDelete(_response);
+        });
+    }
+
+    protected processDelete(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            return throwException("Unauthorized", status, _responseText, _headers);
+
+        } else if (status === 403) {
+            const _responseText = response.data;
+            return throwException("Forbidden", status, _responseText, _headers);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
     }
 
     /**
@@ -13394,18 +13472,14 @@ export class CategoriesClient implements ICategoriesClient {
     /**
      * @return Success
      */
-    update(updateCategoryRequest: UpdateCategoryRequest, cancelToken?: CancelToken): Promise<CategoryDetail> {
-        let url_ = this.baseUrl + "/livestocktrading/Categories/Update";
+    all( cancelToken?: CancelToken): Promise<CategoryListItem[]> {
+        let url_ = this.baseUrl + "/livestocktrading/Categories/All";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(updateCategoryRequest);
-
         let options_: AxiosRequestConfig = {
-            data: content_,
             method: "POST",
             url: url_,
             headers: {
-                "Content-Type": "application/json",
                 "Accept": "application/json"
             },
             cancelToken
@@ -13418,11 +13492,11 @@ export class CategoriesClient implements ICategoriesClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processUpdate(_response);
+            return this.processAll(_response);
         });
     }
 
-    protected processUpdate(response: AxiosResponse): Promise<CategoryDetail> {
+    protected processAll(response: AxiosResponse): Promise<CategoryListItem[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -13437,87 +13511,13 @@ export class CategoriesClient implements ICategoriesClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = resultData200;
-            return Promise.resolve<CategoryDetail>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = resultData400;
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status === 401) {
-            const _responseText = response.data;
-            return throwException("Unauthorized", status, _responseText, _headers);
-
-        } else if (status === 403) {
-            const _responseText = response.data;
-            return throwException("Forbidden", status, _responseText, _headers);
+            return Promise.resolve<CategoryListItem[]>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<CategoryDetail>(null as any);
-    }
-
-    /**
-     * @return No Content
-     */
-    delete(deleteCategoryRequest: DeleteCategoryRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/livestocktrading/Categories/Delete";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(deleteCategoryRequest);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processDelete(_response);
-        });
-    }
-
-    protected processDelete(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 204) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status === 401) {
-            const _responseText = response.data;
-            return throwException("Unauthorized", status, _responseText, _headers);
-
-        } else if (status === 403) {
-            const _responseText = response.data;
-            return throwException("Forbidden", status, _responseText, _headers);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
+        return Promise.resolve<CategoryListItem[]>(null as any);
     }
 }
 
@@ -17049,21 +17049,6 @@ export interface DeleteChemicalInfoRequest {
     id?: string;
 }
 
-export interface CategoryListItem {
-    id?: string;
-    name?: string;
-    slug?: string;
-    description?: string | undefined;
-    iconUrl?: string | undefined;
-    imageUrl?: string | undefined;
-    sortOrder?: number;
-    isActive?: boolean;
-    parentCategoryId?: string | undefined;
-    parentCategoryName?: string | undefined;
-    subCategoryCount?: number;
-    createdAt?: Date;
-}
-
 export interface CategoryDetail {
     id?: string;
     name?: string;
@@ -17080,7 +17065,23 @@ export interface CategoryDetail {
     createdAt?: Date;
 }
 
+export interface UpdateCategoryRequest {
+    id: string;
+    name: string;
+    slug: string;
+    description?: string | undefined;
+    iconUrl?: string | undefined;
+    imageUrl?: string | undefined;
+    parentCategoryId?: string | undefined;
+    sortOrder?: number;
+    isActive?: boolean;
+}
+
 export interface GetCategoryRequest {
+    id?: string;
+}
+
+export interface DeleteCategoryRequest {
     id?: string;
 }
 
@@ -17095,20 +17096,19 @@ export interface CreateCategoryRequest {
     isActive?: boolean;
 }
 
-export interface UpdateCategoryRequest {
-    id: string;
-    name: string;
-    slug: string;
+export interface CategoryListItem {
+    id?: string;
+    name?: string;
+    slug?: string;
     description?: string | undefined;
     iconUrl?: string | undefined;
     imageUrl?: string | undefined;
-    parentCategoryId?: string | undefined;
     sortOrder?: number;
     isActive?: boolean;
-}
-
-export interface DeleteCategoryRequest {
-    id?: string;
+    parentCategoryId?: string | undefined;
+    parentCategoryName?: string | undefined;
+    subCategoryCount?: number;
+    createdAt?: Date;
 }
 
 export interface BrandListItem {

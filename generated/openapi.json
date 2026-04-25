@@ -6809,27 +6809,61 @@
         ]
       }
     },
-    "/livestocktrading/Categories/All": {
+    "/livestocktrading/Categories/Update": {
       "post": {
         "tags": [
           "Categories"
         ],
-        "operationId": "Categories_All",
+        "operationId": "Categories_Update",
+        "requestBody": {
+          "x-name": "UpdateCategoryRequest",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCategoryRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
         "responses": {
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CategoryListItem"
-                  }
+                  "$ref": "#/components/schemas/CategoryDetail"
                 }
               }
             }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
-        }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": [
+              "LivestockTrading.Admin",
+              "LivestockTrading.Moderator"
+            ]
+          }
+        ]
       }
     },
     "/livestocktrading/Categories/Detail": {
@@ -6863,6 +6897,45 @@
             }
           }
         }
+      }
+    },
+    "/livestocktrading/Categories/Delete": {
+      "post": {
+        "tags": [
+          "Categories"
+        ],
+        "operationId": "Categories_Delete",
+        "requestBody": {
+          "x-name": "DeleteCategoryRequest",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteCategoryRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": [
+              "LivestockTrading.Admin"
+            ]
+          }
+        ]
       }
     },
     "/livestocktrading/Categories/Create": {
@@ -6922,100 +6995,27 @@
         ]
       }
     },
-    "/livestocktrading/Categories/Update": {
+    "/livestocktrading/Categories/All": {
       "post": {
         "tags": [
           "Categories"
         ],
-        "operationId": "Categories_Update",
-        "requestBody": {
-          "x-name": "UpdateCategoryRequest",
-          "description": "",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateCategoryRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
+        "operationId": "Categories_All",
         "responses": {
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CategoryDetail"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryListItem"
+                  }
                 }
               }
             }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
           }
-        },
-        "security": [
-          {
-            "JWTBearerAuth": [
-              "LivestockTrading.Admin",
-              "LivestockTrading.Moderator"
-            ]
-          }
-        ]
-      }
-    },
-    "/livestocktrading/Categories/Delete": {
-      "post": {
-        "tags": [
-          "Categories"
-        ],
-        "operationId": "Categories_Delete",
-        "requestBody": {
-          "x-name": "DeleteCategoryRequest",
-          "description": "",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteCategoryRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "204": {
-            "description": "No Content"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "security": [
-          {
-            "JWTBearerAuth": [
-              "LivestockTrading.Admin"
-            ]
-          }
-        ]
+        }
       }
     },
     "/livestocktrading/Brands/All": {
@@ -16417,58 +16417,6 @@
           }
         }
       },
-      "CategoryListItem": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid"
-          },
-          "name": {
-            "type": "string"
-          },
-          "slug": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "iconUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "imageUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "sortOrder": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "parentCategoryId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true
-          },
-          "parentCategoryName": {
-            "type": "string",
-            "nullable": true
-          },
-          "subCategoryCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
       "CategoryDetail": {
         "type": "object",
         "additionalProperties": false,
@@ -16522,63 +16470,6 @@
           "createdAt": {
             "type": "string",
             "format": "date-time"
-          }
-        }
-      },
-      "GetCategoryRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid"
-          }
-        }
-      },
-      "CreateCategoryRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "name",
-          "slug"
-        ],
-        "properties": {
-          "name": {
-            "type": "string",
-            "maxLength": 200,
-            "minLength": 0,
-            "nullable": false
-          },
-          "slug": {
-            "type": "string",
-            "maxLength": 200,
-            "minLength": 0,
-            "pattern": "^[a-z0-9-]+$",
-            "nullable": false
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "iconUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "imageUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "parentCategoryId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true
-          },
-          "sortOrder": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "isActive": {
-            "type": "boolean"
           }
         }
       },
@@ -16636,6 +16527,16 @@
           }
         }
       },
+      "GetCategoryRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          }
+        }
+      },
       "DeleteCategoryRequest": {
         "type": "object",
         "additionalProperties": false,
@@ -16643,6 +16544,105 @@
           "id": {
             "type": "string",
             "format": "guid"
+          }
+        }
+      },
+      "CreateCategoryRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "slug"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 0,
+            "nullable": false
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 0,
+            "pattern": "^[a-z0-9-]+$",
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "iconUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "parentCategoryId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CategoryListItem": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "iconUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "parentCategoryId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
+          "parentCategoryName": {
+            "type": "string",
+            "nullable": true
+          },
+          "subCategoryCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
