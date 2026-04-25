@@ -173,10 +173,25 @@ Tüm ticaret domain'i. Feature klasörleri:
 
 ```
 Livestock.Features/MyEntity/
-  Endpoints.cs    ← FastEndpoints Endpoint<Req, Res> sınıfları
-  Models.cs       ← Request + Response record/class tanımları
-  Validators.cs   ← FluentValidation AbstractValidator<TRequest> sınıfları
+  _Shared/
+    Models.cs                 ← shared DTOs (kullanan endpoint sayısı >= 2 ise)
+  Create/
+    Endpoint.cs               ← tek FastEndpoints Endpoint<Req, Res>
+    Models.cs                 ← Request + Response record
+    Validator.cs              ← FluentValidation AbstractValidator<TRequest>
+  Update/
+    Endpoint.cs
+    Models.cs
+    Validator.cs
+  Delete/ ...
+  _Legacy/                    ← eski route alias endpoint'leri (geçiş süresince)
 ```
+
+- Her `Endpoint.cs` **tek bir** `Endpoint<TReq, TRes>` class içerir
+- Namespace: `Livestock.Features.{Entity}.{UseCase}` (örn. `Livestock.Features.Categories.Create`)
+- Shared DTO sadece **>= 2 endpoint** tarafından kullanılıyorsa `_Shared/` altına alınır
+- Legacy route alias endpoint'leri `_Legacy/` klasöründe tutulur
+- `tests/Architecture.Tests/VerticalSliceTests` bu kuralı derleme zamanı koruyucusu olarak doğrular (whitelist'e ekli refactor edilmiş slice'lar için)
 
 ### Örnek Endpoint
 
@@ -185,7 +200,7 @@ Livestock.Features/MyEntity/
 public record CreateCategoryRequest(string Name, string? Slug, Guid? ParentId);
 public record CreateCategoryResponse(Guid Id, string Name, string Slug);
 
-// Validators.cs
+// Validator.cs
 public class CreateCategoryValidator : AbstractValidator<CreateCategoryRequest>
 {
     public CreateCategoryValidator()
@@ -194,7 +209,7 @@ public class CreateCategoryValidator : AbstractValidator<CreateCategoryRequest>
     }
 }
 
-// Endpoints.cs
+// Endpoint.cs
 public class CreateCategoryEndpoint(LivestockDbContext db) 
     : Endpoint<CreateCategoryRequest, CreateCategoryResponse>
 {
