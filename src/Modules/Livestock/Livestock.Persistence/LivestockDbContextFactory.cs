@@ -13,8 +13,9 @@ public sealed class LivestockDbContextFactory : IDesignTimeDbContextFactory<Live
             ?? "Host=localhost;Database=livestock_design;Username=postgres;Password=postgres";
 
         var options = new DbContextOptionsBuilder<LivestockDbContext>()
-            .UseNpgsql(connectionString, npgsql =>
-                npgsql.MigrationsAssembly(typeof(LivestockDbContext).Assembly.FullName))
+            .UseNpgsql(connectionString, npgsql => npgsql
+                .MigrationsAssembly(typeof(LivestockDbContext).Assembly.FullName)
+                .UseNetTopologySuite())
             .Options;
 
         return new LivestockDbContext(options);

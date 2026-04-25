@@ -21,6 +21,9 @@
     <!-- NSwag overrides FastEndpoints.Swagger's older NSwag transitive deps
          so the in-process OpenAPI generation matches the NSwag CLI. -->
     <PackageReference Include="NSwag.AspNetCore" />
+    <!-- PostGIS: registers NetTopologySuite geometry mappings for Npgsql so
+         Point/Polygon properties round-trip to geography/geometry columns. -->
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NetTopologySuite" />
   </ItemGroup>
 
   <ItemGroup>

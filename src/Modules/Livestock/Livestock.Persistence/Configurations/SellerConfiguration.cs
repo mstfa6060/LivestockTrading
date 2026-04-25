@@ -19,6 +19,11 @@ public class SellerConfiguration : IEntityTypeConfiguration<Seller>
         builder.Property(x => x.SuspensionReason).HasMaxLength(1000);
         builder.HasIndex(x => x.UserId).IsUnique();
 
+        // PostGIS: geography(Point, 4326) backed by a GIST index so
+        // /Sellers/Nearby can do ST_DWithin instead of Haversine scan.
+        builder.Property(x => x.Geo).HasColumnType("geography(Point, 4326)");
+        builder.HasIndex(x => x.Geo).HasMethod("GIST").HasDatabaseName("ix_sellers_geo");
+
         builder.HasQueryFilter(x => !x.IsDeleted);
     }
 }

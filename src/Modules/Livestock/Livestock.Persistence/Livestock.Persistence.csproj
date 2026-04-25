@@ -5,6 +5,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Livestock.Domain\Livestock.Domain.csproj" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NetTopologySuite" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
   </ItemGroup>
 </Project>
