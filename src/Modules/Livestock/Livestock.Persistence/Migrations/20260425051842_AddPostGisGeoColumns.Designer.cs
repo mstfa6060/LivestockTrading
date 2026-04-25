@@ -3,6 +3,7 @@ using System;
 using Livestock.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Livestock.Persistence.Migrations
 {
     [DbContext(typeof(LivestockDbContext))]
-    partial class LivestockDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260425051842_AddPostGisGeoColumns")]
+    partial class AddPostGisGeoColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
