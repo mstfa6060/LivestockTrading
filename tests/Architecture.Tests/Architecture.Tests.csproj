@@ -10,6 +10,7 @@
     <PackageReference Include="xunit.runner.visualstudio" />
     <PackageReference Include="NetArchTest.Rules" />
     <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="FastEndpoints" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,5 +20,6 @@
     <ProjectReference Include="..\..\src\Modules\Iam\Iam.Features\Iam.Features.csproj" />
     <ProjectReference Include="..\..\src\Modules\Files\Files.Domain\Files.Domain.csproj" />
     <ProjectReference Include="..\..\src\Modules\Livestock\Livestock.Domain\Livestock.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Livestock\Livestock.Features\Livestock.Features.csproj" />
   </ItemGroup>
 </Project>
