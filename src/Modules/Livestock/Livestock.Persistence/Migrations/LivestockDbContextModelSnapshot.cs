@@ -4,6 +4,7 @@ using Livestock.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -20,6 +21,7 @@ namespace Livestock.Persistence.Migrations
                 .HasAnnotation("ProductVersion", "10.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Livestock.Domain.Entities.AnimalInfo", b =>
@@ -940,6 +942,9 @@ namespace Livestock.Persistence.Migrations
                     b.Property<string>("District")
                         .HasColumnType("text");
 
+                    b.Property<Point>("Geo")
+                        .HasColumnType("geography(Point, 4326)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -969,6 +974,11 @@ namespace Livestock.Persistence.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Geo")
+                        .HasDatabaseName("ix_locations_geo");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Geo"), "GIST");
 
                     b.ToTable("Locations");
                 });
@@ -1739,6 +1749,9 @@ namespace Livestock.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<Point>("Geo")
+                        .HasColumnType("geography(Point, 4326)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -1778,6 +1791,11 @@ namespace Livestock.Persistence.Migrations
                         .HasColumnType("character varying(500)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Geo")
+                        .HasDatabaseName("ix_sellers_geo");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Geo"), "GIST");
 
                     b.HasIndex("UserId")
                         .IsUnique();
@@ -2223,6 +2241,9 @@ namespace Livestock.Persistence.Migrations
                         .HasMaxLength(5)
                         .HasColumnType("character varying(5)");
 
+                    b.Property<Point>("DeliveryGeo")
+                        .HasColumnType("geography(Point, 4326)");
+
                     b.Property<double?>("DeliveryLatitude")
                         .HasColumnType("double precision");
 
@@ -2252,6 +2273,9 @@ namespace Livestock.Persistence.Migrations
 
                     b.Property<DateTime?>("PickupDate")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Point>("PickupGeo")
+                        .HasColumnType("geography(Point, 4326)");
 
                     b.Property<double?>("PickupLatitude")
                         .HasColumnType("double precision");
@@ -2288,6 +2312,16 @@ namespace Livestock.Persistence.Migrations
 
                     b.HasIndex("AssignedTransporterId");
 
+                    b.HasIndex("DeliveryGeo")
+                        .HasDatabaseName("ix_transport_requests_delivery_geo");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("DeliveryGeo"), "GIST");
+
+                    b.HasIndex("PickupGeo")
+                        .HasDatabaseName("ix_transport_requests_pickup_geo");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("PickupGeo"), "GIST");
+
                     b.ToTable("TransportRequests");
                 });
 
@@ -2302,6 +2336,9 @@ namespace Livestock.Persistence.Migrations
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Point>("Geo")
+                        .HasColumnType("geography(Point, 4326)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -2334,6 +2371,11 @@ namespace Livestock.Persistence.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Geo")
+                        .HasDatabaseName("ix_transport_trackings_geo");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Geo"), "GIST");
 
                     b.HasIndex("TransportRequestId");
 

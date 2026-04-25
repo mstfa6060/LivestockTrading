@@ -28,27 +28,3 @@ public record CategoryDetail(
     string? NameTranslations,
     string? DescriptionTranslations,
     DateTime CreatedAt);
-
-public record CreateCategoryRequest(
-    string Name,
-    string Slug,
-    string? Description,
-    string? IconUrl,
-    string? ImageUrl,
-    Guid? ParentCategoryId,
-    int SortOrder,
-    bool IsActive);
-
-public record UpdateCategoryRequest(
-    Guid Id,
-    string Name,
-    string Slug,
-    string? Description,
-    string? IconUrl,
-    string? ImageUrl,
-    Guid? ParentCategoryId,
-    int SortOrder,
-    bool IsActive);
-
-public record DeleteCategoryRequest(Guid Id);
-public record GetCategoryRequest(Guid Id);

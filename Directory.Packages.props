@@ -25,9 +25,14 @@
   <ItemGroup>
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.0" />
-    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
-    <PackageVersion Include="Npgsql.NetTopologySuite" Version="8.0.5" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL.NetTopologySuite" Version="10.0.0" />
+    <PackageVersion Include="Npgsql.NetTopologySuite" Version="8.0.5" />
+    <!-- PostGIS/NetTopologySuite: pure-managed geometry types (Point, Polygon…)
+         referenced by Domain entities. Safe in Domain because it has no
+         infrastructure dependency (no EF/NATS/DB). -->
+    <PackageVersion Include="NetTopologySuite" Version="2.5.0" />
   </ItemGroup>
 
   <!-- Cache -->
