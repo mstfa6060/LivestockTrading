@@ -299,6 +299,382 @@ export class PushClient implements IPushClient {
     }
 }
 
+export interface ICountriesClient {
+    /**
+     * @return Success
+     */
+    all(countriesAllRequest: CountriesAllRequest,  cancelToken?: CancelToken): Promise<CountryItem[]>;
+}
+
+export class CountriesClient implements ICountriesClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * @return Success
+     */
+    all(countriesAllRequest: CountriesAllRequest, cancelToken?: CancelToken): Promise<CountryItem[]> {
+        let url_ = this.baseUrl + "/iam/Countries/All";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(countriesAllRequest);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processAll(_response);
+        });
+    }
+
+    protected processAll(response: AxiosResponse): Promise<CountryItem[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<CountryItem[]>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<CountryItem[]>(null as any);
+    }
+}
+
+export interface IDistrictsClient {
+    /**
+     * @return Success
+     */
+    byProvince(districtsByProvinceRequest: DistrictsByProvinceRequest,  cancelToken?: CancelToken): Promise<DistrictItem[]>;
+}
+
+export class DistrictsClient implements IDistrictsClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * @return Success
+     */
+    byProvince(districtsByProvinceRequest: DistrictsByProvinceRequest, cancelToken?: CancelToken): Promise<DistrictItem[]> {
+        let url_ = this.baseUrl + "/iam/Districts/ByProvince";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(districtsByProvinceRequest);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processByProvince(_response);
+        });
+    }
+
+    protected processByProvince(response: AxiosResponse): Promise<DistrictItem[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<DistrictItem[]>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<DistrictItem[]>(null as any);
+    }
+}
+
+export interface IGeoipClient {
+    /**
+     * @return Success
+     */
+    detectCountry( cancelToken?: CancelToken): Promise<GeoIpDetectCountryResponse>;
+}
+
+export class GeoipClient implements IGeoipClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * @return Success
+     */
+    detectCountry( cancelToken?: CancelToken): Promise<GeoIpDetectCountryResponse> {
+        let url_ = this.baseUrl + "/iam/GeoIp/DetectCountry";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "POST",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDetectCountry(_response);
+        });
+    }
+
+    protected processDetectCountry(response: AxiosResponse): Promise<GeoIpDetectCountryResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<GeoIpDetectCountryResponse>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<GeoIpDetectCountryResponse>(null as any);
+    }
+}
+
+export interface INeighborhoodsClient {
+    /**
+     * @return Success
+     */
+    byDistrict(neighborhoodsByDistrictRequest: NeighborhoodsByDistrictRequest,  cancelToken?: CancelToken): Promise<NeighborhoodItem[]>;
+}
+
+export class NeighborhoodsClient implements INeighborhoodsClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * @return Success
+     */
+    byDistrict(neighborhoodsByDistrictRequest: NeighborhoodsByDistrictRequest, cancelToken?: CancelToken): Promise<NeighborhoodItem[]> {
+        let url_ = this.baseUrl + "/iam/Neighborhoods/ByDistrict";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(neighborhoodsByDistrictRequest);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processByDistrict(_response);
+        });
+    }
+
+    protected processByDistrict(response: AxiosResponse): Promise<NeighborhoodItem[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<NeighborhoodItem[]>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<NeighborhoodItem[]>(null as any);
+    }
+}
+
+export interface IProvincesClient {
+    /**
+     * @return Success
+     */
+    all(provincesAllRequest: ProvincesAllRequest,  cancelToken?: CancelToken): Promise<ProvinceItem[]>;
+}
+
+export class ProvincesClient implements IProvincesClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * @return Success
+     */
+    all(provincesAllRequest: ProvincesAllRequest, cancelToken?: CancelToken): Promise<ProvinceItem[]> {
+        let url_ = this.baseUrl + "/iam/Provinces/All";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(provincesAllRequest);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processAll(_response);
+        });
+    }
+
+    protected processAll(response: AxiosResponse): Promise<ProvinceItem[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<ProvinceItem[]>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProvinceItem[]>(null as any);
+    }
+}
+
 export interface IAuthClient {
     /**
      * @return Success
@@ -2928,535 +3304,6 @@ export class AdminClient implements IAdminClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<void>(null as any);
-    }
-}
-
-export interface IFilesClient {
-    /**
-     * @param bucketId (optional) 
-     * @return Success
-     */
-    upload(bucketId?: string | undefined,  cancelToken?: CancelToken): Promise<UploadResponse>;
-    /**
-     * @return Success
-     */
-    setCover(setCoverRequest: SetCoverRequest,  cancelToken?: CancelToken): Promise<SetCoverResponse>;
-    /**
-     * @return Success
-     */
-    reorder(reorderRequest: ReorderRequest,  cancelToken?: CancelToken): Promise<ReorderResponse>;
-    /**
-     * @return Success
-     */
-    presignedUrl(getPresignedUrlRequest: GetPresignedUrlRequest,  cancelToken?: CancelToken): Promise<GetPresignedUrlResponse>;
-    /**
-     * @return Success
-     */
-    delete(deleteFileRequest: DeleteFileRequest,  cancelToken?: CancelToken): Promise<DeleteFileResponse>;
-}
-
-export class FilesClient implements IFilesClient {
-    protected instance: AxiosInstance;
-    protected baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(baseUrl?: string, instance?: AxiosInstance) {
-
-        this.instance = instance || axios.create();
-
-        this.baseUrl = baseUrl ?? "";
-
-    }
-
-    /**
-     * @param bucketId (optional) 
-     * @return Success
-     */
-    upload(bucketId?: string | undefined, cancelToken?: CancelToken): Promise<UploadResponse> {
-        let url_ = this.baseUrl + "/fileprovider/Files/Upload";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = new FormData();
-        if (bucketId === null || bucketId === undefined)
-            throw new globalThis.Error("The parameter 'bucketId' cannot be null.");
-        else
-            content_.append("bucketId", bucketId.toString());
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processUpload(_response);
-        });
-    }
-
-    protected processUpload(response: AxiosResponse): Promise<UploadResponse> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = resultData200;
-            return Promise.resolve<UploadResponse>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = resultData400;
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status === 401) {
-            const _responseText = response.data;
-            return throwException("Unauthorized", status, _responseText, _headers);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<UploadResponse>(null as any);
-    }
-
-    /**
-     * @return Success
-     */
-    setCover(setCoverRequest: SetCoverRequest, cancelToken?: CancelToken): Promise<SetCoverResponse> {
-        let url_ = this.baseUrl + "/fileprovider/Files/SetCover";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(setCoverRequest);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processSetCover(_response);
-        });
-    }
-
-    protected processSetCover(response: AxiosResponse): Promise<SetCoverResponse> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = resultData200;
-            return Promise.resolve<SetCoverResponse>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = resultData400;
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status === 401) {
-            const _responseText = response.data;
-            return throwException("Unauthorized", status, _responseText, _headers);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<SetCoverResponse>(null as any);
-    }
-
-    /**
-     * @return Success
-     */
-    reorder(reorderRequest: ReorderRequest, cancelToken?: CancelToken): Promise<ReorderResponse> {
-        let url_ = this.baseUrl + "/fileprovider/Files/Reorder";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(reorderRequest);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processReorder(_response);
-        });
-    }
-
-    protected processReorder(response: AxiosResponse): Promise<ReorderResponse> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = resultData200;
-            return Promise.resolve<ReorderResponse>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = resultData400;
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status === 401) {
-            const _responseText = response.data;
-            return throwException("Unauthorized", status, _responseText, _headers);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<ReorderResponse>(null as any);
-    }
-
-    /**
-     * @return Success
-     */
-    presignedUrl(getPresignedUrlRequest: GetPresignedUrlRequest, cancelToken?: CancelToken): Promise<GetPresignedUrlResponse> {
-        let url_ = this.baseUrl + "/fileprovider/Files/PresignedUrl";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(getPresignedUrlRequest);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processPresignedUrl(_response);
-        });
-    }
-
-    protected processPresignedUrl(response: AxiosResponse): Promise<GetPresignedUrlResponse> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = resultData200;
-            return Promise.resolve<GetPresignedUrlResponse>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = resultData400;
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status === 401) {
-            const _responseText = response.data;
-            return throwException("Unauthorized", status, _responseText, _headers);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<GetPresignedUrlResponse>(null as any);
-    }
-
-    /**
-     * @return Success
-     */
-    delete(deleteFileRequest: DeleteFileRequest, cancelToken?: CancelToken): Promise<DeleteFileResponse> {
-        let url_ = this.baseUrl + "/fileprovider/Files/Delete";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(deleteFileRequest);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processDelete(_response);
-        });
-    }
-
-    protected processDelete(response: AxiosResponse): Promise<DeleteFileResponse> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = resultData200;
-            return Promise.resolve<DeleteFileResponse>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = resultData400;
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status === 401) {
-            const _responseText = response.data;
-            return throwException("Unauthorized", status, _responseText, _headers);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<DeleteFileResponse>(null as any);
-    }
-}
-
-export interface IBucketsClient {
-    /**
-     * @return Success
-     */
-    delete(deleteBucketRequest: DeleteBucketRequest,  cancelToken?: CancelToken): Promise<DeleteBucketResponse>;
-    /**
-     * @return Success
-     */
-    create(createBucketRequest: CreateBucketRequest,  cancelToken?: CancelToken): Promise<CreateBucketResponse>;
-}
-
-export class BucketsClient implements IBucketsClient {
-    protected instance: AxiosInstance;
-    protected baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(baseUrl?: string, instance?: AxiosInstance) {
-
-        this.instance = instance || axios.create();
-
-        this.baseUrl = baseUrl ?? "";
-
-    }
-
-    /**
-     * @return Success
-     */
-    delete(deleteBucketRequest: DeleteBucketRequest, cancelToken?: CancelToken): Promise<DeleteBucketResponse> {
-        let url_ = this.baseUrl + "/fileprovider/Buckets/Delete";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(deleteBucketRequest);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processDelete(_response);
-        });
-    }
-
-    protected processDelete(response: AxiosResponse): Promise<DeleteBucketResponse> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = resultData200;
-            return Promise.resolve<DeleteBucketResponse>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = resultData400;
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status === 401) {
-            const _responseText = response.data;
-            return throwException("Unauthorized", status, _responseText, _headers);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<DeleteBucketResponse>(null as any);
-    }
-
-    /**
-     * @return Success
-     */
-    create(createBucketRequest: CreateBucketRequest, cancelToken?: CancelToken): Promise<CreateBucketResponse> {
-        let url_ = this.baseUrl + "/fileprovider/Buckets/Create";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(createBucketRequest);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processCreate(_response);
-        });
-    }
-
-    protected processCreate(response: AxiosResponse): Promise<CreateBucketResponse> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = resultData200;
-            return Promise.resolve<CreateBucketResponse>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = resultData400;
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status === 401) {
-            const _responseText = response.data;
-            return throwException("Unauthorized", status, _responseText, _headers);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<CreateBucketResponse>(null as any);
     }
 }
 
@@ -6692,6 +6539,14 @@ export interface ISellersClient {
      * @return No Content
      */
     suspend(suspendSellerRequest: SuspendSellerRequest,  cancelToken?: CancelToken): Promise<void>;
+    /**
+     * @return Success
+     */
+    getByUserId(sellerLegacyRequest: SellerLegacyRequest,  cancelToken?: CancelToken): Promise<SellerLegacyProfile>;
+    /**
+     * @return Success
+     */
+    create(sellerCreateLegacyRequest: SellerCreateLegacyRequest,  cancelToken?: CancelToken): Promise<SellerLegacyProfile>;
 }
 
 export class SellersClient implements ISellersClient {
@@ -7178,6 +7033,124 @@ export class SellersClient implements ISellersClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getByUserId(sellerLegacyRequest: SellerLegacyRequest, cancelToken?: CancelToken): Promise<SellerLegacyProfile> {
+        let url_ = this.baseUrl + "/livestocktrading/Sellers/GetByUserId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(sellerLegacyRequest);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetByUserId(_response);
+        });
+    }
+
+    protected processGetByUserId(response: AxiosResponse): Promise<SellerLegacyProfile> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<SellerLegacyProfile>(result200);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            return throwException("Unauthorized", status, _responseText, _headers);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<SellerLegacyProfile>(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    create(sellerCreateLegacyRequest: SellerCreateLegacyRequest, cancelToken?: CancelToken): Promise<SellerLegacyProfile> {
+        let url_ = this.baseUrl + "/livestocktrading/Sellers/Create";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(sellerCreateLegacyRequest);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCreate(_response);
+        });
+    }
+
+    protected processCreate(response: AxiosResponse): Promise<SellerLegacyProfile> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<SellerLegacyProfile>(result200);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            return throwException("Unauthorized", status, _responseText, _headers);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<SellerLegacyProfile>(null as any);
     }
 }
 
@@ -9049,31 +9022,31 @@ export interface IProductsClient {
     /**
      * @return Success
      */
-    all(productSearchRequest: ProductSearchRequest,  cancelToken?: CancelToken): Promise<ProductListItem[]>;
+    update(updateProductRequest: UpdateProductRequest,  cancelToken?: CancelToken): Promise<ProductDetail>;
+    /**
+     * @return No Content
+     */
+    reject(rejectProductRequest: RejectProductRequest,  cancelToken?: CancelToken): Promise<void>;
     /**
      * @return Success
      */
     detail(getProductRequest: GetProductRequest,  cancelToken?: CancelToken): Promise<ProductDetail>;
     /**
-     * @return Success
-     */
-    create(createProductRequest: CreateProductRequest,  cancelToken?: CancelToken): Promise<ProductDetail>;
-    /**
-     * @return Success
-     */
-    update(updateProductRequest: UpdateProductRequest,  cancelToken?: CancelToken): Promise<ProductDetail>;
-    /**
      * @return No Content
      */
     delete(deleteProductRequest: DeleteProductRequest,  cancelToken?: CancelToken): Promise<void>;
+    /**
+     * @return Success
+     */
+    create(createProductRequest: CreateProductRequest,  cancelToken?: CancelToken): Promise<ProductDetail>;
     /**
      * @return No Content
      */
     approve(approveProductRequest: ApproveProductRequest,  cancelToken?: CancelToken): Promise<void>;
     /**
-     * @return No Content
+     * @return Success
      */
-    reject(rejectProductRequest: RejectProductRequest,  cancelToken?: CancelToken): Promise<void>;
+    all(productSearchRequest: ProductSearchRequest,  cancelToken?: CancelToken): Promise<ProductListItem[]>;
 }
 
 export class ProductsClient implements IProductsClient {
@@ -9087,186 +9060,6 @@ export class ProductsClient implements IProductsClient {
 
         this.baseUrl = baseUrl ?? "";
 
-    }
-
-    /**
-     * @return Success
-     */
-    all(productSearchRequest: ProductSearchRequest, cancelToken?: CancelToken): Promise<ProductListItem[]> {
-        let url_ = this.baseUrl + "/livestocktrading/Products/All";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(productSearchRequest);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processAll(_response);
-        });
-    }
-
-    protected processAll(response: AxiosResponse): Promise<ProductListItem[]> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = resultData200;
-            return Promise.resolve<ProductListItem[]>(result200);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<ProductListItem[]>(null as any);
-    }
-
-    /**
-     * @return Success
-     */
-    detail(getProductRequest: GetProductRequest, cancelToken?: CancelToken): Promise<ProductDetail> {
-        let url_ = this.baseUrl + "/livestocktrading/Products/Detail";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(getProductRequest);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processDetail(_response);
-        });
-    }
-
-    protected processDetail(response: AxiosResponse): Promise<ProductDetail> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = resultData200;
-            return Promise.resolve<ProductDetail>(result200);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<ProductDetail>(null as any);
-    }
-
-    /**
-     * @return Success
-     */
-    create(createProductRequest: CreateProductRequest, cancelToken?: CancelToken): Promise<ProductDetail> {
-        let url_ = this.baseUrl + "/livestocktrading/Products/Create";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(createProductRequest);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processCreate(_response);
-        });
-    }
-
-    protected processCreate(response: AxiosResponse): Promise<ProductDetail> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = resultData200;
-            return Promise.resolve<ProductDetail>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = resultData400;
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status === 401) {
-            const _responseText = response.data;
-            return throwException("Unauthorized", status, _responseText, _headers);
-
-        } else if (status === 403) {
-            const _responseText = response.data;
-            return throwException("Forbidden", status, _responseText, _headers);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<ProductDetail>(null as any);
     }
 
     /**
@@ -9342,124 +9135,6 @@ export class ProductsClient implements IProductsClient {
     /**
      * @return No Content
      */
-    delete(deleteProductRequest: DeleteProductRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/livestocktrading/Products/Delete";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(deleteProductRequest);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processDelete(_response);
-        });
-    }
-
-    protected processDelete(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 204) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status === 401) {
-            const _responseText = response.data;
-            return throwException("Unauthorized", status, _responseText, _headers);
-
-        } else if (status === 403) {
-            const _responseText = response.data;
-            return throwException("Forbidden", status, _responseText, _headers);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
-    }
-
-    /**
-     * @return No Content
-     */
-    approve(approveProductRequest: ApproveProductRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/livestocktrading/Products/Approve";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(approveProductRequest);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processApprove(_response);
-        });
-    }
-
-    protected processApprove(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 204) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status === 401) {
-            const _responseText = response.data;
-            return throwException("Unauthorized", status, _responseText, _headers);
-
-        } else if (status === 403) {
-            const _responseText = response.data;
-            return throwException("Forbidden", status, _responseText, _headers);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
-    }
-
-    /**
-     * @return No Content
-     */
     reject(rejectProductRequest: RejectProductRequest, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/livestocktrading/Products/Reject";
         url_ = url_.replace(/[?&]$/, "");
@@ -9522,9 +9197,307 @@ export class ProductsClient implements IProductsClient {
         }
         return Promise.resolve<void>(null as any);
     }
+
+    /**
+     * @return Success
+     */
+    detail(getProductRequest: GetProductRequest, cancelToken?: CancelToken): Promise<ProductDetail> {
+        let url_ = this.baseUrl + "/livestocktrading/Products/Detail";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(getProductRequest);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDetail(_response);
+        });
+    }
+
+    protected processDetail(response: AxiosResponse): Promise<ProductDetail> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<ProductDetail>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProductDetail>(null as any);
+    }
+
+    /**
+     * @return No Content
+     */
+    delete(deleteProductRequest: DeleteProductRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/livestocktrading/Products/Delete";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(deleteProductRequest);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDelete(_response);
+        });
+    }
+
+    protected processDelete(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            return throwException("Unauthorized", status, _responseText, _headers);
+
+        } else if (status === 403) {
+            const _responseText = response.data;
+            return throwException("Forbidden", status, _responseText, _headers);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    create(createProductRequest: CreateProductRequest, cancelToken?: CancelToken): Promise<ProductDetail> {
+        let url_ = this.baseUrl + "/livestocktrading/Products/Create";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(createProductRequest);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCreate(_response);
+        });
+    }
+
+    protected processCreate(response: AxiosResponse): Promise<ProductDetail> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<ProductDetail>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = resultData400;
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            return throwException("Unauthorized", status, _responseText, _headers);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProductDetail>(null as any);
+    }
+
+    /**
+     * @return No Content
+     */
+    approve(approveProductRequest: ApproveProductRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/livestocktrading/Products/Approve";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(approveProductRequest);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processApprove(_response);
+        });
+    }
+
+    protected processApprove(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            return throwException("Unauthorized", status, _responseText, _headers);
+
+        } else if (status === 403) {
+            const _responseText = response.data;
+            return throwException("Forbidden", status, _responseText, _headers);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    all(productSearchRequest: ProductSearchRequest, cancelToken?: CancelToken): Promise<ProductListItem[]> {
+        let url_ = this.baseUrl + "/livestocktrading/Products/All";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(productSearchRequest);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processAll(_response);
+        });
+    }
+
+    protected processAll(response: AxiosResponse): Promise<ProductListItem[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<ProductListItem[]>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProductListItem[]>(null as any);
+    }
 }
 
 export interface IOffersClient {
+    /**
+     * @return No Content
+     */
+    reject(rejectOfferRequest: RejectOfferRequest,  cancelToken?: CancelToken): Promise<void>;
     /**
      * @return Success
      */
@@ -9541,10 +9514,6 @@ export interface IOffersClient {
      * @return No Content
      */
     accept(acceptOfferRequest: AcceptOfferRequest,  cancelToken?: CancelToken): Promise<void>;
-    /**
-     * @return No Content
-     */
-    reject(rejectOfferRequest: RejectOfferRequest,  cancelToken?: CancelToken): Promise<void>;
 }
 
 export class OffersClient implements IOffersClient {
@@ -9558,6 +9527,61 @@ export class OffersClient implements IOffersClient {
 
         this.baseUrl = baseUrl ?? "";
 
+    }
+
+    /**
+     * @return No Content
+     */
+    reject(rejectOfferRequest: RejectOfferRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/livestocktrading/Offers/Reject";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(rejectOfferRequest);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processReject(_response);
+        });
+    }
+
+    protected processReject(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            return throwException("Unauthorized", status, _responseText, _headers);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
     }
 
     /**
@@ -9771,61 +9795,6 @@ export class OffersClient implements IOffersClient {
     }
 
     protected processAccept(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 204) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status === 401) {
-            const _responseText = response.data;
-            return throwException("Unauthorized", status, _responseText, _headers);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
-    }
-
-    /**
-     * @return No Content
-     */
-    reject(rejectOfferRequest: RejectOfferRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/livestocktrading/Offers/Reject";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(rejectOfferRequest);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processReject(_response);
-        });
-    }
-
-    protected processReject(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -12199,10 +12168,6 @@ export class DashboardClient implements IDashboardClient {
             const _responseText = response.data;
             return throwException("Unauthorized", status, _responseText, _headers);
 
-        } else if (status === 403) {
-            const _responseText = response.data;
-            return throwException("Forbidden", status, _responseText, _headers);
-
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -12267,6 +12232,78 @@ export class DashboardClient implements IDashboardClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<SellerDashboardStats>(null as any);
+    }
+}
+
+export interface ICurrenciesClient {
+    /**
+     * @return Success
+     */
+    all( cancelToken?: CancelToken): Promise<CurrencyItem[]>;
+}
+
+export class CurrenciesClient implements ICurrenciesClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * @return Success
+     */
+    all( cancelToken?: CancelToken): Promise<CurrencyItem[]> {
+        let url_ = this.baseUrl + "/livestocktrading/Currencies/All";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "POST",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processAll(_response);
+        });
+    }
+
+    protected processAll(response: AxiosResponse): Promise<CurrencyItem[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<CurrencyItem[]>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<CurrencyItem[]>(null as any);
     }
 }
 
@@ -12727,6 +12764,86 @@ export class ConversationsClient implements IConversationsClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<void>(null as any);
+    }
+}
+
+export interface IMessagesClient {
+    /**
+     * @return Success
+     */
+    unreadCount(messagesUnreadCountRequest: MessagesUnreadCountRequest,  cancelToken?: CancelToken): Promise<MessagesUnreadCountResponse>;
+}
+
+export class MessagesClient implements IMessagesClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * @return Success
+     */
+    unreadCount(messagesUnreadCountRequest: MessagesUnreadCountRequest, cancelToken?: CancelToken): Promise<MessagesUnreadCountResponse> {
+        let url_ = this.baseUrl + "/livestocktrading/Messages/UnreadCount";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(messagesUnreadCountRequest);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUnreadCount(_response);
+        });
+    }
+
+    protected processUnreadCount(response: AxiosResponse): Promise<MessagesUnreadCountResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<MessagesUnreadCountResponse>(result200);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            return throwException("Unauthorized", status, _responseText, _headers);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<MessagesUnreadCountResponse>(null as any);
     }
 }
 
@@ -14078,6 +14195,610 @@ export class AnimalinfosClient implements IAnimalinfosClient {
     }
 }
 
+export interface IFilesClient {
+    /**
+     * @param bucketId (optional) 
+     * @param moduleName (optional) 
+     * @param bucketType (optional) 
+     * @param entityId (optional) 
+     * @return Success
+     */
+    upload(bucketId?: string | undefined, moduleName?: string | undefined, bucketType?: BucketType | undefined, entityId?: string | null | undefined,  cancelToken?: CancelToken): Promise<UploadResponse>;
+    /**
+     * @return Success
+     */
+    setCover(setCoverRequest: SetCoverRequest,  cancelToken?: CancelToken): Promise<SetCoverResponse>;
+    /**
+     * @return Success
+     */
+    reorder(reorderRequest: ReorderRequest,  cancelToken?: CancelToken): Promise<ReorderResponse>;
+    /**
+     * @return Success
+     */
+    presignedUrl(getPresignedUrlRequest: GetPresignedUrlRequest,  cancelToken?: CancelToken): Promise<GetPresignedUrlResponse>;
+    /**
+     * @return Success
+     */
+    delete(deleteFileRequest: DeleteFileRequest,  cancelToken?: CancelToken): Promise<DeleteFileResponse>;
+}
+
+export class FilesClient implements IFilesClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * @param bucketId (optional) 
+     * @param moduleName (optional) 
+     * @param bucketType (optional) 
+     * @param entityId (optional) 
+     * @return Success
+     */
+    upload(bucketId?: string | undefined, moduleName?: string | undefined, bucketType?: BucketType | undefined, entityId?: string | null | undefined, cancelToken?: CancelToken): Promise<UploadResponse> {
+        let url_ = this.baseUrl + "/fileprovider/Files/Upload";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = new FormData();
+        if (bucketId === null || bucketId === undefined)
+            throw new globalThis.Error("The parameter 'bucketId' cannot be null.");
+        else
+            content_.append("bucketId", bucketId.toString());
+        if (moduleName === null || moduleName === undefined)
+            throw new globalThis.Error("The parameter 'moduleName' cannot be null.");
+        else
+            content_.append("moduleName", moduleName.toString());
+        if (bucketType === null || bucketType === undefined)
+            throw new globalThis.Error("The parameter 'bucketType' cannot be null.");
+        else
+            content_.append("bucketType", bucketType.toString());
+        if (entityId !== null && entityId !== undefined)
+            content_.append("entityId", entityId.toString());
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpload(_response);
+        });
+    }
+
+    protected processUpload(response: AxiosResponse): Promise<UploadResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<UploadResponse>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = resultData400;
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            return throwException("Unauthorized", status, _responseText, _headers);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<UploadResponse>(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    setCover(setCoverRequest: SetCoverRequest, cancelToken?: CancelToken): Promise<SetCoverResponse> {
+        let url_ = this.baseUrl + "/fileprovider/Files/SetCover";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(setCoverRequest);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processSetCover(_response);
+        });
+    }
+
+    protected processSetCover(response: AxiosResponse): Promise<SetCoverResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<SetCoverResponse>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = resultData400;
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            return throwException("Unauthorized", status, _responseText, _headers);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<SetCoverResponse>(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    reorder(reorderRequest: ReorderRequest, cancelToken?: CancelToken): Promise<ReorderResponse> {
+        let url_ = this.baseUrl + "/fileprovider/Files/Reorder";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(reorderRequest);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processReorder(_response);
+        });
+    }
+
+    protected processReorder(response: AxiosResponse): Promise<ReorderResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<ReorderResponse>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = resultData400;
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            return throwException("Unauthorized", status, _responseText, _headers);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ReorderResponse>(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    presignedUrl(getPresignedUrlRequest: GetPresignedUrlRequest, cancelToken?: CancelToken): Promise<GetPresignedUrlResponse> {
+        let url_ = this.baseUrl + "/fileprovider/Files/PresignedUrl";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(getPresignedUrlRequest);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processPresignedUrl(_response);
+        });
+    }
+
+    protected processPresignedUrl(response: AxiosResponse): Promise<GetPresignedUrlResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<GetPresignedUrlResponse>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = resultData400;
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            return throwException("Unauthorized", status, _responseText, _headers);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<GetPresignedUrlResponse>(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    delete(deleteFileRequest: DeleteFileRequest, cancelToken?: CancelToken): Promise<DeleteFileResponse> {
+        let url_ = this.baseUrl + "/fileprovider/Files/Delete";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(deleteFileRequest);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDelete(_response);
+        });
+    }
+
+    protected processDelete(response: AxiosResponse): Promise<DeleteFileResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<DeleteFileResponse>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = resultData400;
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            return throwException("Unauthorized", status, _responseText, _headers);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<DeleteFileResponse>(null as any);
+    }
+}
+
+export interface IBucketsClient {
+    /**
+     * @return Success
+     */
+    detail(bucketDetailRequest: BucketDetailRequest,  cancelToken?: CancelToken): Promise<BucketDetailResponse>;
+    /**
+     * @return Success
+     */
+    delete(deleteBucketRequest: DeleteBucketRequest,  cancelToken?: CancelToken): Promise<DeleteBucketResponse>;
+    /**
+     * @return Success
+     */
+    create(createBucketRequest: CreateBucketRequest,  cancelToken?: CancelToken): Promise<CreateBucketResponse>;
+}
+
+export class BucketsClient implements IBucketsClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * @return Success
+     */
+    detail(bucketDetailRequest: BucketDetailRequest, cancelToken?: CancelToken): Promise<BucketDetailResponse> {
+        let url_ = this.baseUrl + "/fileprovider/Buckets/Detail";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(bucketDetailRequest);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDetail(_response);
+        });
+    }
+
+    protected processDetail(response: AxiosResponse): Promise<BucketDetailResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<BucketDetailResponse>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<BucketDetailResponse>(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    delete(deleteBucketRequest: DeleteBucketRequest, cancelToken?: CancelToken): Promise<DeleteBucketResponse> {
+        let url_ = this.baseUrl + "/fileprovider/Buckets/Delete";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(deleteBucketRequest);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDelete(_response);
+        });
+    }
+
+    protected processDelete(response: AxiosResponse): Promise<DeleteBucketResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<DeleteBucketResponse>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = resultData400;
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            return throwException("Unauthorized", status, _responseText, _headers);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<DeleteBucketResponse>(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    create(createBucketRequest: CreateBucketRequest, cancelToken?: CancelToken): Promise<CreateBucketResponse> {
+        let url_ = this.baseUrl + "/fileprovider/Buckets/Create";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(createBucketRequest);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCreate(_response);
+        });
+    }
+
+    protected processCreate(response: AxiosResponse): Promise<CreateBucketResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<CreateBucketResponse>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = resultData400;
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            return throwException("Unauthorized", status, _responseText, _headers);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<CreateBucketResponse>(null as any);
+    }
+}
+
 export interface UpdateProfileResponse {
     success?: boolean;
 }
@@ -14150,6 +14871,74 @@ export interface RevokePushTokenResponse {
 
 export interface RevokePushTokenRequest {
     deviceId?: string;
+}
+
+export interface CountryItem {
+    id?: number;
+    code?: string;
+    code3?: string | undefined;
+    name?: string;
+    nativeName?: string | undefined;
+    phoneCode?: string | undefined;
+    defaultCurrencyCode?: string;
+    defaultCurrencySymbol?: string | undefined;
+}
+
+export interface CountriesAllRequest {
+    keyword?: string | undefined;
+}
+
+export interface DistrictItem {
+    id?: number;
+    name?: string;
+    provinceId?: number;
+    nameTranslations?: string | undefined;
+    latitude?: number | undefined;
+    longitude?: number | undefined;
+    population?: number | undefined;
+    timezone?: string | undefined;
+}
+
+export interface DistrictsByProvinceRequest {
+    provinceId?: number;
+    keyword?: string | undefined;
+}
+
+export interface GeoIpDetectCountryResponse {
+    countryCode?: string;
+    countryId?: number | undefined;
+    countryName?: string;
+}
+
+export interface NeighborhoodItem {
+    id?: number;
+    name?: string;
+    districtId?: number;
+    postalCode?: string | undefined;
+    latitude?: number | undefined;
+    longitude?: number | undefined;
+}
+
+export interface NeighborhoodsByDistrictRequest {
+    districtId?: number;
+    keyword?: string | undefined;
+}
+
+export interface ProvinceItem {
+    id?: number;
+    countryId?: number;
+    name?: string;
+    code?: string | undefined;
+    nameTranslations?: string | undefined;
+    latitude?: number | undefined;
+    longitude?: number | undefined;
+    population?: number | undefined;
+    timezone?: string | undefined;
+}
+
+export interface ProvincesAllRequest {
+    countryId?: number;
+    keyword?: string | undefined;
 }
 
 export interface VerifyOtpResponse {
@@ -14284,92 +15073,6 @@ export interface BanUserRequest {
 
 export interface UnbanUserRequest {
     id?: string;
-}
-
-export interface UploadResponse {
-    fileId?: string;
-    bucketId?: string;
-    objectKey?: string;
-    thumbnailObjectKey?: string | undefined;
-    originalName?: string;
-    contentType?: string;
-    extension?: string;
-    sizeBytes?: number;
-    isCover?: boolean;
-    sortOrder?: number;
-    width?: number | undefined;
-    height?: number | undefined;
-    isImage?: boolean;
-    createdAt?: Date;
-}
-
-export interface UploadRequest {
-    bucketId: string;
-}
-
-export interface SetCoverResponse {
-    success?: boolean;
-}
-
-export interface SetCoverRequest {
-    bucketId: string;
-    fileId: string;
-}
-
-export interface ReorderResponse {
-    success?: boolean;
-}
-
-export interface ReorderRequest {
-    bucketId: string;
-    fileIds: string[];
-}
-
-export interface GetPresignedUrlResponse {
-    fileId?: string;
-    url?: string;
-    expiresAt?: Date;
-}
-
-export interface GetPresignedUrlRequest {
-    fileId: string;
-    expirySeconds?: number;
-}
-
-export interface DeleteFileResponse {
-    success?: boolean;
-}
-
-export interface DeleteFileRequest {
-    bucketId: string;
-    fileId: string;
-}
-
-export interface DeleteBucketResponse {
-    success?: boolean;
-}
-
-export interface DeleteBucketRequest {
-    bucketId: string;
-}
-
-export interface CreateBucketResponse {
-    bucketId?: string;
-    module?: string;
-    entityId?: string | undefined;
-    bucketType?: BucketType;
-    createdAt?: Date;
-}
-
-export enum BucketType {
-    Single = 0,
-    Multiple = 1,
-}
-
-export interface CreateBucketRequest {
-    module: string;
-    entityId?: string | undefined;
-    bucketType?: BucketType;
 }
 
 export interface VeterinaryInfoDetail {
@@ -15085,6 +15788,61 @@ export interface SuspendSellerRequest {
     reason: string;
 }
 
+export interface SellerLegacyProfile {
+    id?: string;
+    userId?: string;
+    businessName?: string;
+    businessType?: string | undefined;
+    taxNumber?: string | undefined;
+    registrationNumber?: string | undefined;
+    description?: string | undefined;
+    logoUrl?: string | undefined;
+    bannerUrl?: string | undefined;
+    email?: string | undefined;
+    phone?: string | undefined;
+    website?: string | undefined;
+    isVerified?: boolean;
+    verifiedAt?: Date | undefined;
+    isActive?: boolean;
+    status?: number;
+    averageRating?: number | undefined;
+    totalReviews?: number;
+    totalSales?: number;
+    totalRevenue?: number;
+    businessHours?: string | undefined;
+    acceptedPaymentMethods?: string | undefined;
+    returnPolicy?: string | undefined;
+    shippingPolicy?: string | undefined;
+    socialMediaLinks?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+}
+
+export interface SellerLegacyRequest {
+    userId?: string;
+}
+
+export interface SellerCreateLegacyRequest {
+    userId?: string;
+    businessName?: string;
+    businessType?: string | undefined;
+    taxNumber?: string | undefined;
+    registrationNumber?: string | undefined;
+    description?: string | undefined;
+    logoUrl?: string | undefined;
+    bannerUrl?: string | undefined;
+    email?: string | undefined;
+    phone?: string | undefined;
+    website?: string | undefined;
+    isActive?: boolean;
+    status?: number;
+    businessHours?: string | undefined;
+    acceptedPaymentMethods?: string | undefined;
+    returnPolicy?: string | undefined;
+    shippingPolicy?: string | undefined;
+    socialMediaLinks?: string | undefined;
+}
+
 export interface SeedInfoDetail {
     id?: string;
     productId?: string;
@@ -15337,63 +16095,6 @@ export interface DeleteProductVariantRequest {
     id?: string;
 }
 
-export interface ProductListItem {
-    id?: string;
-    title?: string;
-    slug?: string;
-    price?: number;
-    currencyCode?: string;
-    quantity?: number;
-    unit?: string | undefined;
-    status?: ProductStatus;
-    condition?: ProductCondition;
-    isNegotiable?: boolean;
-    isFeatured?: boolean;
-    sellerId?: string;
-    sellerBusinessName?: string;
-    categoryId?: string;
-    categoryName?: string;
-    brandId?: string | undefined;
-    brandName?: string | undefined;
-    countryCode?: string | undefined;
-    city?: string | undefined;
-    averageRating?: number;
-    reviewCount?: number;
-    viewCount?: number;
-    createdAt?: Date;
-}
-
-export enum ProductStatus {
-    Draft = 0,
-    PendingApproval = 1,
-    Active = 2,
-    Inactive = 3,
-    OutOfStock = 4,
-    Expired = 5,
-    Sold = 6,
-    Rejected = 7,
-}
-
-export enum ProductCondition {
-    New = 0,
-    Used = 1,
-    Refurbished = 2,
-    ForParts = 3,
-}
-
-export interface ProductSearchRequest {
-    keyword?: string | undefined;
-    categoryId?: string | undefined;
-    brandId?: string | undefined;
-    countryCode?: string | undefined;
-    minPrice?: number | undefined;
-    maxPrice?: number | undefined;
-    isNegotiable?: boolean | undefined;
-    condition?: ProductCondition | undefined;
-    page?: number;
-    pageSize?: number;
-}
-
 export interface ProductDetail {
     id?: string;
     title?: string;
@@ -15425,25 +16126,25 @@ export interface ProductDetail {
     viewCount?: number;
     publishedAt?: Date | undefined;
     createdAt?: Date;
+    mediaBucketId?: string | undefined;
 }
 
-export interface GetProductRequest {
-    id?: string;
+export enum ProductStatus {
+    Draft = 0,
+    PendingApproval = 1,
+    Active = 2,
+    Inactive = 3,
+    OutOfStock = 4,
+    Expired = 5,
+    Sold = 6,
+    Rejected = 7,
 }
 
-export interface CreateProductRequest {
-    categoryId: string;
-    brandId?: string | undefined;
-    farmId?: string | undefined;
-    title: string;
-    slug: string;
-    description?: string | undefined;
-    price?: number;
-    currencyCode: string;
-    quantity?: number;
-    unit?: string | undefined;
-    condition?: ProductCondition;
-    isNegotiable?: boolean;
+export enum ProductCondition {
+    New = 0,
+    Used = 1,
+    Refurbished = 2,
+    ForParts = 3,
 }
 
 export interface UpdateProductRequest {
@@ -15462,17 +16163,129 @@ export interface UpdateProductRequest {
     isNegotiable?: boolean;
 }
 
+export interface RejectProductRequest {
+    id: string;
+    reason: string;
+}
+
+export interface GetProductRequest {
+    id?: string;
+}
+
 export interface DeleteProductRequest {
     id?: string;
+}
+
+export interface CreateProductRequest {
+    categoryId: string;
+    brandId?: string | undefined;
+    farmId?: string | undefined;
+    title: string;
+    slug: string;
+    description?: string | undefined;
+    price?: number;
+    currencyCode?: string;
+    quantity?: number;
+    unit?: string | undefined;
+    condition?: ProductCondition;
+    isNegotiable?: boolean;
+    basePrice?: number | undefined;
+    currency?: string | undefined;
+    stockQuantity?: number | undefined;
+    stockUnit?: string | undefined;
+    shortDescription?: string | undefined;
+    locationId?: string | undefined;
+    mediaBucketId?: string | undefined;
+    priceUnit?: string | undefined;
+    discountedPrice?: number | undefined;
+    minOrderQuantity?: number | undefined;
+    maxOrderQuantity?: number | undefined;
+    isShippingAvailable?: boolean | undefined;
+    shippingCost?: number | undefined;
+    isInternationalShipping?: boolean | undefined;
+    weight?: number | undefined;
+    weightUnit?: string | undefined;
+    attributes?: string | undefined;
+    metaTitle?: string | undefined;
+    metaDescription?: string | undefined;
+    metaKeywords?: string | undefined;
+    coverImageFileId?: string | undefined;
+    sellerId?: string | undefined;
 }
 
 export interface ApproveProductRequest {
     id?: string;
 }
 
-export interface RejectProductRequest {
-    id: string;
-    reason: string;
+export interface ProductListItem {
+    id?: string;
+    title?: string;
+    slug?: string;
+    price?: number;
+    currencyCode?: string;
+    quantity?: number;
+    unit?: string | undefined;
+    status?: ProductStatus;
+    condition?: ProductCondition;
+    isNegotiable?: boolean;
+    isFeatured?: boolean;
+    sellerId?: string;
+    sellerBusinessName?: string;
+    categoryId?: string;
+    categoryName?: string;
+    brandId?: string | undefined;
+    brandName?: string | undefined;
+    countryCode?: string | undefined;
+    city?: string | undefined;
+    averageRating?: number;
+    reviewCount?: number;
+    viewCount?: number;
+    createdAt?: Date;
+    basePrice?: number;
+    currency?: string;
+    stockQuantity?: number;
+    isInStock?: boolean;
+    shortDescription?: string | undefined;
+    locationId?: string | undefined;
+    locationCountryCode?: string | undefined;
+    locationCity?: string | undefined;
+    discountedPrice?: number | undefined;
+    mediaBucketId?: string | undefined;
+}
+
+export interface ProductSearchRequest {
+    keyword?: string | undefined;
+    categoryId?: string | undefined;
+    brandId?: string | undefined;
+    countryCode?: string | undefined;
+    minPrice?: number | undefined;
+    maxPrice?: number | undefined;
+    isNegotiable?: boolean | undefined;
+    condition?: ProductCondition | undefined;
+    page?: number;
+    pageSize?: number;
+    sellerId?: string | undefined;
+    filters?: ProductFilterItem[] | undefined;
+    pageRequest?: ProductPageRequest | undefined;
+    slug?: string | undefined;
+}
+
+export interface ProductFilterItem {
+    key?: string | undefined;
+    type?: string | undefined;
+    isUsed?: boolean | undefined;
+    values?: any[] | undefined;
+    conditionType?: string | undefined;
+}
+
+export interface ProductPageRequest {
+    currentPage?: number | undefined;
+    perPageCount?: number | undefined;
+    listAll?: boolean | undefined;
+}
+
+export interface RejectOfferRequest {
+    id?: string;
 }
 
 export interface OfferListItem {
@@ -15527,10 +16340,6 @@ export interface CreateOfferRequest {
 }
 
 export interface AcceptOfferRequest {
-    id?: string;
-}
-
-export interface RejectOfferRequest {
     id?: string;
 }
 
@@ -15703,8 +16512,12 @@ export interface CreateLocationRequest {
     latitude?: number | undefined;
     longitude?: number | undefined;
     locationType?: LocationType;
-    ownerId?: string;
-    ownerType?: string;
+    ownerId?: string | undefined;
+    ownerType?: string | undefined;
+    addressLine1?: string | undefined;
+    addressLine2?: string | undefined;
+    districtId?: number | undefined;
+    type?: LocationType | undefined;
 }
 
 export interface UpdateLocationRequest {
@@ -16045,6 +16858,17 @@ export interface SellerDashboardStats {
     totalFavorites?: number;
 }
 
+export interface CurrencyItem {
+    id?: string;
+    code?: string;
+    symbol?: string;
+    name?: string;
+    exchangeRateToUsd?: number;
+    lastUpdated?: Date | undefined;
+    isActive?: boolean;
+    createdAt?: Date;
+}
+
 export interface ConversationListItem {
     id?: string;
     initiatorUserId?: string;
@@ -16119,6 +16943,21 @@ export interface UnreadCountItem {
 
 export interface MarkMessagesReadRequest {
     conversationId?: string;
+}
+
+export interface MessagesUnreadCountResponse {
+    totalUnreadCount?: number;
+    conversations?: ConversationUnreadItem[];
+}
+
+export interface ConversationUnreadItem {
+    conversationId?: string;
+    unreadCount?: number;
+    lastMessageAt?: Date | undefined;
+}
+
+export interface MessagesUnreadCountRequest {
+    userId?: string;
 }
 
 export interface ChemicalInfoDetail {
@@ -16656,6 +17495,117 @@ export interface UpdateAppVersionRequest {
 
 export interface DeleteAppVersionRequest {
     id?: string;
+}
+
+export interface UploadResponse {
+    fileId?: string;
+    bucketId?: string;
+    objectKey?: string;
+    thumbnailObjectKey?: string | undefined;
+    originalName?: string;
+    contentType?: string;
+    extension?: string;
+    sizeBytes?: number;
+    isCover?: boolean;
+    sortOrder?: number;
+    width?: number | undefined;
+    height?: number | undefined;
+    isImage?: boolean;
+    createdAt?: Date;
+}
+
+export interface UploadRequest {
+    bucketId?: string;
+    moduleName: string;
+    bucketType: BucketType;
+    entityId?: string | undefined;
+}
+
+export enum BucketType {
+    Single = 0,
+    Multiple = 1,
+}
+
+export interface SetCoverResponse {
+    success?: boolean;
+}
+
+export interface SetCoverRequest {
+    bucketId: string;
+    fileId: string;
+}
+
+export interface ReorderResponse {
+    success?: boolean;
+}
+
+export interface ReorderRequest {
+    bucketId: string;
+    fileIds: string[];
+}
+
+export interface GetPresignedUrlResponse {
+    fileId?: string;
+    url?: string;
+    expiresAt?: Date;
+}
+
+export interface GetPresignedUrlRequest {
+    fileId: string;
+    expirySeconds?: number;
+}
+
+export interface DeleteFileResponse {
+    success?: boolean;
+}
+
+export interface DeleteFileRequest {
+    bucketId: string;
+    fileId: string;
+}
+
+export interface BucketDetailResponse {
+    bucketId?: string;
+    changeId?: string;
+    files?: BucketFile[];
+}
+
+export interface BucketFile {
+    id?: string;
+    extention?: string;
+    name?: string;
+    path?: string;
+    securePath?: string;
+    contentType?: string;
+    isDefault?: boolean;
+    index?: number;
+}
+
+export interface BucketDetailRequest {
+    bucketId?: string;
+    changeId?: string | undefined;
+}
+
+export interface DeleteBucketResponse {
+    success?: boolean;
+}
+
+export interface DeleteBucketRequest {
+    bucketId: string;
+}
+
+export interface CreateBucketResponse {
+    bucketId?: string;
+    module?: string;
+    entityId?: string | undefined;
+    bucketType?: BucketType;
+    createdAt?: Date;
+}
+
+export interface CreateBucketRequest {
+    module: string;
+    entityId?: string | undefined;
+    bucketType?: BucketType;
 }
 
 export class ApiException extends Error {
