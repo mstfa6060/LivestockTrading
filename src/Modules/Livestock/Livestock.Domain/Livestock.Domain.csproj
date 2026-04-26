@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Livestock.Domain</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\Shared.Abstractions\Shared.Abstractions.csproj" />
+    <!-- NetTopologySuite is a pure-managed geometry library (no DB/infra
+         dependency) used for PostGIS-backed Point columns on entities. -->
+    <PackageReference Include="NetTopologySuite" />
+  </ItemGroup>
+</Project>

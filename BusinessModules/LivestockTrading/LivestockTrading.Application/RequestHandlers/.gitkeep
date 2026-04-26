@@ -1,4 +1,0 @@
-# CQRS pattern request handler'lari bu klasore eklenecek
-# Ornek klasor yapisi:
-# - Animals/Commands/Create/
-# - Animals/Queries/All/

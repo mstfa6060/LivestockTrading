@@ -1,0 +1,27 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <!-- Sadece doğrudan bağımlılıkları denetle; transitive güvenlik açıkları
+         ilgili paketin sorumluluğunda — Central Package Management ile çözülür -->
+    <NuGetAuditMode>direct</NuGetAuditMode>
+    <!-- Offline/CI ortamlarında nuget.org'a erişilemediğinde audit hatasını bastır -->
+    <NuGetAudit>false</NuGetAudit>
+  </PropertyGroup>
+
+  <!-- EF Core auto-generated migration files: skip code style enforcement
+       (file-scoped namespace, etc.). They are overwritten by `dotnet ef`. -->
+  <ItemGroup>
+    <Compile Update="Migrations\**\*.cs">
+      <ExcludeFromCodeCoverage>true</ExcludeFromCodeCoverage>
+    </Compile>
+  </ItemGroup>
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);IDE0161;IDE0090;IDE0028;IDE0300;IDE0305</NoWarn>
+  </PropertyGroup>
+</Project>

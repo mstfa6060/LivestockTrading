@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <RootNamespace>Livestock.Host</RootNamespace>
+    <!-- NSwag reads XML doc comments to emit JSDoc on the TS client. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- CS1591: Missing XML comment for publicly visible type or member. -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Shared -->
+    <ProjectReference Include="..\..\Shared\Shared.Infrastructure\Shared.Infrastructure.csproj" />
+
+    <!-- Modules -->
+    <ProjectReference Include="..\..\Modules\Iam\Iam.Features\Iam.Features.csproj" />
+    <ProjectReference Include="..\..\Modules\Files\Files.Features\Files.Features.csproj" />
+    <ProjectReference Include="..\..\Modules\Livestock\Livestock.Features\Livestock.Features.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- NSwag overrides FastEndpoints.Swagger's older NSwag transitive deps
+         so the in-process OpenAPI generation matches the NSwag CLI. -->
+    <PackageReference Include="NSwag.AspNetCore" />
+    <!-- PostGIS: registers NetTopologySuite geometry mappings for Npgsql so
+         Point/Polygon properties round-trip to geography/geometry columns. -->
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NetTopologySuite" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Geography seed data (Countries/Provinces/Districts). Copied to
+         output so GeographySeeder can read them at startup. -->
+    <Content Update="SeedData\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>

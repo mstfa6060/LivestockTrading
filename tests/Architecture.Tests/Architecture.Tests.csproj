@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Central Package Management'tan gelen versiyonlar -->
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="NetArchTest.Rules" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="FastEndpoints" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Test edilen projeler — runtime assembly'ye ihtiyaç var -->
+    <ProjectReference Include="..\..\src\Shared\Shared.Abstractions\Shared.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Iam\Iam.Domain\Iam.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Iam\Iam.Features\Iam.Features.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Files\Files.Domain\Files.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Livestock\Livestock.Domain\Livestock.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Livestock\Livestock.Features\Livestock.Features.csproj" />
+  </ItemGroup>
+</Project>
