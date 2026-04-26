@@ -1,0 +1,35 @@
+# syntax=docker/dockerfile:1.7
+# Livestock.Host — HTTP API + SignalR ChatHub.
+
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+# Copy solution + central package management first so restore can be cached
+# across source-only changes.
+COPY LivestockTrading.slnx Directory.Build.props Directory.Packages.props global.json ./
+COPY src/ src/
+COPY tests/ tests/
+
+RUN dotnet restore src/Bootstrapper/Livestock.Host/Livestock.Host.csproj
+RUN dotnet publish src/Bootstrapper/Livestock.Host/Livestock.Host.csproj \
+    -c Release -o /app/publish --no-restore \
+    /p:DebugType=None /p:DebugSymbols=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+WORKDIR /app
+
+# SkiaSharp NoDependencies still needs libfontconfig at runtime for image
+# decoding. Add it explicitly so image upload codepath works.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends libfontconfig1 \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+USER appuser
+
+COPY --from=build /app/publish .
+
+ENV ASPNETCORE_URLS=http://+:8080
+EXPOSE 8080
+
+ENTRYPOINT ["dotnet", "Livestock.Host.dll"]

@@ -1,0 +1,44 @@
+# Server-side override: collapse infra ports to internal-only so they
+# don't collide with the existing prod stack (which already binds 6379,
+# 9000, etc.). Only port the host exposes is 5300 — nginx fronts it.
+#
+# Usage on the server:
+#   docker compose \
+#     -f docker-compose.dev.yml \
+#     -f docker-compose.dev.app.yml \
+#     -f docker-compose.dev.server.yml \
+#     up -d --pull always
+#
+# Local dev still uses the first two files only and keeps the host ports
+# for psql / redis-cli / nats CLI access.
+
+name: livestock_dev
+
+services:
+
+  postgres:
+    ports: !reset []
+
+  redis:
+    # Server has redis:7-alpine cached; Docker Hub temporarily unreachable
+    # for redis:8-alpine. Pin to 7 here, dev compose stays on 8.
+    image: redis:7-alpine
+    ports: !reset []
+
+  nats:
+    ports: !reset []
+
+  seq:
+    ports: !reset []
+
+  minio:
+    # Expose S3 API on 9011 (loopback only) so nginx can proxy
+    # /file-storage/ to it. 9000 is already taken on the host.
+    ports: !override
+      - "127.0.0.1:9011:9000"
+
+  # The host stays exposed — nginx upstream points at 127.0.0.1:5310.
+  # (5300 hit a stuck docker-proxy reservation on this host; 5310 is free.)
+  livestocktrading-host:
+    ports: !override
+      - "127.0.0.1:5310:8080"

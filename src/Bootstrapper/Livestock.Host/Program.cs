@@ -1,0 +1,167 @@
+using FastEndpoints;
+using FastEndpoints.Security;
+using FastEndpoints.Swagger;
+using Files.Features;
+using Iam.Features;
+using Livestock.Features;
+using Microsoft.EntityFrameworkCore;
+using Shared.Abstractions.Identity;
+using Shared.Infrastructure.Extensions;
+using Shared.Infrastructure.Identity;
+using Shared.Infrastructure.Messaging;
+using Shared.Infrastructure.Swagger;
+using ZiggyCreatures.Caching.Fusion;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// NSwag CLI boots the app to discover endpoint metadata; in that mode no
+// real broker/cache is reachable, so swap heavyweight infra registrations
+// for in-memory / no-op stubs. Triggered by `NSWAG_GENERATE=true`.
+var isCodegen = string.Equals(
+    Environment.GetEnvironmentVariable("NSWAG_GENERATE"), "true",
+    StringComparison.OrdinalIgnoreCase);
+
+// ── Logging ───────────────────────────────────────────────────────────────────
+builder.AddSharedSerilog("livestock-host");
+
+// ── Observability ─────────────────────────────────────────────────────────────
+builder.Services.AddSharedOpenTelemetry(builder.Configuration, "livestock-host");
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+builder.Services
+    .AddAuthenticationJwtBearer(
+        s =>
+        {
+            s.SigningKey = builder.Configuration["Jwt:SigningKey"]
+                ?? throw new InvalidOperationException("Jwt:SigningKey is required.");
+        },
+        b => b.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+        {
+            // SignalR WebSocket cannot send Authorization header; read JWT from query string
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            },
+        })
+    .AddAuthorization();
+
+// ── Cache (FusionCache L1+L2) ─────────────────────────────────────────────────
+if (isCodegen)
+{
+    builder.Services.AddFusionCache(); // in-memory only
+}
+else
+{
+    builder.Services.AddSharedCache(builder.Configuration);
+}
+
+// ── Messaging (NATS JetStream) ────────────────────────────────────────────────
+if (isCodegen)
+{
+    builder.Services.AddSingleton<IEventPublisher, NoopEventPublisher>();
+}
+else
+{
+    builder.Services.AddSharedNats(builder.Configuration);
+}
+
+// ── HTTP Context / User Context ───────────────────────────────────────────────
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IUserContext, HttpUserContext>();
+
+// ── SignalR ───────────────────────────────────────────────────────────────────
+builder.Services.AddSignalR();
+
+// ── CORS ──────────────────────────────────────────────────────────────────────
+// Browser clients (web + mobile WebView) call the API from a different origin.
+// Allowed origins come from Cors:AllowedOrigins (array) so prod can lock down,
+// while dev keeps a permissive list inline. Credentials are required for the
+// SignalR cookie/JWT path, which forbids '*' — origins must be explicit.
+var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+    ?? new[]
+    {
+        "https://dev.livestock-trading.com",
+        "https://livestock-trading.com",
+        "https://www.livestock-trading.com",
+        "http://localhost:3000",
+        "http://localhost:3099",
+        "http://localhost:5173",
+        "http://localhost:8081",
+    };
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins(corsOrigins)
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials()
+              .SetPreflightMaxAge(TimeSpan.FromMinutes(10));
+    });
+});
+
+// ── FastEndpoints ─────────────────────────────────────────────────────────────
+builder.Services.AddFastEndpoints();
+builder.Services.SwaggerDocument(o =>
+{
+    o.DocumentSettings = s =>
+    {
+        s.Title = "GlobalLivestock API";
+        s.Version = "v1";
+        s.OperationProcessors.Add(new RouteBasedOperationIdProcessor());
+    };
+    // /livestocktrading/Sellers/Nearby → tag = "Sellers" → AuthClient/SellersClient/etc.
+    o.AutoTagPathSegmentIndex = 2;
+    o.ShortSchemaNames = true;
+});
+
+// ── Modules ───────────────────────────────────────────────────────────────────
+builder.Services.AddIamModule(builder.Configuration);
+builder.Services.AddFilesModule(builder.Configuration);
+builder.Services.AddLivestockModule(builder.Configuration);
+
+// ── Health Checks ─────────────────────────────────────────────────────────────
+builder.Services.AddHealthChecks();
+
+// ── Build ─────────────────────────────────────────────────────────────────────
+var app = builder.Build();
+
+// ── EF Migrations on startup (Development only) ──────────────────────────────
+// Production should use a dedicated migration job (init container or Jenkins
+// step) so app pods don't race the DB during rolling deploys. For dev/staging
+// this convenience makes `compose up` self-contained.
+if (app.Environment.IsDevelopment() && !isCodegen)
+{
+    using var scope = app.Services.CreateScope();
+    var sp = scope.ServiceProvider;
+    await sp.GetRequiredService<Iam.Persistence.IamDbContext>().Database.MigrateAsync();
+    await sp.GetRequiredService<Files.Persistence.FilesDbContext>().Database.MigrateAsync();
+    await sp.GetRequiredService<Livestock.Persistence.LivestockDbContext>().Database.MigrateAsync();
+
+    // Load Countries/Provinces/Districts from bundled JSON if the tables are
+    // empty. Runs only on first boot after the AddGeography migration lands.
+    await sp.GetRequiredService<Iam.Features.Services.GeographySeeder>().SeedAsync();
+}
+
+app.UseCors();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseFastEndpoints();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwaggerGen();
+}
+
+app.MapHealthChecks("/health");
+app.MapHub<Livestock.Features.Hubs.ChatHub>("/hubs/chat");
+
+app.Run();
