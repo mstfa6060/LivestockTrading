@@ -17,8 +17,17 @@ public class DataAccess : IDataAccess
 	public async Task CreateOrUpdateBucket(FileBucket bucket)
 	{
 		if (string.IsNullOrEmpty(bucket.Id))
+		{
 			await _documentDbContext.FileBuckets.InsertOneAsync(bucket);
-		else
-			await _documentDbContext.FileBuckets.FindOneAndReplaceAsync(v => v.Id == bucket.Id, bucket);
+			return;
+		}
+
+		// Upload Handler artik bucket.Id'yi (Mongo ObjectId) yazimdan once uretiyor; bu durumda
+		// kayit henuz Mongo'da yok. Upsert olmadan FindOneAndReplaceAsync no-op olur ve bucket
+		// kalici olmaz; sonraki upload ayni Id'yi bulamayinca yeni bucket aciyor.
+		await _documentDbContext.FileBuckets.FindOneAndReplaceAsync(
+			v => v.Id == bucket.Id,
+			bucket,
+			new FindOneAndReplaceOptions<FileBucket> { IsUpsert = true });
 	}
 }
