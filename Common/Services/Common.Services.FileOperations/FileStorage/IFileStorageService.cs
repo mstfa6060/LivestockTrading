@@ -22,11 +22,20 @@ public interface IFileStorageService
 	/// <summary>
 	/// Resim dosyasi yukle (otomatik isleme ile)
 	/// </summary>
+	/// <param name="storageBucketId">
+	/// Saglandiginda MinIO/disk anahtari `&lt;storageBucketId&gt;/&lt;storageFileId&gt;` (orjinal) ve
+	/// `&lt;storageBucketId&gt;/&lt;storageFileId&gt;_&lt;variant&gt;` (varyantlar) deseniyle yazilir. Bu
+	/// sayede frontend tarafindaki `/file-storage/{mediaBucketId}/{coverImageFileId}` URL
+	/// kurulumu kullanici yuklemelerinde de calisir.
+	/// </param>
+	/// <param name="storageFileId">Yukaridaki desende kullanilacak dosya kimligi.</param>
 	Task<ImageUploadResult> CreateImageFileAsync(
 		Guid tenantId,
 		IFormFile file,
 		string moduleName,
 		string folderName,
 		Guid? entityId,
-		ImageProcessingOptions options = null);
+		ImageProcessingOptions options = null,
+		string storageBucketId = null,
+		Guid? storageFileId = null);
 }

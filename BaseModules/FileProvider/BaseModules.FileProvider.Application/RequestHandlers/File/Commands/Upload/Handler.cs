@@ -1,6 +1,7 @@
 using Common.Services.Auth.Authorization;
 using Common.Services.Auth.CurrentUser;
 using Common.Services.FileOperations.ImageProcessing;
+using MongoDB.Bson;
 
 namespace BaseModules.FileProvider.Application.RequestHandlers.Files.Commands.Upload;
 
@@ -44,6 +45,10 @@ public class Handler : IRequestHandler
 		{
 			bucket = new FileBucket()
 			{
+				// Frontend'in `/file-storage/{mediaBucketId}/{coverImageFileId}` URL desenine uyabilmesi
+				// icin bucket ve dosya kimlikleri storage'a yazmadan once uretiliyor; MinIO anahtari
+				// `<bucket.Id>/<fileEntry.Id>` olarak yazilir, boylece kapak URL'i dogrudan cozulebilir.
+				Id = ObjectId.GenerateNewId().ToString(),
 				IsWaitingForApproval = true,
 				BucketType = requestPayload.BucketType,
 				ModuleName = requestPayload.ModuleName,
@@ -59,6 +64,7 @@ public class Handler : IRequestHandler
 		int? imageHeight = null;
 		long? fileSizeBytes = null;
 
+		var fileEntryId = Guid.NewGuid();
 		var isImage = requestPayload.FormFile.ContentType?.StartsWith("image/") == true;
 
 		if (isImage)
@@ -76,7 +82,9 @@ public class Handler : IRequestHandler
 					ConvertToWebP = true,
 					StripMetadata = true,
 					GenerateThumbnails = true
-				});
+				},
+				storageBucketId: bucket.Id,
+				storageFileId: fileEntryId);
 
 			uploadedFileProperties = imageResult.Variants["original"];
 			variantPaths = imageResult.Variants.Select(v => new FileVariantInfo { Key = v.Key, Url = v.Value.Path }).ToList();
@@ -96,7 +104,7 @@ public class Handler : IRequestHandler
 		// Create FileEntry Entity
 		var fileEntry = new FileEntry()
 		{
-			Id = Guid.NewGuid(),
+			Id = fileEntryId,
 			IsWaitingForApproval = true,
 
 			ContentType = uploadedFileProperties.ContentType,

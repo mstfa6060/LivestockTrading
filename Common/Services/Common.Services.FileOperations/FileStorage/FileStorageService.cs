@@ -365,7 +365,9 @@ public class FileStorageService : IFileStorageService
 		string moduleName,
 		string folderName,
 		Guid? entityId,
-		ImageProcessingOptions options = null)
+		ImageProcessingOptions options = null,
+		string storageBucketId = null,
+		Guid? storageFileId = null)
 	{
 		options ??= new ImageProcessingOptions();
 
@@ -383,8 +385,12 @@ public class FileStorageService : IFileStorageService
 			SavingsPercent = processed.SavingsPercent
 		};
 
+		var useCanonicalKey = !string.IsNullOrWhiteSpace(storageBucketId) && storageFileId.HasValue;
+
 		// Orijinali kaydet
-		var originalProps = await SaveVariantAsync(tenantId, processed.Original, file.FileName, moduleName, folderName, entityId);
+		var originalProps = useCanonicalKey
+			? await SaveVariantAtCanonicalKey(processed.Original, file.FileName, moduleName, storageBucketId, storageFileId.Value)
+			: await SaveVariantAsync(tenantId, processed.Original, file.FileName, moduleName, folderName, entityId);
 		result.Variants["original"] = originalProps;
 		result.Width = processed.Original.Width;
 		result.Height = processed.Original.Height;
@@ -392,7 +398,9 @@ public class FileStorageService : IFileStorageService
 		// Thumbnail'lari kaydet
 		foreach (var thumb in processed.Thumbnails)
 		{
-			var thumbProps = await SaveVariantAsync(tenantId, thumb, file.FileName, moduleName, folderName, entityId);
+			var thumbProps = useCanonicalKey
+				? await SaveVariantAtCanonicalKey(thumb, file.FileName, moduleName, storageBucketId, storageFileId.Value)
+				: await SaveVariantAsync(tenantId, thumb, file.FileName, moduleName, folderName, entityId);
 			result.Variants[thumb.Name] = thumbProps;
 		}
 
@@ -414,5 +422,38 @@ public class FileStorageService : IFileStorageService
 
 		using var ms = new MemoryStream(variant.Data);
 		return await CreateFileByStream(tenantId, ms, newFileName, variant.ContentType, moduleName, folderName, entityId, variant.Name);
+	}
+
+	// MinIO ile aynı `<bucketId>/<fileId>` deseni; ortamda MinIO yoksa diske de tutarli yazilsin diye.
+	private async Task<FileProperties> SaveVariantAtCanonicalKey(
+		ImageVariant variant,
+		string originalFileName,
+		string moduleName,
+		string storageBucketId,
+		Guid storageFileId)
+	{
+		var relativeFilePath = variant.Name == "original"
+			? $"{storageBucketId}/{storageFileId}"
+			: $"{storageBucketId}/{storageFileId}_{variant.Name}";
+
+		var basePath = this.GetModuleBasePath(moduleName);
+		var physicalFilePath = Path.Combine(basePath, relativeFilePath.Replace("/", Path.DirectorySeparatorChar.ToString()));
+
+		var directory = Path.GetDirectoryName(physicalFilePath);
+		if (!Directory.Exists(directory))
+			Directory.CreateDirectory(directory);
+
+		if (File.Exists(physicalFilePath))
+			File.Delete(physicalFilePath);
+
+		await File.WriteAllBytesAsync(physicalFilePath, variant.Data);
+
+		return new FileProperties
+		{
+			Name = Path.GetFileName(originalFileName),
+			Extention = variant.Extension,
+			Path = relativeFilePath,
+			ContentType = variant.ContentType
+		};
 	}
 }

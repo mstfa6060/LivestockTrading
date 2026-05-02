@@ -110,7 +110,9 @@ public class MinIOFileStorageService : IFileStorageService
 		string moduleName,
 		string folderName,
 		Guid? entityId,
-		ImageProcessingOptions options = null)
+		ImageProcessingOptions options = null,
+		string storageBucketId = null,
+		Guid? storageFileId = null)
 	{
 		options ??= new ImageProcessingOptions();
 
@@ -128,14 +130,20 @@ public class MinIOFileStorageService : IFileStorageService
 			SavingsPercent = processed.SavingsPercent
 		};
 
-		var originalProps = await SaveVariantToMinIO(tenantId, processed.Original, file.FileName, moduleName, folderName, entityId);
+		var useCanonicalKey = !string.IsNullOrWhiteSpace(storageBucketId) && storageFileId.HasValue;
+
+		var originalProps = useCanonicalKey
+			? await PutVariantAtCanonicalKey(processed.Original, file.FileName, storageBucketId, storageFileId.Value)
+			: await SaveVariantToMinIO(tenantId, processed.Original, file.FileName, moduleName, folderName, entityId);
 		result.Variants["original"] = originalProps;
 		result.Width = processed.Original.Width;
 		result.Height = processed.Original.Height;
 
 		foreach (var thumb in processed.Thumbnails)
 		{
-			var thumbProps = await SaveVariantToMinIO(tenantId, thumb, file.FileName, moduleName, folderName, entityId);
+			var thumbProps = useCanonicalKey
+				? await PutVariantAtCanonicalKey(thumb, file.FileName, storageBucketId, storageFileId.Value)
+				: await SaveVariantToMinIO(tenantId, thumb, file.FileName, moduleName, folderName, entityId);
 			result.Variants[thumb.Name] = thumbProps;
 		}
 
@@ -157,6 +165,39 @@ public class MinIOFileStorageService : IFileStorageService
 
 		using var ms = new MemoryStream(variant.Data);
 		return await CreateFileByStream(tenantId, ms, newFileName, variant.ContentType, moduleName, folderName, entityId, variant.Name);
+	}
+
+	// Frontend, kapak gorseli URL'ini `/file-storage/{mediaBucketId}/{coverImageFileId}` deseniyle
+	// kuruyor. Kullanici yuklemelerinin de bu desende cozulmesi icin orjinal ve varyantlar
+	// `<bucketId>/<fileId>` (orjinal) ve `<bucketId>/<fileId>_<variant>` anahtarlariyla yazilir.
+	// Tarayici Content-Type header'ini kullandigi icin uzantisiz key gorseli dogru render eder.
+	private async Task<FileProperties> PutVariantAtCanonicalKey(
+		ImageVariant variant,
+		string originalFileName,
+		string storageBucketId,
+		Guid storageFileId)
+	{
+		var objectName = variant.Name == "original"
+			? $"{storageBucketId}/{storageFileId}"
+			: $"{storageBucketId}/{storageFileId}_{variant.Name}";
+
+		using var ms = new MemoryStream(variant.Data);
+		await _minioClient.PutObjectAsync(new PutObjectArgs()
+			.WithBucket(_bucketName)
+			.WithObject(objectName)
+			.WithStreamData(ms)
+			.WithObjectSize(ms.Length)
+			.WithContentType(variant.ContentType ?? "application/octet-stream"));
+
+		Console.WriteLine($"[MinIO] Uploaded canonical: {_bucketName}/{objectName}");
+
+		return new FileProperties
+		{
+			Name = Path.GetFileName(originalFileName),
+			Extention = variant.Extension,
+			Path = objectName,
+			ContentType = variant.ContentType
+		};
 	}
 
 	public async Task<bool> DeleteFile(string filePath)
