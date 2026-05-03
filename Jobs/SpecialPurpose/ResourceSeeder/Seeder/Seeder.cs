@@ -115,7 +115,7 @@ public class Seeder
         using var db = BuildRelationalDbContext(args);
 
         var businessModules = new List<ModuleDefinition>
-        { 
+        {
             new()
             {
                 ApplicationProjectAssembly = Assembly.GetAssembly(typeof(BaseModules.IAM.Application.Configuration.ApplicationDependencyProvider)),
@@ -125,6 +125,11 @@ public class Seeder
             {
                 ApplicationProjectAssembly = Assembly.GetAssembly(typeof(BaseModules.FileProvider.Application.Configuration.ApplicationDependencyProvider)),
                 ModuleType = ModuleTypes.FileProvider,
+            },
+            new()
+            {
+                ApplicationProjectAssembly = Assembly.GetAssembly(typeof(LivestockTrading.Application.Configuration.ApplicationDependencyProvider)),
+                ModuleType = ModuleTypes.LivestockTrading,
             },
         };
 
