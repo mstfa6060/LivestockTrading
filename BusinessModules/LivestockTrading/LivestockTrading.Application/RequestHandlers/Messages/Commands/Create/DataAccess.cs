@@ -1,5 +1,8 @@
 using LivestockTrading.Domain.Entities;
+using LivestockTrading.Domain.Errors;
 using LivestockTrading.Infrastructure.RelationalDB;
+using Common.Services.ErrorCodeGenerator;
+using Microsoft.EntityFrameworkCore;
 
 namespace LivestockTrading.Application.RequestHandlers.Messages.Commands.Create;
 
@@ -12,9 +15,22 @@ public class DataAccess : IDataAccess
 		_dbContext = dependencyProvider.GetInstance<LivestockTradingModuleDbContext>();
 	}
 
-	public async Task AddMessage(Message message)
+	public async Task<Conversation> GetConversationForUpdate(Guid conversationId, CancellationToken ct)
 	{
+		var conversation = await _dbContext.Conversations
+			.FirstOrDefaultAsync(c => c.Id == conversationId && !c.IsDeleted, ct);
+
+		if (conversation == null)
+			throw new ArfBlocksValidationException(
+				ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ConversationErrors.ConversationNotFound));
+
+		return conversation;
+	}
+
+	public async Task AddMessageAndTouchConversation(Message message, Conversation conversation, CancellationToken ct)
+	{
+		conversation.LastMessageAt = message.SentAt;
 		_dbContext.Messages.Add(message);
-		await _dbContext.SaveChangesAsync();
+		await _dbContext.SaveChangesAsync(ct);
 	}
 }

@@ -15,6 +15,7 @@ public class Handler : IRequestHandler
 		var req = (RequestModel)payload;
 
 		var (messages, page) = await _dataAccessLayer.All(
+			req.ConversationId,
 			req.Sorting,
 			req.Filters,
 			req.PageRequest,

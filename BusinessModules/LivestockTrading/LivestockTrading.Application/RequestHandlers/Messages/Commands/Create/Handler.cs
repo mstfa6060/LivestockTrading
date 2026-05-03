@@ -21,14 +21,22 @@ public class Handler : IRequestHandler
 		var request = (RequestModel)payload;
 		var mapper = new Mapper();
 
-		var entity = mapper.MapToEntity(request);
+		// Sender always comes from JWT — never trust the body
+		var senderUserId = _currentUserService.GetCurrentUserId();
 
-		await _dataAccessLayer.AddMessage(entity);
+		// Recipient is the OTHER participant of the conversation; resolved server-side
+		var conversation = await _dataAccessLayer.GetConversationForUpdate(request.ConversationId, cancellationToken);
+		var recipientUserId = conversation.ParticipantUserId1 == senderUserId
+			? conversation.ParticipantUserId2
+			: conversation.ParticipantUserId1;
 
-		// Get sender name for notification
+		var entity = mapper.MapToEntity(request, senderUserId, recipientUserId);
+
+		// Same SaveChanges updates Conversation.LastMessageAt so list view stays sorted correctly
+		await _dataAccessLayer.AddMessageAndTouchConversation(entity, conversation, cancellationToken);
+
 		var senderName = _currentUserService.GetCurrentUserDisplayName();
 
-		// Publish event for push notification and real-time delivery
 		await _publisher.PublishFanout("livestocktrading.notification.push", new MessageCreatedEvent
 		{
 			MessageId = entity.Id,

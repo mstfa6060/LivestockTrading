@@ -16,5 +16,8 @@ public class ResponseModel : IResponseModel<Array>
 	public string Subject { get; set; }
 	public int Status { get; set; }
 	public DateTime? LastMessageAt { get; set; }
+	public string LastMessageContent { get; set; }
+	public Guid? LastMessageSenderUserId { get; set; }
+	public int UnreadCount { get; set; }
 	public DateTime CreatedAt { get; set; }
 }

@@ -1,26 +1,31 @@
-using LivestockTrading.Application.Authorization;
 using LivestockTrading.Infrastructure.Services;
 
 namespace LivestockTrading.Application.RequestHandlers.Messages.Commands.Create;
 
 public class Verificator : IRequestVerificator
 {
+	private readonly AuthorizationService _authorizationService;
 	private readonly LivestockTradingModuleDbVerificationService _dbVerification;
-	private readonly PermissionService _permissionService;
+	private readonly CurrentUserService _currentUserService;
 
 	public Verificator(ArfBlocksDependencyProvider dependencyProvider)
 	{
+		_authorizationService = dependencyProvider.GetInstance<AuthorizationService>();
 		_dbVerification = dependencyProvider.GetInstance<LivestockTradingModuleDbVerificationService>();
-		_permissionService = dependencyProvider.GetInstance<PermissionService>();
+		_currentUserService = dependencyProvider.GetInstance<CurrentUserService>();
 	}
 
 	public async Task VerificateActor(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
 	{
-		// All authenticated users can send messages
+		await _authorizationService
+			.ForResource(typeof(Verificator).Namespace)
+			.VerifyActor()
+			.Assert();
 	}
 
 	public async Task VerificateDomain(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
 	{
-		await Task.CompletedTask;
+		var request = (RequestModel)payload;
+		await _dbVerification.ValidateUserIsParticipantOfConversation(request.ConversationId, _currentUserService.GetCurrentUserId(), cancellationToken);
 	}
 }

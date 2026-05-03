@@ -1,17 +1,13 @@
 using FluentValidation;
 using LivestockTrading.Domain.Errors;
-using LivestockTrading.Infrastructure.Services;
 using Common.Services.ErrorCodeGenerator;
 
 namespace LivestockTrading.Application.RequestHandlers.Messages.Commands.Create;
 
 public class Validator : IRequestValidator
 {
-	private readonly LivestockTradingModuleDbValidationService _dbValidator;
-
 	public Validator(ArfBlocksDependencyProvider dependencyProvider)
 	{
-		_dbValidator = dependencyProvider.GetInstance<LivestockTradingModuleDbValidationService>();
 	}
 
 	public void ValidateRequestModel(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
@@ -35,14 +31,6 @@ public class RequestModel_Validator : AbstractValidator<RequestModel>
 		RuleFor(x => x.ConversationId)
 			.NotEmpty()
 			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.MessageErrors.MessageConversationRequired));
-
-		RuleFor(x => x.SenderUserId)
-			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.MessageErrors.MessageSenderRequired));
-
-		RuleFor(x => x.RecipientUserId)
-			.NotEmpty()
-			.WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.MessageErrors.MessageRecipientRequired));
 
 		RuleFor(x => x.Content)
 			.NotEmpty()

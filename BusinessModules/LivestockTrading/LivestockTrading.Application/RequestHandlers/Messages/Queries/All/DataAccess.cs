@@ -14,6 +14,7 @@ public class DataAccess : IDataAccess
 	}
 
 	public async Task<(List<Message> Messages, XPageResponse Page)> All(
+		Guid conversationId,
 		XSorting sorting,
 		List<XFilterItem> filters,
 		XPageRequest pageRequest,
@@ -21,15 +22,13 @@ public class DataAccess : IDataAccess
 	{
 		var query = _dbContext.Messages
 			.AsNoTracking()
-			.Where(m => !m.IsDeleted)
+			.Where(m => !m.IsDeleted && m.ConversationId == conversationId)
 			.Sort(sorting)
 			.Filter(filters);
 
-		// Default sorting
 		if (sorting == null)
-			query = query.OrderByDescending(m => m.CreatedAt);
+			query = query.OrderByDescending(m => m.SentAt);
 
-		// Pagination
 		var page = query.GetPage(pageRequest);
 		var messages = await query.Paginate(page).ToListAsync(ct);
 

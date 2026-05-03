@@ -302,6 +302,38 @@ public class LivestockTradingModuleDbVerificationService : DefinitionDbValidatio
 			throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.MessageErrors.MessageNotFound));
 	}
 
+	// Conversation membership: current user must be one of the two participants
+	public async Task ValidateUserIsParticipantOfConversation(Guid conversationId, Guid userId, CancellationToken ct = default)
+	{
+		var conversation = await _dbContext.Conversations
+			.AsNoTracking()
+			.FirstOrDefaultAsync(c => c.Id == conversationId && !c.IsDeleted, ct);
+
+		if (conversation == null)
+			throw new ArfBlocksValidationException(
+				ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ConversationErrors.ConversationNotFound));
+
+		if (conversation.ParticipantUserId1 != userId && conversation.ParticipantUserId2 != userId)
+			throw new ArfBlocksVerificationException(
+				ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.ConversationErrors.ConversationAccessDenied));
+	}
+
+	// Message membership: current user must be a participant of the message's conversation
+	public async Task ValidateUserCanAccessMessage(Guid messageId, Guid userId, CancellationToken ct = default)
+	{
+		var conversationId = await _dbContext.Messages
+			.AsNoTracking()
+			.Where(m => m.Id == messageId && !m.IsDeleted)
+			.Select(m => (Guid?)m.ConversationId)
+			.FirstOrDefaultAsync(ct);
+
+		if (conversationId == null)
+			throw new ArfBlocksValidationException(
+				ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.MessageErrors.MessageNotFound));
+
+		await ValidateUserIsParticipantOfConversation(conversationId.Value, userId, ct);
+	}
+
 	// Offer
 	public async Task ValidateOfferExists(Guid offerId, CancellationToken ct = default)
 	{

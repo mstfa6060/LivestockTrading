@@ -13,7 +13,9 @@ public class Mapper
 			SenderUserId = m.SenderUserId,
 			RecipientUserId = m.RecipientUserId,
 			Content = m.Content,
+			AttachmentUrls = m.AttachmentUrls,
 			IsRead = m.IsRead,
+			ReadAt = m.ReadAt,
 			SentAt = m.SentAt,
 			CreatedAt = m.CreatedAt
 		}).ToList();

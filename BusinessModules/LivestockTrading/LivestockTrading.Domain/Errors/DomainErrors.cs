@@ -233,6 +233,7 @@ public class LivestockTradingDomainErrors
         public static string ConversationNotFound { get; set; } = "Konusma bulunamadi.";
         public static string ConversationParticipantsRequired { get; set; } = "Katilimcilar zorunludur.";
         public static string ConversationIdRequired { get; set; } = "Konusma ID zorunludur.";
+        public static string ConversationAccessDenied { get; set; } = "Bu konusmaya erisim yetkiniz yok.";
     }
 
     public static class MessageErrors

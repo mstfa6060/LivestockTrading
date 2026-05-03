@@ -3,8 +3,6 @@ namespace LivestockTrading.Application.RequestHandlers.Messages.Commands.Create;
 public class RequestModel : IRequestModel
 {
 	public Guid ConversationId { get; set; }
-	public Guid SenderUserId { get; set; }
-	public Guid RecipientUserId { get; set; }
 	public string Content { get; set; }
 	public string AttachmentUrls { get; set; }
 }
