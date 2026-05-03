@@ -88,6 +88,9 @@ public class ChatHub : Hub
 		if (userId != Guid.Empty)
 		{
 			await SetUserOnline(userId);
+			// User-specific group: yeni conversation acildiginda recipient'i bilgilendirmek icin
+			// kullanilir (recipient henuz conversation_{id} grubuna join etmemis olur).
+			await Groups.AddToGroupAsync(Context.ConnectionId, GetUserGroupName(userId));
 			Log.Information("User {UserId} connected. ConnectionId: {ConnectionId}", userId, Context.ConnectionId);
 		}
 		await base.OnConnectedAsync();
@@ -120,6 +123,8 @@ public class ChatHub : Hub
 	}
 
 	private static string GetConversationGroupName(Guid conversationId) => $"conversation_{conversationId}";
+
+	private static string GetUserGroupName(Guid userId) => $"user_{userId}";
 
 	private async Task SetUserOnline(Guid userId)
 	{
