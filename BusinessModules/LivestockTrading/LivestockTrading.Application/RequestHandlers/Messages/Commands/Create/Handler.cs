@@ -1,4 +1,5 @@
 using Common.Services.Messaging;
+using LivestockTrading.Application.Notifications;
 using LivestockTrading.Domain.Events;
 
 namespace LivestockTrading.Application.RequestHandlers.Messages.Commands.Create;
@@ -8,12 +9,14 @@ public class Handler : IRequestHandler
 	private readonly DataAccess _dataAccessLayer;
 	private readonly IRabbitMqPublisher _publisher;
 	private readonly CurrentUserService _currentUserService;
+	private readonly IChatNotifier _chatNotifier;
 
 	public Handler(ArfBlocksDependencyProvider dependencyProvider, object dataAccess)
 	{
 		_dataAccessLayer = (DataAccess)dataAccess;
 		_publisher = dependencyProvider.GetInstance<IRabbitMqPublisher>();
 		_currentUserService = dependencyProvider.GetInstance<CurrentUserService>();
+		_chatNotifier = dependencyProvider.GetInstance<IChatNotifier>();
 	}
 
 	public async Task<ArfBlocksRequestResult> Handle(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
@@ -35,8 +38,21 @@ public class Handler : IRequestHandler
 		// Same SaveChanges updates Conversation.LastMessageAt so list view stays sorted correctly
 		await _dataAccessLayer.AddMessageAndTouchConversation(entity, conversation, cancellationToken);
 
+		// Real-time SignalR broadcast (chat ekrani acik olan client'lar icin)
+		await _chatNotifier.NotifyMessageCreatedAsync(new MessageCreatedNotification(
+			entity.Id,
+			entity.ConversationId,
+			entity.SenderUserId,
+			entity.RecipientUserId,
+			entity.Content,
+			entity.AttachmentUrls,
+			entity.SentAt,
+			entity.CreatedAt
+		), cancellationToken);
+
 		var senderName = _currentUserService.GetCurrentUserDisplayName();
 
+		// Push notification icin event publish (kapali uygulamalarda Firebase ile bildirim)
 		await _publisher.PublishFanout("livestocktrading.notification.push", new MessageCreatedEvent
 		{
 			MessageId = entity.Id,

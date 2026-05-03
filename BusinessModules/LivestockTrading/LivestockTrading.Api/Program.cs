@@ -8,6 +8,8 @@ using Common.Helpers;
 using Serilog;
 using LivestockTrading.Api.Converters;
 using LivestockTrading.Api.Hubs;
+using LivestockTrading.Api.SignalR;
+using LivestockTrading.Application.Notifications;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,6 +68,9 @@ else
 {
     builder.Services.AddSignalR();
 }
+
+// SignalR broadcast abstraction (Application -> Api boundary)
+builder.Services.AddScoped<IChatNotifier, SignalRChatNotifier>();
 
 // ArfBlocks Dependencies
 builder.Services.AddArfBlocks(options =>
