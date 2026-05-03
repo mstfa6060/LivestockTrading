@@ -95,6 +95,9 @@ public class LivestockTradingModuleDbContext : DefinitionDbContext, ILivestockTr
         base.OnModelCreating(modelBuilder);
 
         LivestockTradingModelBuilder.Build(modelBuilder);
+
+        // En son cagrilmali — modele eklenen tum entity'leri kapsasin
+        Common.Definitions.Infrastructure.RelationalDB.CommonModelBuilder.ApplyUtcDateTimeConverter(modelBuilder);
     }
 }
 

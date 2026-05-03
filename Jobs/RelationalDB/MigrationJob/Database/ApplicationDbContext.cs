@@ -311,6 +311,8 @@ public class ApplicationDbContext : DbContext, IDefinitionDbContext, ILivestockT
         }
 
         base.OnModelCreating(modelBuilder);
+
+        CommonModelBuilder.ApplyUtcDateTimeConverter(modelBuilder);
     }
 
 

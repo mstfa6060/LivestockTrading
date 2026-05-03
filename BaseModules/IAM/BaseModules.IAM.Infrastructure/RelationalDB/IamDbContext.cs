@@ -14,6 +14,8 @@ public class IamDbContext : DefinitionDbContext, IIamDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        CommonModelBuilder.ApplyUtcDateTimeConverter(modelBuilder);
     }
 }
 
