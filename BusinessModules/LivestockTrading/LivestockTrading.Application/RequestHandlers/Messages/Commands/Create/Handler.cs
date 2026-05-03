@@ -24,10 +24,13 @@ public class Handler : IRequestHandler
 		try
 		{
 			var sp = dependencyProvider.GetInstance<IServiceProvider>();
+			Console.WriteLine($"[ChatNotifier diag] ServiceProvider null? {sp == null}");
 			_chatNotifier = sp?.GetService<IChatNotifier>();
+			Console.WriteLine($"[ChatNotifier diag] ChatNotifier null? {_chatNotifier == null} (type: {_chatNotifier?.GetType().FullName})");
 		}
-		catch
+		catch (Exception ex)
 		{
+			Console.WriteLine($"[ChatNotifier diag] Exception during resolve: {ex.GetType().Name}: {ex.Message}");
 			_chatNotifier = null;
 		}
 	}
@@ -56,6 +59,7 @@ public class Handler : IRequestHandler
 		{
 			try
 			{
+				Console.WriteLine($"[ChatNotifier diag] Calling NotifyMessageCreatedAsync for message {entity.Id} conversation {entity.ConversationId}");
 				await _chatNotifier.NotifyMessageCreatedAsync(new MessageCreatedNotification(
 					entity.Id,
 					entity.ConversationId,
@@ -66,12 +70,17 @@ public class Handler : IRequestHandler
 					entity.SentAt,
 					entity.CreatedAt
 				), cancellationToken);
+				Console.WriteLine($"[ChatNotifier diag] Broadcast completed for message {entity.Id}");
 			}
 			catch (Exception ex)
 			{
 				// Broadcast hatasi mesaj kaydini bozmasin (Redis/Hub down vs.)
-				Console.WriteLine($"SignalR broadcast failed for message {entity.Id}: {ex.Message}");
+				Console.WriteLine($"[ChatNotifier diag] SignalR broadcast FAILED for message {entity.Id}: {ex.GetType().Name}: {ex.Message}");
 			}
+		}
+		else
+		{
+			Console.WriteLine($"[ChatNotifier diag] SKIPPING broadcast — _chatNotifier is NULL (message {entity.Id})");
 		}
 
 		var senderName = _currentUserService.GetCurrentUserDisplayName();
