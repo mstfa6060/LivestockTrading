@@ -158,7 +158,10 @@ public class ChatHub : Hub
 
     private Guid GetUserId()
     {
-        var userIdClaim = Context.User?.FindFirst("userId")?.Value
+        // JWT'de "nameid" claim'i taşınıyor (CurrentUserService ile aynı kontrat).
+        // Auth middleware ClaimTypes.NameIdentifier'a map etmiş olabilir; her ikisini de dener.
+        var userIdClaim = Context.User?.FindFirst("nameid")?.Value
+            ?? Context.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
             ?? Context.User?.FindFirst("sub")?.Value;
 
         return Guid.TryParse(userIdClaim, out var userId) ? userId : Guid.Empty;

@@ -10,6 +10,10 @@ using LivestockTrading.Api.Converters;
 using LivestockTrading.Api.Hubs;
 using LivestockTrading.Api.SignalR;
 using LivestockTrading.Application.Notifications;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Common.Services.Auth.JsonWebToken;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +58,40 @@ builder.Services.AddMemoryCache(options =>
 {
 });
 
+// JWT Authentication (ChatHub [Authorize] icin gerekli — SignalR negotiate auth challenge ediyor)
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(JwtService.Secret)),
+            ValidateIssuer = false,
+            ValidateAudience = true,
+            ValidAudience = JwtService.Audience,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromSeconds(30),
+            NameClaimType = "nameid"
+        };
+
+        // SignalR JS client WebSocket'te Authorization header set edemez,
+        // accessTokenFactory query string'e ekler (?access_token=...)
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            }
+        };
+    });
+builder.Services.AddAuthorization();
+
 // SignalR for real-time messaging
 var redisConnectionString = builder.Configuration["Caching:Redis:ConnectionString"];
 if (!string.IsNullOrEmpty(redisConnectionString))
@@ -93,6 +131,10 @@ app.UseSerilogRequestLogging(options =>
 
 // CORS
 app.UseCors(DefaultCorsPolicy);
+
+// Auth (UseCors'dan SONRA, MapHub'dan ONCE)
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Controllers
 app.MapControllers();
