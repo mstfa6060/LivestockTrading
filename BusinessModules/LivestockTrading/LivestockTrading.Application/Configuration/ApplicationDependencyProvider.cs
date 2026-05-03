@@ -13,7 +13,8 @@ public class ApplicationDependencyProvider : ArfBlocksDependencyProvider
     public ApplicationDependencyProvider(
         IHttpContextAccessor httpContextAccessor,
         ProjectConfigurations projectConfigurations,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IServiceProvider serviceProvider)
     {
         // Instances
         base.Add<ArfBlocksDependencyProvider>(this);
@@ -22,6 +23,11 @@ public class ApplicationDependencyProvider : ArfBlocksDependencyProvider
         base.Add<IHttpContextAccessor>(httpContextAccessor);
         base.Add<CurrentUserModel>(new CurrentUserModel());
         base.Add<IConfiguration>(configuration);
+
+        // IServiceProvider — Api projesindeki servislere (örn. IChatNotifier) runtime erisim icin.
+        // Application Api'yi referans alamaz (dependency direction), ama Api'deki ASP.NET Core DI'a
+        // register edilmis interface'ler IServiceProvider uzerinden resolve edilebilir.
+        base.Add<IServiceProvider>(serviceProvider);
 
         // Types
         base.Add<CurrentUserService>();

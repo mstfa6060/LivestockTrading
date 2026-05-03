@@ -1,6 +1,7 @@
 using Common.Services.Messaging;
 using LivestockTrading.Application.Notifications;
 using LivestockTrading.Domain.Events;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace LivestockTrading.Application.RequestHandlers.Messages.Commands.Create;
 
@@ -16,7 +17,19 @@ public class Handler : IRequestHandler
 		_dataAccessLayer = (DataAccess)dataAccess;
 		_publisher = dependencyProvider.GetInstance<IRabbitMqPublisher>();
 		_currentUserService = dependencyProvider.GetInstance<CurrentUserService>();
-		_chatNotifier = dependencyProvider.GetInstance<IChatNotifier>();
+
+		// IChatNotifier Application interface, implementation Api'de.
+		// ArfBlocks ApplicationDependencyProvider Api'yi import edemez (dependency direction),
+		// bu yüzden runtime'da Microsoft.Extensions.DependencyInjection.IServiceProvider üzerinden resolve.
+		try
+		{
+			var sp = dependencyProvider.GetInstance<IServiceProvider>();
+			_chatNotifier = sp?.GetService<IChatNotifier>();
+		}
+		catch
+		{
+			_chatNotifier = null;
+		}
 	}
 
 	public async Task<ArfBlocksRequestResult> Handle(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
@@ -39,16 +52,27 @@ public class Handler : IRequestHandler
 		await _dataAccessLayer.AddMessageAndTouchConversation(entity, conversation, cancellationToken);
 
 		// Real-time SignalR broadcast (chat ekrani acik olan client'lar icin)
-		await _chatNotifier.NotifyMessageCreatedAsync(new MessageCreatedNotification(
-			entity.Id,
-			entity.ConversationId,
-			entity.SenderUserId,
-			entity.RecipientUserId,
-			entity.Content,
-			entity.AttachmentUrls,
-			entity.SentAt,
-			entity.CreatedAt
-		), cancellationToken);
+		if (_chatNotifier != null)
+		{
+			try
+			{
+				await _chatNotifier.NotifyMessageCreatedAsync(new MessageCreatedNotification(
+					entity.Id,
+					entity.ConversationId,
+					entity.SenderUserId,
+					entity.RecipientUserId,
+					entity.Content,
+					entity.AttachmentUrls,
+					entity.SentAt,
+					entity.CreatedAt
+				), cancellationToken);
+			}
+			catch (Exception ex)
+			{
+				// Broadcast hatasi mesaj kaydini bozmasin (Redis/Hub down vs.)
+				Console.WriteLine($"SignalR broadcast failed for message {entity.Id}: {ex.Message}");
+			}
+		}
 
 		var senderName = _currentUserService.GetCurrentUserDisplayName();
 
