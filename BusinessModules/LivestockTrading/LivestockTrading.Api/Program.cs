@@ -142,8 +142,11 @@ app.MapControllers();
 // SignalR Hubs
 app.MapHub<ChatHub>("/hubs/chat");
 
-// ArfBlocks Request Handlers
-app.UseArfBlocksRequestHandlers(options => { });
+// ArfBlocks Request Handlers — /hubs/* hariç (SignalR negotiate'i ArfBlocks parse etmesin)
+app.UseWhen(
+    ctx => !ctx.Request.Path.StartsWithSegments("/hubs"),
+    branch => branch.UseArfBlocksRequestHandlers(options => { })
+);
 
 Log.Information("LivestockTrading API Started!");
 Log.Information("Environment: {Environment}", builder.Environment.EnvironmentName);
