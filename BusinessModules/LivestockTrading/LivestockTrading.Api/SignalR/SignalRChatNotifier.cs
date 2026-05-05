@@ -16,22 +16,31 @@ public class SignalRChatNotifier : IChatNotifier
 
 	public async Task NotifyMessageCreatedAsync(MessageCreatedNotification n, CancellationToken cancellationToken = default)
 	{
-		// Broadcast hatasi mesaj gonderme akisini bozmasin (Redis down vs.) — log'la, swallow et.
+		// Hem conversation_{id} grubuna (chat ekrani acik olanlar) hem de katilimcilarin user_{userId}
+		// gruplarina gonderilir. Sebep: conversation listesinde duran ama o conversation'a join etmemis
+		// kullanicilar mesaj listesi grubunda olmaz, sadece kendi user grubunda olur. user_{userId}'e
+		// yansitilmazsa Messages list ekraninda lastMessage/unreadCount real-time guncellenmez (E2E ile
+		// kanitlandi). Cift teslim icin frontend useChat handleNewMessage duplicate guard tutar.
+		var payload = new
+		{
+			id = n.Id,
+			conversationId = n.ConversationId,
+			senderUserId = n.SenderUserId,
+			recipientUserId = n.RecipientUserId,
+			content = n.Content,
+			attachmentUrls = n.AttachmentUrls,
+			sentAt = n.SentAt,
+			createdAt = n.CreatedAt,
+			isRead = false
+		};
+
 		try
 		{
-			await _hubContext.Clients.Group($"conversation_{n.ConversationId}")
-				.SendAsync("ReceiveMessage", new
-				{
-					id = n.Id,
-					conversationId = n.ConversationId,
-					senderUserId = n.SenderUserId,
-					recipientUserId = n.RecipientUserId,
-					content = n.Content,
-					attachmentUrls = n.AttachmentUrls,
-					sentAt = n.SentAt,
-					createdAt = n.CreatedAt,
-					isRead = false
-				}, cancellationToken);
+			await _hubContext.Clients.Groups(
+				$"conversation_{n.ConversationId}",
+				$"user_{n.RecipientUserId}",
+				$"user_{n.SenderUserId}")
+				.SendAsync("ReceiveMessage", payload, cancellationToken);
 		}
 		catch (Exception ex)
 		{
@@ -41,9 +50,16 @@ public class SignalRChatNotifier : IChatNotifier
 
 	public async Task NotifyMessageReadAsync(MessageReadNotification n, CancellationToken cancellationToken = default)
 	{
+		// Sender'in (artik recipient'i degil) listesinde de okundu tikinin tazelenmesi icin
+		// her iki katilimcinin user grubuna da gonderiyoruz. ReadByUserId burada okuyan kisi —
+		// karsi taraf icin: conversation katilimcilarini hub'da bilemiyoruz, ama ConversationId'den
+		// turetmek icin DB'ye git lazim. Pratik cozum: tum dinleyiciler (sender ile recipient) ayni
+		// conversation_{id} grubuna ek olarak okuyanin user grubuna; sender her iki kanal da olabilir.
 		try
 		{
-			await _hubContext.Clients.Group($"conversation_{n.ConversationId}")
+			await _hubContext.Clients.Groups(
+				$"conversation_{n.ConversationId}",
+				$"user_{n.ReadByUserId}")
 				.SendAsync("MessageRead", new
 				{
 					messageId = n.MessageId,
