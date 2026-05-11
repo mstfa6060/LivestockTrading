@@ -1,0 +1,170 @@
+-- ============================================================================
+-- Livestock Trading — Wave 0 Database Initialization
+-- ============================================================================
+-- Runs once at first PostgreSQL container start (via /docker-entrypoint-initdb.d/).
+-- Subsequent runs no-op (IF NOT EXISTS guards).
+--
+-- Password substitution: ${MIGRATOR_PASSWORD} and ${APP_PASSWORD} are placeholders;
+-- replaced by envsubst in init.sh wrapper before psql execution.
+-- ============================================================================
+
+-- ----------------------------------------------------------------------------
+-- 1. Extensions (public schema)
+-- ----------------------------------------------------------------------------
+
+-- Spatial geometry/geography types and operations
+CREATE EXTENSION IF NOT EXISTS postgis;
+
+-- Trigram similarity for FTS keyword search (Listings Faz 1)
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+-- Composite GIST indexes mixing B-tree and GIST columns
+-- Required for: ix_listings_country_location_gist (Karar 4e Madde 4)
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+
+-- NOTE: uuid-ossp / pgcrypto NOT installed.
+-- All Guid IDs generated client-side via Guid.CreateVersion7() (.NET 9+).
+-- DB-side UUID generation not needed (Karar 3a AR factories use Guid v7).
+
+-- ----------------------------------------------------------------------------
+-- 2. Schemas (10 module + public retained for PostGIS)
+-- ----------------------------------------------------------------------------
+
+CREATE SCHEMA IF NOT EXISTS identity;
+CREATE SCHEMA IF NOT EXISTS accounts;
+CREATE SCHEMA IF NOT EXISTS catalog;
+CREATE SCHEMA IF NOT EXISTS listings;
+CREATE SCHEMA IF NOT EXISTS carrier;
+CREATE SCHEMA IF NOT EXISTS marketplace;
+CREATE SCHEMA IF NOT EXISTS messaging;
+CREATE SCHEMA IF NOT EXISTS notifications;
+CREATE SCHEMA IF NOT EXISTS subscription;
+CREATE SCHEMA IF NOT EXISTS admin;
+
+-- ----------------------------------------------------------------------------
+-- 3. Roles (Karar 4b — 2-role least privilege)
+-- ----------------------------------------------------------------------------
+-- livestock_migrator: DDL (CREATE/ALTER/DROP) + DML; used by EF migrations + SeedRunner
+-- livestock_app:       DML only (SELECT/INSERT/UPDATE/DELETE); runtime API + Workers
+-- ----------------------------------------------------------------------------
+
+CREATE ROLE livestock_migrator WITH LOGIN PASSWORD '${MIGRATOR_PASSWORD}';
+CREATE ROLE livestock_app WITH LOGIN PASSWORD '${APP_PASSWORD}';
+
+-- ----------------------------------------------------------------------------
+-- 4. Schema-level grants
+-- ----------------------------------------------------------------------------
+
+-- Migrator: full DDL on all 10 module schemas
+GRANT ALL ON SCHEMA identity, accounts, catalog, listings, carrier,
+                marketplace, messaging, notifications, subscription, admin
+              TO livestock_migrator;
+
+-- App: USAGE only on module schemas (no DDL, no CREATE)
+GRANT USAGE ON SCHEMA identity, accounts, catalog, listings, carrier,
+                  marketplace, messaging, notifications, subscription, admin
+              TO livestock_app;
+
+-- App: PostGIS function access (public schema)
+GRANT USAGE ON SCHEMA public TO livestock_app;
+GRANT SELECT ON spatial_ref_sys TO livestock_app;
+
+-- ----------------------------------------------------------------------------
+-- 5. Default privileges (auto-apply to future tables/sequences/functions)
+-- ----------------------------------------------------------------------------
+-- For each of 10 schemas × 3 statements (TABLES + SEQUENCES + FUNCTIONS) = 30 statements
+--
+-- TABLES:    app does SELECT/INSERT/UPDATE/DELETE
+-- SEQUENCES: app uses (EF SERIAL / IDENTITY columns require USAGE; SELECT for currval)
+-- FUNCTIONS: app executes (Faz 2 admin-defined functions; defensive grant)
+-- ----------------------------------------------------------------------------
+
+-- identity
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA identity
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO livestock_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA identity
+  GRANT USAGE, SELECT ON SEQUENCES TO livestock_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA identity
+  GRANT EXECUTE ON FUNCTIONS TO livestock_app;
+
+-- accounts
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA accounts
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO livestock_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA accounts
+  GRANT USAGE, SELECT ON SEQUENCES TO livestock_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA accounts
+  GRANT EXECUTE ON FUNCTIONS TO livestock_app;
+
+-- catalog
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA catalog
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO livestock_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA catalog
+  GRANT USAGE, SELECT ON SEQUENCES TO livestock_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA catalog
+  GRANT EXECUTE ON FUNCTIONS TO livestock_app;
+
+-- listings
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA listings
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO livestock_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA listings
+  GRANT USAGE, SELECT ON SEQUENCES TO livestock_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA listings
+  GRANT EXECUTE ON FUNCTIONS TO livestock_app;
+
+-- carrier
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA carrier
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO livestock_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA carrier
+  GRANT USAGE, SELECT ON SEQUENCES TO livestock_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA carrier
+  GRANT EXECUTE ON FUNCTIONS TO livestock_app;
+
+-- marketplace
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA marketplace
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO livestock_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA marketplace
+  GRANT USAGE, SELECT ON SEQUENCES TO livestock_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA marketplace
+  GRANT EXECUTE ON FUNCTIONS TO livestock_app;
+
+-- messaging
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA messaging
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO livestock_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA messaging
+  GRANT USAGE, SELECT ON SEQUENCES TO livestock_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA messaging
+  GRANT EXECUTE ON FUNCTIONS TO livestock_app;
+
+-- notifications
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA notifications
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO livestock_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA notifications
+  GRANT USAGE, SELECT ON SEQUENCES TO livestock_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA notifications
+  GRANT EXECUTE ON FUNCTIONS TO livestock_app;
+
+-- subscription
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA subscription
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO livestock_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA subscription
+  GRANT USAGE, SELECT ON SEQUENCES TO livestock_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA subscription
+  GRANT EXECUTE ON FUNCTIONS TO livestock_app;
+
+-- admin
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA admin
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO livestock_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA admin
+  GRANT USAGE, SELECT ON SEQUENCES TO livestock_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE livestock_migrator IN SCHEMA admin
+  GRANT EXECUTE ON FUNCTIONS TO livestock_app;
+
+-- ============================================================================
+-- End of Wave 0 init.sql
+-- ============================================================================
+--
+-- NOTE: search_path NOT set at role/db level.
+-- Runtime: per-module connection string includes "Search Path=<schema>,public"
+-- (Karar 4f). EF Core generates schema-qualified SQL (HasDefaultSchema),
+-- so search_path is defensive (belt-and-suspenders) for raw Dapper queries.
+-- ============================================================================
