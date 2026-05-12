@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Shared/">
+    <Project Path="src/Shared/LivestockTrading.Shared.Contracts/LivestockTrading.Shared.Contracts.csproj" />
+    <Project Path="src/Shared/LivestockTrading.Shared.Infrastructure/LivestockTrading.Shared.Infrastructure.csproj" />
+    <Project Path="src/Shared/LivestockTrading.Shared.Kernel/LivestockTrading.Shared.Kernel.csproj" />
+  </Folder>
+</Solution>
