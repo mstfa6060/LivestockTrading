@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RootNamespace>LivestockTrading.Listings.Infrastructure</RootNamespace>
+    <AssemblyName>LivestockTrading.Listings.Infrastructure</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Listings.Application\Listings.Application.csproj" />
+    <ProjectReference Include="..\..\..\Shared\LivestockTrading.Shared.Infrastructure\LivestockTrading.Shared.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
