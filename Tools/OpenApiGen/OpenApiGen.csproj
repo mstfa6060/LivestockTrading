@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RootNamespace>LivestockTrading.Tools.OpenApiGen</RootNamespace>
+    <AssemblyName>LivestockTrading.Tools.OpenApiGen</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- OpenApiGen needs Api endpoint discovery (Karar 6/2) -->
+    <ProjectReference Include="..\..\src\LivestockTrading.Api\LivestockTrading.Api.csproj" />
+  </ItemGroup>
+
+</Project>

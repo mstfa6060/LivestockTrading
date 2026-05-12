@@ -1,5 +1,7 @@
 <Solution>
-  <Folder Name="/src/" />
+  <Folder Name="/src/">
+    <Project Path="src/LivestockTrading.Api/LivestockTrading.Api.csproj" />
+  </Folder>
   <Folder Name="/src/Modules/" />
   <Folder Name="/src/Modules/Accounts/">
     <Project Path="src/Modules/Accounts/Accounts.Application/Accounts.Application.csproj" />
@@ -55,5 +57,10 @@
     <Project Path="src/Shared/LivestockTrading.Shared.Contracts/LivestockTrading.Shared.Contracts.csproj" />
     <Project Path="src/Shared/LivestockTrading.Shared.Infrastructure/LivestockTrading.Shared.Infrastructure.csproj" />
     <Project Path="src/Shared/LivestockTrading.Shared.Kernel/LivestockTrading.Shared.Kernel.csproj" />
+  </Folder>
+  <Folder Name="/Tools/">
+    <Project Path="Tools/AdminBootstrap/AdminBootstrap.csproj" />
+    <Project Path="Tools/OpenApiGen/OpenApiGen.csproj" />
+    <Project Path="Tools/SeedRunner/SeedRunner.csproj" />
   </Folder>
 </Solution>

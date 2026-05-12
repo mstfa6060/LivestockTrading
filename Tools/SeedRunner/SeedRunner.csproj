@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RootNamespace>LivestockTrading.Tools.SeedRunner</RootNamespace>
+    <AssemblyName>LivestockTrading.Tools.SeedRunner</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Shared (Karar 1 istisna: SeedRunner deployment-time tool) -->
+    <ProjectReference Include="..\..\src\Shared\LivestockTrading.Shared.Infrastructure\LivestockTrading.Shared.Infrastructure.csproj" />
+
+    <!-- All 10 module Infrastructures (seed needs DB context per module) -->
+    <ProjectReference Include="..\..\src\Modules\Accounts\Accounts.Infrastructure\Accounts.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Admin\Admin.Infrastructure\Admin.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Carrier\Carrier.Infrastructure\Carrier.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Catalog\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Identity\Identity.Infrastructure\Identity.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Listings\Listings.Infrastructure\Listings.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Marketplace\Marketplace.Infrastructure\Marketplace.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Messaging\Messaging.Infrastructure\Messaging.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Notifications\Notifications.Infrastructure\Notifications.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Subscription\Subscription.Infrastructure\Subscription.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
