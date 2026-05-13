@@ -1,0 +1,44 @@
+# ============================================================================
+# Livestock Trading — Wave 0 Dev Override
+# ============================================================================
+# Local development additions: ports, bind mounts, dev-only env.
+# Merged with base via: docker compose -f docker-compose.yml -f docker-compose.dev.yml
+#
+# Plan ref: _docs/decisions/04-migration.md (Karar 4 — init.sh mount)
+# ============================================================================
+
+services:
+
+  # --------------------------------------------------------------------------
+  # PostgreSQL — dev port expose + init.sh mount
+  # --------------------------------------------------------------------------
+  postgres:
+    ports:
+      - "5432:5432"
+    volumes:
+      # Phase 3 init scripts — first-run only
+      - ../../db/init.sh:/docker-entrypoint-initdb.d/00-init.sh:ro
+      - ../../db/init.sql.template:/docker-entrypoint-initdb.d/init.sql.template:ro
+
+  # --------------------------------------------------------------------------
+  # Redis — dev port expose
+  # --------------------------------------------------------------------------
+  redis:
+    ports:
+      - "6379:6379"
+
+  # --------------------------------------------------------------------------
+  # RabbitMQ — dev ports expose (AMQP + management UI)
+  # --------------------------------------------------------------------------
+  rabbitmq:
+    ports:
+      - "5672:5672"     # AMQP
+      - "15672:15672"   # Management UI
+
+  # --------------------------------------------------------------------------
+  # MinIO — dev ports expose (S3 API + console UI)
+  # --------------------------------------------------------------------------
+  minio:
+    ports:
+      - "9000:9000"     # S3 API
+      - "9001:9001"     # Console UI

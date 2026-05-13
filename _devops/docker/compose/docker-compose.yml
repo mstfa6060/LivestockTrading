@@ -1,0 +1,125 @@
+# ============================================================================
+# Livestock Trading — Wave 0 Base Compose
+# ============================================================================
+# Base infrastructure services for local development and Faz 2 K3s migration.
+#
+# Override files:
+#   - docker-compose.dev.yml: ports, bind mounts, dev-friendly env
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml \
+#     --env-file .env.dev up -d postgres redis rabbitmq minio
+#
+# Plan ref: _docs/decisions/04-migration.md (Karar 4), 07-operations.md
+# ============================================================================
+
+name: livestock-trading-dev
+
+services:
+
+  # --------------------------------------------------------------------------
+  # PostgreSQL 17 + PostGIS 3.5
+  # --------------------------------------------------------------------------
+  postgres:
+    image: postgis/postgis:17-3.5
+    container_name: livestock_dev-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: livestock_trading
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_SUPER_PASSWORD:?POSTGRES_SUPER_PASSWORD required}
+      MIGRATOR_PASSWORD: ${LT__DATABASE__MIGRATORPASSWORD:?LT__DATABASE__MIGRATORPASSWORD required}
+      APP_PASSWORD: ${LT__DATABASE__APPPASSWORD:?LT__DATABASE__APPPASSWORD required}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - livestock_dev
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d livestock_trading"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # --------------------------------------------------------------------------
+  # Redis 7
+  # --------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: livestock_dev-redis
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD required}
+    volumes:
+      - redis_data:/data
+    networks:
+      - livestock_dev
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "PING"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # --------------------------------------------------------------------------
+  # RabbitMQ 3 (with management plugin)
+  # --------------------------------------------------------------------------
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: livestock_dev-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:?RABBITMQ_USER required}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?RABBITMQ_PASSWORD required}
+      RABBITMQ_DEFAULT_VHOST: livestock
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - livestock_dev
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # --------------------------------------------------------------------------
+  # MinIO (S3-compatible object storage)
+  # --------------------------------------------------------------------------
+  minio:
+    image: minio/minio:latest
+    container_name: livestock_dev-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?MINIO_ROOT_USER required}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD required}
+    volumes:
+      - minio_data:/data
+    networks:
+      - livestock_dev
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+# ============================================================================
+# Volumes (named — Faz 2 K3s PVC migration kolay)
+# ============================================================================
+volumes:
+  postgres_data:
+    name: livestock_dev_postgres_data
+  redis_data:
+    name: livestock_dev_redis_data
+  rabbitmq_data:
+    name: livestock_dev_rabbitmq_data
+  minio_data:
+    name: livestock_dev_minio_data
+
+# ============================================================================
+# Networks
+# ============================================================================
+networks:
+  livestock_dev:
+    name: livestock_dev
+    driver: bridge
