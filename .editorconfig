@@ -1,0 +1,47 @@
+# ============================================================================
+# Livestock Trading — Editor Config
+# ============================================================================
+# Plan ref: _docs/decisions/07-operations.md (Grup B.4.3)
+# ============================================================================
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+
+# C# / .NET source files
+[*.{cs,csx,vb,vbx}]
+indent_size = 4
+
+# C# project files
+[*.{csproj,vbproj,proj,sln,slnx,targets,props}]
+indent_size = 2
+
+# Frontend (Wave 1+ web repo)
+[*.{ts,tsx,js,jsx,vue,svelte}]
+indent_size = 2
+
+# Config files
+[*.{json,yml,yaml,xml,html,css,scss,less}]
+indent_size = 2
+
+# Markdown — preserve trailing whitespace (line breaks)
+[*.md]
+trim_trailing_whitespace = false
+indent_size = 2
+
+# Shell scripts
+[*.{sh,bash}]
+indent_size = 2
+
+# PowerShell
+[*.{ps1,psm1}]
+indent_size = 4
+
+# Makefile (TAB required)
+[Makefile]
+indent_style = tab
