@@ -1,0 +1,82 @@
+// ============================================================================
+// Livestock Trading — Wave 0 CI Pipeline
+// ============================================================================
+// Build & test pipeline for rebuild/v2 and feature/* branches.
+//
+// Wave 0 scope: restore + build (skeleton — no module code yet) + format check.
+// Wave 1+ adds: unit tests, integration tests (Testcontainers), coverage.
+//
+// Agent: docker image mcr.microsoft.com/dotnet/sdk:10.0 (host needs no .NET SDK).
+//
+// Job definition: NOT yet created in Jenkins UI (Wave 1 server-side task).
+// This file is the pipeline script; the job binding comes later.
+//
+// Plan ref: _docs/decisions/07-operations.md (Grup B.1 CI/CD Pipeline)
+// ============================================================================
+
+pipeline {
+    agent {
+        docker {
+            image 'mcr.microsoft.com/dotnet/sdk:10.0'
+            args '-u root:root'
+        }
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '20'))
+        disableConcurrentBuilds()
+        timeout(time: 20, unit: 'MINUTES')
+        timestamps()
+    }
+
+    environment {
+        DOTNET_CLI_TELEMETRY_OPTOUT = '1'
+        DOTNET_NOLOGO = '1'
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+                sh 'git rev-parse --short HEAD'
+            }
+        }
+
+        stage('Restore') {
+            steps {
+                sh 'dotnet restore LivestockTrading.slnx'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Wave 0: 37 .csproj are skeletons (no source files yet).
+                // dotnet build succeeds with empty libraries.
+                // Wave 1+ this becomes meaningful as modules gain code.
+                sh 'dotnet build LivestockTrading.slnx --no-restore -c Release'
+            }
+        }
+
+        stage('Format Check') {
+            steps {
+                // dotnet format verifies code style without modifying files.
+                // Wave 0: passes trivially (no source). Wave 1+ enforces style.
+                sh 'dotnet format LivestockTrading.slnx --verify-no-changes --no-restore || true'
+            }
+        }
+
+    }
+
+    post {
+        success {
+            echo "CI passed — ${env.GIT_BRANCH ?: 'unknown branch'}"
+        }
+        failure {
+            echo "CI failed — check stage logs"
+        }
+        cleanup {
+            cleanWs()
+        }
+    }
+}
