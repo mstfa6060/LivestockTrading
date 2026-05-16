@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <RootNamespace>LivestockTrading.Shared.Contracts</RootNamespace>
+    <RootNamespace>Shared</RootNamespace>
     <AssemblyName>LivestockTrading.Shared.Contracts</AssemblyName>
   </PropertyGroup>
 
