@@ -400,17 +400,20 @@ public class Language
 public class CertificationType
 {
     public int Id { get; private set; }
-    public string Code { get; private set; }                    // kebab-case
-    public string NameTranslationsJson { get; private set; }    // JSONB serialize
-    public string DescriptionTranslationsJson { get; private set; }
+    public string Code { get; private set; }                     // kebab-case — IMMUTABLE
+    public Translations NameTranslations { get; private set; }   // direkt VO field (Sapma 36 revize)
+    public Translations DescriptionTranslations { get; private set; }
     public bool IsActive { get; private set; }
     public int DisplayOrder { get; private set; }
-    
-    public Translations NameTranslations => Translations.Deserialize(NameTranslationsJson);
-    
-    public void UpdateTranslations(Translations translations) { /* validate en exists */ }
+
+    public void UpdateTranslations(Translations translations)
+    {
+        // validate en exists via translations.TryGet("en", out _)
+    }
 }
 ```
+
+> **Revize notu (Wave 1 Sapma 36 / KAYDET-7):** Eski tasarım `NameTranslationsJson: string` + computed `Translations.Deserialize(...)` property, Shared.Kernel/Translations.cs:5 "Domain saf — STJ attribute/converter YOK; JSONB map'i C3 Infra EF value converter (Domain saf)" kararı ile çelişiyordu. Location pattern'ine hizalandı: direkt `Translations` VO field. JSONB persistence detay'ı C3 Infrastructure EF value converter sorumluluğu. C1.1 commit `405be98` bu revize edilmiş tasarımla yaratıldı (doc-revize geriye dönük uyum).
 
 12 seed başlangıç: `health-cert`, `vaccination-card`, `pedigree`, `export-approval`, `origin-cert`, `organic-cert`, `halal-cert` (MENA kritik), `quarantine-clearance`, `quality-stamp`, `insurance-doc`, `brucellosis-test`, `tuberculosis-test`.
 
