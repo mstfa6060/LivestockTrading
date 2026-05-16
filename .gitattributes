@@ -1,0 +1,43 @@
+# LivestockTrading -- Git attributes
+# Wave 0 cleanup (WAVE-0-CLEANUP-02)
+#
+# Line ending normalization: repository internally stores LF,
+# checkout converts based on working tree platform (autocrlf).
+# This file overrides autocrlf for specific file types.
+
+# Default: auto-detect text files, normalize to LF in repo
+* text=auto eol=lf
+
+# Source code -- strict LF (cross-platform consistency)
+*.cs        text eol=lf
+*.csproj    text eol=lf
+*.slnx      text eol=lf
+*.sln       text eol=lf
+*.json      text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+*.md        text eol=lf
+*.sh        text eol=lf
+*.groovy    text eol=lf
+*.editorconfig text eol=lf
+
+# Windows-specific scripts
+*.bat       text eol=crlf
+*.cmd       text eol=crlf
+*.ps1       text eol=crlf
+
+# Binary -- git does no text manipulation
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.ico       binary
+*.pdf       binary
+*.zip       binary
+*.gz        binary
+*.tar       binary
+
+# Docker layer cache friendly
+*.dll       binary
+*.exe       binary
+*.pdb       binary
