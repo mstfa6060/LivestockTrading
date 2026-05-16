@@ -13,4 +13,8 @@
     <ProjectReference Include="..\..\..\Shared\LivestockTrading.Shared.Kernel\LivestockTrading.Shared.Kernel.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="NetTopologySuite" Version="2.6.0" />
+  </ItemGroup>
+
 </Project>
