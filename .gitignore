@@ -17,9 +17,6 @@ TestResults/
 *.user
 *.sln.docstates
 
-# Dokümantasyon SSH anahtarı
-_devops/ssh/id_rsa_mobileapp
-_devops/ssh/
 
 # Firebase service account dosyaları
 firebase-service-account.json
@@ -40,20 +37,11 @@ secrets/
 # Local development overrides
 docker-compose.override.yml
 
-# SSL certificates
-nginx/ssl/
 
 # Temporary files
 *.tmp
 *.log
 
-# GeoNames büyük veri dosyaları (sunucuda generate edilir)
-Jobs/RelationalDB/MigrationJob/SeedData/neighborhoods.json
-Jobs/RelationalDB/MigrationJob/SeedData/_tmp_*.zip
-Jobs/RelationalDB/MigrationJob/SeedData/_tmp_*
 
 # Node modules
 node_modules/
-_doc/excel/node_modules/
-_doc/excel/package-lock.json
-nul
