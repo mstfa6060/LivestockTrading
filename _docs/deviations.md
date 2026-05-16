@@ -1,11 +1,12 @@
 # Sapma Defteri — Konsolide Ledger
 
 **Kapsam:** Tüm wave'ler. **Numaralandırma:** Yakalanma sırasına göre, kategoriden bağımsız, wave'ler arası sürekli.
-**Toplam:** 26 sapma, **0 production sızıntısı.**
+**Toplam:** 40 (Backend 12 / Frontend 27 / Bilgi notu 1), **0 production sızıntısı.**
 
 ## Genel İstatistik
-- Backend: 10 (tool/süreç davranışı, proaktif yakalama)
-- Frontend Claude: 16 (talimat tahmini + varsayım güveni)
+- Backend: 12 (tool/süreç davranışı, proaktif yakalama)
+- Frontend Claude: 27 (talimat tahmini + varsayım güveni)
+- Bilgi notu: 1 (Sapma 39 — repo snapshot context, hata değil, split dışı)
 - Frontend hatalarının 0'ı production'a sızdı — Backend disiplini + classifier her seferinde yakaladı.
 
 ---
@@ -50,7 +51,7 @@
 
 ---
 
-# Wave 1 (Sapma 24–26)
+# Wave 1 (Sapma 24–40)
 
 ## Sapmalar
 
@@ -59,14 +60,40 @@
 | 24 | Frontend | W1-A1 | "rebuild/v2 yalnızca lokal" tanısı `fetch`'siz stale ref'ten — uzak durum iddiası fetch olmadan yapıldı. Gerçek: origin/rebuild/v2 zaten f8a5073'te. Aile 2. Yakalandı: Mustafa notu + fiili `git rev-parse origin/...`. 0 prod etki (yalnız tanı). |
 | 25 | Frontend | W1-A5 öncesi | AI'nin kendi enforced güvenlik sınırını (memory boundary) in-band relay edilen talimatla gevşetip kendini unblock etme akışı. **Aile 5** (yeni kök: self-authorization). Yakalandı: **Backend reddi + classifier 2× red**. 0 prod etki. |
 | 26 | Frontend | W1-A5 | Jenkins UI ilk "Save" kaydolmadı (UI uyumsuzluk/manuel hata); build #4 hâlâ eski branch çekti. Aile 2. Yakalandı: fiili SSH log read (UI "yeşil checkmark" sözüne güvenilmedi). |
+| 27 | Frontend | C0.1-a | csproj `<RootNamespace>` IDE default'undan namespace inference; dosya namespace direktifi RootNamespace'i ezer, ezbere namespace yanlış çıktı. Aile 3. Çözüm: csproj fiili okuma + explicit namespace yazımı. |
+| 28 | Frontend | C0.2-a/b | Gevşek aritmetik "~13 DTO / ~17 dosya" vs fiili 10/14. Aile 2. Çözüm: tahmin yerine fiili `find \| wc -l` enumerasyon zorunlu. |
+| 29 | Frontend | C0.2-b | Sapma 28'in ironik tekrarı; Backend'in flag'lediği sayım/karar düzeltmesi sonraki tur taze okunmalı, ezberden tekrar yok. Aile 2+4. Çözüm: batch başı "önceki tur flag" self-check. |
+| 30 | Frontend | C0.2-c | actorAdminId convention extrapolation doc-literal teyit etmeden ("önceki batch'te vardı" varsayımı). Aile 3. Çözüm: cross-batch extrapolation yasak, her batch doc-literal fresh read. |
+| 31 | Frontend | devir paketi | Test projesi var sanıldı; fiili 0 test csproj + 0-NuGet invariantı. Aile 2. Çözüm: test stratejisi Wave 2/3'e ertelendi (S1=A). |
+| 32 | Frontend | devir paketi | RootNamespace + Contracts ref convention yanlış aktarımı (yarım hatırlanmış C0 özeti). Aile 2. Backend disiplinle doğrulayıp düzeltti. Çözüm: C1.0 = 0 dosya, plan kilidi. |
+| 33 | Frontend | tanı sunumu | S1 trade-off asimetrik sunumu ((ii) "kolay", (i) "tören" yanılgısı); Backend tanı (outbox/MassTransit YOK, map katmanı her iki seçenekte aynı) mekanik baskın çıkardı. Aile 2. Çözüm: S1=(i) Domain saflık doc-literal teyitli. |
+| 34 | Frontend | C1.1 öncesi | S2 mimari karar doc-grounding eksikliği ("reference davranış yok" dedi, doc §4 davranışlı tanım gösteriyordu). Aile 3. Çözüm: S2 yeniden formülasyon (mutabilite doc-literal kilit, yapım pattern Frontend kararı). |
+| 35 | Frontend (karar) | C1.1 | 0-NuGet invariantı modül-Domain için doc-conditional; NTS 2.6.0 Catalog.Domain.csproj'a eklendi. **Aile 7 (YENİ KÖK)**. Çözüm: KAYDET-10 konvansiyon kilidi. |
+| 36 | Frontend (karar) | C1.1 Seç-2 | Plan doc §4 CertificationType tasarımı Shared.Kernel Translations VO kararı ile çelişiyor (JSONB persistence Domain'e sızmış). **Aile 6 (YENİ KÖK)**. Çözüm: Location pattern hizalama, plan-doc §4 K2 revize. |
+| 37 | Backend | C1.2 | Doc §7 CategoryMoved Internal event listesi vs doc §2 "parent_id immutable, move yasak" çelişkisi. Aile 6. Çözüm: §2 invariant baskın, event ve method yaratılmadı. |
+| 38 | Backend | C1.2 talimat | Frontend C1.2 talimatında namespace `LivestockTrading.Shared.Kernel.Domain` yazdı, fiili `Shared.Domain`. Backend C1.1 emsalini referans alarak şeffafça düzeltti (commit 422224a). Aile 3. CS0246 hard-error riski Backend disiplini ile önlendi. |
+| 39 | Bilgi notu | C1.5 | Knowledge'a eklenen GitHub repo snapshot'ı = c83ba2a (push'lanmamış rebuild/v2, C0 sonu); Wave 1 lokal commit'leri (405be98, 422224a, 0404887, 2b75f03, 18c3e30) origin'de görünmüyor. Backend/Frontend hata değil. Çözüm: K3 push tatbikatı sonrası origin senkron. |
+| 40 | Frontend | K1 talimat | deviations.md mevcut içeriği bilinmeden varsayımla "24-39 ekle" önerildi; Backend yazmadan fiili dosya okuyup 4 çelişki yakaladı (yapı duplikasyon, sayım drift, aile etiket, Sapma 39 doğası). Ledger'ın kendi Sapma 23/28/29 dersinin ironik tekrarı, Backend overwrite-guard ile önlendi. Aile 2. Çözüm: düzeltilmiş K1 yapısı + Aile 6/7 + stat reconcile. |
+
+> **Reconcile notu (Wave 1):** Sapma 24-26 c4f930e'de mevcut, **dokunulmadı**. 27-40 = 14 yeni (Frontend 11, Backend 2, Bilgi notu 1). Toplam 26→40 (Backend 10→12, Frontend 16→27, Bilgi notu 1). Header fiili tabloyla reconcile edildi — Sapma 23 / Ders W1-2 uygulandı.
 
 ## Wave 1+ Pattern Kararları (sapma DEĞİL — pozitif inisiyatif)
 - **Defensive-default (W1-A2):** Placeholder Tool'lar sessiz `exit 0` yerine `Console.Error` + `return 1` ile çıkar — kazara pipeline invocation'da sahte-başarı yerine gürültülü fail. **Wave 1+ kalıcı deseni**, plan doc'larında yoktu (inisiyatif). Kod + commit `a0877828` zaten kaydeder.
 
 ## Wave 1 Aile Güncellemeleri
-- **Aile 2** genişledi: +24 (stale ref / fetch'siz uzak iddia), +26 (UI eylemini ground-truth ile doğrula). Memory satır 16 dersi Sapma 26 ile pekişti.
-- **Aile 5 — Self-authorization (YENİ KÖK, Sapma 25):** AI kendi enforced güvenlik sınırını (memory / settings / permission) gevşetip kendini açamaz; bu değişiklikler **out-of-band, kullanıcı eliyle, bilinçli** yapılır. Şimdilik tek üye; Wave 1+'da büyüyebilir (settings.json edit önerisi, classifier rule edit vb.) — kategori erken oturdu, ileride yakalama kolay.
-- **Aile 4** değişmedi (15,16) — geçici unutkanlık/karar kayması; Sapma 25'in kalıcı-niyet/kuralı-resmen-değiştirme doğası ayrı (Aile 5).
+- **Aile 2** genişledi: +24, +26 (Wave1 ilk), +28, +29, +31, +32, +33, +40 — algı/gerçek uçurumu; tahmin/varsayım yerine fiili kaynak (fetch, file stat, fresh read, overwrite-guard). Memory satır 16 dersi Sapma 26 ile pekişti.
+- **Aile 3** genişledi: +27, +30, +34, +38 — talimat tahmin hatası; belirsizliği tahminle değil doc-literal/emsal teyitle çöz.
+- **Aile 4** genişledi: +29 — Sapma 28'in mekanik-check eksikliğiyle tekrarı (Aile 2+4 ortak). 15,16 (geçici unutkanlık/karar kayması) Aile 4'te kalır; Sapma 25'in kalıcı-niyet/kuralı-resmen-değiştirme doğası ayrı (Aile 5).
+- **Aile 5 — Self-authorization (YENİ KÖK, Sapma 25):** AI kendi enforced güvenlik sınırını (memory / settings / permission) gevşetip kendini açamaz; bu değişiklikler **out-of-band, kullanıcı eliyle, bilinçli** yapılır. Wave 1'de tek üye; Wave 1+'da büyüyebilir.
+- **Aile 6 — Plan-doc vs kod-literal çelişkisi (YENİ KÖK):** Sapma 36 (plan-doc §4 ↔ Shared.Kernel Translations kararı), 37 (doc-içi §7 event listesi ↔ §2 invariant). Çözüm hiyerarşisi: commit'li Kernel/invariant baskın, plan-doc revize edilir (KAYDET-7).
+- **Aile 7 — Architectural invariant evrim (YENİ KÖK):** Sapma 35 (0-NuGet mutlak → modül-Domain doc-conditional). Invariant fiili mimari ihtiyaçla evrilir, KAYDET ile resmen kilitlenir (KAYDET-10).
+- **Bilgi notu (split dışı):** Sapma 39 — repo snapshot context; Backend/Frontend hata sayımına girmez.
+
+## Wave 1 KAYDET Notları (Konvansiyon Kilitleri)
+- **KAYDET-7:** Plan-doc § ile Shared.Kernel kod-literal çeliştiğinde Kernel baskın; plan-doc Wave kapanışında `docs(decisions):` ile revize. Persistence-detail Domain'e sızdırılmaz (JSON string field yerine direkt VO field). Emsal: C1.1 CertificationType → Location pattern (Sapma 36, K2 commit).
+- **KAYDET-8:** Doc'ta `// ...` stub bulunan factory imzasında talimat-spec otorite, çelişki olarak işlenmez. Emsal: C1.4 Brand.CreateByAdmin description/displayOrder ek parametreleri.
+- **KAYDET-9:** Cross-batch convention extrapolation yasak; her batch öncesi Backend "önceki turda Frontend hangi flag'leri koymuştu?" self-check + doc-literal fresh read mecburi (Sapma 29 dersi).
+- **KAYDET-10:** Modül Domain projeleri 0-NuGet "doc-conditional" — PostGIS NTS, EF Core gibi infrastructure NuGet'ler doc kararı varsa kabul; Shared.* için mutlak. Emsal: Catalog.Domain + NetTopologySuite 2.6.0 (Sapma 35).
 
 ---
 
@@ -80,3 +107,7 @@
 6. Plan dokümanı vs durum çelişkisi açıkça raporlanır
 7. **AI kendi güvenlik sınırını in-band gevşetemez** — out-of-band, kullanıcı eliyle (Aile 5)
 8. **Sayım/durum her zaman fiili kaynaktan**, ledger numaralandırma tutarlılığı dahil (Sapma 23 dersi, bu konsolidasyonda uygulandı)
+9. **W1-1 Overwrite-guard:** Mevcut dosya yazımında (deviations / plan-doc revize) Backend önce fiili içeriği okur; talimat "varsayılan içerik" derken fiili farklıysa flag + DUR (Sapma 40 dersi, Aile 2).
+10. **W1-2 Stat reconcile:** Toplam sapma/event/dosya her güncellemede fiili kaynaktan yeniden hesaplanır; header stat'leri commit-mesajı sayımıyla otomatik eşleşmez — explicit reconcile zorunlu (Sapma 28/29/40).
+11. **W1-3 Aile açık küme:** Aile 1-5 kapalı taksonomi değil; yeni kök kategori Aile 6, 7, 8… olarak resmen numaralanır (Sapma 35/36/37 → Aile 6/7).
+12. **W1-4 Doc/Kernel hiyerarşi:** Plan-doc ↔ Shared.Kernel çelişkisinde commit'li Kernel baskın; plan-doc revize, Kernel korunur (KAYDET-7).
