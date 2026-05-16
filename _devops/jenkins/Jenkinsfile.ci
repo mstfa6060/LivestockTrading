@@ -1,26 +1,10 @@
-// ============================================================================
-// Livestock Trading — Wave 0 CI Pipeline
-// ============================================================================
-// Build & test pipeline for rebuild/v2 and feature/* branches.
-//
-// Wave 0 scope: restore + build (skeleton — no module code yet) + format check.
-// Wave 1+ adds: unit tests, integration tests (Testcontainers), coverage.
-//
-// Agent: docker image mcr.microsoft.com/dotnet/sdk:10.0 (host needs no .NET SDK).
-//
-// Job definition: NOT yet created in Jenkins UI (Wave 1 server-side task).
-// This file is the pipeline script; the job binding comes later.
-//
-// Plan ref: _docs/decisions/07-operations.md (Grup B.1 CI/CD Pipeline)
-// ============================================================================
+// LivestockTrading Wave 0+ CI Pipeline
+// Pluginsiz: agent any + host docker engine + sh 'docker run'
+// .NET SDK image: mcr.microsoft.com/dotnet/sdk:10.0 (MCR multi-arch dogrulandi)
+// NuGet cache: named volume livestock-nuget-cache (Wave 1+ icin kritik)
 
 pipeline {
-    agent {
-        docker {
-            image 'mcr.microsoft.com/dotnet/sdk:10.0'
-            args '-u root:root'
-        }
-    }
+    agent any
 
     options {
         buildDiscarder(logRotator(numToKeepStr: '20'))
@@ -32,10 +16,10 @@ pipeline {
     environment {
         DOTNET_CLI_TELEMETRY_OPTOUT = '1'
         DOTNET_NOLOGO = '1'
+        DOTNET_IMAGE = 'mcr.microsoft.com/dotnet/sdk:10.0'
     }
 
     stages {
-
         stage('Checkout') {
             steps {
                 checkout scm
@@ -45,38 +29,55 @@ pipeline {
 
         stage('Restore') {
             steps {
-                sh 'dotnet restore LivestockTrading.slnx'
+                sh '''docker run --rm \
+                    -u root:root \
+                    -v "$WORKSPACE":/src -w /src \
+                    -v livestock-nuget-cache:/root/.nuget \
+                    -e DOTNET_CLI_TELEMETRY_OPTOUT -e DOTNET_NOLOGO \
+                    "$DOTNET_IMAGE" \
+                    dotnet restore LivestockTrading.slnx'''
             }
         }
 
         stage('Build') {
+            // Wave 0 skeleton: 3 executable Program.cs yok, CS5001
+            // bekleniyor. Wave 1'de duzelecek. 33 class library
+            // basariyla derlenmeli (TreatWarningsAsErrors=true).
             steps {
-                // Wave 0: 37 .csproj are skeletons (no source files yet).
-                // dotnet build succeeds with empty libraries.
-                // Wave 1+ this becomes meaningful as modules gain code.
-                sh 'dotnet build LivestockTrading.slnx --no-restore -c Release'
+                sh '''docker run --rm \
+                    -u root:root \
+                    -v "$WORKSPACE":/src -w /src \
+                    -v livestock-nuget-cache:/root/.nuget \
+                    -e DOTNET_CLI_TELEMETRY_OPTOUT -e DOTNET_NOLOGO \
+                    "$DOTNET_IMAGE" \
+                    dotnet build LivestockTrading.slnx --no-restore -c Release'''
             }
         }
 
         stage('Format Check') {
             steps {
-                // dotnet format verifies code style without modifying files.
-                // Wave 0: passes trivially (no source). Wave 1+ enforces style.
-                sh 'dotnet format LivestockTrading.slnx --verify-no-changes --no-restore || true'
+                sh '''docker run --rm \
+                    -u root:root \
+                    -v "$WORKSPACE":/src -w /src \
+                    -v livestock-nuget-cache:/root/.nuget \
+                    -e DOTNET_CLI_TELEMETRY_OPTOUT -e DOTNET_NOLOGO \
+                    "$DOTNET_IMAGE" \
+                    dotnet format LivestockTrading.slnx --verify-no-changes --no-restore || true'''
             }
         }
-
     }
 
     post {
-        success {
-            echo "CI passed — ${env.GIT_BRANCH ?: 'unknown branch'}"
-        }
-        failure {
-            echo "CI failed — check stage logs"
-        }
-        cleanup {
+        always {
+            // Container'lar root:root yaziyordu — cleanWs jenkins
+            // user'la silemez. Once ownership reset.
+            sh '''docker run --rm \
+                -v "$WORKSPACE":/src \
+                "$DOTNET_IMAGE" \
+                chown -R $(id -u):$(id -g) /src 2>/dev/null || true'''
             cleanWs()
         }
+        success { echo "Build succeeded" }
+        failure { echo "Build failed - check stage logs" }
     }
 }
