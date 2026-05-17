@@ -19,6 +19,7 @@
     <Project Path="src/Modules/Carrier/Carrier.Infrastructure/Carrier.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/src/Modules/Catalog/">
+    <Project Path="src/Modules/Catalog/Catalog.Application.Tests/Catalog.Application.Tests.csproj" />
     <Project Path="src/Modules/Catalog/Catalog.Application/Catalog.Application.csproj" />
     <Project Path="src/Modules/Catalog/Catalog.Domain/Catalog.Domain.csproj" />
     <Project Path="src/Modules/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj" />
