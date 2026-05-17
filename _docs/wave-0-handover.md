@@ -11,7 +11,7 @@
 | `main` | `44416138...` | ArfBlocks production, Wave 0 + cleanup boyunca DOKUNULMADI |
 | `rebuild/v2` | `4d5780c...` | Wave 0 isi + handover docs + cleanup, FF merge ile geldi |
 | `feature/wave-0-infra` | `cc8d51b...` | Wave 0 isi origin (referans olarak korunuyor) |
-| `feature/wave-0-cleanup` | `4d5780c...` | C-serisi origin (referans olarak korunuyor) |
+| `feature/wave-0-cleanup` | `f8a5073...` | C-serisi origin (referans olarak korunuyor) — SHA Sapma 43 ile düzeltildi (eski `4d5780c`, branch 1 commit ilerlemiş) |
 | tag `wave-0-complete` | → `dd50923` | Wave 0 isi bitisi (annotated, cleanup dışı) |
 
 ## Wave 0 Commit Zinciri (10 isi + 1 handover + 2 cleanup = 13 commit)

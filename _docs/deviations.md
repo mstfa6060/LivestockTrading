@@ -1,11 +1,11 @@
 # Sapma Defteri — Konsolide Ledger
 
 **Kapsam:** Tüm wave'ler. **Numaralandırma:** Yakalanma sırasına göre, kategoriden bağımsız, wave'ler arası sürekli.
-**Toplam:** 41 (Backend 12 / Frontend 28 / Bilgi notu 1), **0 production sızıntısı.**
+**Toplam:** 43 (Backend 12 / Frontend 30 / Bilgi notu 1), **0 production sızıntısı.**
 
 ## Genel İstatistik
 - Backend: 12 (tool/süreç davranışı, proaktif yakalama)
-- Frontend Claude: 28 (talimat tahmini + varsayım güveni)
+- Frontend Claude: 30 (talimat tahmini + varsayım güveni)
 - Bilgi notu: 1 (Sapma 39 — repo snapshot context, hata değil, split dışı)
 - Frontend hatalarının 0'ı production'a sızdı — Backend disiplini + classifier her seferinde yakaladı.
 
@@ -51,7 +51,7 @@
 
 ---
 
-# Wave 1 (Sapma 24–41)
+# Wave 1 (Sapma 24–43)
 
 ## Sapmalar
 
@@ -75,8 +75,10 @@
 | 39 | Bilgi notu | C1.5 | Knowledge'a eklenen GitHub repo snapshot'ı = c83ba2a (push'lanmamış rebuild/v2, C0 sonu); Wave 1 lokal commit'leri (405be98, 422224a, 0404887, 2b75f03, 18c3e30) origin'de görünmüyor. Backend/Frontend hata değil. Çözüm: K3 push tatbikatı sonrası origin senkron. |
 | 40 | Frontend | K1 talimat | deviations.md mevcut içeriği bilinmeden varsayımla "24-39 ekle" önerildi; Backend yazmadan fiili dosya okuyup 4 çelişki yakaladı (yapı duplikasyon, sayım drift, aile etiket, Sapma 39 doğası). Ledger'ın kendi Sapma 23/28/29 dersinin ironik tekrarı, Backend overwrite-guard ile önlendi. Aile 2. Çözüm: düzeltilmiş K1 yapısı + Aile 6/7 + stat reconcile. |
 | 41 | Frontend | K3 push tatbikatı | Snapshot-temelli "origin'de yok" varsayımı vs fiili git remote durumu. Sapma 39'da Anthropic knowledge snapshot gecikmesi ile git origin durumu karıştırıldı; Backend K3 pre-push'ta cache=2b75f03 göstererek flag'ledi, K3 fetch ile kesinleşti. Aile 2. Çözüm: knowledge snapshot ≠ git origin remote — ayrı doğrulama yöntemleri (knowledge re-index timing vs `git fetch + git rev-parse`). Ders W1-5. |
+| 42 | Frontend | CI-01-A talimat | In-band relay talimatı, enforced prod-Jenkins-SSH sınırını "read-only tanı" çerçevesiyle aşmayı önerdi (sensitive-read credential listing + aktif POST webhook endpoint). Backend memory (`feedback_prod_jenkins_ui_only` + `feedback_ai_self_authorization_boundary`) ve Sapma 25 emsali ile reddetti. Aile 5 + Aile 2. Ledger'ın kendi Aile 5 dersinin Frontend tarafından tekrarı, Backend self-authorization-boundary disiplini ile önlendi. Çözüm: out-of-band Mustafa yürütmesi (Jenkins UI + GitHub UI tanı + branch ayarı düzeltme). |
+| 43 | Frontend | wave-0 handover doc | `_docs/wave-0-handover.md:14` feature/wave-0-cleanup SHA `4d5780c` listelemiş; fiili origin `f8a5073` (1 commit ileride, "handover + deviations guncellemesi"). Branch handover sonrası ilerlemiş, doc stale kalmış. Aile 2 (doc/kayıt vs fiili). Backend ARCHIVE-01 Tur 1 envanterinde yakaladı. Çözüm: handover doc SHA güncellendi (bu commit'te). Koruma kararı etkilenmedi (her iki SHA da MERGED). |
 
-> **Reconcile notu (Wave 1):** Sapma 24-26 c4f930e'de mevcut, **dokunulmadı**. 27-41 = 15 yeni (Frontend 12, Backend 2, Bilgi notu 1). Toplam 26→41 (Backend 10→12, Frontend 16→28, Bilgi notu 1). Header fiili tabloyla reconcile edildi — Sapma 23 / Ders W1-2 uygulandı (Sapma 41 sonrası iteratif güncelleme).
+> **Reconcile notu (Wave 1):** Sapma 24-26 c4f930e'de mevcut, **dokunulmadı**. 27-43 = 17 yeni (Frontend 14, Backend 2, Bilgi notu 1). Toplam 26→43 (Backend 10→12, Frontend 16→30, Bilgi notu 1). Header fiili tabloyla reconcile edildi — Sapma 23 / Ders W1-2 uygulandı (mini-wave kapanışında iteratif güncelleme).
 
 ## Wave 1+ Pattern Kararları (sapma DEĞİL — pozitif inisiyatif)
 - **Defensive-default (W1-A2):** Placeholder Tool'lar sessiz `exit 0` yerine `Console.Error` + `return 1` ile çıkar — kazara pipeline invocation'da sahte-başarı yerine gürültülü fail. **Wave 1+ kalıcı deseni**, plan doc'larında yoktu (inisiyatif). Kod + commit `a0877828` zaten kaydeder.
@@ -96,6 +98,14 @@
 - **KAYDET-9:** Cross-batch convention extrapolation yasak; her batch öncesi Backend "önceki turda Frontend hangi flag'leri koymuştu?" self-check + doc-literal fresh read mecburi (Sapma 29 dersi).
 - **KAYDET-10:** Modül Domain projeleri 0-NuGet "doc-conditional" — PostGIS NTS, EF Core gibi infrastructure NuGet'ler doc kararı varsa kabul; Shared.* için mutlak. Emsal: Catalog.Domain + NetTopologySuite 2.6.0 (Sapma 35).
 
+## Wave 1 Mini-Wave Sonuç (CI-01 + ARCHIVE-01)
+
+**WAVE-1-CI-01 (GitHub→Jenkins webhook):** Wave 0 backlog kapandı. Tanı: webhook ALTYAPISI çalışıyordu (GitHub delivery yeşil), ama Jenkins job branch ayarı `*/feature/wave-1-senaryo-y-program-cs`'de kalmış (Wave 0 devir notu yanlış formüle etmişti — "tetiklemiyor" demişti, fiilen "branch eşleşmiyor" idi, Sapma 26 ailesi). Düzeltme: Branch `*/rebuild/v2` (UI'dan, Mustafa). Test: 309211e push → webhook → build başarılı tamamlandı. CI/CD pipeline Wave 2+ için canlı.
+
+**WAVE-1-ARCHIVE-01 (Branch temizliği):** 14 origin branch silindi (3 feature/wave-1-* MERGED + 4 claude/* MERGED + 7 claude/* UNMERGED). feature/wave-0-* (infra + cleanup) korundu. Mustafa eliyle out-of-band silme (Sapma 42 dersi). Post-delete: origin toplam 24→10, main + rebuild/v2 INTACT.
+
+**Mini-wave süresince Backend disiplini:** 2 sapma yakalama (42 Frontend prod-sınır talimat hatası reddi, 43 handover doc SHA stale), 0 prod sızıntı, ledger'ın kendi Aile 5 (self-authorization) dersi Backend tarafından Frontend hatasına karşı işlevsel olarak uygulandı.
+
 ---
 
 # Wave 1+ İçin Konsolide Dersler
@@ -113,3 +123,4 @@
 11. **W1-3 Aile açık küme:** Aile 1-5 kapalı taksonomi değil; yeni kök kategori Aile 6, 7, 8… olarak resmen numaralanır (Sapma 35/36/37 → Aile 6/7).
 12. **W1-4 Doc/Kernel hiyerarşi:** Plan-doc ↔ Shared.Kernel çelişkisinde commit'li Kernel baskın; plan-doc revize, Kernel korunur (KAYDET-7).
 13. **W1-5 Knowledge snapshot ≠ git origin:** Anthropic knowledge'a eklenen repo snapshot ile fiili git origin farklı zaman ölçeklerinde olabilir; knowledge re-index periyodik gecikme taşır, origin `git fetch + git rev-parse` ile gerçek zamanlı. Push doğrulamasında origin baskın, snapshot yardımcı (Sapma 41 dersi — cache=2b75f03 vs snapshot=c83ba2a çelişkisi fetch ile çözüldü).
+14. **W1-6 Branch arşivlemede iki-aşamalı hazırlık:** `git push origin --delete` geri alınamaz operasyonlar için Backend hazırlık + Mustafa icra modeli (K3 push tatbikatı emsali). Pre-delete guard (MERGED durumu + branch var mı?) + post-delete envanter (silinen sayım + invariant SHA'lar). UNMERGED branch'ler için bilinçli Frontend kararı kayıtlı (chat history + GitHub 90-gün reflog yedek değer). Emsal: ARCHIVE-01 mini-wave 14 branch silme (Sapma 42 sonrası out-of-band yürütme).
