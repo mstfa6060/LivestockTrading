@@ -10,6 +10,7 @@ namespace LivestockTrading.Catalog.Application.Abstractions;
 public interface ICategoryRepository
 {
     Task<Category?> GetByIdAsync(int id, CancellationToken ct);
+    Task<Category?> GetByCodeAsync(string code, CancellationToken ct);
     Task AddAsync(Category entity, CancellationToken ct);
     void Remove(Category entity);
 }
