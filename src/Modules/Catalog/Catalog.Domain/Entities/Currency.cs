@@ -53,6 +53,16 @@ public sealed class Currency : Entity
         RateUpdatedAt = DateTimeOffset.UtcNow;
     }
 
+    public void Activate()
+    {
+        IsActive = true;
+    }
+
+    public void Deactivate()
+    {
+        IsActive = false;
+    }
+
     protected override object IdentityValue => Id;
     protected override bool IsTransient => Id == 0;
 }

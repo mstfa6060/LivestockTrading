@@ -69,6 +69,19 @@ public sealed class Location : Entity
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
+    public void Update(
+        Translations name,
+        Translations? nativeName,
+        int population,
+        int displayOrder)
+    {
+        Name = name;
+        NativeName = nativeName;
+        Population = population;
+        DisplayOrder = displayOrder;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
     protected override object IdentityValue => Id;
     protected override bool IsTransient => Id == 0;
 }
