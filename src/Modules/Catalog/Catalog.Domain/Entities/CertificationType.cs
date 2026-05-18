@@ -37,11 +37,27 @@ public sealed class CertificationType : Entity
         IsActive = true;
     }
 
-    public void UpdateTranslations(Translations translations)
+    public void UpdateTranslations(Translations name, Translations description)
     {
-        if (!translations.TryGet("en", out _))
+        if (!name.TryGet("en", out _))
             throw new DomainException("CertificationType translations must include 'en' locale.");
-        NameTranslations = translations;
+        NameTranslations = name;
+        DescriptionTranslations = description;
+    }
+
+    public void UpdateDisplayOrder(int order)
+    {
+        DisplayOrder = order;
+    }
+
+    public void Activate()
+    {
+        IsActive = true;
+    }
+
+    public void Deactivate()
+    {
+        IsActive = false;
     }
 
     protected override object IdentityValue => Id;

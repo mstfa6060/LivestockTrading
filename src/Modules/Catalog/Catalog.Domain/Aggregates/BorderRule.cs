@@ -90,14 +90,28 @@ public sealed class BorderRule : AggregateRoot
         // Event YOK Faz 1 (BorderRuleCreated Faz 2'de aktive)
     }
 
-    public void UpdateRestrictions(string json, Guid actorAdminId)
+    public void Update(
+        BorderRuleKind kind,
+        string restrictionsJson,
+        Translations notes,
+        DateTimeOffset? effectiveFrom,
+        DateTimeOffset? effectiveUntil,
+        Guid actorAdminId)
     {
-        if (string.IsNullOrWhiteSpace(json))
-            throw new DomainException("RestrictionsJson is required.");
         if (actorAdminId == Guid.Empty)
             throw new DomainException("ActorAdminId is required.");
+        if (string.IsNullOrWhiteSpace(restrictionsJson))
+            throw new DomainException("RestrictionsJson is required.");
+        if (!notes.TryGet("en", out _))
+            throw new DomainException("BorderRule notes must include 'en' locale.");
+        if (effectiveFrom.HasValue && effectiveUntil.HasValue && effectiveFrom >= effectiveUntil)
+            throw new DomainException("EffectiveFrom must be earlier than EffectiveUntil.");
 
-        RestrictionsJson = json;
+        Kind = kind;
+        RestrictionsJson = restrictionsJson;
+        Notes = notes;
+        EffectiveFrom = effectiveFrom;
+        EffectiveUntil = effectiveUntil;
         Touch();
         // Event YOK Faz 1 (BorderRuleUpdated Faz 2'de aktive)
     }

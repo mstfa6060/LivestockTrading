@@ -10,6 +10,7 @@ namespace LivestockTrading.Catalog.Application.Abstractions;
 public interface IBreedRepository
 {
     Task<Breed?> GetByIdAsync(int id, CancellationToken ct);
+    Task<Breed?> GetByCodeAsync(string code, CancellationToken ct);
     Task AddAsync(Breed entity, CancellationToken ct);
     void Remove(Breed entity);
 }
