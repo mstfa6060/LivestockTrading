@@ -124,3 +124,123 @@
 12. **W1-4 Doc/Kernel hiyerarşi:** Plan-doc ↔ Shared.Kernel çelişkisinde commit'li Kernel baskın; plan-doc revize, Kernel korunur (KAYDET-7).
 13. **W1-5 Knowledge snapshot ≠ git origin:** Anthropic knowledge'a eklenen repo snapshot ile fiili git origin farklı zaman ölçeklerinde olabilir; knowledge re-index periyodik gecikme taşır, origin `git fetch + git rev-parse` ile gerçek zamanlı. Push doğrulamasında origin baskın, snapshot yardımcı (Sapma 41 dersi — cache=2b75f03 vs snapshot=c83ba2a çelişkisi fetch ile çözüldü).
 14. **W1-6 Branch arşivlemede iki-aşamalı hazırlık:** `git push origin --delete` geri alınamaz operasyonlar için Backend hazırlık + Mustafa icra modeli (K3 push tatbikatı emsali). Pre-delete guard (MERGED durumu + branch var mı?) + post-delete envanter (silinen sayım + invariant SHA'lar). UNMERGED branch'ler için bilinçli Frontend kararı kayıtlı (chat history + GitHub 90-gün reflog yedek değer). Emsal: ARCHIVE-01 mini-wave 14 branch silme (Sapma 42 sonrası out-of-band yürütme).
+
+---
+
+# Wave 2 (Sapma 44–82)
+
+## Stat Reconcile
+
+- Wave 0+1: Toplam 43 (Backend 12 / Frontend 30 / Bilgi notu 1)
+- Wave 2: +39 distinct (Sapma 44–82)
+- **TOPLAM: 82 distinct Sapma (43 + 39), 0 production sızıntısı**
+
+> W1-2 reconcile: memory §5 "+19 W2.0-W2.4" ↔ distinct 18 = 1-item gap (prior-session arşiv scope dışı); "Aile 3 ~30 kümülatif" = pattern-tetik sayısı, distinct ledger DEĞİL — distinct Aile 3 = 35.
+
+## Sapmalar
+
+| # | Kategori | Adım | Açıklama |
+|---|---|---|---|
+| 44 | Backend self-inflicted | W2.1-D | WithTags over-removal (şeffaf sahiplenildi) |
+| 45 | Frontend Aile 8 (KÖK) | W2.1 plan-fazı | Çift-enum tip-kimliği: AttributeValueType Domain `LivestockTrading.Catalog.Domain.Entities` ≠ Contracts `Shared.Contracts.Catalog`; plan-fazı üye-listesine bakıldı, namespace kaçırıldı |
+| 46 | Frontend Aile 3 | W2.4-C | [memory: W2.4-C-Y1] aggregator/endpoint yapısal divergens nokta 1 |
+| 47–55 | Frontend Aile 3 | W2.4-C | [memory: W2.4-C-Y2..Y10] 9 nokta yapısal divergens (her biri ayrı tetik) |
+| 56–57 | Frontend Aile 3 | W2.4-B2 | [memory: W2.4-B2-D1/D2] CreateLocation inline-switch compile-blocker |
+| 58–61 | Frontend Aile 3 | W2.4-B-V | [memory: W2.4-B-V-D1..D4] validator API-specifics divergens |
+| 62–68 | Frontend Aile 3 | W2.5 Plan-1/2 | [memory: F-S1..F-S7] grep'siz ön-bilgi (IBorderRule.cs, 9-param, UpdateTranslations vb.) |
+| 69–70 | Frontend Aile 3 | W2.5-C | [memory: W2.5-C-Y1/Y2] aggregator RequireAuth→WithTags sıra + MapPost("/") slash |
+| 71–72 | Frontend Aile 3 | W2.5/W2.6 | [memory: F-S11/F-S12] path-ezberi (test-yolu) |
+| 73–76 | Frontend Aile 3 | W2.6 | [memory: F-S13/F-S14/F-S15/F-S16] BorderRule-GET-port, rate-logs-port, Module-AddScoped boundary, fabrik-issue# |
+| 77 | Frontend Aile 4 | W2.6 Plan-2+3 | [memory: F-S17] Plan-2+3 talimatını 2. kez birebir gönderme (durum-farkındalığı kaybı) |
+| 78–80 | Frontend Aile 3 | W2.6/Plan-3.A | [memory: F-S18/F-S19/F-S20] using-prefix, .sln-adı, Conventional-Commits-iki-nokta |
+| 81 | Frontend Aile 3 | Plan-3.A | [memory: F-S21] "deviations.md ~89+ madde" gevşek aritmetik → Backend fiili 43-grep reddetti, W1-2 yeniden-tetik |
+| 82 | Frontend Aile 4 | Plan-3.B | [memory: F-S22] Kümülatif Plan-3.B turu: prior-rapor enumerasyon kayması sorgusuz kabul (KAYDET-24 boşluk + Aile 3 = 34 sayımları) + 1-item aritmetik drift. Backend fresh-read dosya-öncesi yakaladı (Ç1/Ç3). KAYDET-23 emsali — Backend son raporu otorite ama Frontend fiili enumerasyon teyidi yapmalı. 0 sızıntı |
+
+> Açıklama-kolonu kuralı: memory etiketi (`F-Sxx`/`W2.x-Yn`) `[memory: …]` ref korunur. F-S sekans boşlukları: **F-S8 tetiklenmedi** (Translations.Empty fiili-uyumlu, pozitif, ledger'a girmez), **F-S9/F-S10 atanmadı** (W2.5-C-Y1/Y2 = Sapma 69-70 kullanıldı). Continuous 44–82 **boşluksuz**; memory-etiket farklı işaretleme.
+
+## Wave 2 Sapma Aileleri
+
+Distinct üyeler (Sapma 44–82, 39 madde):
+- **Aile 3** (Frontend grep'siz varsayım): 35 distinct
+- **Aile 4** (durum-farkındalığı): 2 distinct (F-S17 Sapma 77 + F-S22 Sapma 82)
+- **Aile 8** (plan-fazı tip-kimliği, YENİ KÖK): 1 distinct (kök Sapma 45)
+- **Backend self-inflicted:** 1 distinct (Sapma 44)
+- **Toplam:** 39
+
+> Bilgi notu (W1-2): memory §5 "Aile 3 ~30 / Aile 4 ~5 kümülatif" = pattern kaç kez TETİKLENDİ sayısı (kümülatif tetik), distinct ledger-entry DEĞİL. Distinct enumerasyon otorite (Sapma 28 dersi). 39−(Backend 1 + Aile 8 1 + Aile 4 2) = Aile 3 35 (çıkarma + üye-liste enumerasyonu iki yöntemle teyit).
+
+## Wave 2 Aile Güncellemeleri
+
+### Aile 8 — Plan-fazı tip-kimliği gözden kaçırma (YENİ KÖK)
+
+Kök: Sapma 45 (W2.1 çift-enum `AttributeValueType` Domain `LivestockTrading.Catalog.Domain.Entities` ≠ Contracts `Shared.Contracts.Catalog`). Plan-fazında üye-listesine bakıldı, namespace/tip-kimliği kaçırıldı. KAYDET-21 (plan-fazı tip-kimliği namespace grep) + KAYDET-22 (Domain↔Contracts duplike-enum explicit-switch + Mapper extraction) bu kökten doğdu. W1-3 emsali (Aile taksonomisi açık küme — Aile 8 doğal evrim). Üye: 1 distinct (kök S45).
+
+## Wave 2 KAYDET Notları (Konvansiyon Kilitleri)
+
+(Kaynak: session-start devir-teslim metni — memory §2 lossy alıntı YASAK)
+
+- **KAYDET-9:** (Wave 1 KAYDET — kaynak: deviations.md Wave 1 §) Cross-batch convention extrapolation yasak; Wave 2'de F-S4 cross-aggregate'te yeniden uygulandı (CertType `Entity` ≠ Category `AggregateRoot`).
+- **KAYDET-11:** ⚠️ BOŞLUK — session-start metninde tanım YOK; yalnız memory §2 lossy sıkıştırmada ("11-22 önceki…"). Lossy dump YASAK → fabrike edilmedi, flag.
+- **KAYDET-12:** ⚠️ BOŞLUK — aynı (memory §2 lossy-only, fabrike edilmedi, flag).
+- **KAYDET-13:** Frontend grep'siz varsayım YASAK (Aile 3 önleme, en yoğun tetiklenen).
+- **KAYDET-14:** Plan-doc §4 ↔ §5 contract çelişkisinde §5 (port) baskın.
+- **KAYDET-15:** Frontend kendi handover/path ezberi sorunlu → fresh-read.
+- **KAYDET-16:** Wave commit-zinciri sayım closure-scope range (tag-range değil).
+- **KAYDET-17:** Port amendment vertical-slice içinde, ayrı commit değil.
+- **KAYDET-18:** Wave 2 hata kodu konvansiyonu — `INVALID_*` (request shape/ValidationFilter) · `NOT_FOUND_{ENTITY}`/`NOT_FOUND_PARENT_{ENTITY}` · `CONFLICT_*` · `{AGGREGATE}_RULE_VIOLATION` (DomainException) · `UNAUTHORIZED`/`FORBIDDEN`.
+- **KAYDET-19:** Validator'da magic number YASAK (Domain-backing yoksa length/regex validator'da YOK).
+- **KAYDET-20:** Defensive using YASAK (unused-using TWAE'yi kırar; Backend reflex temizler).
+- **KAYDET-21:** Plan-fazı tip-kimliği namespace grep zorunlu.
+- **KAYDET-22:** Domain↔Contracts duplike enum → handler-içi explicit switch + defansif `_ => throw` (ham cast YASAK); 2. use-site → `Application/Common/Mappers/` extraction (repeated-twice-rule).
+- **KAYDET-23:** Frontend reconcile turu öncesi Backend son raporu state-of-truth otorite.
+- **KAYDET-24:** Uzun doc parçalı teslim disiplini (40 satır dilim eşiği + anchor + W1-1 + atomik append) — [W2.4 yeni; Ç1: BOŞLUK DEĞİL, session-start'ta TANIMLI].
+- **KAYDET-25:** Frontend template ↔ Backend grep emsal çelişkisinde grep otorite.
+- **KAYDET-26:** ⚠️ BOŞLUK — atanmadı (bilinçli, Sapma 4 drift emsali, yeniden-numaralandırma YOK).
+- **KAYDET-27:** ⚠️ BOŞLUK — atanmadı (aynı).
+- **KAYDET-28:** ⚠️ BOŞLUK — atanmadı (aynı).
+- **KAYDET-29:** Sanctioned test-seam reflection-helper (junction guard sadece).
+- **KAYDET-30:** Frontend kod template'lerinde fiili API specifics (Parse/Failure/Success factory/ctor signature) plan-fazında Backend mikro-grep otorite (session-start'ta "adayı"; W2.5'te sertleştirildi). Emsal: W2.4-B2 D1/D2 compile-blocker.
+- **KAYDET-31 + alt-varyant:** Frontend endpoint/host dosya-mimarisi mikro-grep otorite (session-start "adayı"; W2.5'te sertleştirildi). Alt-varyant (W2.5-C): Frontend KOD-BLOK template YASAK = endpoint Handle body + aggregator MapXxxEndpoints body + mapper switch body + helper body + test method body; Frontend yalnız structural pattern + envanter + scope. Emsal: W2.4-C 10-nokta divergens + W2.5-C-Y1/Y2.
+
+> Bilgi notu: KAYDET-11/12 = lossy-only boşluk (fabrike YASAK, Ç2). KAYDET-26/27/28 = atanmadı (bilinçli boşluk, Sapma 4 emsali, yeniden-numaralandırma YOK). KAYDET-24 session-start'ta TANIMLI (Ç1).
+
+## Wave 2 Retro Item Backlog
+
+> deviations.md'de daha önce retro bölümü yoktu. Wave 0+1 retro maddeleri Backend memory §6'da phrase-list olarak izlendi, discrete kayıt yapılmadı.
+
+### Wave 0+1 retro phrase-list (Backend memory §6 VERBATIM alıntı)
+
+> "hata-kodu §1290 align, host-wiring, AGGREGATE_RULE terminoloji, PATCH /brands doc-port, BulkImport, Country event-eksik, Country zengin-PATCH, Country PATCH-vs-toggle, LOCATION_NOT_FOUND kelime-sıra, Location slug/path doc-literal, UpdateLocation ulaşılamaz-catch"
+
+⚠️ Drift: memory "Önceki 12 item" der; verbatim phrase-list **11 ifade** sayar (1-item drift, dokunulmaz, Sapma 4 emsali — discrete fabrike YASAK).
+
+### Wave 2 retro item (discrete)
+
+| # | Konu | Wave/Sub-batch |
+|---|---|---|
+| 13 | BORDER_RULE_VIOLATION çift-RULE çökmesi (doc §1290 literal) | W2.5 |
+| 14 | CertType §8:812 DELETE ↔ port Deactivate inconsistency | W2.5 |
+| 15 | AttributeValueType inline → Mapper extraction (2. use-site çıkarsa) | W2.5 |
+| 16 | UpdateBorderRuleDto/05-catalog.md:257 stale UpdateRestrictions doc-ref | W2.5 |
+| 17 | BorderRule GET cursor §8:806 ↔ IAdminCatalogReadService port mismatch | W2.6 |
+| 18 | rate-logs §8:819 ?cursor= ↔ port int days mismatch | W2.6 |
+| 19 | NotImpl → 501 mapping Wave 3 host concern (W2.6 default HTTP 500) | W2.6-B |
+| 19a | GetRateLogs `int days=7` Frontend kararı, doc-literal pin yok | W2.6-B |
+| 19b | GetRateLogsEndpoint param-sırası emsal-asimetrik (default-param C# kısıtı: service→ct→days=7) | W2.6-B |
+| 20 | FluentAssertions csproj referanslı, kullanım 0 → Wave 3 dep-cleanup | W2.6-C |
+
+### Wave 2 Frontend disiplin meta-trend
+
+- **Meta-1 (path-ezberi, 3 tetik):** F-S11 test-yolu + F-S19 .sln-adı + W2.6-C tests/ hedge'le yakalanan. Aile 3 + KAYDET-15. Wave 3: yol verirken explicit "ezbere yazmadım" notu VEYA pre-write grep zorunlu.
+- **Meta-2 (tipografi/syntax-ezberi, 4 tetik):** F-S18 using-prefix + F-S19 .sln + F-S20 Conventional-Commits + F-S21 sayım-gevşekliği. Aile 3 + KAYDET-25. Wave 3: syntax/tipografi her zaman Backend grep otorite.
+
+## Wave 2 Reconcile Notu
+
+> **Reconcile notu (W1-2 disiplini):** Wave 2 = 39 distinct (Sapma 44–82). Reconcile-edilemez/bilinçli boşluklar:
+> 1. memory §5 "+19 W2.0-W2.4" ↔ distinct 18 (1-item gap, prior-session arşiv scope dışı)
+> 2. F-S8 tetiklenmedi (pozitif — Translations.Empty fiili-uyumlu, distinct'e girmedi)
+> 3. F-S9/F-S10 atanmadı; W2.5-C-Y1/Y2 = S69-70 kullanıldı (F-S sekans boşluğu; continuous 44-82 boşluksuz)
+> 4. KAYDET 26/27/28 atanmadı (bilinçli boşluk, Sapma 4 emsali, yeniden-numaralandırma YOK). KAYDET-24 session-start'ta TANIMLI (Ç1 düzeltmesi). KAYDET-11/12 lossy-only boşluk (fabrike YASAK, Ç2).
+> 5. Aile 3 distinct = 35 (Frontend ön-karar "34" = W1-2 1-item drift, fiili enumerasyon baskın, Ç3 → F-S22 distinct ledger'a Sapma 82).
+> 6. Wave 0+1 retro phrase-list discrete kayıt YOK; memory "12" sayar, verbatim 11 ifade (1-item drift, dokunulmaz).
+> 7. F-S22 (Sapma 82, Aile 4): Plan-3.B Frontend kümülatif prior-rapor sorgusuz kabul + 1-item drift; Backend fresh-read dosya-öncesi yakaladı, 0 sızıntı.
