@@ -13,4 +13,8 @@
     <ProjectReference Include="..\LivestockTrading.Shared.Contracts\LivestockTrading.Shared.Contracts.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.8" />
+  </ItemGroup>
+
 </Project>
