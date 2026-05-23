@@ -1,24 +1,24 @@
-# Wave 3 Mid-Handover (W3.5B sonrası state — mid-handover-2 `f2972e8` üstüne W3.5B 4 sub-batch + Grup 3 push + W3.6 ön-plan güncellemesi)
+# Wave 3 Mid-Handover (W3.6.A sonrası state — mid-handover-3 `8c75694` üstüne W3.6.A 3 commit + K1 ledger update [K2-pre amend dahil] + bu K2)
 
-**Durum:** Wave 3 ORTA NOKTA-3 — Catalog.Infrastructure W3.0+W3.8+W3.1+W3.2+W3.3+W3.4+W3.5A+**W3.5B (4 alt-batch atomik)** tamam, Grup 3 push origin'de. Kalan 2 sub-batch (W3.6 + W3.7) + Grup 4 push + `wave-3-complete` tag. **W3.6 yeni session devralacak** (4 tematik blok yoğun: Cache decorator + Rate providers 3-tier + Quartz scheduler + Domain event handlers).
+**Durum:** Wave 3 ORTA NOKTA-4 — Catalog.Infrastructure W3.0+W3.8+W3.1+W3.2+W3.3+W3.4+W3.5A+W3.5B (4 alt-batch atomik)+**W3.6.A (3 commit + K1 amend + bu K2)** tamam, K3 push tatbikatı 28 BEKLİYOR (5 commit toplu, lokal ahead 5). Kalan 1 sub-batch grup (W3.6.B+C+D rate/Quartz/event handlers) + W3.7 host-wire SON + Grup 4 push + `wave-3-complete` tag. **W3.6.B yeni session devralacak** (rate providers 3-tier + Quartz scheduler + domain event handlers; W3.6.A cache decorator TAMAM).
 **Tarih:** 2026-05-23
-**Sebep:** W3.5B 4 sub-batch ardışık icra (3 atomik impl + 1 DELETE) context yorgun + W3.6 4-tematik-blok geniş kapsam (HttpClient retry/circuit + Quartz NuGet + cache decorator pattern + domain event subscriber'lar). Yeni session güvenli devralma, mid-handover-3 canonical SoT.
-**Canonical state-of-truth:** bu doc + `_docs/wave-2-handover.md` (Wave 2 kapanış) + memory `wave3_plan1_decisions.md`.
+**Sebep:** W3.6.A sub-batch kapanış K1+K2-pre amend+K2 doc revize (3 W3.6.A commit + ledger + handover doc), W3.6.B kickoff için canonical SoT taze + F-S serisi clarity (mid-handover-3 handover-only F-S23-F-S50 ↔ W3.6.A distinct F-S51-F-S56 ayrı seri). Yeni session güvenli devralma, mid-handover-4 canonical SoT.
+**Canonical state-of-truth:** bu doc + `_docs/wave-2-handover.md` (Wave 2 kapanış) + `_docs/deviations.md` (Wave 3 W3.6.A distinct ledger F-S51-F-S56) + memory `wave3_plan1_decisions.md`.
 
-## 1. Repo Durumu (W3.5B sonrası)
+## 1. Repo Durumu (W3.6.A sonrası, K2 öncesi)
 
 | | SHA |
 |---|---|
-| HEAD (rebuild/v2) | `9d7000c583aa2dc50f94d5d6a4999c146572cc45` (W3.5B.4 DI register) |
+| HEAD (rebuild/v2) | `9784cd2…` (K1 amend, deviations.md Wave 3 açılışı + K2-pre F-S etiket rename) → **bu K2 commit** post-commit SHA |
 | main | `44416138b978774146f992f9e0756b829ba541e0` (**INVARIANT, dokunulmaz**) |
-| origin/main | `44416138...` (= lokal main, Backend fetch cross-check) |
-| origin/rebuild/v2 | `9d7000c...` (Grup 3 push 26. tatbikat sonrası, lokal = origin 0/0) |
+| origin/main | `44416138…` (= lokal main, Backend fetch cross-check) |
+| origin/rebuild/v2 | `8c75694…` (mid-handover-3 ara push 27. = W3.5B kapanış commit, K3 push tatbikatı 28 BEKLİYOR — ahead 5 lokal) |
 
-- `main..HEAD` = **53** commit · working tree clean · **ahead 0** (Grup 3 push tamam; bu handover commit Adım 5'te +1 ekler)
+- `main..HEAD` = **58** commit (K2 commit'inde **59**) · working tree clean · **ahead 5** (4 lokal commit K2 öncesi: fb0426b W3.6.A.1 + c72d97c W3.6.A.1.5 + 712b270 W3.6.A.2 + 9784cd2 K1 amend; K2 +1 ekler → ahead 5)
 - Tag'ler (origin intact): `wave-0-complete` obj `40927c8`→`dd50923` · `wave-1-complete` obj `deaadb7`→`33d058d` · `wave-2-complete` obj `e7e7fec`→`1f2c7dd` · `wave-3-complete` **YOK** (Grup 4 sonrası)
-- **Push tatbikatı: 30** (Wave 0+1+2=20 · Grup 1=22. · ara push 1=23. · Grup 2=24. · ara push 2=25. · **Grup 3=26.**). **main INVARIANT 30/30 korundu** (her push Backend bağımsız fetch + ls-remote cross-check, Mustafa raporuna körlemesine güvenme — F-S25→F-S50 emsali kalıcı disiplin).
+- **Push tatbikatı: 30** (Wave 0+1+2=20 · Wave 3 6 tatbikat: Grup 1=22. · ara push 1=23. · Grup 2=24. · ara push 2=25. · Grup 3=26. · **ara push 3=27. mid-handover-3 commit `8c75694`**). **main INVARIANT 30/30 korundu** → K3 push tatbikatı 28 sonrası **31/31** (5 commit toplu push, Backend bağımsız fetch + ls-remote cross-check, F-S25→F-S50 emsali kalıcı disiplin).
 
-## 2. Wave 3 Commit Zinciri (13 commit, mid-state-3)
+## 2. Wave 3 Commit Zinciri (19 commit total: 14 mid-handover-3 + 5 W3.6.A serisi, mid-state-4)
 
 | SHA | Subject |
 |---|---|
@@ -35,7 +35,12 @@
 | `09917e4` | feat(catalog) W3.5B.2 catalog read service infra impl 22 metot |
 | `a6b4a3b` | feat(catalog) W3.5B.3 admin catalog read service infra impl 3 metot |
 | `9d7000c` | feat(catalog) W3.5B.4 catalog read service di register |
-| _(bu handover commit Adım 5'te eklenir)_ | docs(wave-3-mid): W3.5B kapanis state guncelleme |
+| `8c75694` | docs(wave-3-mid): W3.5B kapanis state guncelleme (mid-handover-3, push 27.) |
+| `fb0426b` | feat(catalog) W3.6.A.1 Scrutor + cache decorator skeleton Country trio |
+| `c72d97c` | feat(catalog) W3.6.A.1.5 Translations JsonConverter Redis serialize fix |
+| `712b270` | feat(catalog) W3.6.A.2 CachedCatalogReadService 19 metot complete |
+| `9784cd2` | docs(deviations) W3.6.A Wave 3 acilis + 6 sapma + pozitif onleme + stat reconcile (K1 amend, eski `a782927` K2-pre F-S etiket cakismasi duzeltme) |
+| _(bu K2 commit, post-commit SHA)_ | docs(wave-3-mid) W3.6.A kapanis state guncelleme mid-handover-4 |
 
 Wave 2 sınır: `1f2c7dd` (wave-2-complete). Wave 3 closure-anchor ileride `wave-3-complete` (Grup 4 sonrası).
 
@@ -46,9 +51,10 @@ Wave 2 sınır: `1f2c7dd` (wave-2-complete). Wave 3 closure-anchor ileride `wave
 - **Grup 2 (W3.1 `1f693b3` + W3.2 `a5fa005`):** dry-run `c523106..a5fa005`, 36 obje / 19.82 KiB / delta 19 — **24. push** Mustafa eli. Backend mini-bağımsız verify: origin/main=`44416138` INVARIANT 24/24, origin/rebuild/v2=`a5fa005` 0/0 senkron.
 - **Handover ara push 2 (`f2972e8`):** mid-handover-2 commit, F-S28 önleme — **25. push** Mustafa eli. Bağımsız fetch + ls-remote cross-check.
 - **Grup 3 (W3.3 + W3.4 + W3.5A + W3.5B.1 + W3.5B.2 + W3.5B.3 + W3.5B.4):** dry-run `f2972e8..9d7000c`, 4 commit (W3.5B chain; W3.3/W3.4/W3.5A 25. push'a kadar lokal'di, dry-run yalnız W3.5B) — **26. push** Mustafa eli. **F-S50 yakalama:** Mustafa "push tamamlandı" ilk raporda fiili push yapılmamıştı (origin/rebuild/v2 hâlâ `f2972e8`); Backend `git fetch + ls-remote` bağımsız doğrulama ile tespit etti, Mustafa düzeltici push sonrası ikinci fetch ile teyit. F-S25 emsali kalıcı disiplin: Mustafa raporuna körlemesine güven YASAK.
-- **Handover ara push 3 (bu doc commit ⏭):** **27. push** Mustafa eli BEKLEYECEK (F-S28 önleme: Grup 4'e yedirilmez).
-- **Grup 4 (W3.6 + W3.7 + `wave-3-complete` tag):** ⏭ **28. push** Wave 3 sonu Mustafa eli.
-- **main INVARIANT 30/30 korundu**, her push Backend bağımsız fetch+ls-remote cross-check (Mustafa raporuna körlemesine güvenme, F-S50 kalıcı ders).
+- **Handover ara push 3 (mid-handover-3 commit `8c75694`):** **27. push** Mustafa eli yapıldı (F-S28 önleme: Grup 4'e yedirilmedi). Backend bağımsız fetch + ls-remote cross-check teyit.
+- **K3 push tatbikatı 28 (W3.6.A 5 commit toplu, ⏭ BEKLİYOR):** `fb0426b` + `c72d97c` + `712b270` + `9784cd2` (K1 amend) + K2 commit (bu doc). Backend hazırlık + Mustafa eli komut çalıştırma + Backend post-push bağımsız doğrulama. F-S50 emsali kalıcı disiplin.
+- **Grup 4 (W3.6.B/C/D + W3.7 + `wave-3-complete` tag):** ⏭ **29. push** Wave 3 sonu Mustafa eli (W3.6.A push 28. = K3'ten ayrı, W3.6.B kickoff sonrası).
+- **main INVARIANT 30/30 korundu**, K3 sonrası **31/31** (her push Backend bağımsız fetch+ls-remote cross-check, Mustafa raporuna körlemesine güvenme, F-S50 kalıcı ders).
 
 ## 4. Modül Envanteri (W3.5B sonrası, obj/bin hariç fiili)
 
@@ -77,16 +83,33 @@ Wave 2 sınır: `1f2c7dd` (wave-2-complete). Wave 3 closure-anchor ileride `wave
 
 ## 5. NuGet Durumu (fiili csproj pin, W3.5B sonrası)
 
-**Catalog.Infrastructure (8 PackageReference, W3.5B değişmedi):**
+**Catalog.Infrastructure (9 PackageReference, W3.6.A +1 Scrutor):**
 - EFCore.NamingConventions `10.0.1` · Microsoft.EntityFrameworkCore `10.0.8` · .Design `10.0.8` (PrivateAssets=all) · .Relational `10.0.8` · Npgsql.EntityFrameworkCore.PostgreSQL `10.0.1` · .NetTopologySuite `10.0.1`
 - **W3.5A eklemeleri (invariant):** Microsoft.Extensions.Caching.Memory `10.0.8` · StackExchange.Redis `[2.*, 3.0)`
+- **W3.6.A ek (yeni, Sa4 risksiz geçti):** Scrutor `[5.*, 6.0)` (resolved `5.1.2`, .NET 10 clean build, `Decorate<>` pattern destekçisi W3.5A major-pin pattern emsali)
 
 **Catalog.Application (3 PackageReference):** MassTransit `[8.*, 9.0)` · FluentValidation `12.1.1` · FluentValidation.DependencyInjectionExtensions `12.1.1` (Wave 2 invariant).
 **Shared.Infrastructure:** Microsoft.Extensions.Configuration.Abstractions `10.0.8`.
 
-**Wave 3 kalan beklenen NuGet:** Quartz + Quartz.Extensions.Hosting + Microsoft.Extensions.Http (W3.6 RateProviders + Quartz scheduler) · opsiyonel Scrutor (W3.6.A cache decorator için, manuel factory alternatifi). Dapper YOK (C.5#2 EF projection).
+**Wave 3 kalan beklenen NuGet:** Quartz + Quartz.Extensions.Hosting + Microsoft.Extensions.Http (W3.6.B/C RateProviders + Quartz scheduler). Dapper YOK (C.5#2 EF projection). Scrutor W3.6.A'da eklendi (cache decorator için, manuel factory alternatifi reddedildi).
 
-## 6. Sapma Defteri (Wave 3 mid-state-3)
+## 5.A W3.6.A Kapanış Detayı (Cache Decorator, 22/22 ICatalogReadService metot)
+
+**5 commit serisi (3 W3.6.A + 1 K1 amend + 1 K2):**
+- **`fb0426b` W3.6.A.1 (Blok-A):** Scrutor `[5.*, 6.0)` NuGet (5.1.2 resolved) + `CacheTtl.cs` 7 named bucket (ReferenceData/CertificationType/Category/Brand/Breed/CurrencyRate/Validator) + `CachedCatalogReadService.cs` internal sealed skeleton + Country trio cache-aside (3 metot full) + 19 metot passthrough placeholder. DI `services.Decorate<ICatalogReadService, CachedCatalogReadService>()` Scrutor lifetime-preserve Scoped.
+- **`c72d97c` W3.6.A.1.5 (Translations JsonConverter, F-S51 fix):** `TranslationsJsonConverter.cs` Infrastructure tarafı (`Catalog.Infrastructure/Caching/JsonConverters/`) + RedisCacheService static `JsonSerializerOptions` field wire-up. JSON şema `{"tr":"...","en":"..."}` LanguageCode lowercase 2-char key + plain string value. Domain Pure POCO korundu (KAYDET-7/W1-4 Kernel baskın, Infrastructure çözüm üretir). MemoryCacheService dokunulmadı (direct ref store, JSON YOK).
+- **`712b270` W3.6.A.2 (Blok-B):** 19 metot cache-aside refactor (Currency 3 + Language 3 + Category 3 + Breed 3 + Brand 2 + Location 2 + CertificationType 3). 22/22 metot complete, G5 self-audit fiili enumerasyon `_inner.`=22, `_cache.GetAsync`=22, `_cache.SetAsync`=22, `public async Task`=22. Validator metotları `bool?` boxing cache-miss-vs-false ayrımı, sentinel token (`lvl-any`, `cat-any`) null parametre slot collision sıfırlandı.
+- **`9784cd2` K1 amend (deviations.md Wave 3 açılışı, K2-pre F-S etiket cakismasi duzeltme):** Wave 3 distinct ledger açılışı `_docs/deviations.md`'de, 6 sapma (Sapma 83-88 / memory etiket F-S51-F-S56), 17 entry pozitif önleme defteri, header W1-2 ihlali fırsat-yakalama düzeltme (Toplam 43 → 88 fiili distinct enumerasyon). K2-pre amend ile F-S41-F-S45 → F-S51-F-S55 rename (mid-handover-3 satır 113-120 F-S41-F-S50 çakışma temizlendi), yeni F-S56 etiketi Sapma 88'e tahsis.
+- **K2 (bu commit):** mid-handover-3 → mid-handover-4 doc revize.
+
+**Mimari notlar:**
+- **Cache key konvansiyonu:** `livestock:catalog:<entity>:<discriminator>` (doc 05-catalog.md:620 SoT). 22 metot mapping `_docs/deviations.md` Pozitif Önleme entry 1 referans + W3.6.A Adım 2 raporundaki tablo.
+- **TTL strategy (Faz 1 TTL-only):** Doc 05-catalog.md:604-618 satır-literal mapping. Faz 2 event-driven invalidation backlog (`RemoveAsync` ICacheService'de mevcut, kullanılmıyor).
+- **Negative caching:** YOK (inner null → cache SET ETME). Validator olmayan invalid code spam'inde inner'a iner — Faz 2 short-TTL negative cache backlog.
+- **CurrencyRate semantic ayrı bucket:** 1h TTL ama daily-job invalidation hook Faz 2 hazırlığı (W3.6.B/C rate refresh + Quartz scheduler entegrasyonu).
+- **DI scope mismatch yok:** Decorator Scoped (Scrutor preserve) + ICacheService Singleton — Microsoft DI legal yön (longer-lived → shorter-lived inject), pattern doğru.
+
+## 6. Sapma Defteri (Wave 3 mid-state-4)
 
 **Committed ledger (`deviations.md` `74550a7` immutable, Wave 2 sonu):** **82 distinct** (43 Wave 0+1 + 39 Wave 2), 0 production sızıntısı.
 
@@ -123,11 +146,34 @@ Wave 2 sınır: `1f2c7dd` (wave-2-complete). Wave 3 closure-anchor ileride `wave
 - **F-S46** (S11 muafiyeti, interface impl sub-build CS0535 yapısal kaçınılmaz tek-shot doğal — talimat-pattern güncelleme, defekt değil)
 - **F-S48** (S14 proaktif önleme, BrandStatus enum dublication W3.5B.2 dersinden W3.5B.3 Adım 1'de proaktif yakalama — S12 emsali tekrar olmadı, pozitif Aile 6 önleme)
 
-**Wave 3 talimat-pattern defekt sayım (mid-state-3):**
+**Wave 3 talimat-pattern defekt sayım (mid-state-3 handover-only):**
 - **10 Frontend Aile 3** (S30+S31[Frontend nullable variant atlama]+S32+S34+S35+S38+F-S41+F-S43+F-S44) + **F-S42 (3+1 transport)** = 10 distinct Frontend defekt
 - **6 Backend Aile 6** (S36+S39+S40+F-S45+F-S47+F-S49) — 3rd-party API + plan-doc↔fiili-kod
 - **F-S50 (5+1, Mustafa transport sapması, Aile 5+1)** — ayrı kategoride
 - **Toplam 16 talimat-pattern defekt** + **5+ pozitif önleme/ders pattern** kalıcı disipline (S28+S33+S37+S14 emsali+F-S25→F-S50 emsali + Translations.FirstOrEmpty() VO native keşif + helper vs inline EF translate kararı + S11 muafiyeti)
+
+### 6.A W3.6.A Distinct Ledger (deviations.md'ye işlendi, mid-state-4)
+
+**K1 (`9784cd2`) + K2-pre amend:** Wave 3 distinct ledger açılışı `_docs/deviations.md`'de tamamlandı.
+
+- **6 distinct sapma:** Sapma 83-88, memory etiket **F-S51-F-S56** (K2-pre amend ile F-S41-F-S45 → F-S51-F-S55 rename, F-S56 yeni).
+  - Sapma 83 / F-S51 (Frontend, Aile 3+6+pozitif önleme): Translations STJ-deser pre-write yakalama, W3.6.A.1.5 JsonConverter Infrastructure çözüm
+  - Sapma 84 / F-S52 (Backend, Aile 2+KAYDET-9): Adım 1 sayım drift 154/151
+  - Sapma 85 / F-S53 (Frontend, Aile 4+pozitif önleme): List naming compound vs segmented Frontend self-revize
+  - Sapma 86 / F-S54 (Backend, KAYDET-9 hafif): BrandDto.OriginCountryCode adlandırma drift
+  - Sapma 87 / F-S55 (Frontend, Aile 3+KAYDET-9+pozitif önleme): K1 talimat numara ezber drift
+  - Sapma 88 / F-S56 (Frontend, Aile 3+KAYDET-9+KAYDET-7+pozitif önleme): K1 F-S etiket çakışması, K2-pre amend ile rename
+- **17 entry pozitif önleme defteri:** Adım 2 + W3.6.A.1.5 + Blok-A/B + K1/K2-pre Backend yakalamalar.
+- **Header W1-2 ihlali düzeltildi:** Wave 2'den kalan "Toplam: 43" → fiili distinct **88** (Wave 0+1: 43 + Wave 2: +39 + Wave 3 W3.6.A: +6). Genel İstatistik Backend 15 + Frontend 72 + Bilgi notu 1.
+- **F-S serisi clarity (KAYDET-7 hiyerarşi uygulaması):** **mid-handover-3 handover-only F-S23-F-S50** (bu doc satır 89-130, dokunulmadı) **+ W3.6.A distinct F-S51-F-S56** (`deviations.md` K1 amend). İki ayrı seri net, push tatbikatı 28'de ledger semantic clarity.
+- **Handover-only F-S23-F-S40 (W3.0-W3.5B sub-batch'leri):** Hâlâ bu doc satır 89-130'da izlenmeye devam, Wave 3 sonu final reconcile turunda `deviations.md`'ye işlenecek.
+
+**Karşılıklı KAYDET-9 çapraz pekişme pattern (3 tezahür, sistemik):**
+- Backend Sapma 84 (F-S52, Adım 1 sayım drift) → Blok-B G1 fresh-read disipliniyle kendi düzeltti
+- Backend Sapma 87 (F-S55, K1 numara drift Frontend ezberi) → Backend G1 fresh-check ile yakaladı
+- Backend Sapma 88 (F-S56, K1 F-S etiket çakışması Frontend ezberi) → Backend K2 G1 fresh-read ile yakaladı, K1 amend ile düzeltti
+
+Wave 3 sonu final reconcile turunda Aile 3/KAYDET-9 retrospektif değerlendirmesi gerek (sistemik Frontend KAYDET-9 ihlal pattern + Backend disiplin çapraz uygulaması).
 
 **G3 amendment KALICI (Wave 4+):** 3rd-party API knowledge **3 katmanda ayrı doğrulama** gerek — (a) namespace · (b) method-signature · (c) class/struct üye isimleri. G1 compile-test tek-katman API yeterli; **3+ katmanlı API'lerde G2 (assembly reflection) veya G4 (alternatif pattern decomposition, örn. W3.5A 2-call SET+EXPIRE) erken tercih**. W3.5B.2 enum dublication F-S45 emsali 4 cast fix R-A patron uygulandı; W3.5B.3 S14 emsali Adım 1 proaktif check ile S12 tekrarı önlendi (Aile 6 önleme pattern kanıtı).
 
@@ -142,6 +188,55 @@ Wave 2 sınır: `1f2c7dd` (wave-2-complete). Wave 3 closure-anchor ileride `wave
 - **Grup 4: W3.6 + W3.7 + `wave-3-complete` tag** (⏭ 28. push, "rate+host-wiring host-inert SON" + kritik milestone, Wave 3 sonu)
 
 **Çapraz-kesen tespit (kalıcı):** Backend push ASLA `main`'e atmaz (yalnız `rebuild/v2`); `main` INVARIANT push-hedef disipliniyle korunur, doğrulama-frekansıyla DEĞİL → push sıklığı production-safety değil CI/lokal-kayıp/state-sync trade-off'u. F-S50 emsali (Mustafa transport sapması) sıfır production riski (main INVARIANT zaten korundu), yalnız tatbikat sayım/canonical SoT lag — Backend bağımsız fetch doğrulama disipline süresi az pozitif önleme.
+
+## 7.A K3 Push Tatbikatı 28 Hazırlık (W3.6.A 5 commit toplu push)
+
+**Sıra:** Bu K2 commit (mid-handover-4) sonrası → Frontend K3 talimat → Mustafa eli push → Backend post-push doğrulama.
+
+**5 commit toplu push (`fb0426b..K2 SHA`, 6c75 baseline `8c75694`):**
+- `fb0426b` — feat(catalog) W3.6.A.1 Scrutor + cache decorator skeleton Country trio
+- `c72d97c` — feat(catalog) W3.6.A.1.5 Translations JsonConverter Redis serialize fix
+- `712b270` — feat(catalog) W3.6.A.2 CachedCatalogReadService 19 metot complete
+- `9784cd2` — docs(deviations) W3.6.A Wave 3 acilis + 6 sapma + pozitif onleme + stat reconcile (K1 amend, eski `a782927` K2-pre F-S etiket cakismasi duzeltme)
+- _(bu K2 commit SHA, post-commit Backend hazırlıkta bilinir)_ — docs(wave-3-mid) W3.6.A kapanis state guncelleme mid-handover-4
+
+**Backend pre-push hazırlık (lokal, network'süz):**
+1. **Status guard:** `git status` clean teyit (working tree saf)
+2. **Branch durumu:** `git log --oneline main..HEAD` (5 commit listele: `fb0426b` → K2 SHA arası)
+3. **3-branch SHA cross-check öncesi state:**
+   - `git rev-parse HEAD` = K2 SHA (bu commit post-commit)
+   - `git rev-parse origin/rebuild/v2` = `8c75694` (push öncesi, mid-handover-3)
+   - `git rev-parse origin/main` = `44416138` (**INVARIANT, dokunulmaz**)
+   - ahead/behind: `git rev-list --left-right --count origin/rebuild/v2...HEAD` = `0 5`
+4. **Dry-run push:** `git push --dry-run origin rebuild/v2` (Backend lokal, network'süz olsa bile dry-run mevcut state'i gösterir)
+
+**Mustafa eli komut bloğu (kendi terminal, sandbox YOK):**
+```bash
+git fetch origin
+git push --dry-run origin rebuild/v2  # gerçek dry-run (network)
+git push origin rebuild/v2              # gerçek push
+git ls-remote origin refs/heads/main refs/heads/rebuild/v2
+```
+
+**Backend post-push doğrulama (lokal, bağımsız fetch — F-S50 emsali kalıcı):**
+- `git fetch origin --prune`
+- `git rev-parse origin/main` = `44416138` (**INVARIANT teyit, 31/31 push doğrulaması +1**)
+- `git rev-parse origin/rebuild/v2` = K2 SHA (push sonrası lokal = origin)
+- `git rev-list --left-right --count origin/rebuild/v2...HEAD` = `0 0` (senkron)
+- `git ls-remote origin refs/heads/rebuild/v2` Mustafa rapor cross-check
+
+**Sapma sinyalleri (Mustafa terminalde gözlemlerse Frontend'e bildir):**
+- **`non-fast-forward` / `rejected`:** Origin'de görülmeyen commit (lokal stale) → DUR, Backend fetch + diagnostik
+- **`main` SHA değişti:** `44416138` ≠ yeni SHA → **KRİTİK DUR** (production safety ihlali, immediate stop)
+- **`Everything up-to-date` rebuild/v2'de:** Push zaten yapılmış olabilir (F-S29 silent succeed pattern) → `ls-remote` ile teyit, Backend bağımsız doğrulama
+- **Auth/permission hatası:** Credential helper sorunu → Mustafa terminal çıktısı paste
+
+**K3 sonrası beklenen state:**
+- origin/rebuild/v2 = K2 SHA (push sonrası senkron)
+- main INVARIANT: **31/31** (mid-handover-3 30/30 + K3 push doğrulaması +1)
+- Push tatbikatı: **31** (mid-handover-3 30 + K3 = 31; mid-handover-3 satır 19 fiili "30" baseline)
+- W3.6.A sub-batch tamamen kapanır (origin'de görünür)
+- Sonraki: W3.6.B kickoff (yeni Backend session veya devamı, rate providers 3-tier + Quartz)
 
 ## 8. Plan-1 Kilitli Kararlar (W3.6+ icra girdileri, yeniden açılmaz)
 
@@ -171,7 +266,7 @@ Wave 2 sınır: `1f2c7dd` (wave-2-complete). Wave 3 closure-anchor ileride `wave
 
 | Sub-batch | Kapsam (fiili dosya tahmini) | Doc dayanak | Notlar |
 |---|---|---|---|
-| **W3.6.A Cache Decorator** | `CachedCatalogReadService : ICatalogReadService` (22 metot read-through, W3.5A ICacheService wrap) · DI register decorator (Scrutor `Decorate<>` opsiyon veya manuel factory) · NuGet karar (Scrutor `[6.*, 7.0)` opsiyonel) · cache key pattern `"catalog:<entity>:<code>"` + TTL = 5-30 dk varsayılan = **~2 dosya** | §5:481-623 cache-aside Faz 1 | **1 batch tahminî**, decorator pattern Wave 4+ Listings/Marketplace emsali |
+| ~~**W3.6.A Cache Decorator**~~ **TAMAM** | ✅ `CachedCatalogReadService` 22/22 metot cache-aside complete + `CacheTtl` 7 named bucket + `TranslationsJsonConverter` Infrastructure + Scrutor `[5.*, 6.0)` (5.1.2) + DI `services.Decorate<>()` Scoped preserve. 5 commit (`fb0426b` + `c72d97c` + `712b270` + `9784cd2` K1 + bu K2). Cache key fiili `livestock:catalog:<entity>:<discriminator>` (doc 05-catalog.md:620 SoT, talimattaki "catalog:" prefix değil), TTL 7 bucket doc 05-catalog.md:604-618 satır-literal. K3 push tatbikatı 28 BEKLİYOR. | §5:481-623 cache-aside Faz 1 ✅ | **Fiili 5 commit** (1 batch + Translations fix mini sub-batch + K1 ledger + K2 doc), decorator pattern Wave 4+ Listings/Marketplace emsali kalıcı. |
 | **W3.6.B Rate Providers 3-tier** | `IRateProvider` (Application port) + `RateFetchResult` (record) + `TcmbRateProvider` (primary, TR cb) + `EcbRateProvider` (fallback, EU cb) + `ExchangeRateHostRateProvider` (tier 3, free API) · HttpClient retry+circuit breaker (Polly opsiyonel veya manuel) · NuGet `Microsoft.Extensions.Http` = **~5-6 dosya** | §6:629-730 RateProviders ns `Catalog.Infrastructure.RateProviders` | **1-2 batch tahminî**, 3-tier fallback strategy + HttpClient registration emsali |
 | **W3.6.C Quartz Scheduler** | NuGet `Quartz` + `Quartz.Extensions.Hosting` · `CurrencyRateUpdateJob : IJob` (cron pattern, varsayılan `0 0 6 * * ?` günlük 06:00) · DI register Quartz scheduler + JobDataMap = **~2-3 dosya** | §6:629-730 + retention/cleanup §6:716 | **1 batch tahminî**, Quartz job pattern + DI hosting wire |
 | **W3.6.D Domain Event Handlers** | In-process MassTransit.Mediator (Karar 3b) Brand/Category/Breed event subscriber'lar (Wave 1 events 8 + Wave 2 events 3 = 11 event handler) · `RateLogRepository.cs` (Append-only entity W3.1 RateLog + repository thin) · `RefreshExchangeRatesHandler` impl swap (Wave 2 NotImpl stub → IRateProvider chain + RateLogRepository persist) · `ICurrencyRateRefresher` Application portu (C.5#3 izinli imza Backend Adım 1 önerir) = **~5-7 dosya** | §6:629-730 + Wave 1/2 event/handler emsalleri | **1-2 batch tahminî**, event handler katmanı + rate refresh pipeline |
@@ -240,6 +335,6 @@ Beklenen yaklaşım (Frontend tam talimat verecek — F-S26 emsali tek-blok; eks
 
 **Yeni Frontend session ilk aksiyon:** (1) bu doc'u (`_docs/wave-3-handover-mid.md` mid-handover-3) oku · (2) Backend handover özetini Mustafa'ya ilet · (3) Mustafa onay · (4) W3.6.A sub-batch tam talimat (tek büyük kod-bloğu, F-S26 emsali; pattern referansları MİNİMUM F-S34/S35/S38/F-S41/F-S44 dersi; Wave 0/1/2/3 fiili kod fresh grep zorunlu KAYDET-9 Frontend için de; path/klasör adlandırma F-S43 dersi her klasör fiili teyit).
 
-**Yeni Backend session ilk aksiyon:** (1) bu doc'u oku + ham özet rapor · (2) fresh fetch + 4-SHA sanity (HEAD/main/origin-main/origin-rebuild-v2; main INVARIANT 30/30 veya 31/31 27. push sonrası) · (3) memory `wave3_plan1_decisions.md` + `MEMORY.md` hook kontrol (W3.5B kapanış kayıtları persist) · (4) Frontend W3.6.A tam talimat bekle, kendiliğinden W3.6 hazırlık YAPMA · (5) S14 emsali proaktif Adım 1 check rutini (enum dublication / VO accessor / NuGet version / namespace-qualified usage / 3rd-party API katman sayım) Aile 6 önleme kalıcı.
+**Yeni Backend session ilk aksiyon (W3.6.B kickoff):** (1) bu doc'u oku + ham özet rapor · (2) fresh fetch + 4-SHA sanity (HEAD/main/origin-main/origin-rebuild-v2; main INVARIANT 30/30 K3 öncesi veya 31/31 K3 sonrası) · (3) memory `wave3_plan1_decisions.md` + `MEMORY.md` hook kontrol (W3.6.A kapanış kayıtları persist) · (4) Frontend W3.6.B tam talimat bekle (rate providers 3-tier + Quartz), kendiliğinden W3.6.B hazırlık YAPMA · (5) S14 emsali proaktif Adım 1 check rutini (HttpClient registration emsali / Quartz NuGet karar / IRateProvider port tasarımı / RateLog ↔ RateLogRepository entegrasyon / 3rd-party API katman sayım) Aile 6 önleme kalıcı.
 
-**Canonical SoT (handover sonrası):** bu doc (`_docs/wave-3-handover-mid.md` mid-handover-3) + `_docs/wave-2-handover.md` + memory `wave3_plan1_decisions.md` + `MEMORY.md` hook + Wave 3 commit zinciri (W3.0→W3.5B.4 13 commit + bu handover ara push 14. commit).
+**Canonical SoT (handover sonrası, mid-handover-4):** bu doc (`_docs/wave-3-handover-mid.md` mid-handover-4) + `_docs/wave-2-handover.md` + `_docs/deviations.md` (Wave 3 W3.6.A distinct ledger F-S51-F-S56) + memory `wave3_plan1_decisions.md` + `MEMORY.md` hook + Wave 3 commit zinciri (W3.0→W3.5B.4 13 commit + mid-handover-3 ara push commit `8c75694` 14. + W3.6.A 3 commit `fb0426b`+`c72d97c`+`712b270` + K1 amend `9784cd2` + bu K2 = **19 commit total**).
