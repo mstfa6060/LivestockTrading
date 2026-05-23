@@ -3,6 +3,7 @@ using LivestockTrading.Catalog.Infrastructure.Caching;
 using LivestockTrading.Catalog.Infrastructure.Persistence;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Scrutor;
 using Shared.Contracts.Catalog;
 using Shared.Contracts.Catalog.Admin;
 using StackExchange.Redis;
@@ -54,10 +55,14 @@ public static class CatalogInfrastructureModule
         // W3.5B.4: read services — ICatalogReadService (22 metot, W3.5B.2 impl) +
         // IAdminCatalogReadService (3 metot, W3.5B.3 impl). Lifetime Scoped: DbContext
         // Scoped (EF Core default) + ReadService DbContext dependency → Scoped zorunlu
-        // (Singleton-in-Scoped capture memory leak + thread-safety). Cache decorator wrap
-        // W3.6 (Decorate<ICatalogReadService, CachedCatalogReadService>).
+        // (Singleton-in-Scoped capture memory leak + thread-safety).
         services.AddScoped<ICatalogReadService, CatalogReadService>();
         services.AddScoped<IAdminCatalogReadService, AdminCatalogReadService>();
+
+        // W3.6.A: Cache decorator wrap — Scrutor Decorate pattern lifetime-preserve
+        // (Scoped inner → Scoped outer). Negative caching YOK; 22 metot mapping CacheTtl
+        // class'inda doc 05-catalog.md:604-618 grounded.
+        services.Decorate<ICatalogReadService, CachedCatalogReadService>();
 
         // Sıradaki: W3.6 (rate providers + Quartz), W3.7 (DbContext + interceptor wire
         // + endpoint mapping, host-inert SON).
