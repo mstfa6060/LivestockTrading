@@ -1,6 +1,7 @@
 using LivestockTrading.Catalog.Application.Abstractions;
 using LivestockTrading.Catalog.Infrastructure.Caching;
 using LivestockTrading.Catalog.Infrastructure.Persistence;
+using LivestockTrading.Catalog.Infrastructure.RateProviders;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Scrutor;
@@ -64,8 +65,40 @@ public static class CatalogInfrastructureModule
         // class'inda doc 05-catalog.md:604-618 grounded.
         services.Decorate<ICatalogReadService, CachedCatalogReadService>();
 
-        // Sıradaki: W3.6 (rate providers + Quartz), W3.7 (DbContext + interceptor wire
-        // + endpoint mapping, host-inert SON).
+        // W3.6.B: Currency rate providers 3-tier (plan-doc 05-catalog.md §6:629-730).
+        // TCMB (Tier 1, primary) → ECB (Tier 2, fallback) → Fawazahmed0 currency-api (Tier 3,
+        // last-resort; W3.6.B Frontend kararı exchangerate.host swap, B.4 SENARYO-2 Aile 2).
+        // Typed HttpClient (mock-friendly testability) + AddStandardResilienceHandler
+        // (retry + timeout + circuit-breaker + rate-limiter Microsoft.Extensions.Http.Resilience).
+        // 3 impl IRateProvider port'a kayitli → DI IEnumerable<IRateProvider> resolve eder
+        // (W3.6.D Handler chain iteration icin); ayrica concrete tip resolve (typed client constraint).
+        services.AddHttpClient<TcmbRateProvider>(client =>
+        {
+            client.BaseAddress = new Uri("https://www.tcmb.gov.tr/");
+        })
+        .AddStandardResilienceHandler();
+
+        services.AddHttpClient<EcbRateProvider>(client =>
+        {
+            client.BaseAddress = new Uri("https://www.ecb.europa.eu/");
+        })
+        .AddStandardResilienceHandler();
+
+        services.AddHttpClient<CurrencyApiRateProvider>(client =>
+        {
+            client.BaseAddress = new Uri("https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/");
+        })
+        .AddStandardResilienceHandler();
+
+        // IRateProvider port → 3 concrete kayıt (W3.6.D Handler IEnumerable<IRateProvider> ile chain'i
+        // tier sırasıyla iterate eder). AddHttpClient<TImpl> sadece concrete kaydeder; port kaydı manuel.
+        services.AddTransient<IRateProvider>(sp => sp.GetRequiredService<TcmbRateProvider>());
+        services.AddTransient<IRateProvider>(sp => sp.GetRequiredService<EcbRateProvider>());
+        services.AddTransient<IRateProvider>(sp => sp.GetRequiredService<CurrencyApiRateProvider>());
+
+        // Sıradaki: W3.6.C (Quartz scheduler + CurrencyRateUpdateJob), W3.6.D (event handlers +
+        // CurrencyRateRefresher impl + RefreshExchangeRatesHandler swap), W3.7 (DbContext +
+        // interceptor wire + endpoint mapping, host-inert SON).
         return services;
     }
 }
