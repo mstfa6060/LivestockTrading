@@ -1,5 +1,6 @@
 using System.Text.Json;
 using LivestockTrading.Catalog.Application.Abstractions;
+using LivestockTrading.Catalog.Infrastructure.Caching.JsonConverters;
 using StackExchange.Redis;
 
 namespace LivestockTrading.Catalog.Infrastructure.Caching;
@@ -11,9 +12,17 @@ namespace LivestockTrading.Catalog.Infrastructure.Caching;
 /// resmi pattern, thread-safe internal connection pool). IDatabase her call'da
 /// multiplexer.GetDatabase() — lightweight, multiplexer pool yönetir.
 /// CancellationToken ignored (StackExchange.Redis async overloads ct accept etmiyor).
+/// F-S51 (W3.6.A.1.5): TranslationsJsonConverter Translations sealed class Pure POCO
+/// Domain saf STJ-default-deser uyumsuzlugunu kapatir. Static readonly JsonOptions
+/// tum Get/Set cagrilarinda paylasilir.
 /// </summary>
 public sealed class RedisCacheService : ICacheService
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        Converters = { new TranslationsJsonConverter() }
+    };
+
     private readonly IDatabase _redis;
 
     public RedisCacheService(IConnectionMultiplexer connection)
@@ -24,12 +33,12 @@ public sealed class RedisCacheService : ICacheService
         var value = await _redis.StringGetAsync(key);
         if (value.IsNullOrEmpty)
             return default;
-        return JsonSerializer.Deserialize<T>(value.ToString());
+        return JsonSerializer.Deserialize<T>(value.ToString(), JsonOptions);
     }
 
     public async Task SetAsync<T>(string key, T value, TimeSpan? ttl, CancellationToken ct)
     {
-        var json = JsonSerializer.Serialize(value);
+        var json = JsonSerializer.Serialize(value, JsonOptions);
         await _redis.StringSetAsync(key, json);
         if (ttl.HasValue)
             await _redis.KeyExpireAsync(key, ttl.Value);
