@@ -1,11 +1,11 @@
 # Sapma Defteri — Konsolide Ledger
 
 **Kapsam:** Tüm wave'ler. **Numaralandırma:** Yakalanma sırasına göre, kategoriden bağımsız, wave'ler arası sürekli.
-**Toplam:** 43 (Backend 12 / Frontend 30 / Bilgi notu 1), **0 production sızıntısı.**
+**Toplam:** 88 (Backend 15 / Frontend 72 / Bilgi notu 1), **0 production sızıntısı.**
 
 ## Genel İstatistik
-- Backend: 12 (tool/süreç davranışı, proaktif yakalama)
-- Frontend Claude: 30 (talimat tahmini + varsayım güveni)
+- Backend: 15 (tool/süreç davranışı, proaktif yakalama)
+- Frontend Claude: 72 (talimat tahmini + varsayım güveni)
 - Bilgi notu: 1 (Sapma 39 — repo snapshot context, hata değil, split dışı)
 - Frontend hatalarının 0'ı production'a sızdı — Backend disiplini + classifier her seferinde yakaladı.
 
@@ -244,3 +244,56 @@ Kök: Sapma 45 (W2.1 çift-enum `AttributeValueType` Domain `LivestockTrading.Ca
 > 5. Aile 3 distinct = 35 (Frontend ön-karar "34" = W1-2 1-item drift, fiili enumerasyon baskın, Ç3 → F-S22 distinct ledger'a Sapma 82).
 > 6. Wave 0+1 retro phrase-list discrete kayıt YOK; memory "12" sayar, verbatim 11 ifade (1-item drift, dokunulmaz).
 > 7. F-S22 (Sapma 82, Aile 4): Plan-3.B Frontend kümülatif prior-rapor sorgusuz kabul + 1-item drift; Backend fresh-read dosya-öncesi yakaladı, 0 sızıntı.
+
+---
+
+# Wave 3 (Sapma 83–..., devam ediyor)
+
+> **Wave 3 ledger açılış commit'i:** W3.6.A sub-batch (Catalog.Infrastructure Cache Decorator, 3 atomic commit: Blok-A `fb0426b` + W3.6.A.1.5 `c72d97c` + Blok-B `712b270`). Wave 3'ün W3.0–W3.5B sub-batch'leri sırasında yakalanan sapma ve pozitif önleme'ler **handover-only ledger F-S23–F-S40** olarak `_docs/wave-3-handover-mid.md`'de izlendi; distinct `_docs/deviations.md` ledger entry'lerine **Wave 3 sonu reconcile turunda** işlenecek (memory plan: `wave3_plan1_decisions.md`).
+
+## Wave 3 Stat Reconcile (W3.6.A açılış sonrası, K2-pre amend dahil)
+
+- Wave 0+1+2 baseline: 82 distinct Sapma (43 + 39, satır 134–136 Wave 2 reconcile)
+- Wave 3 W3.6.A: +6 distinct Sapma (Sapma 83–88, memory etiket F-S51–F-S56)
+- Toplam (Wave 3 W3.6.A K2-pre amend sonrası): **88 distinct Sapma**
+
+## Wave 3 W3.6.A Sapmaları
+
+| # | Taraf | Konum | Açıklama |
+|---|---|---|---|
+| 83 | Frontend | W3.6.A Blok-A G1 | (F-S51) Translations sealed class Pure POCO Domain saf (`Translations.cs:5` yorum "STJ attribute/converter YOK"), parameterless ctor + setter + `[JsonConstructor]` YOK — System.Text.Json default policy ile deserialize edilemez. Etkilenen DTO: CategoryDto.Name/Description, BreedDto.Name/Description, CertificationTypeDto.NameTranslations/DescriptionTranslations. W3.5A cache foundation scope'u value tipi tüketim tarafını gündeme almadı; W3.6.A başında Frontend talimatı "Translations parameterless ctor + setter VAR ise OK; YOKSA DUR" guard koydu (proaktif W1-1 emsali), Backend Gate 1 fresh-check ile yakaladı. Aile 3 + Aile 6 + pozitif önleme. Çözüm: W3.6.A.1.5 sub-batch'inde `JsonConverter<Translations>` Infrastructure tarafında (`Catalog.Infrastructure/Caching/JsonConverters/`), RedisCacheService static `JsonSerializerOptions` field'a register. Domain Pure POCO korundu (KAYDET-7/W1-4 Kernel baskın, Infrastructure çözüm üretir). Memory cache etkilenmez (direct ref store). Geri sarma maliyeti 0, Redis prod env runtime crash önlendi. |
+| 84 | Backend | W3.6.A Adım 1 rapor | (F-S52) Adım 1 raporunda "Catalog.Application 115 .cs / 3216 satır / 154/154 test" memory ezberinden alıntılandı; fiili count Adım 1'de doğrulanmadı. Blok-A G8 fiili `dotnet test` çalıştırmasında 151/151 ortaya çıktı (3 test'lik delta — pre-existing W3.5B.1 commit `ec84f70` "application admin read stub + test sil" kaynaklı, sayım drift Adım 1'de yakalanmayıp Blok-A G8'de yakalandı). Aile 2 (algı/gerçek uçurumu) + KAYDET-9 ihlali (ezber sayım). Çözüm: Blok-B G1'de 5 DTO fresh-read disipliniyle KAYDET-9 öğrenimi uygulandı, hata tekrar etmedi. Fiili kaynak >> memory ezber kuralı pekişti. |
+| 85 | Frontend | W3.6.A Adım 2 mapping tablosu | (F-S53) Backend Adım 2 raporunda list naming compound (`breed-list:{x}`) vs segmented (`country:list:active`) tutarsızlığı Sa5 olarak flag etti — Frontend talimat-örneği `breed-list:{categoryCode}` compound önermişti, ama country için segmented yazılmıştı. Frontend Adım 2 review'de Backend Sa5'i kabul etti ve segmented pattern'i kanonical kıldı (`livestock:catalog:breed:list:by-category:{categoryCode}`). Aile 4 (talimat tutarsızlığı, Frontend self-correction) + pozitif önleme (Blok-B impl'den ÖNCE yakalama). Çözüm: mapping #14 segmented olarak revize, Blok-B'de uygulanıp 22/22 metot complete. Glob-friendly prefix scan Faz 2 event-invalidation hazırlığına simetri kazandırdı. |
+| 86 | Backend | W3.6.A Adım 2 BrandDto tahmin | (F-S54) Adım 2 raporunda BrandDto.OriginCountry için "tip string? mi CountryCode? mi belirsiz, Blok-B G1'e ertelenecek" diye flag etti, field adını "OriginCountry" olarak ezberden varsaydı. Blok-B G1 fresh-read'de gerçek field adı `OriginCountryCode` (suffix farkı), tip `string?` plain (CountryCode VO değil) — tahminin tip kısmı doğru, adlandırma drift'i. KAYDET-9 hafif ihlali (ezber adlandırma). Cache key Guid-tabanlı (`brand:{brandId}`) olduğundan runtime etkisi sıfır. Çözüm: G1 fresh-read'de adlandırma teyit, Blok-B impl raw passthrough'tan cache-aside'a refactor sırasında sorun çıkmadı. Adlandırma drift'i ön-flag'in varlığı sayesinde yakalandı (pozitif önleme yan-not). |
+| 87 | Frontend | W3.6.A-K1 talimat | (F-S55) Frontend K1 talimatında ezberden "F-S51–F-S54 ekle" diyerek deviations.md fiili continuous Sapma numarasını (82) ve F-S memory etiket numarasını (F-S22, Wave 2 son) okumadan numara verdi. Memory'deki "F-S41–F-S50 (16 talimat-pattern defekt)" referansı handover-only Wave 3 mid F-S23–F-S40 + 10 yeni şeklindeydi, distinct deviations.md ledger F-S22'de bitiyordu. Backend G1 fresh-check ile yakalamadan yazsaydı: (i) Sapma 51 zaten Wave 1 Sapma 35 ile çakışırdı (numara broken), (ii) header sayım "43" kalırdı (katlanan W1-2 ihlali), (iii) Wave 3 baş bölümü açılmamış olurdu. Aile 3 (talimat tahmin hatası) + KAYDET-9 ihlali (Frontend tarafı, Sapma 84 [yeni F-S52, eski W3.6.A Adım 1 sayım drift dersi] çapraz uygulamasının ters yönde Frontend tekrarı) + pozitif önleme (Backend Sapma 84 dersi Frontend ezberine çapraz uygulama). Çözüm: K1 talimatı Frontend tarafından revize, continuous Sapma 83–87 + memory etiket (ilk yazımda F-S41–F-S45 → K2-pre amend ile F-S51–F-S55 rename, Sapma 88 / F-S56 kapsamı) seri devam, Wave 3 baş bölümü K1'de açıldı (Stat Reconcile + Sapmalar + Reconcile Notu). Karşılıklı KAYDET-9 çapraz pekişmesi: Backend Sapma 84'ten öğrendi, Frontend ezberini Backend yakalamasıyla düzeltti. |
+| 88 | Frontend | W3.6.A-K2-Pre G1 yakalama | (F-S56) Frontend K1 talimat (ilk SHA a782927, K2-pre amend ile yeni SHA) ezberden F-S41–F-S45 memory etiket atadı, ama `_docs/wave-3-handover-mid.md` satır 113–120 mid-handover-3 sapma defterinde F-S41–F-S50 **zaten atanmış** (W3.5B sub-batch handover-only ledger: F-S41 W3.5B.1 "25 metot" ezber, F-S42 W3.5B.1 stub DELETE, F-S43 W3.5B path drift, F-S44 W3.5B.3 MissingTranslations 4. bucket, F-S45 W3.5B.2 enum dublication R-A). K1 commit yazıldı ve deviations.md'ye 5 yeni satır işlendi (Sapma 83–87 / F-S41–F-S45) — iki ayrı doc'ta aynı F-S etiketleri farklı semantikle çakıştı. Backend K2 Gate 1 fresh-read'de mid-handover-3 sapma defterini okurken çakışmayı yakaladı, DUR sinyali verdi. K1 commit henüz push edilmemiş (origin/rebuild/v2 = `8c75694`), amend safe operation. Aile 3 (Frontend talimat tahmin hatası) + KAYDET-9 ihlali (memory ezber) + KAYDET-7 hiyerarşi uygulaması (fiili doc baskın) + pozitif önleme (Backend Sapma 84 dersinin sürekli çapraz uygulaması, Sapma 87'nin daha derin formu — sayım drift değil etiket çakışması). Çözüm: K1 commit amend (K2-pre commit), Sapma 83–87 memory etiketleri F-S41–F-S45 → F-S51–F-S55 rename (continuous Sapma numaraları sabit), yeni F-S56 etiketi bu sapma için tahsis. Frontend disiplinini Backend yakalaması ile düzeltmenin üçüncü turu — sistemik Frontend KAYDET-9 ihlal pattern'i (Sapma 87 + Sapma 88), Wave 3 sonu final reconcile turunda Aile 3/KAYDET-9 retrospektif değerlendirmesi gerek. |
+
+## Wave 3 W3.6.A Pozitif Önleme Defteri
+
+W3.6.A sub-batch boyunca yakalanan 17 pre-empt ve drift önleme örneği:
+
+1. **Adım 2 mapping + 7 tasarım sorusu:** Backend tasarım sorularını Frontend onayına bekletti, "muhtemelen şöyle" tahmini ile devam etmedi (KAYDET-9).
+2. **Adım 2 Sa5 Frontend self-revize:** List naming compound vs segmented tutarsızlığı Backend tarafından flag, Frontend review'de segmented kanonical (F-S43).
+3. **Blok-A G1 Sa1 yakalama (F-S41):** Translations STJ-deser uyumsuzluğu Frontend guard + Backend fresh-check ile pre-write yakalandı, runtime crash önlendi.
+4. **W3.6.A.1.5 refactor scope (b) avoidance:** RedisCacheService Pattern (c) yakalandı, scope creep yok, Frontend onayı gerekmedi.
+5. **W3.6.A.1.5 Hexagonal port-adapter koruma:** `Translations.cs:5` yorum dokunulmadı, Infrastructure'da converter (KAYDET-7/W1-4 hiyerarşi).
+6. **W3.6.A.1.5 MemoryCacheService dokunulmadı:** Frontend kararı birebir, gereksiz değişiklik önlendi.
+7. **W3.6.A.1.5 LanguageCode VO ToLowerInvariant garantisi:** Backend gereksiz duplicate normalize eklemedi (VO ctor zaten normalize).
+8. **W3.6.A.1.5 null token kapsamlı handling:** Nested null'da fail-fast `JsonException`, invariant koruma.
+9. **Blok-B G1 5 DTO fresh-read (F-S42 dersi uygulaması):** Memory ezber yerine fiili kaynak, KAYDET-9 öğreniminin Backend tarafı transfer.
+10. **Blok-B G1 doc-literal flag yakalama:** `LocationDto.cs:5` yorumu "Centroid YOK, CountryCode plain ISO string" ön-çekincesini geçersiz kıldı.
+11. **Blok-B G5 self-audit fiili enumerasyon:** 22/22/22/22 birebir eşit, F-S22 (Wave 2) emsali metot atlanmadığı kanıtlandı.
+12. **Blok-B pattern tutarlılığı:** Country trio pin'lenen pattern 19 metoda birebir uygulandı, "smart" optimization yok (Aile 4 hijyen).
+13. **Blok-B class-level XML doc revize:** Blok-A obsolete ifadesi güncellendi, kod-doc senkron (KAYDET-9 doc-vs-fiili drift önleme).
+14. **Sentinel token (`lvl-any`, `cat-any`):** Null parametre cache slot collision sıfırlandı.
+15. **Scrutor `[5.*, 6.0)` major-pin Sa4 risksiz geçti:** W3.5A pattern emsali, Scrutor 5.1.2 .NET 10 clean build, sürüm bump gerekmedi.
+16. **K1 G1 Frontend ezber drift yakalama (Sapma 87 / F-S55 pozitif yan):** Backend Sapma 84 (F-S52) dersinin çapraz uygulaması, Frontend K1 ezber numarasını fiili doc state ile çelişkide yakaladı, KAYDET-7 hiyerarşi uygulamasıyla Frontend talimatı revize edildi. Karşılıklı pekişme.
+17. **K2-pre G1 Frontend F-S etiket ezber drift yakalama (Sapma 88 / F-S56 pozitif yan, Backend Sapma 84 cross-application sürekli):** Backend K2 Gate 1 fresh-read'de mid-handover-3 sapma defterini okudu, K1 commit'teki F-S41–F-S45 atamasının mid-handover-3 F-S41–F-S50 atamasıyla çakıştığını yakaladı. DUR sinyali, K1 amend safe operation (lokal-only, push'lanmadı). Sapma 87 (F-S55) ile aynı sistemik Frontend KAYDET-9 ihlal pattern'i, ama daha derin (etiket çakışması, sayım drift değil). Karşılıklı KAYDET-9 çapraz pekişmesi üçüncü tezahürü. Pozitif önleme: push öncesi etiket temizliği, K3 push tatbikatında ledger semantic clarity, mid-handover-3 handover-only F-S23–F-S50 + Wave 3 W3.6.A distinct F-S51–F-S56 iki ayrı seri net.
+
+**Bilgi notu (F-S### kaydı değil):** `CertificationTypeDto.NameTranslations`/`DescriptionTranslations` adlandırma `CategoryDto`/`BreedDto` `Name`/`Description`'dan farklı — pre-existing tasarım kararı (entity §4:400-412 doc-grounded), converter scope etkilemez. W3.6.A.1.5'te kayıt.
+
+## Wave 3 W3.6.A Reconcile Notu
+
+Header satır 4 (`Toplam: 43`) W1-2 ihlali idi (Wave 2 +39 reconcile satır 134–136'da yapılmış ama header satırı güncellenmemişti). K1 commit'inde fırsat-yakalama düzeltmesiyle header **fiili tablo enumerasyonundan** yeniden hesaplanıp güncellendi: `Toplam: 87` (Wave 0+1: 43 + Wave 2: +39 + Wave 3 W3.6.A: +5). Genel İstatistik bölümü (satır 7–10) de aynı reconcile ile güncellendi. Aile/KAYDET listesi güncellemesi ve Wave 3 Retrospektif Wave 3 sonu final reconcile turunda (deviations.md final reconcile) yapılacak.
+
+**K2-pre amend (F-S etiket çakışması düzeltme):** K1 commit (ilk SHA `a782927`) ilk yazımda "memory etiket F-S41–F-S45" Wave 3 W3.6.A için tahsis edildi, ancak `_docs/wave-3-handover-mid.md` satır 113–120 F-S41–F-S50 ZATEN atanmış (W3.5B sub-batch handover-only ledger). Backend K2 Gate 1 fresh-read'de yakaladı, K1 commit lokal-only (origin/rebuild/v2 = `8c75694`, push'lanmadı) amend safe operation. Memory etiketler F-S41–F-S45 → F-S51–F-S55 rename, continuous Sapma numaraları (83–87) sabit. Yeni F-S56 etiketi bu çakışma sapma'sına (Sapma 88) tahsis. F-S serisi temiz: mid-handover-3 handover-only F-S23–F-S50 + Wave 3 W3.6.A distinct F-S51–F-S56. KAYDET-7 hiyerarşi (fiili doc baskın) uygulaması, Sapma 84 (F-S52) dersi sürekli pekişme. Header `Toplam: 87 → 88` (+1, Sapma 88 Frontend), Genel İstatistik Frontend 71 → 72.
