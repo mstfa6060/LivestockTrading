@@ -1,6 +1,9 @@
+using LivestockTrading.Catalog.Application.Abstractions;
+using LivestockTrading.Catalog.Infrastructure.Caching;
 using LivestockTrading.Catalog.Infrastructure.Persistence;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 
 namespace LivestockTrading.Catalog.Infrastructure;
 
@@ -8,8 +11,9 @@ namespace LivestockTrading.Catalog.Infrastructure;
 /// DI extension for Catalog.Infrastructure.
 /// W3.0 placeholder — wire-up lands across later sub-batches:
 /// repositories + IUnitOfWork (W3.3, DI host-wire W3.7), domain-event dispatch
-/// interceptor (W3.4, this), read service + cache (W3.5), rate providers + Quartz (W3.6),
-/// DbContext + interceptor wire + endpoint mapping (W3.7, host-inert SON).
+/// interceptor (W3.4), cache foundation (W3.5A, this), read service + AdminRead (W3.5B),
+/// rate providers + Quartz (W3.6), DbContext + interceptor wire + endpoint mapping
+/// (W3.7, host-inert SON).
 /// Doc grounding: 01-architecture.md:185 (only LivestockTrading.Api host references
 /// module .Infrastructure for DI registration); 03-domain-patterns.md Kural 5.
 /// </summary>
@@ -26,7 +30,26 @@ public static class CatalogInfrastructureModule
         // AddDbContext ile tek noktada gelir).
         services.AddScoped<DomainEventDispatchInterceptor>();
 
-        // Sıradaki: W3.5 (read+cache), W3.6 (rate providers + Quartz),
+        // W3.5A: cache foundation — Plan-1 Karar 4 config-driven Catalog:CacheProvider
+        // (default "Memory" — dev/test güvenli; "Redis" prod opt-in). Singleton tüm cache
+        // services: Memory shared in-process state, Redis IConnectionMultiplexer connection
+        // reuse pattern (StackExchange.Redis resmi, thread-safe internal pool).
+        var cacheProvider = configuration["Catalog:CacheProvider"] ?? "Memory";
+        if (string.Equals(cacheProvider, "Redis", StringComparison.OrdinalIgnoreCase))
+        {
+            var redisConn = configuration.GetConnectionString("Redis")
+                ?? throw new InvalidOperationException(
+                    "Redis CacheProvider seçildi ama ConnectionStrings:Redis yapılandırması eksik.");
+            services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConn));
+            services.AddSingleton<ICacheService, RedisCacheService>();
+        }
+        else
+        {
+            services.AddMemoryCache();
+            services.AddSingleton<ICacheService, MemoryCacheService>();
+        }
+
+        // Sıradaki: W3.5B (read service + AdminRead transition), W3.6 (rate providers + Quartz),
         // W3.7 (DbContext + interceptor wire + endpoint mapping, host-inert SON).
         return services;
     }
