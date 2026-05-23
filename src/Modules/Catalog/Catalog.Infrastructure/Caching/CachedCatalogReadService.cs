@@ -11,10 +11,10 @@ namespace LivestockTrading.Catalog.Infrastructure.Caching;
 /// cache SET ETME, sonraki cagri yine inner'a iner. Validator metotlari `bool?` boxing ile
 /// cache-miss-vs-false ayrimi yapar (default(bool) = false false-positive olusturmasin).
 ///
-/// Blok-A scope: Country trio (3 metot) cache-aside full impl; kalan 19 metot inner
-/// passthrough — Blok-B'de tek tek cache-wrap'lenecek. F-S51 (Translations STJ-deser
-/// uyumsuzlugu) W3.6.A.1.5 sub-batch'te JsonConverter pattern ile cozulecek; Country trio
-/// Translations icermez (primitive only DTO), Blok-A risk-free.
+/// Blok-A (W3.6.A.1) Country trio cache-aside full impl + Blok-B (W3.6.A.2) kalan 19 metot
+/// cache-aside complete = 22/22 metot. F-S51 (Translations STJ-deser) W3.6.A.1.5'te
+/// JsonConverter ile cozuldu — Category/Breed/CertificationType/Brand/Location metotlari
+/// Redis-safe (Translations field'lari converter ile ser/deser).
 /// </summary>
 internal sealed class CachedCatalogReadService : ICatalogReadService
 {
@@ -69,74 +69,257 @@ internal sealed class CachedCatalogReadService : ICatalogReadService
         return result;
     }
 
-    // ───────── Currency (Blok-B: passthrough) ─────────
+    // ───────── Currency ─────────
 
-    public Task<CurrencyDto?> GetCurrencyAsync(string code, CancellationToken ct)
-        => _inner.GetCurrencyAsync(code, ct);
+    public async Task<CurrencyDto?> GetCurrencyAsync(string code, CancellationToken ct)
+    {
+        var key = $"livestock:catalog:currency:{code}";
+        var cached = await _cache.GetAsync<CurrencyDto>(key, ct);
+        if (cached is not null)
+            return cached;
 
-    public Task<IReadOnlyList<CurrencyDto>> ListActiveCurrenciesAsync(CancellationToken ct)
-        => _inner.ListActiveCurrenciesAsync(ct);
+        var result = await _inner.GetCurrencyAsync(code, ct);
+        if (result is not null)
+            await _cache.SetAsync(key, result, CacheTtl.ReferenceData, ct);
+        return result;
+    }
 
-    public Task<decimal?> GetRateToUsdAsync(string code, CancellationToken ct)
-        => _inner.GetRateToUsdAsync(code, ct);
+    public async Task<IReadOnlyList<CurrencyDto>> ListActiveCurrenciesAsync(CancellationToken ct)
+    {
+        const string key = "livestock:catalog:currency:list:active";
+        var cached = await _cache.GetAsync<IReadOnlyList<CurrencyDto>>(key, ct);
+        if (cached is not null)
+            return cached;
 
-    // ───────── Language (Blok-B: passthrough) ─────────
+        var result = await _inner.ListActiveCurrenciesAsync(ct);
+        await _cache.SetAsync(key, result, CacheTtl.ReferenceData, ct);
+        return result;
+    }
 
-    public Task<LanguageDto?> GetLanguageAsync(string code, CancellationToken ct)
-        => _inner.GetLanguageAsync(code, ct);
+    public async Task<decimal?> GetRateToUsdAsync(string code, CancellationToken ct)
+    {
+        var key = $"livestock:catalog:currency:rate:{code}";
+        // decimal? value type — cache-miss = default(decimal?) = null; hit HasValue=true.
+        var cached = await _cache.GetAsync<decimal?>(key, ct);
+        if (cached.HasValue)
+            return cached;
 
-    public Task<IReadOnlyList<LanguageDto>> ListActiveLanguagesAsync(CancellationToken ct)
-        => _inner.ListActiveLanguagesAsync(ct);
+        var result = await _inner.GetRateToUsdAsync(code, ct);
+        if (result.HasValue)
+            await _cache.SetAsync(key, result, CacheTtl.CurrencyRate, ct);
+        return result;
+    }
 
-    public Task<bool> IsValidActiveLanguageCodeAsync(string code, CancellationToken ct)
-        => _inner.IsValidActiveLanguageCodeAsync(code, ct);
+    // ───────── Language ─────────
 
-    // ───────── Category (Blok-B: passthrough; F-S51 Translations etkilenir) ─────────
+    public async Task<LanguageDto?> GetLanguageAsync(string code, CancellationToken ct)
+    {
+        var key = $"livestock:catalog:language:{code}";
+        var cached = await _cache.GetAsync<LanguageDto>(key, ct);
+        if (cached is not null)
+            return cached;
 
-    public Task<CategoryDto?> GetCategoryByCodeAsync(string code, CancellationToken ct)
-        => _inner.GetCategoryByCodeAsync(code, ct);
+        var result = await _inner.GetLanguageAsync(code, ct);
+        if (result is not null)
+            await _cache.SetAsync(key, result, CacheTtl.ReferenceData, ct);
+        return result;
+    }
 
-    public Task<CategoryTreeDto> GetCategoryTreeAsync(CancellationToken ct)
-        => _inner.GetCategoryTreeAsync(ct);
+    public async Task<IReadOnlyList<LanguageDto>> ListActiveLanguagesAsync(CancellationToken ct)
+    {
+        const string key = "livestock:catalog:language:list:active";
+        var cached = await _cache.GetAsync<IReadOnlyList<LanguageDto>>(key, ct);
+        if (cached is not null)
+            return cached;
 
-    public Task<bool> IsValidActiveCategoryCodeAsync(string code, int? requiredLevel, CancellationToken ct)
-        => _inner.IsValidActiveCategoryCodeAsync(code, requiredLevel, ct);
+        var result = await _inner.ListActiveLanguagesAsync(ct);
+        await _cache.SetAsync(key, result, CacheTtl.ReferenceData, ct);
+        return result;
+    }
 
-    // ───────── Breed (Blok-B: passthrough; F-S51 Translations etkilenir) ─────────
+    public async Task<bool> IsValidActiveLanguageCodeAsync(string code, CancellationToken ct)
+    {
+        var key = $"livestock:catalog:language:valid:{code}";
+        var cached = await _cache.GetAsync<bool?>(key, ct);
+        if (cached.HasValue)
+            return cached.Value;
 
-    public Task<BreedDto?> GetBreedByCodeAsync(string code, CancellationToken ct)
-        => _inner.GetBreedByCodeAsync(code, ct);
+        var result = await _inner.IsValidActiveLanguageCodeAsync(code, ct);
+        await _cache.SetAsync<bool?>(key, result, CacheTtl.Validator, ct);
+        return result;
+    }
 
-    public Task<IReadOnlyList<BreedDto>> ListBreedsByCategoryAsync(string categoryCode, CancellationToken ct)
-        => _inner.ListBreedsByCategoryAsync(categoryCode, ct);
+    // ───────── Category (Translations icerir — W3.6.A.1.5 converter ile Redis-safe) ─────────
 
-    public Task<bool> IsValidActiveBreedCodeAsync(string code, string? requiredCategoryCode, CancellationToken ct)
-        => _inner.IsValidActiveBreedCodeAsync(code, requiredCategoryCode, ct);
+    public async Task<CategoryDto?> GetCategoryByCodeAsync(string code, CancellationToken ct)
+    {
+        var key = $"livestock:catalog:category:{code}";
+        var cached = await _cache.GetAsync<CategoryDto>(key, ct);
+        if (cached is not null)
+            return cached;
 
-    // ───────── Brand (Blok-B: passthrough) ─────────
+        var result = await _inner.GetCategoryByCodeAsync(code, ct);
+        if (result is not null)
+            await _cache.SetAsync(key, result, CacheTtl.Category, ct);
+        return result;
+    }
 
-    public Task<BrandDto?> GetBrandByIdAsync(Guid brandId, CancellationToken ct)
-        => _inner.GetBrandByIdAsync(brandId, ct);
+    public async Task<CategoryTreeDto> GetCategoryTreeAsync(CancellationToken ct)
+    {
+        const string key = "livestock:catalog:category:tree";
+        var cached = await _cache.GetAsync<CategoryTreeDto>(key, ct);
+        if (cached is not null)
+            return cached;
 
-    public Task<bool> IsValidBrandForCategoryAsync(Guid brandId, int categoryId, CancellationToken ct)
-        => _inner.IsValidBrandForCategoryAsync(brandId, categoryId, ct);
+        var result = await _inner.GetCategoryTreeAsync(ct);
+        // CategoryTreeDto non-nullable; inner her zaman sentinel kok ile tree doner (Domain invariant).
+        await _cache.SetAsync(key, result, CacheTtl.Category, ct);
+        return result;
+    }
 
-    // ───────── Location (Blok-B: passthrough) ─────────
+    public async Task<bool> IsValidActiveCategoryCodeAsync(string code, int? requiredLevel, CancellationToken ct)
+    {
+        var levelToken = requiredLevel.HasValue ? $"lvl-{requiredLevel.Value}" : "lvl-any";
+        var key = $"livestock:catalog:category:valid:{code}:{levelToken}";
+        var cached = await _cache.GetAsync<bool?>(key, ct);
+        if (cached.HasValue)
+            return cached.Value;
 
-    public Task<LocationDto?> GetLocationAsync(int locationId, CancellationToken ct)
-        => _inner.GetLocationAsync(locationId, ct);
+        var result = await _inner.IsValidActiveCategoryCodeAsync(code, requiredLevel, ct);
+        await _cache.SetAsync<bool?>(key, result, CacheTtl.Validator, ct);
+        return result;
+    }
 
-    public Task<bool> IsValidLocationIdAsync(int locationId, CancellationToken ct)
-        => _inner.IsValidLocationIdAsync(locationId, ct);
+    // ───────── Breed (Translations icerir — W3.6.A.1.5 converter ile Redis-safe) ─────────
 
-    // ───────── CertificationType (Blok-B: passthrough; F-S51 Translations etkilenir) ─────────
+    public async Task<BreedDto?> GetBreedByCodeAsync(string code, CancellationToken ct)
+    {
+        var key = $"livestock:catalog:breed:{code}";
+        var cached = await _cache.GetAsync<BreedDto>(key, ct);
+        if (cached is not null)
+            return cached;
 
-    public Task<CertificationTypeDto?> GetCertificationTypeAsync(string code, CancellationToken ct)
-        => _inner.GetCertificationTypeAsync(code, ct);
+        var result = await _inner.GetBreedByCodeAsync(code, ct);
+        if (result is not null)
+            await _cache.SetAsync(key, result, CacheTtl.Breed, ct);
+        return result;
+    }
 
-    public Task<IReadOnlyList<CertificationTypeDto>> ListActiveCertificationTypesAsync(CancellationToken ct)
-        => _inner.ListActiveCertificationTypesAsync(ct);
+    public async Task<IReadOnlyList<BreedDto>> ListBreedsByCategoryAsync(string categoryCode, CancellationToken ct)
+    {
+        var key = $"livestock:catalog:breed:list:by-category:{categoryCode}";
+        var cached = await _cache.GetAsync<IReadOnlyList<BreedDto>>(key, ct);
+        if (cached is not null)
+            return cached;
 
-    public Task<bool> IsValidCertificationTypeIdAsync(int id, CancellationToken ct)
-        => _inner.IsValidCertificationTypeIdAsync(id, ct);
+        var result = await _inner.ListBreedsByCategoryAsync(categoryCode, ct);
+        await _cache.SetAsync(key, result, CacheTtl.Breed, ct);
+        return result;
+    }
+
+    public async Task<bool> IsValidActiveBreedCodeAsync(string code, string? requiredCategoryCode, CancellationToken ct)
+    {
+        var catToken = requiredCategoryCode is not null ? $"cat-{requiredCategoryCode}" : "cat-any";
+        var key = $"livestock:catalog:breed:valid:{code}:{catToken}";
+        var cached = await _cache.GetAsync<bool?>(key, ct);
+        if (cached.HasValue)
+            return cached.Value;
+
+        var result = await _inner.IsValidActiveBreedCodeAsync(code, requiredCategoryCode, ct);
+        await _cache.SetAsync<bool?>(key, result, CacheTtl.Validator, ct);
+        return result;
+    }
+
+    // ───────── Brand (BrandDto Translations icerir — W3.6.A.1.5 converter ile Redis-safe) ─────────
+
+    public async Task<BrandDto?> GetBrandByIdAsync(Guid brandId, CancellationToken ct)
+    {
+        var key = $"livestock:catalog:brand:{brandId}";
+        var cached = await _cache.GetAsync<BrandDto>(key, ct);
+        if (cached is not null)
+            return cached;
+
+        var result = await _inner.GetBrandByIdAsync(brandId, ct);
+        if (result is not null)
+            await _cache.SetAsync(key, result, CacheTtl.Brand, ct);
+        return result;
+    }
+
+    public async Task<bool> IsValidBrandForCategoryAsync(Guid brandId, int categoryId, CancellationToken ct)
+    {
+        var key = $"livestock:catalog:brand:valid-for-category:{brandId}:{categoryId}";
+        var cached = await _cache.GetAsync<bool?>(key, ct);
+        if (cached.HasValue)
+            return cached.Value;
+
+        var result = await _inner.IsValidBrandForCategoryAsync(brandId, categoryId, ct);
+        await _cache.SetAsync<bool?>(key, result, CacheTtl.Validator, ct);
+        return result;
+    }
+
+    // ───────── Location (LocationDto Translations icerir — W3.6.A.1.5 converter ile Redis-safe) ─────────
+
+    public async Task<LocationDto?> GetLocationAsync(int locationId, CancellationToken ct)
+    {
+        var key = $"livestock:catalog:location:{locationId}";
+        var cached = await _cache.GetAsync<LocationDto>(key, ct);
+        if (cached is not null)
+            return cached;
+
+        var result = await _inner.GetLocationAsync(locationId, ct);
+        if (result is not null)
+            await _cache.SetAsync(key, result, CacheTtl.ReferenceData, ct);
+        return result;
+    }
+
+    public async Task<bool> IsValidLocationIdAsync(int locationId, CancellationToken ct)
+    {
+        var key = $"livestock:catalog:location:valid:{locationId}";
+        var cached = await _cache.GetAsync<bool?>(key, ct);
+        if (cached.HasValue)
+            return cached.Value;
+
+        var result = await _inner.IsValidLocationIdAsync(locationId, ct);
+        await _cache.SetAsync<bool?>(key, result, CacheTtl.Validator, ct);
+        return result;
+    }
+
+    // ───────── CertificationType (Translations icerir — W3.6.A.1.5 converter ile Redis-safe) ─────────
+
+    public async Task<CertificationTypeDto?> GetCertificationTypeAsync(string code, CancellationToken ct)
+    {
+        var key = $"livestock:catalog:cert-type:{code}";
+        var cached = await _cache.GetAsync<CertificationTypeDto>(key, ct);
+        if (cached is not null)
+            return cached;
+
+        var result = await _inner.GetCertificationTypeAsync(code, ct);
+        if (result is not null)
+            await _cache.SetAsync(key, result, CacheTtl.CertificationType, ct);
+        return result;
+    }
+
+    public async Task<IReadOnlyList<CertificationTypeDto>> ListActiveCertificationTypesAsync(CancellationToken ct)
+    {
+        const string key = "livestock:catalog:cert-type:list:active";
+        var cached = await _cache.GetAsync<IReadOnlyList<CertificationTypeDto>>(key, ct);
+        if (cached is not null)
+            return cached;
+
+        var result = await _inner.ListActiveCertificationTypesAsync(ct);
+        await _cache.SetAsync(key, result, CacheTtl.CertificationType, ct);
+        return result;
+    }
+
+    public async Task<bool> IsValidCertificationTypeIdAsync(int id, CancellationToken ct)
+    {
+        var key = $"livestock:catalog:cert-type:valid:{id}";
+        var cached = await _cache.GetAsync<bool?>(key, ct);
+        if (cached.HasValue)
+            return cached.Value;
+
+        var result = await _inner.IsValidCertificationTypeIdAsync(id, ct);
+        await _cache.SetAsync<bool?>(key, result, CacheTtl.Validator, ct);
+        return result;
+    }
 }
