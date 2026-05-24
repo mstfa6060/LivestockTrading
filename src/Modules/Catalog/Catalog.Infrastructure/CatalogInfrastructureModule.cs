@@ -2,8 +2,10 @@ using LivestockTrading.Catalog.Application.Abstractions;
 using LivestockTrading.Catalog.Infrastructure.Caching;
 using LivestockTrading.Catalog.Infrastructure.Persistence;
 using LivestockTrading.Catalog.Infrastructure.RateProviders;
+using LivestockTrading.Catalog.Infrastructure.Scheduling;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Quartz;
 using Scrutor;
 using Shared.Contracts.Catalog;
 using Shared.Contracts.Catalog.Admin;
@@ -96,9 +98,23 @@ public static class CatalogInfrastructureModule
         services.AddTransient<IRateProvider>(sp => sp.GetRequiredService<EcbRateProvider>());
         services.AddTransient<IRateProvider>(sp => sp.GetRequiredService<CurrencyApiRateProvider>());
 
-        // Sıradaki: W3.6.C (Quartz scheduler + CurrencyRateUpdateJob), W3.6.D (event handlers +
-        // CurrencyRateRefresher impl + RefreshExchangeRatesHandler swap), W3.7 (DbContext +
-        // interceptor wire + endpoint mapping, host-inert SON).
+        // W3.6.C: Quartz scheduler + CurrencyRateUpdateJob (plan-doc 05-catalog.md §6:655-697).
+        // Cron "0 0 13 * * ?" = daily 13:00:00 UTC (TCMB ~12:30 UTC publish + 30dk buffer §6:697).
+        // Quartz default scheduler in-memory store (Faz 1; persistent JobStore Wave 5+ HA backlog).
+        // WaitForJobsToComplete = true: graceful shutdown semantic, in-flight rate fetch tamamlanir.
+        services.AddQuartz(q =>
+        {
+            var jobKey = new JobKey("CurrencyRateUpdate");
+            q.AddJob<CurrencyRateUpdateJob>(jobKey);
+            q.AddTrigger(t => t
+                .WithIdentity("CurrencyRateUpdateTrigger")
+                .ForJob(jobKey)
+                .WithCronSchedule("0 0 13 * * ?"));
+        });
+        services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
+
+        // Sıradaki: W3.6.D (event handlers + CurrencyRateRefresher impl + RefreshExchangeRatesHandler
+        // swap), W3.7 (DbContext + interceptor wire + endpoint mapping, host-inert SON).
         return services;
     }
 }
