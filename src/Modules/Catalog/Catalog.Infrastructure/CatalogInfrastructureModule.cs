@@ -1,5 +1,6 @@
 using LivestockTrading.Catalog.Application.Abstractions;
 using LivestockTrading.Catalog.Infrastructure.Caching;
+using LivestockTrading.Catalog.Infrastructure.Currencies;
 using LivestockTrading.Catalog.Infrastructure.Persistence;
 using LivestockTrading.Catalog.Infrastructure.RateProviders;
 using LivestockTrading.Catalog.Infrastructure.Scheduling;
@@ -113,8 +114,12 @@ public static class CatalogInfrastructureModule
         });
         services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
 
-        // Sıradaki: W3.6.D (event handlers + CurrencyRateRefresher impl + RefreshExchangeRatesHandler
-        // swap), W3.7 (DbContext + interceptor wire + endpoint mapping, host-inert SON).
+        // W3.6.D: ICurrencyRateRefresher concrete (single source of truth — Quartz CurrencyRateUpdateJob
+        // ve admin RefreshExchangeRatesHandler ayni impl'i delege eder, DRY karari). Lifetime Scoped:
+        // CatalogDbContext Scoped (EF Core default) + Refresher DbContext dependency → Scoped zorunlu.
+        services.AddScoped<ICurrencyRateRefresher, CurrencyRateRefresher>();
+
+        // Sıradaki: W3.7 (DbContext + interceptor wire + endpoint mapping, host-inert SON).
         return services;
     }
 }
