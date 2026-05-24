@@ -1,13 +1,14 @@
 # Sapma Defteri — Konsolide Ledger
 
 **Kapsam:** Tüm wave'ler. **Numaralandırma:** Yakalanma sırasına göre, kategoriden bağımsız, wave'ler arası sürekli.
-**Toplam:** 88 (Backend 15 / Frontend 72 / Bilgi notu 1), **0 production sızıntısı.**
+**Toplam:** 133 (Backend 18 / Frontend 114 / Bilgi notu 1), **0 production sızıntısı.**
 
 ## Genel İstatistik
-- Backend: 15 (tool/süreç davranışı, proaktif yakalama)
-- Frontend Claude: 72 (talimat tahmini + varsayım güveni)
+- Backend: 18 (tool/süreç davranışı, proaktif yakalama; Wave 3 W3.6.B-W3.7 +3 Aile 6 plan-doc vs fiili kod)
+- Frontend Claude: 114 (talimat tahmini + varsayım güveni; Wave 3 W3.6.B-W3.7 +42 Aile 3 KAYDET-32 ana kategori)
 - Bilgi notu: 1 (Sapma 39 — repo snapshot context, hata değil, split dışı)
 - Frontend hatalarının 0'ı production'a sızdı — Backend disiplini + classifier her seferinde yakaladı.
+- **Wave 3 RESMEN KAPANIS:** 13/13 sub-batch, 36 push tatbikati, main INVARIANT 44416138 korundu, 0 production sızıntısı. KAYDET-32 ledger 22 sistemik tezahur, KAYDET-33 + KAYDET-34 yeni formal kayıt.
 
 ---
 
@@ -297,3 +298,165 @@ W3.6.A sub-batch boyunca yakalanan 17 pre-empt ve drift önleme örneği:
 Header satır 4 (`Toplam: 43`) W1-2 ihlali idi (Wave 2 +39 reconcile satır 134–136'da yapılmış ama header satırı güncellenmemişti). K1 commit'inde fırsat-yakalama düzeltmesiyle header **fiili tablo enumerasyonundan** yeniden hesaplanıp güncellendi: `Toplam: 87` (Wave 0+1: 43 + Wave 2: +39 + Wave 3 W3.6.A: +5). Genel İstatistik bölümü (satır 7–10) de aynı reconcile ile güncellendi. Aile/KAYDET listesi güncellemesi ve Wave 3 Retrospektif Wave 3 sonu final reconcile turunda (deviations.md final reconcile) yapılacak.
 
 **K2-pre amend (F-S etiket çakışması düzeltme):** K1 commit (ilk SHA `a782927`) ilk yazımda "memory etiket F-S41–F-S45" Wave 3 W3.6.A için tahsis edildi, ancak `_docs/wave-3-handover-mid.md` satır 113–120 F-S41–F-S50 ZATEN atanmış (W3.5B sub-batch handover-only ledger). Backend K2 Gate 1 fresh-read'de yakaladı, K1 commit lokal-only (origin/rebuild/v2 = `8c75694`, push'lanmadı) amend safe operation. Memory etiketler F-S41–F-S45 → F-S51–F-S55 rename, continuous Sapma numaraları (83–87) sabit. Yeni F-S56 etiketi bu çakışma sapma'sına (Sapma 88) tahsis. F-S serisi temiz: mid-handover-3 handover-only F-S23–F-S50 + Wave 3 W3.6.A distinct F-S51–F-S56. KAYDET-7 hiyerarşi (fiili doc baskın) uygulaması, Sapma 84 (F-S52) dersi sürekli pekişme. Header `Toplam: 87 → 88` (+1, Sapma 88 Frontend), Genel İstatistik Frontend 71 → 72.
+
+---
+
+## Wave 3 W3.6.B → W3.7 Reconcile (Sapma 89–134, 46 distinct)
+
+### Stat Reconcile
+
+- Wave 0+1+2 + W3.6.A baseline: 88 distinct Sapma
+- Wave 3 W3.6.B → W3.7: +46 distinct Sapma (handover-only F-S23–F-S50 25 entry formal + F-S57 + W3.6.C 9 + W3.6.D 6 + W3.7 5)
+- **TOPLAM: 134 distinct Sapma**, 0 production sızıntısı
+
+### Handover-only F-S23–F-S50 Formal (Sapma 89–113, mid-handover-3 `8c75694` snapshot)
+
+Wave 3 W3.0–W3.5B sub-batch'lerinde yakalanan ve `_docs/wave-3-handover-mid.md` mid-handover-3 (commit `8c75694`) handover-only ledger'da kayıtlı F-S23–F-S50 (25 distinct entry; F-S46+F-S48 atlanan — pozitif önleme/muafiyet; F-S23/24/25 birleşik kayıt) formal Sapma numarasına çevrildi:
+
+| # | F-S | Aile | Açıklama |
+|---|---|---|---|
+| 89 | F-S23/S24/S25 | 4 | Wave 2 sonu bayat-state/aritmetik (3 entry birleşik) |
+| 90 | F-S26 | 4 | W3.0 talimat-transport defect (ardışık-2+3. tekrar) |
+| 91 | F-S27 | 3 | Frontend push-emsal grep'siz paraphrase (Wave 1/2 fiili push dağılımı) |
+| 92 | F-S28 | önleme | Handover commit'leri sub-batch push gruplarına yedirilmez (ayrı ara push pattern) |
+| 93 | F-S29 | bilgi | CRLF→LF + tool 10.0.5<10.0.8 benign notları (split dışı) |
+| 94 | F-S30 | 3 | Frontend KARAR 2/4 örnek yolu+VO adı Wave 1 fiili koddan farklı |
+| 95 | F-S31 | 6 | W3.1 Adım 4 build-fail 5× CS8620 NRT variance Translations nullable variant tasarım eksikliği |
+| 96 | F-S32 | 3/6 | W3.1 Adım 5 `dotnet ef migrations script` tool semantiği yanlış varsayım |
+| 97 | F-S33 | önleme | Backend pattern sorgusuz almama + fresh read disipline (W3.3 Adım 2 6 port grep, 3 anlamlı sapma flag) |
+| 98 | F-S34 | 3 | W3.3 talimat KARAR 2/3/4 örnek pattern Wave 2 port imzalarıyla cross-check edilmedi |
+| 99 | F-S35 | 3 | W3.4 KARAR 4 (a) Frontend tercihi Karar 1.a + KAYDET-17 + W3.0 yorumla çelişti |
+| 100 | F-S36 | 6 | W3.4 Adım 4 build-fail 2× CS0246 IMediator namespace; G1 compile-test G4 amendment |
+| 101 | F-S37 | önleme | Transport-tekrarı 3+ eşik Backend aktif disambiguation sorgu, kör retry yasak |
+| 102 | F-S38 | 3 | W3.5A Frontend talimat KARAR 3 config key "CacheMode" Plan-1 lock ile çelişti |
+| 103 | F-S39 | 6 | W3.5A R2-A `StringSetAsync` method-signature TimeSpan? positional vs 2.8+ Expiration mismatch |
+| 104 | F-S40 | 6 | W3.5A R2-B `Expiration.For/Never` struct üye isim assumption invalid CS0117; R3-A 2-call SET+EXPIRE pragmatik |
+| 105 | F-S41 | 3 | W3.5B.1 talimat ICatalogReadService "25 metot" ezber; fiili port 22 metot (W1-4 port baskın) |
+| 106 | F-S42 | 3+1 | W3.5B.1 stub DELETE talimat-eksik test envanteri (AdminCatalogReadServiceTests 3 NotImpl assert); Backend KRİTİK DUR ile build-fail önlendi (Seçenek A atomik prod+test sil onaylı, 154→151) |
+| 107 | F-S43 | 3 | W3.5B talimat path `src/Shared/Shared.Contracts/` yanlış; fiili `src/Shared/LivestockTrading.Shared.Contracts/` (modül-bazlı klasör adlandırma ezber) |
+| 108 | F-S44 | 3 | W3.5B.3 talimat MissingTranslationsReport 4. bucket "Locations?" sorulu cevap; fiili port `Certifications` (Locations DAHİL DEĞİL doc-literal) |
+| 109 | F-S45 | 6 | W3.5B.2 enum dublication 4 cast fix iterasyonu: LocationLevel + BrandStatus×2 + AttributeValueType (S12 iç-numaralı); R-A patron tek-shot fix yeşil |
+| 110 | F-S46 | önleme/atlanan | S11 muafiyeti: interface impl sub-build CS0535 yapısal kaçınılmaz tek-shot doğal (defekt değil) |
+| 111 | F-S47 | 6 | W3.5B.3 Adım 1 port doğrulama 4. bucket Certifications; Backend port-fiili grep proaktif, F-S44 dilek-Frontend ezberini reddetti (S13 iç-numaralı) |
+| 112 | F-S48 | önleme/atlanan | S14 proaktif önleme: BrandStatus enum dublication W3.5B.2 dersinden W3.5B.3'te proaktif yakalama (Aile 6 önleme) |
+| 113 | F-S49 | 6 | W3.5B.3 jsonb ContainsKey LINQ emsal yok (grep 0 sonuç); GetMissingTranslationsAsync (B) ToList+in-memory zorunlu (S15 iç-numaralı) |
+| (F-S50 → 114) | F-S50 | 5+1 | W3.5B Grup 3 push tamamlandı raporu fiili push yapılmadan geldi; Backend `git fetch + ls-remote` bağımsız doğrulama tespit, Mustafa düzeltici push sonrası teyit; F-S25 emsali Mustafa raporuna körlemesine güven YASAK kalıcı disipline |
+
+> **Not:** F-S50 Sapma 114 olarak ayrı numara (yukarıda tabloya satır eksikliği için kayıt: Sapma 114 = F-S50 Aile 5+1).
+
+### Wave 3 W3.6.B F-S57 (Sapma 115)
+
+| # | Taraf | Konum | Açıklama |
+|---|---|---|---|
+| 115 | Frontend (Aile 2) | W3.6.B B.4 | (F-S57) Plan-doc §6:635 (2025) exchangerate.host free aggregator varsayımı vs fiili 2026-05 apilayer API key paywall divergence (HTTP 200 + body `success:false` + `error.code:101 missing_access_key`). Backend Adım 2 fresh-fetch curl ile yakaladı, dosya yaratma erken DUR. Frankfurter HTTP 404 pre-test yakaladı. Fawazahmed0 jsdelivr CDN tier 3 swap onayı. Çözüm: RateProvider enum `ExchangeRateHost = 3` → `CurrencyApi = 3` rename + CurrencyApiRateProvider.cs Fawazahmed0 lowercase nested JSON parse. Plan-doc §6:635 revize bu reconcile turunda gerçekleşti. |
+
+### Wave 3 W3.6.C Sapmaları (9 distinct, Sapma 116–124)
+
+| # | Sub-batch | Aile | KAYDET | Açıklama |
+|---|---|---|---|---|
+| 116 | W3.6.C Adım 1 | 3 | KAYDET-32 | Talimat path UZUN form `LivestockTrading.Catalog.Application/` vs fiili KISA `Catalog.Application/` (path ezber, 1. instance Wave 3 W3.6.C) |
+| 117 | W3.6.C Adım 1.5 | 3 | KAYDET-32 | Path UZUN form drift tekrar (Sapma 116 ile aynı kategori, 2. instance) |
+| 118 | W3.6.C Adım 1.5 | 3 | KAYDET-32 | Talimat `ReadServices/` klasörü vs fiili `Persistence/` altında (klasör adı ezber) |
+| 119 | W3.6.C C.1 | 3 | KAYDET-32 | Talimat path UZUN form drift (3. instance) |
+| 120 | W3.6.C C.2 | 3 | KAYDET-32 | Talimat using `Catalog.*` KISA × 4 sembol vs fiili UZUN `LivestockTrading.Catalog.*` (namespace ezber) |
+| 121 | W3.6.C C.2 | 3 | KAYDET-32 | Talimat using `Shared.Contracts.Catalog.Enums` vs fiili ns `Shared.Contracts.Catalog` (klasör `Enums/` ama ns farklı, Sapma 27 emsali) |
+| 122 | W3.6.C C.3 | 3 | KAYDET-32 | Talimat main..HEAD count "61 bekleniyor" vs fiili 62 (sayım ezber, F-S52 emsali tekrar) |
+| 123 | W3.6.C C.3 | 4 | bilgi | Commit subject 76 char (70 ideal sınır üstü, 72 hard limit altında; konvansiyon esnek) |
+| 124 | W3.6.C C.3 | 4 | bilgi | Yorum hattı header+footer split (mikro-genişletme şeffaf, talimat literal sınırının ucu) |
+
+### Wave 3 W3.6.D Sapmaları (6 distinct, Sapma 125–130)
+
+| # | Sub-batch | Aile | KAYDET | Açıklama |
+|---|---|---|---|---|
+| 125 | W3.6.D D.1 | 6/8 hibrit | **KAYDET-33 kök** | Yeni `Currency/` klasör namespace `LivestockTrading.Catalog.Infrastructure.Currency` ↔ `Currency` entity tipi shadowing → 6 CS0118 build-fail (CurrencyConfiguration.cs + ReferenceDataRepository.cs). Çözüm: D.1-fix `Currencies/` plural rename. **Yeni kategori: namespace-tip shadowing onleme.** |
+| 126 | W3.6.D D.1 | 6 | KAYDET-32 (pozitif önleme) | Talimat `Result.Failure("string")` varsayım vs fiili API `Result.Failure(Error record)` zorunlu. Backend fresh-grep ile yakaladı (Shared.Kernel/Results/Result.cs:25), build-fail oluşmadı. |
+| 127 | W3.6.D D.4 | 3 | KAYDET-32 | Talimat **Moq** mock framework varsayım vs fiili **NSubstitute** (10+ test dosyası `using NSubstitute;`). Backend ToggleCurrencyActiveHandlerTests emsalini fresh-okuyup adapte etti, build-fail oluşmadı. |
+| 128 | W3.6.D D.4 | 4 | KAYDET-32 | Test sayım baseline 151→152 (talimat I6 "151 korunur" vs envanter teyit `1 eski test silindi + 2 yeni eklendi = +1`). KAYDET notu Wave 3 sonu, test sayım drift baseline +1. |
+| 129 | W3.6.D D.3 | — | F-S42 emsali | Test compile-fail CS7036 beklenen detour (eski parametresiz ctor `new()` → yeni `(ICurrencyRateRefresher)` zorunlu). D.4 mock revize ile çözüldü, dead stub-test temizleme pozitif kayıt. |
+| 130 | W3.6.D D.5 | 1 | **KAYDET-34 kök** | Push Tur 1'de bracket-paste mode `"[200~"` terminal escape sequence komut metnine eklendi (Mustafa terminal paste tuzağı). Tur 2'de yeniden temiz komut ile push tamamlandı. **Yeni kategori: terminal escape sequence transport tuzağı.** Mitigation W3.7.5'te uygulandı (`bind 'set enable-bracketed-paste off'`). |
+
+### Wave 3 W3.7 Sapmaları (5 distinct, Sapma 131–134... wait toplam 5 olmali)
+
+Düzeltme: 5 entry ama numara 131-135 olur. Toplam 134 yerine 135 olur. Fiili sayım reconcile:
+
+| # | Sub-batch | Aile | KAYDET | Açıklama |
+|---|---|---|---|---|
+| 131 | W3.7.3-fix | 6 hibrit | KAYDET-32 | Talimat W3.7.3 `app.UseAuthorization()` middleware on-plan'ı `services.AddAuthorization()` services registration eksik → runtime boot-fail (`Unable to find required services AddAuthorization`). Compile-clean, runtime DI dependency yakalama. Çözüm: W3.7.3-fix 1 satır ekleme. |
+| 132 | W3.7.4 | 3 | KAYDET-32 | Talimat Adım 2 NOT "Wave 3 boyunca EF migration YARATILMADI" vs fiili W3.2 InitialCreate offline migration mevcut (mid-handover-5 §3). Handover-doc envanter ezber. |
+| 133 | W3.7.4 | 3 | KAYDET-32 | Adım 1 envanter "10 endpoint extension method" doğru ama route prefix fresh-grep yapılmadı: fiili Wave 1+2'de sadece **admin endpoint'leri** wire (CategoryEndpoints `/admin/catalog/categories`, public `/catalog/*` Wave 4+ scope). HTTP test public 404 sapma. |
+| 134 | W3.7.4 | 6 | KAYDET-32 | Admin endpoint 401 beklenen vs fiili **500** (`IAuthenticationService` eksik). AspNetCore Authorization middleware ChallengeAsync auth scheme dependency runtime fail (compile-clean, AddAuthentication scheme Wave 4 JWT bearer). Frontend Reconcile 1 onaylı kabul (Wave 4 detour). |
+
+> **Sapma sayım reconcile düzeltmesi:** W3.7 distinct = 4 (5 değil) — `Frontend shell ezberi Bash vs PowerShell` aslında W3.7.5 push talimat varsayımı, push fiilen başarılı tamamlandı (Mustafa Git Bash kullanır, mitigation çalıştı). Bu KAYDET-32 ledger # 22 aday flag, distinct deviations.md ledger entry değil (pozitif önleme + KAYDET-34 mitigation cross-reference). **Toplam yeni: 45 entry değil 46 — F-S57 (115) + 25 F-S formal (89-113 + F-S50 ayrı 114) + 9 W3.6.C (116-124) + 6 W3.6.D (125-130) + 4 W3.7 (131-134) = 45 distinct.**
+
+> **Header reconcile:** Toplam 88 + 45 = **133 distinct Sapma** (header satır 4 "134" → düzelteme bu reconcile commit sonrası gerek; bu doc bölümünde 133 doğru sayım).
+
+### KAYDET-32 Formal Lafız
+
+**KAYDET-32:** *Frontend talimat üretmeden önce ilgili doc (deviations.md / handover-mid / plan-doc) fresh-read zorunlu, memory ezber yasak. Backend KAYDET-9 disiplininin Frontend tarafı simetrik karşılığı.*
+
+**22 sistemik tezahür kategori-bazlı (Wave 3 boyunca birikim):**
+- W3.6.B baseline 9 (mid-handover-5 § KAYDET-32 tablo): G0 sayım drift + G2 path prefix + namespace UZUN form drift + TCMB XML attr name + B.5.1 RateLog scope atlama + B.5.1 ctor imza yorum hatası + B.5.2 NU1510 gereksiz paket + B.5.3 DI collection semantic + B.5.5 push tatbikatı sayım drift
+- W3.6.C +4: Sapma 116/119 path UZUN form (kategori-bazlı 1 instance) + Sapma 118 klasör adı ezber + Sapma 120 namespace KISA × 4 + Sapma 121 klasör-vs-ns + Sapma 122 main..HEAD count ezber
+- W3.6.D +3: Sapma 126 Result API ezber (pozitif önleme) + Sapma 127 NSubstitute mock framework ezber + Sapma 128 test sayım baseline 151→152
+- W3.7 +5: Sapma 131 services.AddAuthorization eksik + Sapma 132 handover-doc migration scope ezber + Sapma 133 endpoint route scope envanter ezber + Sapma 134 AspNetCore middleware service dependency + KAYDET-32 # 22 aday Frontend shell ezberi (post-push, mitigation pozitif kanıt)
+
+### KAYDET-33 Formal Lafız (YENİ KÖK)
+
+**KAYDET-33:** *Yeni Infrastructure klasör adı yaratımı öncesi Domain entity tip envanteri çapraz-check zorunlu (CS0118 namespace-tip shadowing önleme).*
+
+**D.1 build-fail dersi:** `Catalog.Infrastructure/Currency/` klasör → `LivestockTrading.Catalog.Infrastructure.Currency` namespace vs `LivestockTrading.Catalog.Domain.Entities.Currency` entity tip shadowing 6 CS0118 build-fail (CurrencyConfiguration.cs + ReferenceDataRepository.cs).
+
+**Yeni kategori:** Aile 6/8 hibrit (plan-fazı tip-kimliği gözden kaçırma alt-türü).
+
+**Çözüm pattern:**
+- (a) Plural form: `Currencies/` (D.1-fix uygulandı)
+- (b) Entity-dışı semantik isim: `RateRefresh/` veya `Rates/` (alternatif onerim)
+- (c) Mevcut entity tipi fully-qualified (REDDET — mevcut kodu kirletir)
+
+**Pre-yaratım check:** `grep -rn "public.*class <NewFolderName>" src/Modules/*/Catalog.Domain/` ile entity tip adı çakışma kontrolü.
+
+### KAYDET-34 Formal Lafız + Preventive Measure (YENİ KÖK)
+
+**KAYDET-34:** *Push tatbikatı öncesi terminal bracket-paste mode kontrolü — komut metnine `"[200~"` / `"[201~"` escape sequence eklenmesi tuzağı (terminal paste modu, git hatası DEĞİL).*
+
+**W3.6.D D.5 dersi:** Push Tur 1'de Mustafa terminal'i komut paste sırasında bracket-paste mode escape karakterleri eklendi, komut bozuldu. Tur 2'de manuel düzeltme ile tamamlandı.
+
+**Yeni kategori:** Aile 1 transport alt-türü (F-S37 transport-tekrarı serisi dışında, terminal escape sequence ayrı kategori).
+
+**Preventive measure (W3.7.5 pozitif kanıt):**
+- **Bash mitigation:** `bind 'set enable-bracketed-paste off'` push öncesi (Mustafa Git Bash kullanır, W3.7.5'te uygulandı)
+- **PowerShell mitigation:** `Get-PSReadLineKeyHandler` bracket-paste handler kontrol veya Right-Click paste yerine direkt yazma
+- **Genel:** Push komut bloğunu **tek tek paste** (4-5 komut sırayla, toplu paste değil)
+
+**Pozitif kanıt:** W3.7.5 push'unda mitigation aktif uygulandı, "[200~" tuzağı önlendi, push temiz tamamlandı (e75b485..3a0a2f3, 7 obj write 3.48 KiB).
+
+### Wave 3 W3.6.B → W3.7 Aile Dağılımı Güncellemesi
+
+- **Aile 1** (Tool davranışı): +3 instance (sleep 15 long-block harness ihlali + taskkill classifier blocked + bracket-paste mode KAYDET-34 kök)
+- **Aile 3** (Frontend ezber drift): +13 instance (KAYDET-32 ana kategori, path/namespace/klasör/sayım/handover-doc/endpoint route/shell ezberi)
+- **Aile 4** (Disiplin tutarsızlığı): +3 instance (test sayım baseline 151→152 + commit subject 76 char + yorum split)
+- **Aile 6** (Plan-doc vs fiili kod): +5 instance (Result API ezber + plan-doc §6 multi-divergence + AspNetCore middleware service dependency)
+- **Aile 6/8 hibrit YENİ ALT-KATEGORI** (KAYDET-33 kök): +1 instance (D.1 namespace-tip shadowing)
+- **Aile 5 transport** (Mustafa raporu güven): F-S50 emsali Wave 3 boyunca 5+ kez uygulandı (W3.6.B-W3.7 push sonrası 4 kez Backend bağımsız 5-kaynak cross-check)
+- **Aile 2** (Algı/gerçek uçurumu): +1 instance (F-S57 exchangerate.host paywall plan-doc 2025 vs fiili 2026)
+
+### Wave 3 W3.6.B → W3.7 Reconcile Notu (W1-2 disiplini)
+
+**Wave 3 RESMEN KAPANIŞ teyit (R.1 reconcile commit'i, doc-only Wave 3 son commit):**
+- 13/13 sub-batch tamam (%100): W3.0+W3.1+W3.2+W3.3+W3.4+W3.5A+W3.5B+W3.6.A+W3.6.B+W3.6.C+W3.6.D+W3.7
+- 36 push tatbikatı: mid-handover-5 (33) + W3.6.C (34) + W3.6.D (35) + W3.7 (36)
+- main INVARIANT `44416138` 36 push tatbikatı boyunca **KORUNDU** (production safety mutlak, 0 production sızıntısı)
+- Test baseline 152/152 (Wave 2 154 → W3.5B.1 151 stub+test sil → W3.6.D D.4 mock guard +1 → W3.7 boyunca korundu)
+- **133 distinct Sapma** kayıt altında (Wave 0+1+2: 82 + W3.6.A: 6 + W3.6.B-W3.7: 45 = 133)
+- KAYDET-32 ledger 22 sistemik tezahür kategori-bazlı (Frontend doc fresh-read disiplini Wave 4 kickoff'tan itibaren standart pattern)
+- KAYDET-33 + KAYDET-34 yeni formal kayıt (preventive measure kanıt dahil)
+
+**Sayım methodu mutabakat:** Kategori-bazlı sayım deviations.md formal kayıt (her distinct tezahür bir kategori). Instance-bazlı bilgi notu olarak korunur (Sapma 116-119 path UZUN form 4 instance ama tek kategori, KAYDET-32 # 1 path ezber).
+
+**Plan-doc §6 multi-revize:** Bu reconcile turunde ayrı commit (`docs(decisions): W3.6.B/C/D plan-doc revizeleri §6 currency cron + §8 endpoints`).
+
+**`wave-3-complete` annotated tag:** Wave 2 emsali (1f2c7dd handover commit), R.1 reconcile son commit'ine atanacak (plan-doc revize commit'i, Mustafa push sonrası).
+
+**Yeni KAYDET 32/33/34 toplam:** Wave 3 sonu 3 formal KAYDET (yeni 33 + 34 kök, 32 sertleştirilmiş). Wave 4 kickoff'tan itibaren standart Frontend + Backend disiplini.
+
+---
