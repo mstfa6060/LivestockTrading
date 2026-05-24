@@ -632,7 +632,9 @@ public interface IAdminCatalogReadService
 |---|---|---|---|---|
 | **1 (primary)** | TCMB | `https://www.tcmb.gov.tr/kurlar/today.xml` | Daily 15:30 TR (12:30 UTC) | 23 currency XML |
 | **2 (fallback)** | ECB | `https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml` | Daily 16:00 CET | EUR-base XML |
-| **3 (last resort)** | exchangerate.host | `https://api.exchangerate.host/latest?base=USD` | Daily anytime | USD-base JSON |
+| **3 (last resort)** | Fawazahmed0 currency-api | `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json` | Daily anytime | USD-base JSON (lowercase nested `{date, usd: {...}}`) |
+
+> **Revize (W3.6.B Aile 2 Sapma 115 / F-S57):** Plan-doc 2025'te `exchangerate.host` free aggregator olarak listelemişti; fiili 2026-05 itibarıyla apilayer akquisition sonrası API key paywall'a alındı (HTTP 200 + body `success:false` + `error.code:101 missing_access_key`). W3.6.B B.4 sub-batch'inde Backend Adım 2 fresh-fetch curl ile yakaladı. Frankfurter HTTP 404 pre-test sonrası **Fawazahmed0 currency-api jsdelivr CDN** swap onayı (Unlicense, multi-source aggregator). RateProvider enum `ExchangeRateHost = 3` → `CurrencyApi = 3` rename (int sabit, label semantik).
 
 ### `IRateProvider` Interface
 
@@ -654,7 +656,10 @@ public sealed record RateFetchResult(
 
 ### Cron Job
 
+> **Revize notu (W3.6.C/D fiili impl, KAYDET-7 fiili kod baskın):** Aşağıdaki örnek plan-doc 2025 tasarım taslağıdır. Wave 3 W3.6.C/D'de fiili impl üç farklılık taşır: (1) `[Quartz.JobKey(...)]` attribute Quartz.NET 3.x'te **mevcut değil** (JobKey identifier struct, attribute değil); DI'da `.WithIdentity("CurrencyRateUpdate")` pattern kullanıldı. (2) `_tcmb/_ecb/_erh` ayrı field yerine `IEnumerable<IRateProvider>` collection pattern (W3.6.B `AddTransient<IRateProvider>` × 3 factory delegate Microsoft DI semantic). (3) `_db.RateLogs.Add` / `_db.Currencies.Where` property access yerine **`_db.Set<T>()` pattern** (W3.6.C/D Adım 1.5 F5 kararı; repository + read service 8 dosya × 30+ metot tutarlı pattern, DbSet property eklenmemiş). (4) W3.6.D D.2'de Job 3-tier chain logic `ICurrencyRateRefresher.RefreshAsync` delege edildi (DRY single source of truth, Job 84→44 satır %48 azalma; admin `RefreshExchangeRatesHandler` aynı Refresher'ı çağırır).
+
 ```csharp
+// Plan-doc 2025 tasarım taslağı (fiili impl revize notu yukarıda)
 [Quartz.JobKey("CurrencyRateUpdate")]
 public sealed class CurrencyRateUpdateJob : IJob
 {
@@ -694,7 +699,7 @@ public sealed class CurrencyRateUpdateJob : IJob
 }
 ```
 
-**Schedule:** Daily 13:00 UTC (TCMB ~12:30 UTC publish; 30dk buffer).
+**Schedule:** Daily 13:00 UTC (TCMB ~12:30 UTC publish; 30dk buffer). **Fiili cron expression (W3.6.C C.3 DI register):** `"0 0 13 * * ?"` (Quartz 6-field format: sec min hour day-of-month month day-of-week, `?` no-spec).
 
 ### `RateLog` Entity (Audit)
 
@@ -757,7 +762,9 @@ public enum RateProvider { Tcmb = 1, Ecb = 2, ExchangeRateHost = 3, Manual = 99 
 
 ## 8. API Endpoint Inventory
 
-### Public (15 endpoint)
+> **Revize notu (W3.7.4 fiili durum, Sapma 133):** Wave 3 W3.7 host-wire sonrası fiili durum: Wave 1+2'de **sadece admin endpoint'leri** Application katmanında yazıldı (10 endpoint extension: Categories/Breeds/Brands/Currencies/Countries/Languages/CertificationTypes/Locations/BorderRules/AdminCatalogRead, hepsi `/admin/catalog/*` prefix). **Public `/catalog/*` endpoint'leri (aşağıdaki 15 endpoint) Wave 4+ scope** — Listings/Marketplace consumer'ları `ICatalogReadService` üzerinden erişir; Frontend tarafı public API'lar Wave 4+ host-wire'da eklenir. W3.7.4 smoke test'inde `GET /catalog/categories` HTTP 404 döner (Wave 4 detour, beklenen).
+
+### Public (15 endpoint, Wave 4+ scope)
 
 | Method | Path |
 |---|---|
