@@ -460,3 +460,39 @@ Düzeltme: 5 entry ama numara 131-135 olur. Toplam 134 yerine 135 olur. Fiili sa
 **Yeni KAYDET 32/33/34 toplam:** Wave 3 sonu 3 formal KAYDET (yeni 33 + 34 kök, 32 sertleştirilmiş). Wave 4 kickoff'tan itibaren standart Frontend + Backend disiplini.
 
 ---
+
+# Wave 4 Handover-Only (W4.0 — Shared.Contracts/Identity foundation, commit 0f9b98d)
+
+**Durum:** Handover-only ledger. Formal Sapma 134+ numaralandirmasi W4.R reconcile turunda gerceklesecek. Header stat ("Toplam: 133") W4.R'de guncellenecek.
+
+## W4.0 Handover-Only F-S Listesi
+
+| # | Aile | Konu | Aciklama |
+|---|---|---|---|
+| F-W4-1 | 3 | Frontend namespace .Enums suffix tahmini | W4.0.A talimatinda `Shared.Contracts.Identity.Enums` namespace yazildi (.Enums suffix). Backend Catalog fresh-read ile fiili pattern'in `Shared.Contracts.Catalog` (suffix yok) oldugunu tespit edip duzeltdi. KAYDET-9 dogru uygulama (cross-batch convention extrapolation: Backend ezberden talimat degil fresh-read literal baskin). Duzeltme: namespace `Shared.Contracts.Identity` (suffix yok), tum Identity enum dosyalari bu pattern'i izledi. |
+| F-W4-2 | 6 | UserPreferences property adlari plan-doc vs kod-literal celiskisi | 03-domain-patterns.md satir 431 UserPreferences VO property adlari `Currency`, `Country` (kisa form). Fiili kod `CurrencyCode`, `CountryCode` (Code suffix) — ICurrentUserService.GetCurrencyCode()/GetCountryCode() metot adlariyla uyum + ambiguity onleme gerekçesiyle Backend Code suffix tercih etti. Frontend onayladi. W4.R'de 03-domain-patterns.md revize commit'i gerekli. |
+| F-W4-3 | 3 | Frontend SearchTerm tahmini, plan-doc literal Search dogru | W4.0.B Mini-Tur 2 talimatinda UserListQuery.SearchTerm yazildi. Backend Catalog'da `Search` vs `SearchTerm` grep yapti, hicbiri kullanilmamis (Catalog'da free-text arama yok). Plan-doc §12 endpoint literal `?search=` → `Search` dogru. Frontend SearchTerm tahmini geçersizdi. |
+| F-W4-4 | 4+1 | Backend session handoff disipline ihlali | Backend eski session context'i dolunca yeni session acildi. Yeni session Frontend Claude'un sub-batch DUR disiplinini bilmediginden W4.0.B Mini-Tur 2 talimatini "tum W4.0'i tamamla" olarak yorumladi, W4.0.C interface'leri + W4.0.D atomic commit'i talimat disi icra etti. Build temiz + plan-doc literal sadakat 4/5, ama Frontend gozden gecirmesi by-pass oldu. Cozum: `feedback_session_handoff_discipline.md` memory dosyasi eklendi (bootstrap sirasi + scope siniri kurallari kalici). |
+| F-W4-5 | 3 | ICurrentUserService XML doc uye sayim hatasi | W4.0.C ICurrentUserService XML doc'unda "19 uye" yazildi (Frontend talimat tahmini). Fiili sayim 18 uye (1 property + 17 metot). Backend audit'le yakaladi, amend ile duzeltildi. |
+| F-W4-6 | 3 | Backend UserListItem'a talimat-disi Roles property ekledi | Backend UserListItem'a `IReadOnlyList<string> Roles` property ekledi (Frontend talimat 6 property idi, Backend 7 yazdi). Gerekce: admin liste UX. Frontend reddetti: Catalog BrandListItem emsali (list projection bandwidth minimize, Description/LogoUrl cikartma emsali) + N+1 query riski + projection/detail ayrimi baskin. Amend ile Roles cikarildi. |
+| F-W4-7 | 3 | Backend GetUserDetailAsync, Catalog convention GetXByIdAsync baskin | Backend IAdminUserReadService metot adi `GetUserDetailAsync` yazdi (Frontend B-4 karari `GetUserByIdAsync' idi). Gerekce: semantik aciklayici. Frontend reddetti: Catalog convention `GetCategoryByIdAsync` / `GetBrandByIdAsync` pattern'i (metot adi donus tipini degil arama yolunu belirtir, KAYDET-9 cross-batch convention baskin). Amend ile `GetUserByIdAsync` duzeltildi. |
+| F-W4-8 | 3 | Frontend dosya sayim tahmini 13 vs fiili 14 | W4.0 baslangiçinda dosya sayimi 13 olarak hesaplandi. Fiili 14 (UserStatus enum B-3 karariyla sonradan eklendi, sayim reconcile zamaninda yapildi). Sapma 28 emsali "gevşek arithmetic yerine fiili enumeration" disiplinin uygulanisi. |
+| F-W4-9 | 3 | Memory dosyasi satir sayim tahmini 50-80 vs emsal 14 | Session Handoff Disipline memory dosyasi yazim talimatinda "satir sayisi 50-80 arasi beklenen" yazildi (Frontend tahmini). Backend mevcut feedback_*.md emsalini fresh okudu, fiili stil 14 satir yogun paragraf + YAML frontmatter oldugunu tespit etti, talimat satir beklentisi yerine emsal stilini baskin aldi (KAYDET-9 dogru uygulama). Dosya 14 satir yazildi, icerik eksiksiz. |
+
+## W4.R Plan-Doc Revize Backlog
+
+W4.R reconcile turunda yapilacak plan-doc revize listesi:
+
+1. **02-modules-list.md** — Wave numaralandirma (Wave 2 = Identity plan-doc'ta, fiili gerceklesme Wave 4 = Identity; numaralandirma guncellenmeli)
+2. **03-domain-patterns.md satir 431** — UserPreferences VO property adlari `Currency/Country` → `CurrencyCode/CountryCode` (F-W4-2 celiskisi)
+3. **05-identity.md §13 Faz 2 placeholder** — OAuth Google/Apple + Phone OTP Twilio + Email Brevo NoOp stub eklenmesi (Faz 1 strateji onaylandi)
+4. **HashedPassword algoritma konsolidasyon** — 00-kickoff-context.md (BCrypt) + 03-domain-patterns.md (BCrypt) + 07-operations.md (Argon2id) → PasswordHasher<T> (PBKDF2-SHA256, .NET Identity built-in) Frontend onaylandi; tek otorite kaynak 05-identity.md §X yeni paragraf olacak
+5. **05-identity.md §5'e DTO property listeleri eklenecek** (plan-doc gap — W4.0'da Backend endpoint-inferred tasarim yapti):
+   - UserSummary: 6 property literal
+   - DeviceInfo: 4 property literal
+   - UserDetail: 14 property literal (Admin)
+   - UserListItem: 6 property literal (Admin)
+   - UserListQuery: 6 property literal (Admin)
+6. **05-identity.md §5'e IAdminUserReadService metot imzalari** — `GetUserByIdAsync` + `ListUsersAsync` (Frontend B-4 karari + Catalog convention, W4.0'da tespit edildi)
+
+---
