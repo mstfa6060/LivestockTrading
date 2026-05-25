@@ -195,3 +195,80 @@ Bootstrap sırası (5 adım):
 | Wave emsalleri | Wave 1: 11 push, Wave 2: 9 push, Wave 3: 16 push |
 
 ---
+
+
+# W4.1 Identity.Domain — Mid-Wave Progress (In-Flight)
+
+## Durum
+
+W4.1 sub-batch'leri devam ediyor. W4.1.0 + W4.1.A working tree'de bekliyor, atomic commit W4.1.I'de. Backend context'i onceki session'da bitti, yeni session pickup edecek.
+
+## Tamamlanan (Working Tree, Staging Yok)
+
+- W4.1.0 Identity.Domain.csproj edit: +Shared.Contracts ProjectReference, +Microsoft.Extensions.Identity.Core 10.0.8, +libphonenumber-csharp 9.0.31. Build 0/0.
+- W4.1.A 2 enum: RevocationReason (7 deger) + PhonePurpose (4 deger). Namespace LivestockTrading.Identity.Domain.Enums (Catalog policy uyumlu, subfolder yansir). Build 0/0.
+
+## Frontend Sapma F-W4-12 (W4.R ledger)
+
+W4.1.A ilk yaziminda namespace flat (LivestockTrading.Identity.Domain) idi. W4.1.B pre-write guard'da Backend Catalog.Domain emsalini grep ile yakaladi (Aggregates/Entities subfolder namespace'e yansir). Revize edildi: .Enums suffix eklendi. Frontend talimati W4.0.A emsali demisti ama W4.0.A Shared.Contracts'ti (flat policy), Identity.Domain Domain projesi (subfolder yansir).
+
+## Frontend Sapma F-W4-13 (W4.R ledger)
+
+Mid-handover talimatinda Frontend "doc'a su metni ekle" dedi ama hangi tool ile (str_replace / Write / heredoc) belirtmedi. Yeni session bunu executable adim olarak yorumlayamadi, bos commit anti-pattern'inden kacindi, DUR verdi. Dogru disipline (KAYDET-32 talimat satir eksigi erken yakala).
+
+## Frontend Sapma F-W4-14 (W4.R ledger)
+
+Frontend talimatinda ic ice Markdown fence kullanildi (disda uc backtick blok, icinde ayni). Mustafa'nin gordugu render parcalandi, talimat tek butun gozukmedi. Duzeltme: heredoc + plain text (Markdown fence yok).
+
+## Namespace Policy (Wave 4 Boyunca)
+
+- Domain projeleri (Catalog.Domain, Identity.Domain, Shared.Kernel): subfolder -> namespace yansir
+- Shared.Contracts projesi: subfolder yansimaz (Admin haric)
+
+## Frontend Onayli 10 Karar (B-W4.1-1..10)
+
+1. HashedPassword pure VO + IPasswordHasher<User> parameter injection
+2. NationalId TC checksum BCL inference (10-hane carpim algoritmasi)
+3. PhoneVerificationTicket repository W4.2 Application'da
+4. UserRoleGranted + UserRoleRevoked 2 ayri event
+5. RegisterWithSocial 9 param + EmailVerifiedAt=now
+6. UserConsent immutable audit trail
+7. 8 internal event, toplam 14 (6 public + 8 internal)
+8. EmailVerificationToken yok, string token doner
+9. VO'lar Identity.Domain.ValueObjects (modul-ici)
+10. MailKit YOK, System.Net.Mail.MailAddress.TryCreate BCL ici
+
+## Teknik Referanslar
+
+- DomainException: src/Shared/LivestockTrading.Shared.Kernel/Domain/DomainException.cs, namespace Shared.Domain
+- Shared.Kernel VO pattern: readonly record struct + public ctor with validation + _value nullable backing + override ToString(). CountryCode/LanguageCode emsali (factory yok, ctor'da validate)
+- Catalog.Domain VO: yok (sadece sealed record event). Shared.Kernel emsali baskin.
+
+## Kalan Sub-Batch'ler
+
+W4.1.B: NationalId + PersonName + EmailAddress + PhoneNumber + ConsentGrant (5 dosya, LivestockTrading.Identity.Domain.ValueObjects)
+W4.1.C: HashedPassword (1 dosya, .ValueObjects)
+W4.1.D: RefreshToken + UserDevice + UserExternalLogin + UserRole + UserConsent (5 dosya, .Entities)
+W4.1.E: PhoneVerificationTicket + Catalog repo emsal grep (1 dosya, .Entities veya .Aggregates Frontend kararla)
+W4.1.F: 14 Domain Events (.Events.Public 6 + .Events.Internal 8)
+W4.1.H: User AR (1 dosya, .Aggregates)
+W4.1.I: Build + atomic commit + push hazirligi
+
+Kalan: 27 yeni .cs. W4.1 total: 30 dosya tek atomic commit.
+
+## Mevcut Working Tree
+
+modified:   src/Modules/Identity/Identity.Domain/Identity.Domain.csproj
+untracked:  src/Modules/Identity/Identity.Domain/Enums/RevocationReason.cs
+untracked:  src/Modules/Identity/Identity.Domain/Enums/PhonePurpose.cs
+
+Staging yok. W4.1.I atomic commit'e kadar bekleyecek.
+
+## Yeni Session Pickup Komutu
+
+1. git status -> 2 untracked + 1 modified teyit
+2. git diff src/Modules/Identity/Identity.Domain/Identity.Domain.csproj -> csproj edit
+3. cat src/Modules/Identity/Identity.Domain/Enums/RevocationReason.cs -> namespace .Enums teyit
+4. dotnet build src/Modules/Identity/Identity.Domain/Identity.Domain.csproj -> 0/0 teyit
+5. Frontend talimati bekle (W4.1.B VO yazimi)
+
