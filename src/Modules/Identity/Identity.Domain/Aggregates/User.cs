@@ -325,6 +325,15 @@ public sealed class User : AggregateRoot
         Raise(new UserPreferencesChanged(Id));
     }
 
+    public void UpdateName(PersonName newName, DateTimeOffset now)
+    {
+        EnsureNotSuspendedOrDeleted();
+        Name = newName;
+        UpdatedAt = now;
+        // Event YOK - plan-doc §6 lifecycle event listesi kilitli (UserRegistered/EmailVerified/
+        // PasswordChanged/Suspended/Reactivated/Deleted); profile name change burada degil.
+    }
+
     // === Behavior: Role ===
 
     public void GrantRole(string role, Guid? grantedByUserId, DateTimeOffset now)
@@ -405,13 +414,57 @@ public sealed class User : AggregateRoot
         UpdatedAt = now;
     }
 
-    public void RemoveDevice(Guid deviceId)
+    public void UpdateDevicePushToken(Guid deviceId, string? newPushToken, DateTimeOffset now)
+    {
+        var device = _devices.FirstOrDefault(d => d.Id == deviceId);
+        if (device is null)
+            throw new DomainException($"Device bulunamadi: {deviceId}");
+
+        device.UpdatePushToken(newPushToken);
+        UpdatedAt = now;
+    }
+
+    public void RemoveDevice(Guid deviceId, DateTimeOffset now)
     {
         var device = _devices.FirstOrDefault(d => d.Id == deviceId);
         if (device is null)
             throw new DomainException($"Device bulunamadi: {deviceId}");
 
         _devices.Remove(device);
+        UpdatedAt = now;
+    }
+
+    // === Behavior: External Login ===
+
+    public void LinkExternalLogin(string provider, string externalId, DateTimeOffset now)
+    {
+        if (string.IsNullOrWhiteSpace(provider))
+            throw new DomainException("Provider bos olamaz.");
+        if (string.IsNullOrWhiteSpace(externalId))
+            throw new DomainException("ExternalId bos olamaz.");
+
+        // Idempotent: ayni provider+externalId zaten varsa sessizce don.
+        if (_externalLogins.Any(l => l.Provider == provider && l.ExternalId == externalId))
+            return;
+
+        _externalLogins.Add(new UserExternalLogin(Id, provider, externalId, now));
+        UpdatedAt = now;
+        // Event YOK - plan-doc §6 lifecycle event listesi kilitli; external-login link burada degil.
+    }
+
+    public void UnlinkExternalLogin(Guid externalLoginId, DateTimeOffset now)
+    {
+        var link = _externalLogins.FirstOrDefault(l => l.Id == externalLoginId);
+        if (link is null)
+            throw new DomainException($"External login bulunamadi: {externalLoginId}");
+
+        // Son-auth-method invariant: password yoksa ve tek external-login kaldiysa kullanici
+        // tum giris yontemlerini kaybeder - bunu engelle.
+        if (Password is null && _externalLogins.Count == 1)
+            throw new DomainException("Tek kalan giris yontemi (external login) kaldirilamaz.");
+
+        _externalLogins.Remove(link);
+        UpdatedAt = now;
     }
 
     // === Behavior: Token ===
