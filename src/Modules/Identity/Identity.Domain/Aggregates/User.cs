@@ -496,6 +496,21 @@ public sealed class User : AggregateRoot
         UpdatedAt = now;
     }
 
+    public void RevokeFamilyRefreshTokens(Guid familyId, RevocationReason reason, DateTimeOffset now)
+    {
+        // Reuse detection family-scoped revoke (plan-doc 05-identity §3 satir 215 "Token reuse -> tum family revoke").
+        // RevokeAllRefreshTokens emsali: filter familyId-scoped, geri kalan birebir ayni desen.
+        foreach (var token in _refreshTokens)
+        {
+            if (token.FamilyId == familyId && token.IsActive(now))
+            {
+                token.Revoke(reason, now);
+                Raise(new RefreshTokenRevoked(Id, token.Id, token.FamilyId, reason));
+            }
+        }
+        UpdatedAt = now;
+    }
+
     // === Private helpers ===
 
     private void EnsureNotSuspendedOrDeleted()
