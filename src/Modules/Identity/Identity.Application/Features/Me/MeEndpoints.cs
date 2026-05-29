@@ -7,9 +7,9 @@ namespace LivestockTrading.Identity.Application.Features.Me;
 /// <summary>
 /// Identity self-service endpoint registration — MapGroup wiring for /me/* surface.
 /// All routes require authentication (group-level RequireAuthorization). Host
-/// application invokes MapMeEndpoints in startup configuration. Avatar, devices,
-/// external-logins and account lifecycle endpoints are added in later W4.2.C
-/// sub-batches; this aggregator is partial until those land.
+/// application invokes MapMeEndpoints in startup configuration. Avatar, devices
+/// and external-logins endpoints are added in later W4.2.C sub-batches; this
+/// aggregator is partial until those land.
 /// </summary>
 public static class MeEndpoints
 {
@@ -26,6 +26,9 @@ public static class MeEndpoints
         group.MapPost("/password", ChangePasswordEndpoint.Handle);
         group.MapGet("/sessions", SessionsEndpoint.Handle);
         group.MapDelete("/sessions/{sessionId:guid}", RevokeSessionEndpoint.Handle);
+        group.MapPost("/account/delete-request", RequestDeletionEndpoint.Handle);
+        group.MapPost("/account/restore", RestoreAccountEndpoint.Handle);
+        group.MapPost("/data-export", RequestDataExportEndpoint.Handle);
 
         return app;
     }
