@@ -21,6 +21,8 @@ public static class AuthEndpoints
         group.MapPost("/refresh", RefreshTokenEndpoint.Handle).AllowAnonymous();
         group.MapPost("/logout", LogoutEndpoint.Handle).RequireAuthorization();
         group.MapPost("/register", RegisterWithPasswordEndpoint.Handle).AllowAnonymous();
+        group.MapPost("/email/send-verify", SendEmailVerifyEndpoint.Handle).AllowAnonymous();
+        group.MapPost("/email/verify", VerifyEmailEndpoint.Handle).AllowAnonymous();
 
         return app;
     }
