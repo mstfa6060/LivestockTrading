@@ -7,9 +7,8 @@ namespace LivestockTrading.Identity.Application.Features.Me;
 /// <summary>
 /// Identity self-service endpoint registration — MapGroup wiring for /me/* surface.
 /// All routes require authentication (group-level RequireAuthorization). Host
-/// application invokes MapMeEndpoints in startup configuration. Avatar upload
-/// is the only remaining /me/* route — it depends on Shared IFileStorage and
-/// is deferred to W4.2.D pending the Shared port decision.
+/// application invokes MapMeEndpoints in startup configuration. Email-change
+/// endpoints are added in W4.2.D.3.
 /// </summary>
 public static class MeEndpoints
 {
@@ -34,6 +33,7 @@ public static class MeEndpoints
         group.MapDelete("/devices/{deviceId:guid}", RemoveDeviceEndpoint.Handle);
         group.MapPost("/external-logins", LinkExternalLoginEndpoint.Handle);
         group.MapDelete("/external-logins/{externalLoginId:guid}", UnlinkExternalLoginEndpoint.Handle);
+        group.MapPost("/avatar", UploadAvatarEndpoint.Handle).DisableAntiforgery();
 
         return app;
     }
