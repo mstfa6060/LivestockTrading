@@ -558,12 +558,12 @@ Per modül implement (Catalog hariç — user-specific data yok).
 | POST | `/connect/token` |
 | GET | `/connect/userinfo` + `/.well-known/...` |
 
-### Authenticated (16 endpoint)
+### Authenticated (19 endpoint)
 
 | Method | Path |
 |---|---|
 | GET | `/identity/users/me` |
-| PATCH | `/identity/users/me` (firstName/lastName split + email change requestPattern) |
+| PATCH | `/identity/users/me` (firstName/lastName split) |
 | POST | `/identity/users/me/password` |
 | POST | `/identity/users/me/avatar` (multipart → IFileStorage) |
 | GET | `/identity/users/me/sessions` (enriched: UA parse + GeoIP) |
@@ -578,6 +578,9 @@ Per modül implement (Catalog hariç — user-specific data yok).
 | DELETE | `/identity/users/me/devices/{id}` |
 | PATCH | `/identity/users/me/preferences` |
 | PATCH | `/identity/users/me/consents` (v2 — MarketingEmail toggle + revoke flows) |
+| POST | `/identity/users/me/email-change/request` |
+| POST | `/identity/users/me/email-change/confirm` |
+| DELETE | `/identity/users/me/email-change` |
 
 ### Admin (9 endpoint)
 
@@ -593,7 +596,7 @@ Per modül implement (Catalog hariç — user-specific data yok).
 | GET | `/admin/users/{id}/audit` |
 | GET | `/admin/users/{id}/sessions` |
 
-**Toplam: 15 + 16 + 9 = 40 endpoint.**
+**Toplam: 15 + 19 + 9 = 43 endpoint.**
 
 ---
 
@@ -651,4 +654,4 @@ Per modül implement (Catalog hariç — user-specific data yok).
 | GDPR | Data export (Quartz async + IDataExportContributor); 30-day grace delete + anonymize |
 | JWT | RS256 + key rotation (90 gün); jti blacklist Redis |
 | Cross-modül | `ICurrentUserService` (JWT) + `IIdentityReadService` (cached) |
-| Endpoint | 40 (15 public + 16 auth + 9 admin) |
+| Endpoint | 43 (15 public + 19 auth + 9 admin) |
