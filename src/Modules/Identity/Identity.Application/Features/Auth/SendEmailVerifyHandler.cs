@@ -1,5 +1,6 @@
 using LivestockTrading.Identity.Application.Abstractions;
 using LivestockTrading.Identity.Domain.Aggregates;
+using LivestockTrading.Identity.Domain.Enums;
 using LivestockTrading.Identity.Domain.ValueObjects;
 using MassTransit;
 using Shared.Domain;
@@ -51,7 +52,7 @@ public sealed class SendEmailVerifyHandler : IConsumer<SendEmailVerifyCommand>
             var pair = _tokenGen.Generate();
             var ttl = TimeSpan.FromHours(24);
             var ticket = EmailVerificationTicket.Issue(
-                email, pair.Hash, now, ttl, context.Message.IpAddress, user.Id);
+                email, EmailPurpose.Verify, pair.Hash, now, ttl, context.Message.IpAddress, user.Id);
 
             await _tickets.AddAsync(ticket, ct);
             await _email.SendEmailVerificationAsync(email, pair.Raw, ct);

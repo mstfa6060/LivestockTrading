@@ -22,4 +22,13 @@ public interface IEmailSender
     /// SendEmailVerificationAsync.
     /// </summary>
     Task SendEmailChangeAsync(EmailAddress to, string verifyToken, CancellationToken ct);
+
+    /// <summary>
+    /// Sends the password-reset mail with an opaque reset token (W4.2.D2-out
+    /// cift-kanal Flow A — email kanali). The raw resetToken is hashed against
+    /// EmailVerificationTicket.CodeHash (Purpose=ResetPassword) by the reset
+    /// handler. Faz 1 implementation is a NoOp + log adapter alongside
+    /// SendEmailVerificationAsync.
+    /// </summary>
+    Task SendPasswordResetAsync(EmailAddress to, string resetToken, CancellationToken ct);
 }

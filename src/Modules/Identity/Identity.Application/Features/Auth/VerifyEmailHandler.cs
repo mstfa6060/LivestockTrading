@@ -1,4 +1,5 @@
 using LivestockTrading.Identity.Application.Abstractions;
+using LivestockTrading.Identity.Domain.Enums;
 using LivestockTrading.Identity.Domain.ValueObjects;
 using MassTransit;
 using Shared.Domain;
@@ -34,7 +35,7 @@ public sealed class VerifyEmailHandler : IConsumer<VerifyEmailCommand>
         {
             var email = new EmailAddress(context.Message.Dto.Email);
 
-            var ticket = await _tickets.GetActiveByEmailAsync(email, ct);
+            var ticket = await _tickets.GetActiveByEmailAsync(email, EmailPurpose.Verify, ct);
             if (ticket is null)
             {
                 await context.RespondAsync(Result.Failure(

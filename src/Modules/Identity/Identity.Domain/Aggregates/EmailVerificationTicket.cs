@@ -1,21 +1,24 @@
 namespace LivestockTrading.Identity.Domain.Aggregates;
 
 using System.Security.Cryptography;
+using LivestockTrading.Identity.Domain.Enums;
 using LivestockTrading.Identity.Domain.ValueObjects;
 using Shared.Domain;
 
 /// <summary>
 /// Email dogrulama bileti - User AR'dan bagimsiz standalone AR
 /// (PhoneVerificationTicket simetrik). 32-byte hex token + SHA-256 hash;
-/// 24 saat TTL + max 5 deneme. Send-verify akisi (W4.2.C G3) tarafindan
-/// uretilir, verify endpoint TryConsume cagrir. PhoneVerificationTicket
-/// emsali PhonePurpose yok - email-verify tek amac.
+/// 24 saat TTL + max 5 deneme. Send-verify akisi (W4.2.C G3) ve password-reset
+/// (W4.2.D2-out Flow A) tarafindan uretilir, verify/reset endpoint TryConsume
+/// cagrir. EmailPurpose discriminator (Verify + ResetPassword) — Repository
+/// lookup purpose-bazli (PhoneVerificationTicket.GetActiveByPhoneAsync emsali).
 /// </summary>
 public sealed class EmailVerificationTicket : AggregateRoot
 {
     public Guid Id { get; private set; }
     public Guid? UserId { get; private set; }
     public EmailAddress Email { get; private set; }
+    public EmailPurpose Purpose { get; private set; }
     public byte[] CodeHash { get; private set; }
     public DateTimeOffset IssuedAt { get; private set; }
     public DateTimeOffset ExpiresAt { get; private set; }
@@ -33,6 +36,7 @@ public sealed class EmailVerificationTicket : AggregateRoot
 
     public static EmailVerificationTicket Issue(
         EmailAddress email,
+        EmailPurpose purpose,
         byte[] codeHash,
         DateTimeOffset now,
         TimeSpan ttl,
@@ -51,6 +55,7 @@ public sealed class EmailVerificationTicket : AggregateRoot
             Id = Guid.CreateVersion7(),
             UserId = userId,
             Email = email,
+            Purpose = purpose,
             CodeHash = codeHash,
             IssuedAt = now,
             ExpiresAt = now.Add(ttl),
