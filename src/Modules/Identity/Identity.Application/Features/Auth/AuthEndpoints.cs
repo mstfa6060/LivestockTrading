@@ -5,11 +5,10 @@ using Microsoft.AspNetCore.Routing;
 namespace LivestockTrading.Identity.Application.Features.Auth;
 
 /// <summary>
-/// Identity auth endpoint registration — MapGroup wiring for token lifecycle
-/// and password register. Route group: /identity/auth (anonymous for login,
-/// refresh and register, authenticated for logout). Host application invokes
-/// MapAuthEndpoints in startup configuration. Social register (oauth/google,
-/// oauth/apple) is added in W4.2.C alongside IExternalLoginValidator.
+/// Identity auth endpoint registration — MapGroup wiring for token lifecycle,
+/// password register, email verification and OAuth social register. Route
+/// group: /identity/auth (anonymous for everything except logout). Host
+/// application invokes MapAuthEndpoints in startup configuration.
 /// </summary>
 public static class AuthEndpoints
 {
@@ -23,6 +22,8 @@ public static class AuthEndpoints
         group.MapPost("/register", RegisterWithPasswordEndpoint.Handle).AllowAnonymous();
         group.MapPost("/email/send-verify", SendEmailVerifyEndpoint.Handle).AllowAnonymous();
         group.MapPost("/email/verify", VerifyEmailEndpoint.Handle).AllowAnonymous();
+        group.MapPost("/oauth/google", RegisterWithSocialEndpoint.Handle).AllowAnonymous();
+        group.MapPost("/oauth/apple", RegisterWithSocialEndpoint.Handle).AllowAnonymous();
 
         return app;
     }

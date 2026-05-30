@@ -1,5 +1,4 @@
 using LivestockTrading.Identity.Application.Abstractions;
-using LivestockTrading.Identity.Application.Common.Mappers;
 using LivestockTrading.Identity.Domain.Aggregates;
 using LivestockTrading.Identity.Domain.ValueObjects;
 using MassTransit;
@@ -70,16 +69,10 @@ public sealed class LoginHandler : IConsumer<LoginCommand>
 
             user.RecordLogin(device.Id, context.Message.IpAddress, now);
 
-            var pair = _rtGen.Generate();
-            var familyId = Guid.CreateVersion7();
-            var ttl = dto.RememberMe ? TimeSpan.FromDays(90) : TimeSpan.FromDays(30);
-            user.IssueRefreshToken(device.Id, pair.Hash, familyId, ttl, now);
+            var response = await TokenIssuance.IssueLoginTokensAsync(
+                user, device.Id, dto.RememberMe, _rtGen, _jwt, now, ct);
 
-            var access = await _jwt.IssueAsync(user, device.Id, ct);
-            var summary = user.ToSummary();
-
-            await context.RespondAsync<Result<LoginResponse>>(Result.Success(
-                new LoginResponse(access.Value, access.ExpiresAt, pair.Raw, now.Add(ttl), summary)));
+            await context.RespondAsync<Result<LoginResponse>>(Result.Success(response));
         }
         catch (DomainException ex)
         {
