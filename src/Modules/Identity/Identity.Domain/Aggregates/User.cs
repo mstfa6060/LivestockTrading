@@ -347,6 +347,15 @@ public sealed class User : AggregateRoot
         // PasswordChanged/Suspended/Reactivated/Deleted); profile name change burada degil.
     }
 
+    public void SetAvatarUrl(string? url, DateTimeOffset now)
+    {
+        EnsureNotSuspendedOrDeleted();
+        AvatarUrl = url;
+        UpdatedAt = now;
+        // Event YOK - plan-doc §6 lifecycle event listesi kilitli; avatar set burada degil.
+        // null = clear (kullanici avatari kaldirir).
+    }
+
     // === Behavior: Role ===
 
     public void GrantRole(string role, Guid? grantedByUserId, DateTimeOffset now)

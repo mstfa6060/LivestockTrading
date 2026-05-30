@@ -14,4 +14,12 @@ namespace LivestockTrading.Identity.Application.Abstractions;
 public interface IEmailSender
 {
     Task SendEmailVerificationAsync(EmailAddress to, string verifyToken, CancellationToken ct);
+
+    /// <summary>
+    /// Sends the email-change confirmation mail (W4.2.D email-change flow). The
+    /// raw verifyToken is hashed against User.PendingEmailTokenHash by
+    /// ConfirmEmailChange. Faz 1 implementation is a NoOp + log adapter alongside
+    /// SendEmailVerificationAsync.
+    /// </summary>
+    Task SendEmailChangeAsync(EmailAddress to, string verifyToken, CancellationToken ct);
 }
