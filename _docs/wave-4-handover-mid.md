@@ -1,8 +1,8 @@
 # Wave 4 W4.2 (Identity.Application) Mid-Handover
 
-**Stamped:** Saturday, 30 May 2026 (W4.2.D.1c sonrasi, D.3 oncesi)
-**Commit:** 65958f5 (W4.2.D.1c, lokal rebuild/v2 ucu)
-**Push tatbikati:** YOK (Mustafa eli Wave sonu tek milestone push); ahead 15 lokal
+**Stamped:** Sunday, 31 May 2026 (W4.2.D KAPANDI: D.3 + D.3.5 sonrasi)
+**Commit:** da74b7e (W4.2.D.3.5 spec revize, lokal rebuild/v2 ucu)
+**Push tatbikati:** YOK (Mustafa eli Wave sonu tek milestone push); ahead 18 lokal
 **Context:** Esige yaklasildi, yeni Frontend Claude session W4.2'yi D.3'ten devralabilsin diye uretildi.
 
 ---
@@ -12,7 +12,7 @@
 | Branch / Ref | SHA | Durum |
 |---|---|---|
 | `main` | `44416138b978774146f992f9e0756b829ba541e0` | **INVARIANT** — 44/44 push tatbikati boyunca dokunulmadi |
-| `rebuild/v2` (lokal) | `65958f5` | W4.2.D.1c, 15 commit ahead |
+| `rebuild/v2` (lokal) | `da74b7e` | W4.2.D KAPANDI (D.3 + D.3.5), 18 commit ahead |
 | `origin/rebuild/v2` | `b8c7845` | W4.1 (Identity.Domain) son push; W4.2 lokal-only |
 | Tag `wave-0-complete` | intact | |
 | Tag `wave-1-complete` | intact | |
@@ -21,12 +21,12 @@
 | Tag `wave-4-1-complete` | `b8c7845` | W4.1 Identity.Domain kapanis |
 | Tag `wave-4-2-complete` | YOK | W4.2 sonu eklenecek |
 
-`main..HEAD = 87` (production'dan rebuild/v2 ucuna gercek delta; bu handover commit'i ile 88 olacak).
+`main..HEAD = 90` (production'dan rebuild/v2 ucuna gercek delta; bu handover guncellemesi commit'i ile 91 olacak).
 Working tree: clean.
 
 ---
 
-## 2. W4.2 Commit Zinciri (15 commit, hepsi lokal, hepsi rebuild/v2)
+## 2. W4.2 Commit Zinciri (18 commit, origin `b8c7845` sonrasi, hepsi lokal, push bekliyor)
 
 | Sub-batch | SHA | Kapsam (kisa) |
 |---|---|---|
@@ -45,6 +45,9 @@ Working tree: clean.
 | D.1b | 0943df0 | IFileStorage Shared.Contracts.Storage port + SetAvatarUrl (D1) + IEmailSender.SendEmailChangeAsync |
 | D.2 | 4af6640 | Avatar yukleme (multipart, ilk emsal endpoint) |
 | D.1c | 65958f5 | fix: email token hash algoritma kontrati (FromHexString→SHA256 netlesti, UTF8 YASAK) |
+| docs(handover-mid-1) | f8fa2a1 | W4.2 mid-handover (D.1c sonrasi) |
+| D.3 | 8f640b9 | email-change 3 use-case (Request/Confirm/Cancel quartet + MeEndpoints 3 route) |
+| D.3.5 | da74b7e | 05-identity spec 19 endpoint hizalama (B-W4.2-D-3 audit-trail) |
 
 ---
 
@@ -62,8 +65,8 @@ Working tree: clean.
 - **ACIK** (D2-out): `POST /auth/phone/send-otp`, `POST /auth/phone/verify-otp`, `POST /auth/password/forgot`, `POST /auth/password/reset` (4 endpoint)
 - **SCOPE-DISI**: OpenIddict `/connect/*` 3 endpoint (W4.3+ Infrastructure)
 
-### Authenticated (17/16+)
-- `/me` GET (C.2), PATCH (C.2, email-change HARIC)
+### Authenticated (19/19) — TAMAM
+- `/me` GET (C.2), PATCH (C.2, email-change HARIC — D.3.5 spec hizalandi)
 - `/me/password` PATCH (C.3, cascade revoke refresh)
 - `/me/sessions` GET (C.3), DELETE (C.3)
 - `/me/data-export` POST (C.4, DataExportRequested internal event)
@@ -73,7 +76,7 @@ Working tree: clean.
 - `/me/preferences` PATCH (C.2)
 - `/me/consents` PATCH (C.2, RevokeConsent guard telafi)
 - `/me/avatar` POST (D.2, multipart) — IFileStorage W4.3'te MinIO concrete
-- **ACIK (D.3 SIRADA)**: `POST /me/email-change/request`, `POST /me/email-change/confirm`, `DELETE /me/email-change` (3 endpoint)
+- **TAMAM (D.3 — 8f640b9)**: `POST /me/email-change/request`, `POST /me/email-change/confirm`, `DELETE /me/email-change` (3 endpoint)
 
 ### Admin (0/9)
 HEPSI ACIK — W4.2.E:
@@ -134,15 +137,7 @@ HEPSI ACIK — W4.2.E:
 
 ## 6. W4.2 Kalan Is
 
-### D.3 (SIRADA)
-Email-change 3 use-case + endpoint:
-- `RequestEmailChange` consumer + validator
-- `ConfirmEmailChange` consumer + validator (yeni Domain imza `byte[] hash` tuketici, `_tokenGen.Hash(raw)` reuse — kontrat D.1c garanti)
-- `CancelEmailChange` consumer + validator
-- `MeEndpoints` 3 route ekleme (POST request, POST confirm, DELETE cancel)
-- ~11 dosya, orta boy commit
-
-### D2-out
+### D2-out (SIRADA)
 Phone OTP (send-code + verify-code, `PhoneVerificationTicket` AR hazir) + password forgot/reset.
 **ACIK KARAR (D2-out girisinde Mustafa onayina):** Password-reset ticket stratejisi:
 - (a) `PhoneVerificationTicket` purpose reuse (`PhonePurpose.ResetPassword` enum'da var — minimum kod, semantik karisik)
@@ -176,6 +171,7 @@ Phone OTP (send-code + verify-code, `PhoneVerificationTicket` AR hazir) + passwo
 | D-2 | Email-change token-match: Domain amendment (`PendingEmailTokenHash` byte[16]) | D.1a |
 | D-1 | `IFileStorage` Shared.Contracts.Storage (doc §466); concrete Shared.Infrastructure W4.3 | D.1b |
 | D.1c | Hash algoritma kontrati: `FromHexString → SHA256.HashData` (UTF8 YASAK; round-trip W4.3 testi) | D.1c |
+| B-W4.2-D-3 | Email-change 3 ayri REST endpoint (PATCH `/me` icine gomme yerine); spec satir 561/566/580/596/654 revize | D.3 + D.3.5 (`8f640b9` + `da74b7e`) |
 
 ---
 
@@ -190,6 +186,8 @@ Phone OTP (send-code + verify-code, `PhoneVerificationTicket` AR hazir) + passwo
 - C.4: `IPublishEndpoint` ilk emsal (MassTransit producer pattern)
 - D.1a: Email-change token-match guvenlik acigi (W4.1 retro check-list maddesi: "raw token donduren ama hash saklamayan metot = guvenlik bos")
 - D.3 deflect → D.1c: Hash algoritma uyusmazlik (Domain `Convert.FromHexString` vs Application yanlislikla `Encoding.UTF8` riski)
+- D.3 smooth: 5 yazim turu (Request/Confirm/Cancel quartet + MeEndpoints register + spec revize) 0 yazim sapmasi; tum sapma adaylari kesif turlarinda erken yakalandi (D.3.0/D.3.1.0/D.3.2.0/D.3.5.0). D.3-dev-1 (Confirm 3-param imza), D.3-dev-2 (Domain self-generate token, `_tokenGen` REQUEST'te yok), D.3-dev-3 (DTO primitive string, VO degil) + CRLF benign (Aile 1) + spec-deviation B-W4.2-D-3 → W4.2.R'de deviations.md'ye F-S numarasi alacak (handover'da kayit, henuz numara yok).
+- D.HANDOVER reconcile: 4 sayim duzeltmesi (ahead 19→18, kaynak .cs 116→110 obj-haric, tatbikat 47→44 push-yok, §2 15→18) — W1-2 stat reconcile + Aile 1 obj/ sahte-pozitif onleme calisti.
 
 ### Aile-tezahurleri
 - **Aile 1** (Edit cache stale): Commit sonrasi `str_replace` oncesi `Read`-refresh mecburi — C.3 + C.6 iki kez kanitlandi, kalici refleks.
@@ -210,14 +208,10 @@ Phone OTP (send-code + verify-code, `PhoneVerificationTicket` AR hazir) + passwo
 
 ## 9. Yeni Session Ilk Aksiyon
 
-1. Bu handover-mid'i bastan sona oku.
-2. Durum dogrula: `git log -1` → `65958f5`; `git rev-list --count main..HEAD` → 88 (bu commit dahil); working tree clean.
-3. W4.2.D.3 yazim talimati uret:
-   - Email-change 3 use-case (Request + Confirm + Cancel)
-   - `ConfirmEmailChange` handler: `_tokenGen.Hash(rawToken)` → `Domain.User.ConfirmEmailChange(byte[] hash, ...)` (D.1a imza + D.1c algoritma kontrati garanti)
-   - `MeEndpoints` 3 route
-   - Mustafa'ya copy-paste blok formatinda (Backend'a yapistirmaya hazir)
-4. Backend D.3 raporu → review → commit → **W4.2.D KAPANIR**
-5. → D2-out (password-reset ticket karari) → E (admin 8) → W4.2.R (reconcile + tag + push)
+1. Bu handover'i (wave-4-handover-mid.md) bastan sona oku — HEAD `da74b7e`, ahead 18, `main..HEAD = 91` (bu handover guncellemesi commit'i dahil), main `44416138` **INVARIANT**.
+2. W4.2.D **KAPANDI**; sirada **D2-out** (phone OTP + password reset).
+3. D2-out kickoff: ONCE plan-only tur (kod yok) — kac use-case, hangi Domain metotlari hazir, spec hangi endpoint'ler. Doc fresh-read mecburi (KAYDET-32 / Aile 1 emsali).
+4. D2-out sonrasi **E** (Admin 8) → **W4.2.R** (reconcile + deviations.md F-S kayit + `wave-4-2-complete` tag + Mustafa-eli push, 18+ commit tek milestone).
+5. Backend VS Code'da hazir mi teyit; ilk talimat plan-only D2-out (password-reset ticket stratejisi karari a/b/c).
 
 **DUR.** Push yok, SSH yok, main DOKUNULMAZ.
