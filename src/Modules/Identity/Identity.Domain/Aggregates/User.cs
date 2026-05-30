@@ -23,6 +23,7 @@ public sealed class User : AggregateRoot
     public EmailAddress? PendingEmail { get; private set; }
     public DateTimeOffset? PendingEmailRequestedAt { get; private set; }
     public DateTimeOffset? PendingEmailExpiresAt { get; private set; }
+    public byte[]? PendingEmailTokenHash { get; private set; }
     public HashedPassword? Password { get; private set; }
     public PersonName Name { get; private set; }
     public PhoneNumber? Phone { get; private set; }
@@ -180,14 +181,19 @@ public sealed class User : AggregateRoot
         EnsureNotSuspendedOrDeleted();
         if (ttl <= TimeSpan.Zero)
             throw new DomainException("Ttl pozitif olmali.");
+        var raw = GenerateOpaqueToken();
+        // SHA-256 of the underlying 32 random bytes (hex-decode the raw token).
+        // Avoids string-encoding ambiguity and keeps the FixedTimeEquals input
+        // length canonical.
+        PendingEmailTokenHash = SHA256.HashData(Convert.FromHexString(raw));
         PendingEmail = newEmail;
         PendingEmailRequestedAt = now;
         PendingEmailExpiresAt = now + ttl;
         UpdatedAt = now;
-        return GenerateOpaqueToken();
+        return raw;
     }
 
-    public void ConfirmEmailChange(EmailAddress confirmedNewEmail, DateTimeOffset now)
+    public void ConfirmEmailChange(EmailAddress confirmedNewEmail, byte[] providedTokenHash, DateTimeOffset now)
     {
         if (PendingEmail is null)
             throw new DomainException("Pending email yok.");
@@ -195,11 +201,17 @@ public sealed class User : AggregateRoot
             throw new DomainException("Email change suresi dolmus.");
         if (!PendingEmail.Equals(confirmedNewEmail))
             throw new DomainException("Confirm email pending ile eslesmiyor.");
+        if (PendingEmailTokenHash is null
+            || providedTokenHash is null
+            || providedTokenHash.Length != PendingEmailTokenHash.Length
+            || !CryptographicOperations.FixedTimeEquals(providedTokenHash, PendingEmailTokenHash))
+            throw new DomainException("Gecersiz dogrulama tokeni.");
         Email = confirmedNewEmail;
         EmailVerifiedAt = now;
         PendingEmail = null;
         PendingEmailRequestedAt = null;
         PendingEmailExpiresAt = null;
+        PendingEmailTokenHash = null;
         UpdatedAt = now;
         Raise(new UserEmailVerified(Id, Email.Value, now));
     }
@@ -209,6 +221,7 @@ public sealed class User : AggregateRoot
         PendingEmail = null;
         PendingEmailRequestedAt = null;
         PendingEmailExpiresAt = null;
+        PendingEmailTokenHash = null;
         UpdatedAt = now;
     }
 
