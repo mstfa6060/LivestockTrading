@@ -28,6 +28,8 @@ public static class AdminUsersEndpoints
         group.MapGet("/{id:guid}/sessions", GetAdminUserSessionsEndpoint.Handle);
         group.MapPost("/{id:guid}/suspend", SuspendUserEndpoint.Handle);
         group.MapPost("/{id:guid}/reactivate", ReactivateUserEndpoint.Handle);
+        group.MapPost("/{id:guid}/grant-role", GrantUserRoleEndpoint.Handle);
+        group.MapPost("/{id:guid}/revoke-role", RevokeUserRoleEndpoint.Handle);
 
         return app;
     }
