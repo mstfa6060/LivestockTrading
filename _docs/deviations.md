@@ -1,14 +1,15 @@
 # Sapma Defteri — Konsolide Ledger
 
 **Kapsam:** Tüm wave'ler. **Numaralandırma:** Yakalanma sırasına göre, kategoriden bağımsız, wave'ler arası sürekli.
-**Toplam:** 133 (Backend 18 / Frontend 114 / Bilgi notu 1), **0 production sızıntısı.**
+**Toplam:** 151 (Backend 19 / Frontend 131 / Bilgi notu 1), **0 production sızıntısı.**
 
 ## Genel İstatistik
-- Backend: 18 (tool/süreç davranışı, proaktif yakalama; Wave 3 W3.6.B-W3.7 +3 Aile 6 plan-doc vs fiili kod)
-- Frontend Claude: 114 (talimat tahmini + varsayım güveni; Wave 3 W3.6.B-W3.7 +42 Aile 3 KAYDET-32 ana kategori)
+- Backend: 19 (tool/süreç davranışı, proaktif yakalama; Wave 4 W4.2 +1 Aile 1 CRLF benign)
+- Frontend Claude: 131 (talimat tahmini + varsayım güveni; Wave 4 W4.0 +9 + W4.2 +7 = +16)
 - Bilgi notu: 1 (Sapma 39 — repo snapshot context, hata değil, split dışı)
 - Frontend hatalarının 0'ı production'a sızdı — Backend disiplini + classifier her seferinde yakaladı.
 - **Wave 3 RESMEN KAPANIS:** 13/13 sub-batch, 36 push tatbikati, main INVARIANT 44416138 korundu, 0 production sızıntısı. KAYDET-32 ledger 22 sistemik tezahur, KAYDET-33 + KAYDET-34 yeni formal kayıt.
+- **Wave 4 W4.2.R RECONCILE:** W4.0 handover-only 9 entry (F-W4-1..F-W4-9) + W4.2 D2-out 8 negatif sapma formal F-S 135-151 numara aldi. Pozitif kod-emsali kayitlari (enumeration-protection idiom, generic INVALID_OR_EXPIRED, RevokeAllRefreshTokens cascade) ayri Pozitif Onleme bolumunde formal sayima girmez. W3->W4.2 header drift duzeltildi (eski header "133/134" cakismasi → fiili tablo 151 satir).
 
 ---
 
@@ -463,7 +464,7 @@ Düzeltme: 5 entry ama numara 131-135 olur. Toplam 134 yerine 135 olur. Fiili sa
 
 # Wave 4 Handover-Only (W4.0 — Shared.Contracts/Identity foundation, commit 0f9b98d)
 
-**Durum:** Handover-only ledger. Formal Sapma 134+ numaralandirmasi W4.R reconcile turunda gerceklesecek. Header stat ("Toplam: 133") W4.R'de guncellenecek.
+**Durum:** Handover-only ledger. **W4.2.R reconcile (bu commit) ile formal F-S 135-143 numarasi aldi** — asagidaki bolum "Wave 4 W4.2 (Sapma 135-151)" referans icin korunur (KAYDET-9 audit-trail). Header stat W4.2.R'de guncellendi.
 
 ## W4.0 Handover-Only F-S Listesi
 
@@ -494,5 +495,68 @@ W4.R reconcile turunda yapilacak plan-doc revize listesi:
    - UserListItem: 6 property literal (Admin)
    - UserListQuery: 6 property literal (Admin)
 6. **05-identity.md §5'e IAdminUserReadService metot imzalari** — `GetUserByIdAsync` + `ListUsersAsync` (Frontend B-4 karari + Catalog convention, W4.0'da tespit edildi)
+
+> **W4.2.R Backlog Update:** Madde 3 (Phone OTP placeholder) **c1fddd8** ile kismi kapatildi (ChangePhone Faz-2 satiri eklendi). OAuth Google/Apple + Email Brevo NoOp stub satirlari W4.3+ Infrastructure'da; bu maddenin email + oauth alt-kalemleri hala acik.
+
+---
+
+# Wave 4 W4.2 (Sapma 135-151)
+
+**Stamped:** Sunday, 31 May 2026 (W4.2.R reconcile, commit asagida).
+**Kapsam:** W4.0 9 entry (handover-only ledger'dan promote) + W4.2 D2-out 8 negatif. Pozitif kayitlar ayri bolumde.
+
+## W4.0 Promote (F-S 135-143)
+
+| # | Sub-batch | Aile | KAYDET | Aciklama |
+|---|---|---|---|---|
+| 135 | W4.0.A | 3 | KAYDET-9 | Frontend talimati namespace `.Enums` suffix yazdi (`Shared.Contracts.Identity.Enums`). Backend Catalog fresh-read ile fiili pattern'in `Shared.Contracts.Catalog` (suffix yok) oldugunu tespit edip duzeltdi. Duzeltme: namespace `Shared.Contracts.Identity`, tum Identity enum dosyalari bu pattern'i izledi. (F-W4-1 promote) |
+| 136 | W4.0.B | 6 | — | UserPreferences VO property adlari plan-doc vs kod-literal celiskisi. 03-domain-patterns.md satir 431 `Currency`/`Country` (kisa); fiili kod `CurrencyCode`/`CountryCode` (Code suffix) — ICurrentUserService metot adlariyla uyum + ambiguity onleme. W4.R'de 03-domain-patterns.md revize backlog. (F-W4-2 promote) |
+| 137 | W4.0.B | 3 | — | Frontend SearchTerm tahmini; plan-doc §12 endpoint literal `?search=` → `Search` dogru (Catalog'da hicbiri kullanilmamis). UserListQuery `Search` olarak duzeltildi. (F-W4-3 promote) |
+| 138 | W4.0.B-D | 4+1 hibrit | — | Backend session handoff disipline ihlali — eski session context dolunca yeni session acildi; Frontend Claude sub-batch DUR disiplinini bilmediginden W4.0.C interface + W4.0.D atomic commit talimat-disi icra. Build temiz + plan-doc literal sadakat 4/5, ama Frontend gozden gecirmesi by-pass. Cozum: `feedback_session_handoff_discipline.md` memory (bootstrap sirasi + scope siniri kalici). (F-W4-4 promote) |
+| 139 | W4.0.C | 3 | — | ICurrentUserService XML doc "19 uye" yazildi; fiili 18 uye (1 property + 17 metot). Backend audit + amend ile duzeltildi. (F-W4-5 promote) |
+| 140 | W4.0.C | 3 | KAYDET-9 | Backend UserListItem'a talimat-disi `IReadOnlyList<string> Roles` property ekledi. Frontend reddi: Catalog BrandListItem emsali (list projection bandwidth minimize + N+1 query riski + projection/detail ayrimi). Amend ile Roles cikarildi. (F-W4-6 promote) |
+| 141 | W4.0.C | 3 | KAYDET-9 | Backend IAdminUserReadService metot adi `GetUserDetailAsync` yazdi; Frontend B-4 karari `GetUserByIdAsync` idi. Catalog convention `GetXByIdAsync` baskin (metot adi donus tipini degil arama yolunu belirtir). Amend ile duzeltildi. (F-W4-7 promote) |
+| 142 | W4.0.D | 2 | — | Frontend dosya sayim tahmini 13 vs fiili 14 (UserStatus enum B-3 karariyla sonradan eklendi). Sapma 28 emsali "gevsek aritmetik yerine fiili enumeration" disiplinin uygulanisi. (F-W4-8 promote) |
+| 143 | W4.0 (memory) | 3 | KAYDET-9 | Memory dosyasi satir sayim tahmini 50-80 vs emsal 14 (yogun paragraf + YAML frontmatter). Backend mevcut `feedback_*.md` emsali fresh okudu, talimat satir beklentisi yerine emsal stilini baskin aldi (KAYDET-9 dogru uygulama). (F-W4-9 promote) |
+
+## W4.2 D2-out Negatif (F-S 144-151)
+
+| # | Sub-batch | Aile | KAYDET | Aciklama |
+|---|---|---|---|---|
+| 144 | W4.2.D.3.5 / D2-out (commits) | 1 | — | `git add` sirasinda CRLF→LF normalization warning (working-copy-only, commit'e etkisi yok). Wave 3 emsalleri var; benign tool davranisi. Birden cok commit'te (D.3.5 `da74b7e`, D2-out.2-docs `c1fddd8`) gozuktu. |
+| 145 | W4.2.D.HANDOVER | 2 | KAYDET-32 | Handover guncelleme oncesi 4 sayim duzeltmesi: ahead 19→18, kaynak .cs 116→110 (obj-haric), tatbikat 47→44 (push-yok), §2 commit 15→18. W1-2 stat reconcile + Aile 1 `obj/` sahte-pozitif onleme calisti. Ezber yerine fiili `git rev-list` / `find -not -path` / push-state. |
+| 146 | W4.2.D.3.0 | 3 | KAYDET-9 | Confirm 3-param imza yanlis tahmin: handover-mid "byte[] hash" 1-param ozetlemis; gercekte `ConfirmEmailChange(EmailAddress, byte[], DateTimeOffset)` 3-param. Kesif turunda Domain fresh-read ile yakalandi (D.3.0/D.3.1.0). |
+| 147 | W4.2.D.3.1.0 | 6 | — | Domain `RequestEmailChange` self-generate token (`GenerateOpaqueToken()` private helper, RNG 32-byte hex); handler `_tokenGen.Generate()` REQUEST'te kullanilmaz, sadece Confirm'da `_tokenGen.Hash(raw)` cagrilir. Spec/plan-doc bu Domain detayini belirtmedi, kesif turunde Domain fiili oku ile cikti. |
+| 148 | W4.2.D.3.0 | 6 | KAYDET-9 | Confirm/Request DTO primitive `string Email/Token` (VO `EmailAddress` degil). VerifyEmailRequest emsali (kod-konvansiyonu, cross-batch). |
+| 149 | W4.2.D.3 + D.3.5 | 6 | — | **B-W4.2-D-3 karar:** Email-change 3 ayri REST endpoint (`/me/email-change/request` + `/confirm` + `/cancel`) — spec satir 561/566/580/596/654 PATCH `/me` icine-gomulu plani yerine. D.3.5 `da74b7e` audit-trail commit ile spec hizalandi (16→19 auth endpoint, 40→43 total). |
+| 150 | W4.2.D2-out.2 + docs | 6 | — | **B-W4.2-D2-1 Karar Z:** Phone OTP send-code/verify Faz-1 SADECE Register purpose; ChangePhone Faz-2 (audit `c1fddd8` §13 placeholder satiri); LoginPhoneOtp zaten Faz-2. Spec §12 satir 549-550 endpoint literal Public/anonim, purpose body-field YOK karari. |
+| 151 | W4.2.D2-out.2 | 6 | — | Anonim pre-register phone-verify → consumed-ticket register'a baglanma akisi tanimsiz. VerifyPhoneOtp handler `user?.VerifyPhone(now)` null-conditional; user null = ticket consumed kalir + Success doner. Register handler ileride bu ticket'i nasil tuketecek (lookup'la consumed-ticket goz onunde bulundurma vs post-register verify tekrari) **gelecek batch tasarim karari** — D2-out scope-disi acik-is kaydi. |
+
+## Wave 4 W4.2 Pozitif Onleme Defteri (formal F-S DEGIL, kod-emsali uyumu)
+
+Wave 1 emsali `## Wave 1+ Pattern Kararları (sapma DEĞİL — pozitif inisiyatif)` satir 84 ve Wave 3 `## Wave 3 W3.6.A Pozitif Önleme Defteri` satir 272 desenleri ile simetrik. Bu kayitlar **sapma DEGIL**, doc-literal olmayan ama kod-emsali ile dogru uygulanan pattern'ler.
+
+- **Enumeration-protection idiom (D2-out.1 Forgot + D2-out.2 SendPhoneOtp):** Bilinmeyen identifier veya gecersiz format → silent `Result.Success()` (identifier-existence sizdirmaz). Doc-literal degil, `SendEmailVerifyHandler.cs:42-49` fiili kod-emsali (C.3'te yazilmis). D2-out.1 ForgotPasswordHandler + D2-out.2 SendPhoneOtpHandler **birebir** uyguladi. KAYDET-9 cross-batch convention baskin uygulamasi.
+- **Generic INVALID_OR_EXPIRED failure mode (D2-out.1 Reset + D2-out.2 Verify):** Reset/Verify handler'larda tek hata sabiti — token-validity ile identifier-existence sizdirmaz. Format gecersiz / bilinmeyen user / aktif ticket yok / hash mismatch hepsi ayni `Error`. Doc-literal degil, guvenlik-konvansiyonu. ResetPasswordHandler emsali VerifyPhoneOtpHandler'a aktarildi.
+- **RevokeAllRefreshTokens cascade (D2-out.1 Reset basarisinda):** Password reset basariliysa `user.ChangePassword(...)` sonrasi `user.RevokeAllRefreshTokens(RevocationReason.PasswordChanged, now)`. `ChangePasswordHandler.cs:65` (C.3 cascade emsali). Doc-literal degil, **guvenlik kritik** — reset = tum cihazlardan logout. Frontend tasariminda eksikti, Backend ratify turunde (D2-out.1 PLAN-ONLY VALIDATE) FLAG'le eklendi.
+- **D.3 smooth (5 yazim turu, 0 yazim sapmasi):** Request/Confirm/Cancel quartet (8 dosya) + MeEndpoints +3 register + spec D.3.5 revize. Tum sapma adaylari kesif turlarinda (D.3.0/D.3.1.0/D.3.2.0/D.3.5.0) erken yakalandi. Wave 1 "Wave 1+ Pattern Kararları" emsali — pozitif inisiyatif, sapma sayimina girmez.
+
+## Wave 4 W4.2 Aile Guncellemeleri
+
+- **Aile 1** (Tool davranisi yanilgisi): +1 instance (Sapma 144 CRLF benign, working-copy-only)
+- **Aile 2** (Algi/gercek ucurumu): +2 instance (Sapma 142 dosya sayim, Sapma 145 D.HANDOVER 4-metric reconcile)
+- **Aile 3** (Talimat tahmin hatasi / ezber drift, KAYDET-9 cross-ref): +7 instance (Sapma 135, 137, 139, 140, 141, 143, 146 — namespace + SearchTerm + XML doc sayim + UserListItem property + metot adi convention + memory satir sayim + Confirm imza tahmin)
+- **Aile 4+1 hibrit** (Disiplin + Self-authorization): +1 instance (Sapma 138 session handoff disipline)
+- **Aile 6** (Plan-doc vs kod-literal celiskisi): +6 instance (Sapma 136 UserPreferences Code suffix, Sapma 147 Domain self-gen token spec eksikligi, Sapma 148 DTO primitive VO degil, Sapma 149 B-W4.2-D-3 email-change 3 endpoint, Sapma 150 B-W4.2-D2-1 Karar Z phone OTP, Sapma 151 anonim ticket akis tanimsiz)
+
+## Wave 4 W4.2 Reconcile Notu (W1-2 + KAYDET-32)
+
+- **Header drift duzeltildi:** Eski "Toplam 133" + tabloda son satir 134 (W3 reconcile sirasinda kayitli — satir 391) → bu commit'te fiili tablo 151 satir → header `Toplam: 151`. W1-2 stat reconcile disiplini.
+- **W4.0 handover-only entry'ler korundu** (KAYDET-9 audit-trail): satir 470-480 `F-W4-1...F-W4-9` referans olarak kaldi, "promote" notu eklendi. Formal F-S 135-143 yeni Wave 4 bolumunde duplike degil ozet-promote ile.
+- **Pozitif kayit ayrimi:** 4 kalem (enumeration idiom + generic-failure + RevokeAll cascade + D.3 smooth) ayri "Pozitif Onleme" bolumunde — Wave 1 + Wave 3 emsali. Formal sayima girmez.
+- **W4.0 plan-doc revize backlog:** Madde 3 (phone OTP placeholder) `c1fddd8` ile kismi kapatildi (ChangePhone Faz-2 satiri). Email/OAuth NoOp stub W4.3+ acik.
+- **Aile dagilim guncel:** +17 yeni F-S (Aile 1: +1, Aile 2: +2, Aile 3: +7, Aile 4+1: +1, Aile 6: +6). KAYDET-9 cross-ref 6 entry'de (135, 140, 141, 143, 146, 148).
+- **Yeni KAYDET YOK** — mevcut KAYDET 32/33/34 yeterli (KAYDET-9 cross-ref ile W4.0+W4.2 systemik pattern karsilanir).
+- **W4.2.E (Admin 8 endpoint) ayri reconcile turunde** — bu commit yalniz W4.0+D2-out kapsami; E sonrasi W4.2.E.R reconcile gerekir.
 
 ---
