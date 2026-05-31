@@ -22,6 +22,8 @@ public static class AuthEndpoints
         group.MapPost("/register", RegisterWithPasswordEndpoint.Handle).AllowAnonymous();
         group.MapPost("/password/forgot", ForgotPasswordEndpoint.Handle).AllowAnonymous();
         group.MapPost("/password/reset", ResetPasswordEndpoint.Handle).AllowAnonymous();
+        group.MapPost("/phone/send-code", SendPhoneOtpEndpoint.Handle).AllowAnonymous();
+        group.MapPost("/phone/verify", VerifyPhoneOtpEndpoint.Handle).AllowAnonymous();
         group.MapPost("/email/send-verify", SendEmailVerifyEndpoint.Handle).AllowAnonymous();
         group.MapPost("/email/verify", VerifyEmailEndpoint.Handle).AllowAnonymous();
         group.MapPost("/oauth/google", RegisterWithSocialEndpoint.Handle).AllowAnonymous();
