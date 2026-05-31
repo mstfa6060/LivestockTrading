@@ -1,15 +1,16 @@
 # Sapma Defteri — Konsolide Ledger
 
 **Kapsam:** Tüm wave'ler. **Numaralandırma:** Yakalanma sırasına göre, kategoriden bağımsız, wave'ler arası sürekli.
-**Toplam:** 151 (Backend 19 / Frontend 131 / Bilgi notu 1), **0 production sızıntısı.**
+**Toplam:** 155 (Backend 21 / Frontend 133 / Bilgi notu 1), **0 production sızıntısı.**
 
 ## Genel İstatistik
-- Backend: 19 (tool/süreç davranışı, proaktif yakalama; Wave 4 W4.2 +1 Aile 1 CRLF benign)
-- Frontend Claude: 131 (talimat tahmini + varsayım güveni; Wave 4 W4.0 +9 + W4.2 +7 = +16)
+- Backend: 21 (tool/süreç davranışı + Domain-gozlem; Wave 4 W4.2 +1 Aile 1 CRLF benign + W4.2.E +2 Aile 6 Domain idempotency)
+- Frontend Claude: 133 (talimat tahmini + varsayım güveni; Wave 4 W4.0 +9 + W4.2 +7 + W4.2.E.R adim 3a +2 = +18)
 - Bilgi notu: 1 (Sapma 39 — repo snapshot context, hata değil, split dışı)
 - Frontend hatalarının 0'ı production'a sızdı — Backend disiplini + classifier her seferinde yakaladı.
 - **Wave 3 RESMEN KAPANIS:** 13/13 sub-batch, 36 push tatbikati, main INVARIANT 44416138 korundu, 0 production sızıntısı. KAYDET-32 ledger 22 sistemik tezahur, KAYDET-33 + KAYDET-34 yeni formal kayıt.
 - **Wave 4 W4.2.R RECONCILE:** W4.0 handover-only 9 entry (F-W4-1..F-W4-9) + W4.2 D2-out 8 negatif sapma formal F-S 135-151 numara aldi. Pozitif kod-emsali kayitlari (enumeration-protection idiom, generic INVALID_OR_EXPIRED, RevokeAllRefreshTokens cascade) ayri Pozitif Onleme bolumunde formal sayima girmez. W3->W4.2 header drift duzeltildi (eski header "133/134" cakismasi → fiili tablo 151 satir).
+- **Wave 4 W4.2.E.R RECONCILE:** Admin endpoint grubu (8/8) yapisal tam. F-S 152-153 (Aile 6, Domain idempotency tutarsizligi) Backend-catch formal + F-S 154-155 (Aile 3, Frontend self-catch SHA-self-ref + ara-tag emsalsiz) ADIM 3a'da eklendi. Pozitif Onleme 3 entry (Aile-1 stale-Edit + B-W4.1-4 cift-event teyit + F2 sayim reconcile) formal-disi. 3 yeni karar (B-W4.2-E-1/2/3) karar arsivine. Yeni KAYDET YOK. Toplam 151 → 155.
 
 ---
 
@@ -558,5 +559,52 @@ Wave 1 emsali `## Wave 1+ Pattern Kararları (sapma DEĞİL — pozitif inisiyat
 - **Aile dagilim guncel:** +17 yeni F-S (Aile 1: +1, Aile 2: +2, Aile 3: +7, Aile 4+1: +1, Aile 6: +6). KAYDET-9 cross-ref 6 entry'de (135, 140, 141, 143, 146, 148).
 - **Yeni KAYDET YOK** — mevcut KAYDET 32/33/34 yeterli (KAYDET-9 cross-ref ile W4.0+W4.2 systemik pattern karsilanir).
 - **W4.2.E (Admin 8 endpoint) ayri reconcile turunde** — bu commit yalniz W4.0+D2-out kapsami; E sonrasi W4.2.E.R reconcile gerekir.
+
+---
+
+# Wave 4 W4.2.E (Sapma 152-153)
+
+**Stamped:** Sunday, 31 May 2026 (W4.2.E.R reconcile, /admin/users 8/8 yapisal tam).
+**Kapsam:** Admin endpoint grubu yazimi (E.1 read foundation + E.2 status + E.3 role + E.4 forceLogout, 5 commit). 2 Domain-gozlem formal F-S, 3 pozitif onleme, 3 yeni karar. Yeni KAYDET YOK.
+
+## W4.2.E Formal F-S (152-153)
+
+| # | Sub-batch | Aile | KAYDET | Aciklama |
+|---|---|---|---|---|
+| 152 | W4.2.E.2 | 6 | — | `User.Suspend` already-suspended `UserSuspended` event-duplikasyon. Domain `User.cs:254` already-suspended guard yok, line 274 kosulsuz `Raise(new UserSuspended(...))`. Re-suspend cagrisi → ikinci `UserSuspended` event Notifications/Accounts consumer'larina tekrar tetik (idempotency Application-katmaninda da yok cunku Domain otoritedir). Backend E.2 yaziminda yakalandi; Application dogru (Domain'e guvenir), sorun Domain-katman scope-disi. Cozum: Wave 7 hardening — `if (Status == UserStatus.Suspended) return;` early-return (GrantRole H-10 emsali). |
+| 153 | W4.2.E.3 | 6 | — | Domain idempotency tutarsizligi (F-S 152 kok-analiz). Ayni `User` AR'inda iki farkli desen: `GrantRole` line 367 idempotent early-return + event-skip (H-10), `Suspend` line 254 kosulsuz Status overwrite + event raise. Tutarli pattern olmali. Cozum: Wave 7 hardening — Suspend (+ olasi Reactivate, RevokeRole olmayan-role guard'ina denk) icin H-10-style idempotent guard ekleme; veya tum lifecycle metotlari kosulsuz raise (en az surpriz). Pattern karari Wave 7 review. |
+| 154 | W4.2.E.R ADIM 2 | 3 | — | **Frontend self-catch:** handover-mid §2/§6 E.R commit SHA "placeholder" + "geri-doldur" talimati self-referential imkansiz (commit kendi SHA'sini icerigine iceremez — chicken-and-egg). Backend yazimda placeholder kullandi, ama dogru cozum Wave 2 handover emsali "self (bu commit)" ifadesidir (SHA-yok atif, push sonrasi origin'de gorulur). Frontend talimat kusuru, Aile 3 (talimat tahmin hatasi). Cozum: handover §2/§6 placeholder ifadeleri "E.R reconcile (self — bu commit)" diye duzeltildi (W4.2.E.R ADIM 3a). |
+| 155 | W4.2.E.R ADIM 2 | 3 | KAYDET-9 | **Frontend self-catch:** `wave-4-2-complete` ara-tag onerisi emsalsiz ekstrapolasyon. Wave 0/1/2/3 hepsi `wave-N-complete` (wave-sonu, ara-tag yok); wave-ici E.R reconcile turunde ara-tag onerme Wave-bazli emsal-yok. KAYDET-9 cross-batch convention extrapolation: Wave 2/3 emsali wave-N-complete fiili kontrol edilmedi, "wave-4-2" ezber. Aile 3. Cozum: bu push'ta tag YOK; `wave-4-complete` Wave 4 sonu (W4.3/W4.4 sonrasi); handover guncellemesi senkron. |
+
+## W4.2.E Pozitif Onleme Defteri (formal F-S DEGIL)
+
+- **Aile-1 stale-Edit kazasi (E.4):** `AdminUsersEndpoints.cs` E.3 commit sonrasi degisti (RevokeUserRoleEndpoint register satiri eklendi `133bccf`). E.4 Edit cache stale geldi (eski `old_string` E.3 oncesi 2 register'a referansli), Edit `tool_use_error: File has not been read yet` dondu. Read-refresh ile guncel govde okundu, Edit retry basarili. Tool davranisi (Edit cache invalidate mekanigi); self-correction ile cozuldu, kod ciktida etkilenmedi. Aile 1 + KAYDET-32 (commit sonrasi Read-refresh refleksi).
+- **B-W4.1-4 cift-event teyit pozitif (E.3):** Plan-doc B-W4.1-4 karari `GrantRole → UserRoleGranted` + `RevokeRole → UserRoleRevoked` 2 ayri Domain event. E.3 PLAN-ONLY grep'inde fiili teyit: `User.cs:371` UserRoleGranted raise + `User.cs:382` UserRoleRevoked raise + 2 ayri dosya `Events/Internal/UserRoleGranted.cs` + `UserRoleRevoked.cs` mevcut. Plan-doc + Domain birebir uyum, FLAG-DUR gerekmedi. Wave 0 "Wave 1+ Pattern Kararlari" emsali — pozitif inisiyatif.
+- **F2 sayim reconcile (W1-2 disiplini):** E.0 PREP'te "21 dosya" provisional, E.1 sonrasi "24 total" guncellendi, E.5 sanity'de fiili enumerasyon: AdminUsers/ klasor **22 .cs** + Shared.Contracts/Admin **+1 yeni + 1 modify** = **24 dosya total**. Read endpoint'lerin trio (direct-service) degil quartet sanildigi ezber yakalandi (E.1 yaziminda AdminCatalogRead emsali ile dogru cikti). Gevsek-aritmetik onleme dogru calisti (Sapma 28 emsali sistemik uygulama). Aile 2 (algi/gercek ucurumu) pozitif yan.
+
+## W4.2.E Frontend Onayli Kararlar (karar arsivi, mevcut karar tablosuna ek)
+
+| Kod | Karar | Sub-batch |
+|---|---|---|
+| B-W4.2-E-1 | Impersonate Wave 7 / W4.3 host-auth delege — spec 447 JWT mint + `IJwtTokenService` RS256+jti bagimli (W4.3 backlog); `IAdminUserCommands.ImpersonateAsync` contract'ta durur, Application handler+endpoint YAZILMADI. Auth-inert Faz 1. | E.0 PLAN |
+| B-W4.2-E-2 | Admin auth role `"admin"`-only tek-rol (`RequireAuthorization(policy => policy.RequireRole("admin"))`). Spec doc-silent; Catalog emsali `("admin", "moderator")` REDDEDILDI cunku user suspend/role super-admin tier. Auth-inert host-auth wave revisit (W4.4). | E.1 |
+| B-W4.2-E-3 | `AdminSessionInfo` 7-field DTO (Karar c) — Me-scope `SessionInfo`'dan `IsCurrent` dusurulerek tureti; admin baglaminda current-session marker tanimsiz. Me-tarafi DOKUNULMADI (0 modify). Spec doc-silent, defansif default. | E.1 |
+
+## W4.2.E Aile Guncellemeleri
+
+- **Aile 1** (Tool davranisi): +1 instance (pozitif — E.4 stale-Edit self-correction)
+- **Aile 6** (Plan-doc vs kod, Domain idempotency tutarsizligi): +2 formal (F-S 152 Suspend event-dup + F-S 153 idempotency pattern carmasi)
+- **Aile 2** (Algi/gercek): +1 pozitif (E.5 F2 sayim reconcile self-correction)
+- **Aile 3** (Talimat tahmin hatasi / ezber drift): +2 formal Frontend self-catch (F-S 154 SHA-self-ref imkansiz placeholder + F-S 155 ara-tag emsalsiz ekstrapolasyon; KAYDET-9 cross-batch convention extrapolation ihlali)
+
+## W4.2.E Reconcile Notu (W1-2)
+
+- **Header drift:** Baseline 151 → bu reconcile +4 formal (152/153 Backend + 154/155 Frontend) → **fiili tablo 155 satir** → header `Toplam: 155`. Pozitif (3) + karar (3) + W4.3 backlog (+1) formal sayima girmez.
+- **Backend artisi:** F-S 152 + 153 Backend-catch (Domain-gozlem, Application yaziminda yakalandi; taraf-hata Frontend talimat ya da Backend kod sapmasi DEGIL — Domain inconsistency raporlama). **Backend 19 → 21** (formal +2).
+- **Frontend artisi:** F-S 154 + 155 Frontend self-catch (E.R adim 3a turunde Backend yakaladi). E.0-E.5 Application yazim turlerinde Frontend talimat-tahmin sapmasi yok, ama E.R adim 2 talimatinda 2 ezber/extrapolasyon kustu (SHA self-ref imkansiz placeholder + ara-tag emsalsiz). **Frontend 131 → 133** (formal +2).
+- **B-W4.1-4 cift-event teyit pozitif** karar arsivine girmez (plan-doc onceden onayli; Domain teyit pozitif kayit).
+- **Yeni KAYDET YOK** — mevcut KAYDET 9/18/19/32 cross-ref yeterli. KAYDET-9 (cross-batch convention extrapolation YASAK) E.3 role-list hardcode YASAK + E.0 GetUserId reuse karari ile capraz pekisti.
+- **AdminSessionInfo.IpAddress kaynak entity field yok** (RefreshToken+UserDevice'ta IpAddress sadece UserConsent disinda yok); Me SessionInfo da ayni durumda. W4.3 mapping karari backlog (asagi §5 W4.3 Infrastructure Backlog ek).
+- **W4.2 RESMI KAPANIS:** D.1-3 + D.3.5 + D2-out 5 + handover-mid-2 + W4.2.R + E.1-4 + W4.2.E.R = **22 commit kod + 7 docs** (handover-mid'de tam log). main INVARIANT `44416138` 100+ commit boyunca korundu, 0 production sızıntısı, ahead 29 (Backend-executed push W4.2.E.R sonrasi).
 
 ---

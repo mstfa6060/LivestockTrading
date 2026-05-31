@@ -1,8 +1,8 @@
 # Wave 4 W4.2 (Identity.Application) Mid-Handover
 
-**Stamped:** Sunday, 31 May 2026 (W4.2.D2-out + W4.2.R reconcile sonrasi)
-**Commit:** 03d7fa8 (W4.2.R reconcile, lokal rebuild/v2 ucu)
-**Push tatbikati:** YOK (Mustafa eli Wave sonu tek milestone push); ahead 24 lokal
+**Stamped:** Sunday, 31 May 2026 (W4.2.E + W4.2.E.R reconcile sonrasi — W4.2 RESMI KAPANIS)
+**Commit:** W4.2.E.R reconcile (self — bu commit; SHA push sonrasi origin/rebuild/v2'de gorulur). Onceki kod ucu `809d7e7` (W4.2.E.4 forceLogout).
+**Push tatbikati:** YOK (Backend-executed milestone, W4.2.E.R commit + tag + push); ahead 29 lokal
 **Context:** Esige yaklasildi, yeni Frontend Claude session W4.2'yi D.3'ten devralabilsin diye uretildi.
 
 ---
@@ -12,21 +12,21 @@
 | Branch / Ref | SHA | Durum |
 |---|---|---|
 | `main` | `44416138b978774146f992f9e0756b829ba541e0` | **INVARIANT** — 44/44 push tatbikati boyunca dokunulmadi |
-| `rebuild/v2` (lokal) | `03d7fa8` | W4.2.D + D2-out + W4.2.R reconcile KAPANDI, 24 commit ahead |
+| `rebuild/v2` (lokal) | `809d7e7` → E.R reconcile (self — bu commit) | W4.2 TUMU KAPANDI (D + D2-out + R + E + E.R), 30 commit ahead push oncesi |
 | `origin/rebuild/v2` | `b8c7845` | W4.1 (Identity.Domain) son push; W4.2 lokal-only |
 | Tag `wave-0-complete` | intact | |
 | Tag `wave-1-complete` | intact | |
 | Tag `wave-2-complete` | intact (`e7e7fec` → `1f2c7dd`) | |
 | Tag `wave-3-complete` | intact | |
 | Tag `wave-4-1-complete` | `b8c7845` | W4.1 Identity.Domain kapanis |
-| Tag `wave-4-2-complete` | YOK | W4.2 sonu eklenecek |
+| Tag `wave-4-complete` | YOK | Wave 4 sonu eklenecek (W4.3 + W4.4 sonrasi); wave-ici ara-tag emsali yok (F-S 155 kayit) |
 
-`main..HEAD = 96` (production'dan rebuild/v2 ucuna gercek delta; bu handover guncellemesi commit'i ile 97 olacak).
+`main..HEAD = 101` (production'dan rebuild/v2 ucuna gercek delta; W4.2.E.R toplu commit + tag sonrasi 102+ olacak).
 Working tree: clean.
 
 ---
 
-## 2. W4.2 Commit Zinciri (24 commit, origin `b8c7845` sonrasi, hepsi lokal, push bekliyor)
+## 2. W4.2 Commit Zinciri (30 commit, origin `b8c7845` sonrasi, hepsi lokal, push bekliyor)
 
 | Sub-batch | SHA | Kapsam (kisa) |
 |---|---|---|
@@ -54,6 +54,11 @@ Working tree: clean.
 | D2-out.2 | 4a20f21 | phone OTP register verify (Register purpose, anonim Public) |
 | docs(D2-out.2) | c1fddd8 | 05-identity §13 ChangePhone Faz-2 placeholder (B-W4.2-D2-1 audit-trail) |
 | W4.2.R | 03d7fa8 | deviations.md W4.0 + D2-out F-S 135-151 formal kayit, Pozitif Onleme 4 kalem |
+| E.1 | f50e29d | admin users read foundation (AdminSessionInfo + IAdminUserReadService +1 + 3 read endpoint + aggregator) |
+| E.2 | 6a44486 | admin users suspend reactivate (Suspend quartet + Reactivate trio + aggregator +2) |
+| E.3 | 133bccf | admin users grant revoke role (GrantRole + RevokeRole quartet + aggregator +2; B-W4.1-4 cift-event teyit) |
+| E.4 | 809d7e7 | admin users force logout (ForceLogout trio handler-cascade + aggregator +1; /admin/users 8/8 yapisal tam) |
+| W4.2.E.R | self (bu commit) | deviations.md W4.2.E F-S 152-155 formal (152/153 Backend Domain-gozlem + 154/155 Frontend self-catch SHA-self-ref + ara-tag emsalsiz) + Pozitif Onleme 3 + Karar 3 (B-W4.2-E-1/2/3); handover-mid guncelleme |
 
 ---
 
@@ -84,17 +89,18 @@ Working tree: clean.
 - `/me/avatar` POST (D.2, multipart) — IFileStorage W4.3'te MinIO concrete
 - **TAMAM (D.3 — 8f640b9)**: `POST /me/email-change/request`, `POST /me/email-change/confirm`, `DELETE /me/email-change` (3 endpoint)
 
-### Admin (0/9)
-HEPSI ACIK — W4.2.E:
-- `GET /admin/users` (list, filter+page)
-- `GET /admin/users/{id}` (detay)
-- `POST /admin/users/{id}/suspend`
-- `POST /admin/users/{id}/reactivate`
-- `POST /admin/users/{id}/roles` (grant)
-- `DELETE /admin/users/{id}/roles/{role}` (revoke)
-- `POST /admin/users/{id}/force-logout` (RevokeAllRefreshTokens)
-- `GET /admin/users/{id}/sessions`
-- (audit endpoint HARIC — Wave 7 Admin module delege)
+### Admin (8/9 — TAMAM, audit delege)
+TAMAM (W4.2.E sub-batch'ler):
+- `GET /admin/users` (E.1 list, `[AsParameters] UserListQuery` cursor + 4 filtre)
+- `GET /admin/users/{id}` (E.1 detay, `UserDetail?` null → 404)
+- `GET /admin/users/{id}/sessions` (E.1 sessions, `AdminSessionInfo` 7-field projeksiyon)
+- `POST /admin/users/{id}/suspend` (E.2 quartet, reason body, Domain cascade refresh-revoke + UserSuspended event)
+- `POST /admin/users/{id}/reactivate` (E.2 trio, void)
+- `POST /admin/users/{id}/grant-role` (E.3 quartet, role body, Domain H-10 idempotent + UserRoleGranted event)
+- `POST /admin/users/{id}/revoke-role` (E.3 quartet, role body, UserRoleRevoked event)
+- `POST /admin/users/{id}/force-logout` (E.4 trio handler-cascade, `RevocationReason.AdminRevoked`)
+- **HARIC:** `GET /admin/users/{id}/audit` (Wave 7 Admin module delege); `POST /admin/users/{id}/impersonate` (B-W4.2-E-1: Wave 7 / W4.3 host-auth delege, contract `IAdminUserCommands.ImpersonateAsync` durur ama Application impl yok)
+- **Auth:** `RequireRole("admin")` tek-rol (B-W4.2-E-2 super-admin tier; Catalog `("admin","moderator")` REDDEDILDI). Auth-inert host-auth wave revisit (W4.4).
 
 ---
 
@@ -121,6 +127,11 @@ HEPSI ACIK — W4.2.E:
 ### Cross-cutting (1)
 - `IFileStorage` (Shared.Contracts.Storage, D.1b) — concrete **Shared.Infrastructure** MinIO (bucket=`avatars` + `data-exports`); B-W4.2-D-1 karari.
 
+### Shared.Contracts/Identity/Admin (W4.0 + W4.2.E)
+- `IAdminUserCommands` (6 metot): Suspend / Reactivate / GrantRole / RevokeRole / ForceLogout / **Impersonate**. W4.2.E'de **5 Application impl** yapildi (Suspend/Reactivate/GrantRole/RevokeRole/ForceLogout handler-direct User AR cagrisi, IAdminUserCommands impl Wave 7 / W4.3 delege). Impersonate impl YOK (B-W4.2-E-1).
+- `IAdminUserReadService` (3 metot): `ListUsersAsync` + `GetUserByIdAsync` (W4.0) + **`GetSessionsByUserAsync` (E.1 additive)**. Concrete W4.3 Infrastructure (NotImpl emsali, auth-inert).
+- `AdminSessionInfo` (E.1 yeni DTO): 7-field projeksiyon (IsCurrent dusurulmus, B-W4.2-E-3 Karar c). Me-scope `SessionInfo` (MeProfile.cs:44) dokunulmadi.
+
 ### Domain amendment (D2-out.0 c-light)
 - **Yeni enum:** `EmailPurpose { Verify = 1, ResetPassword = 2 }` — `Identity.Domain/Enums/EmailPurpose.cs`
 - **`EmailVerificationTicket.Purpose`** property discriminator + `Issue` factory +EmailPurpose param. Migration etkisi YOK (Identity.Infrastructure'da hicbir migration yok, W4.3 InitialCreate'de NOT NULL kolon DEFAULT 1 ile uretilir).
@@ -146,20 +157,22 @@ HEPSI ACIK — W4.2.E:
 7. **YENI (D2-out.0):** `IPhoneOtpCodeGenerator` concrete — 6-digit numeric (`Random.Shared.Next(0, 1_000_000).ToString("D6")` emsali) + `SHA256.HashData(Encoding.UTF8.GetBytes(raw))` byte[32]. Round-trip test ZORUNLU (kontrat D2-out.0 port XML doc).
 8. **YENI (D2-out.0):** `ISmsSender` Faz 1 NoOp + log adapter (IEmailSender stub emsali). Faz 2'de Twilio (Notifications module delege, Backlog #57/#73).
 9. `DataExportWorker` (Quartz) + `IDataExportContributor` (doc §11) — **veya W4.4 ayri batch**.
+10. **YENI (E.1):** `AdminSessionInfo.IpAddress` (non-null `string`) kaynak entity field karari. `RefreshToken` + `UserDevice` Domain'de `IpAddress` field **YOK** (sadece `UserConsent`'te var); Me-scope `SessionInfo.IpAddress` ayni durumda. W4.3 mapping secenekleri: (a) `RefreshToken` entity'ye `IpAddress` alani ekle (Domain amendment, migration), (b) audit log ayri lookup, (c) DTO nullable'a cevir (geri-uyum sapmasi, B-W4.2-E-3 revize). Karar W4.3 InitialCreate Domain-review turunde.
 
 ---
 
 ## 6. W4.2 Kalan Is
 
-### E (Admin 8 endpoint) (SIRADA)
-- audit HARIC (Wave 7 Admin module delege)
-- `IAdminUserCommands` + `IAdminUserReadService` concrete (W4.0 Shared.Contracts'ta imza var)
-- Domain metotlar hazir: `Suspend`, `Reactivate`, `GrantRole`, `RevokeRole`, `RevokeAllRefreshTokens`
+### E (Admin 8/9 endpoint) — KAPANDI ✓
+- 5 commit (E.1 `f50e29d` + E.2 `6a44486` + E.3 `133bccf` + E.4 `809d7e7` + E.R self bu commit): 23 yeni .cs (AdminUsers/ klasor 22 + Shared.Contracts/Admin AdminSessionInfo) + 1 modify (IAdminUserReadService).
+- Solution-wide build 0/0 (E.5 sanity teyit).
+- audit + impersonate Wave 7 / W4.3 delege (B-W4.2-E-1 karari).
+- Application impl handler-direct User AR cagrisi; IAdminUserCommands concrete Wave 7 / W4.3.
 
-### W4.2.E.R (E sonrasi reconcile)
-- `deviations.md` W4.2.E F-S kayitlari (E sub-batch sapmalari) — W4.2.R `03d7fa8` formatinda ek bolum
-- Bu handover guncellenip "wave-4-2 complete" snapshot
-- Tek milestone push hazirlik (Mustafa eli, 24+ commit) → `wave-4-2-complete` annotated tag
+### W4.2.E.R (KAPANDI — bu commit) ✓
+- `deviations.md` W4.2.E F-S 152-153 formal (Aile 6 Domain idempotency tutarsizligi, Backend-CATCH) + Pozitif Onleme 3 entry + 3 yeni karar (B-W4.2-E-1/2/3).
+- Bu handover-mid guncellendi ("wave-4-2 complete" snapshot).
+- **Sirada:** Backend-executed push (30 commit milestone). **Tag YOK** bu push'ta (F-S 155: wave-ici ara-tag emsali yok); `wave-4-complete` Wave 4 sonu (W4.3 + W4.4 sonrasi).
 
 ---
 
@@ -179,6 +192,9 @@ HEPSI ACIK — W4.2.E:
 | D.1c | Hash algoritma kontrati: `FromHexString → SHA256.HashData` (UTF8 YASAK; round-trip W4.3 testi) | D.1c |
 | B-W4.2-D-3 | Email-change 3 ayri REST endpoint (PATCH `/me` icine gomme yerine); spec satir 561/566/580/596/654 revize | D.3 + D.3.5 (`8f640b9` + `da74b7e`) |
 | B-W4.2-D2-1 | Phone OTP send-code/verify Faz-1 SADECE Register purpose (anonim Public); ChangePhone + LoginPhoneOtp Faz-2 (§13 placeholder). Password reset cift-kanal (email + phone) c-light (EmailVerificationTicket.Purpose discriminator). | D2-out.0/1/2 + docs (`8ae54cf` + `e91a60e` + `4a20f21` + `c1fddd8`) |
+| B-W4.2-E-1 | Impersonate Wave 7 / W4.3 host-auth delege — spec 447 JWT mint + `IJwtTokenService` RS256+jti bagimli; `IAdminUserCommands.ImpersonateAsync` contract'ta durur, Application handler+endpoint YAZILMADI. Auth-inert Faz 1. | E.0 PLAN |
+| B-W4.2-E-2 | Admin auth role `"admin"`-only tek-rol (`RequireAuthorization(policy => policy.RequireRole("admin"))`). Spec doc-silent; Catalog emsali `("admin", "moderator")` REDDEDILDI (user suspend/role super-admin tier). Auth-inert host-auth wave revisit (W4.4). | E.1 |
+| B-W4.2-E-3 | `AdminSessionInfo` 7-field DTO (Karar c) — Me-scope `SessionInfo`'dan `IsCurrent` dusurulerek tureti; admin baglaminda current-session marker tanimsiz. Me-tarafi DOKUNULMADI (0 modify). Spec doc-silent, defansif default. | E.1 |
 
 ---
 
@@ -187,6 +203,10 @@ HEPSI ACIK — W4.2.E:
 **W4.2.R RECONCILE TAMAM** (`03d7fa8`): W4.0 handover-only 9 entry (F-W4-1..F-W4-9) + W4.2 D2-out 8 negatif sapma **formal F-S 135-151** numara aldi. Pozitif kod-emsali kayitlari ayri **Pozitif Onleme** bolumune girdi (formal sayima girmez).
 
 **Header reconcile:** eski 133/134 cakismasi → fiili tablo 151 satir. Aile dagilim: Aile 1 +1 (CRLF), Aile 2 +2 (sayim + handover reconcile), Aile 3 +7 (KAYDET-9 cross-ref 4 entry), Aile 4+1 hibrit +1 (session handoff), Aile 6 +6 (spec vs kod). Backend 19, Frontend 131, Bilgi 1.
+
+**W4.2.E.R RECONCILE TAMAM** (self bu commit): F-S 152-155 formal eklendi (152/153 Backend Domain-gozlem + 154/155 Frontend self-catch ADIM 3a) → **toplam 155** (Backend 21, Frontend 133, Bilgi 1). Pozitif Onleme 3 entry (E.4 Aile-1 stale-Edit + E.3 B-W4.1-4 cift-event teyit + E.5 F2 sayim reconcile) formal-disi. 3 yeni karar (B-W4.2-E-1/2/3) karar arsivine eklendi.
+
+**KRITIK NOT — F-S 152/153 sayac yakalama-tarafi konvansiyonu:** F-S 152 (User.Suspend already-suspended event-dup) + F-S 153 (Domain idempotency tutarsizligi GrantRole H-10 vs Suspend kosulsuz) **Backend-CATCH** kayit (Domain-gozlem; E.2/E.3 yaziminda grep ile yakalandi). E batch'inde **iki tarafta da fiili kod-hatasi YOK** — Application yazimi dogru (Domain'e guvenir, Application'da idempotency guard ekleme yanlis olurdu cunku Domain otoritedir). Sayac yakalama-tarafi (kim yakaladi) konvansiyonuna gore Backend 21'e gitti; sorun Wave 7 Domain-katmani hardening backlog'da. **Gelecek-okuma:** F-S 152/153 "Frontend talimat sapmasi" veya "Backend kod sapmasi" olarak yanlis-yorumlanmamali.
 
 ### KRITIK NOT — Sayim metodolojisi (KAYDET-32 tuzagi)
 
@@ -224,10 +244,10 @@ HEPSI ACIK — W4.2.E:
 
 ## 9. Yeni Session Ilk Aksiyon
 
-1. Bu handover'i (wave-4-handover-mid.md) bastan sona oku — HEAD `03d7fa8`, ahead 24, `main..HEAD = 97` (bu handover guncellemesi commit'i dahil), main `44416138` **INVARIANT**.
-2. W4.2.D + D2-out + W4.2.R **KAPANDI**; sirada **E** (Admin 8 endpoint).
-3. E kickoff: ONCE plan-only tur (kod yok) — spec §12 satir 582-594 9 endpoint listesi (audit HARIC = 8), Domain metotlari hazir mi (Suspend/Reactivate/GrantRole/RevokeRole/RevokeAllRefreshTokens User.cs:560 emsali), `IAdminUserCommands` + `IAdminUserReadService` Shared.Contracts (W4.0 mevcut). Doc fresh-read MECBURI (KAYDET-32).
-4. E sonrasi **W4.2.E.R** (reconcile + deviations.md F-S 152+ E sapmalari + `wave-4-2-complete` annotated tag + Mustafa-eli push, 24+ commit tek milestone).
-5. Backend VS Code'da hazir mi teyit; ilk talimat plan-only E (admin endpoint sayim + Domain metot envanteri + DTO sekli `UserDetail` + `UserListQuery` Shared.Contracts'tan).
+1. Bu handover'i (wave-4-handover-mid.md) bastan sona oku — HEAD W4.2.E.R reconcile (self bu commit; onceki kod ucu `809d7e7`), push sonrasi ahead 0, `main..HEAD = 102`, main `44416138` **INVARIANT**.
+2. W4.2 **TAMAMI KAPANDI** (D + D2-out + R + E + E.R): Public 13/15 + Authenticated 19/19 + Admin 8/9 (audit + impersonate delege).
+3. Sirada **W4.3 Infrastructure** — §5 W4.3 backlog 10 madde oncelik sirali (KRITIK ilk: IEmailVerificationTokenGenerator round-trip kontrat). Plan-only kickoff: backlog reorder + ilk concrete sub-batch (muhtemel EF Core repository concrete + DbContext + InitialCreate migration).
+4. **Backend-executed push** (W4.2.E.R commit + 30 commit, **tag YOK** bu push'ta — F-S 155 wave-ici ara-tag emsalsiz); operating-model: push Backend yurutur, guard `--dry-run` once + 3-SHA teyit; main'e ASLA, `--force` ASLA. `wave-4-complete` Wave 4 sonu (W4.3 + W4.4 sonrasi).
+5. Backend VS Code hazir; ilk talimat W4.2.E.R toplu commit (deviations.md + wave-4-handover-mid.md scoped add).
 
 **DUR.** Push yok, SSH yok, main DOKUNULMAZ.
