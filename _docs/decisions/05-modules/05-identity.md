@@ -609,6 +609,7 @@ Per modül implement (Catalog hariç — user-specific data yok).
 | Apple email relay deactivation webhook | skeleton | Real handler |
 | NationalId NVI sync | self-declared, verified_at null | NVI API entegrasyonu |
 | `LoginPhoneOtp` purpose | enum'da var, endpoint yok | Passwordless phone login |
+| `ChangePhone` purpose | enum'da var, endpoint yok | Authenticated phone-degisikligi (PendingPhone akisi, email-change emsali) |
 | Consent versioning re-prompt | single version | Versionlu doc upgrade → UI re-consent |
 
 ---
