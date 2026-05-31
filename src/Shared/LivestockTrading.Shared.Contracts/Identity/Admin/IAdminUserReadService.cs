@@ -7,4 +7,5 @@ public interface IAdminUserReadService
 {
     Task<CursorPage<UserListItem>> ListUsersAsync(UserListQuery query, CancellationToken ct);
     Task<UserDetail?> GetUserByIdAsync(Guid userId, CancellationToken ct);
+    Task<IReadOnlyList<AdminSessionInfo>?> GetSessionsByUserAsync(Guid userId, CancellationToken ct);
 }
