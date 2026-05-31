@@ -26,6 +26,8 @@ public static class AdminUsersEndpoints
         group.MapGet("/", ListAdminUsersEndpoint.Handle);
         group.MapGet("/{id:guid}", GetAdminUserDetailEndpoint.Handle);
         group.MapGet("/{id:guid}/sessions", GetAdminUserSessionsEndpoint.Handle);
+        group.MapPost("/{id:guid}/suspend", SuspendUserEndpoint.Handle);
+        group.MapPost("/{id:guid}/reactivate", ReactivateUserEndpoint.Handle);
 
         return app;
     }
