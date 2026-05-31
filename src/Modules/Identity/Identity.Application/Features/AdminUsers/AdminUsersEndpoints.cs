@@ -30,6 +30,7 @@ public static class AdminUsersEndpoints
         group.MapPost("/{id:guid}/reactivate", ReactivateUserEndpoint.Handle);
         group.MapPost("/{id:guid}/grant-role", GrantUserRoleEndpoint.Handle);
         group.MapPost("/{id:guid}/revoke-role", RevokeUserRoleEndpoint.Handle);
+        group.MapPost("/{id:guid}/force-logout", ForceLogoutUserEndpoint.Handle);
 
         return app;
     }
