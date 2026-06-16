@@ -1,1135 +1,490 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Bu dosya Claude Code'a bu repository'de çalışırken rehberlik eder.
 
-## Current Priority: TASKS.md (Birlesik Gorev Listesi)
+> **AKTİF MİMARİ:** `src/` altında Vertical Slice + Modüler Monolit (`LivestockTrading.slnx`).
+> `legacy/` klasörü eski ArfBlocks kodunu içerir — **SADECE REFERANS**, dokunma, build'e girmez.
 
-When starting a new chat without a specific task, refer to `../TASKS.md` in the parent directory (`d:\Projects\GlobalLivestock\TASKS.md`). This is the **unified task list** across all three projects (web, mobil, backend). Work through the unchecked items in priority order.
+---
 
-Additional project-specific reference:
-- `CHANGELOG.md` — All features, fixes, and improvements log (58 commits in revenue strategy)
+## 1. Proje Genel Bilgisi
 
-## Build & Development Commands
+**livestock-trading.com** — canlı hayvan alım satım platformu. Çiftçiler, satıcılar, alıcılar ve nakliyecileri bir araya getirir; 50+ dil ve çok ülke desteği vardır.
+
+- Mimari: **Modüler Monolit** + **Vertical Slice** pattern
+- Runtime: .NET 10, tek `Program.cs` (`src/Bootstrapper/Livestock.Host`)
+- Tüm modüller tek process içinde çalışır; modüller arası iletişim NATS event'leri üzerinden
+
+---
+
+## 2. Teknoloji Stack
+
+| Alan | Kütüphane |
+|------|-----------|
+| Endpoint framework | FastEndpoints 5.x |
+| Validation | FluentValidation (FastEndpoints entegre) |
+| ORM | EF Core 10 + Npgsql (PostgreSQL 17) |
+| Cache | FusionCache (L1 memory + L2 Redis 8) |
+| Messaging | NATS JetStream (NATS.Net 2.x) |
+| Logging | Serilog → Seq + OTLP |
+| Observability | OpenTelemetry (traces + metrics) → Jaeger |
+| File Storage | MinIO (S3-uyumlu, Minio SDK) |
+| Real-time | SignalR (mesajlaşma hub'ı) |
+| Tests | xUnit + NetArchTest.Rules |
+
+---
+
+## 3. Solution Yapısı
+
+```
+src/
+  Shared/
+    Shared.Abstractions/     ← IEndpoint, Result<T>, Error, IUserContext
+                               SADECE .NET runtime bağımlılığı — EF/NATS/FastEndpoints YASAK
+    Shared.Contracts/        ← IIntegrationEvent + tüm cross-module event'ler
+                               Events/Iam/  →  EmailOtpRequestedEvent, UserRegisteredEvent ...
+                               Events/Livestock/  →  ProductCreatedEvent, MessageSentEvent ...
+    Shared.Infrastructure/   ← FastEndpoints, EF Core, FusionCache, NATS, Serilog, OTel extension'ları
+                               Messaging/IEventPublisher, NatsEventPublisher, NatsConsumerBase<T>
+
+  Modules/
+    Iam/
+      Iam.Domain/            ← User, Role, RefreshToken entity'leri + hata sabitleri
+      Iam.Features/          ← Auth/ Users/ Admin/ Consumers/ Services/
+      Iam.Persistence/       ← IamDbContext + EF migrations (Npgsql)
+    Files/
+      Files.Domain/          ← MediaBucket, FileRecord entity'leri
+      Files.Features/        ← Buckets/ Files/ Services/
+      Files.Persistence/     ← FilesDbContext + migrations
+    Livestock/
+      Livestock.Domain/      ← Tüm ticaret entity'leri + enum'lar + hata sabitleri
+      Livestock.Features/    ← Her entity için slice klasörü (aşağıda liste)
+      Livestock.Persistence/ ← LivestockDbContext + migrations
+
+  Bootstrapper/
+    Livestock.Host/          ← TEK Program.cs: tüm modülleri mount eder, /health endpoint'i
+
+  Workers/
+    Livestock.Workers/       ← NatsConsumerBase<T> tabanlı worker'lar
+                               Consumers/  →  Email, SMS, Push notification consumer'ları
+                               Services/   →  EmailService, SmsService, PushService, PriceConversionService
+
+tests/
+  Architecture.Tests/        ← NetArchTest bağımlılık kuralları (6 test)
+
+deploy/docker/
+  Dockerfile.host            ← Livestock.Host image (multi-stage, aspnet runtime)
+  Dockerfile.workers         ← Livestock.Workers image
+  compose/
+    docker-compose.dev.yml       ← Postgres 17, Redis 8, NATS 2.11, MinIO, Seq
+                                   (Jaeger profile: tracing — opt-in)
+    docker-compose.dev.app.yml   ← host + workers overlay (build veya pull)
+    docker-compose.dev.server.yml ← server-side overlay: portları daraltır
+
+Jenkinsfile.dev              ← dev branch push → image build + push + deploy + smoke
+```
+
+---
+
+## 4. Modül Sınırları
+
+### IAM Modülü (`src/Modules/Iam/`)
+Auth, kullanıcılar ve kimlik yönetimi:
+- **Auth**: Login, Register, Logout, RefreshToken, ForgotPassword, ResetPassword, SendOtp, VerifyOtp, SendEmailOtp, VerifyEmailOtp
+- **Users**: GetCurrentUser, UpdateProfile
+- **Admin/Users**: kullanıcı yönetimi (admin)
+- **Consumers**: event consumer'ları (Iam eventlerini dinler)
+
+### Files Modülü (`src/Modules/Files/`)
+MinIO üzerinden dosya depolama:
+- **Buckets**: Create, Delete (yönetici)
+- **Files**: Upload (multipart), Delete, GetPresignedUrl, Reorder, SetCover
+
+### Livestock Modülü (`src/Modules/Livestock/`)
+Tüm ticaret domain'i. Feature klasörleri:
+
+| Klasör | Açıklama |
+|--------|----------|
+| `Products` | İlan yönetimi (search, detail, create, update, delete, slug) |
+| `Categories` | Kategori ağacı (çok dil desteği) |
+| `Brands` | Marka yönetimi |
+| `Sellers` | Satıcı profili, nearby, oto-kayıt |
+| `Transporters` | Nakliyeci profili |
+| `Farms` | Çiftlik yönetimi |
+| `Offers` | Teklif sistemi (create, accept, reject) |
+| `Deals` | Tamamlanmış anlaşmalar |
+| `Conversations` | Mesajlaşma konuşmaları |
+| `Notifications` | Bildirim yönetimi |
+| `Reviews` | Ürün/satıcı değerlendirmeleri |
+| `Subscriptions` | Abonelik planları (limit kontrolü) |
+| `Transport` | Nakliye talepleri |
+| `Locations` | Konum bilgileri |
+| `Favorites` | Favori ürünler |
+| `AnimalInfos` | Hayvan detay bilgisi |
+| `HealthRecords` | Sağlık kayıtları |
+| `Vaccinations` | Aşı kayıtları |
+| `ChemicalInfos` / `FeedInfos` / `SeedInfos` / `MachineryInfos` / `VeterinaryInfos` | Tarım bilgi tipleri |
+| `ProductVariants` | Ürün varyantları |
+| `ProductViewHistories` | Görüntüleme geçmişi |
+| `SearchHistories` | Arama geçmişi |
+| `UserPreferences` | Kullanıcı tercihleri |
+| `Dashboard` | Satıcı dashboard istatistikleri |
+| **`Admin/`** | Yönetici endpoint'leri |
+| `Admin/Products` | Ürün onay/red |
+| `Admin/Sellers` | Satıcı doğrula/askıya al |
+| `Admin/Transporters` | Nakliyeci doğrula/askıya al |
+| `Admin/Currencies` | Para birimi yönetimi |
+| `Admin/SubscriptionPlans` | Abonelik planı yönetimi |
+| `Admin/BoostPackages` | Boost paketi yönetimi |
+| `Admin/AppVersions` | Uygulama versiyon yönetimi |
+| `Admin/Reports` | Rapor endpoint'leri |
+
+---
+
+## 5. Yeni Endpoint Ekleme Rehberi
+
+### Adımlar
+
+1. **Domain entity** (gerekiyorsa) → `Livestock.Domain/Entities/`
+2. **DbSet** ekle → `LivestockDbContext.cs`
+3. **Entity configuration** → `Livestock.Persistence/Configurations/`
+4. **EF migration** ekle:
+   ```bash
+   cd src/Modules/Livestock/Livestock.Persistence
+   dotnet ef migrations add AddMyEntity --startup-project ../../Bootstrapper/Livestock.Host
+   ```
+5. **Feature slice** oluştur → `Livestock.Features/MyEntity/`
+6. **Endpoint, Models, Validators** dosyalarını yaz (aşağıda örnek)
+7. **Architecture testleri** geçiyor mu kontrol et:
+   ```bash
+   dotnet test tests/Architecture.Tests
+   ```
+8. **TypeScript client'ı yeniden üret** (web + mobile için):
+   ```bash
+   bash scripts/generate-api-client.sh
+   ```
+   Bu komut `Livestock.Host`'u build eder, `generated/openapi.json` ve
+   `generated/api-client.ts` üretir, ardından client'ı
+   `livestock-frontend/src/api/generated/` ve
+   `livestock-mobile/src/api/generated/` altına kopyalar. Frontend dev
+   yeni endpoint'i IDE autocomplete'inde tipli olarak görür.
+
+### Endpoint Dosya Yapısı (Vertical Slice)
+
+```
+Livestock.Features/MyEntity/
+  _Shared/
+    Models.cs                 ← shared DTOs (kullanan endpoint sayısı >= 2 ise)
+  Create/
+    Endpoint.cs               ← tek FastEndpoints Endpoint<Req, Res>
+    Models.cs                 ← Request + Response record
+    Validator.cs              ← FluentValidation AbstractValidator<TRequest>
+  Update/
+    Endpoint.cs
+    Models.cs
+    Validator.cs
+  Delete/ ...
+  _Legacy/                    ← eski route alias endpoint'leri (geçiş süresince)
+```
+
+- Her `Endpoint.cs` **tek bir** `Endpoint<TReq, TRes>` class içerir
+- Namespace: `Livestock.Features.{Entity}.{UseCase}` (örn. `Livestock.Features.Categories.Create`)
+- Shared DTO sadece **>= 2 endpoint** tarafından kullanılıyorsa `_Shared/` altına alınır
+- Legacy route alias endpoint'leri `_Legacy/` klasöründe tutulur
+- `tests/Architecture.Tests/VerticalSliceTests` bu kuralı derleme zamanı koruyucusu olarak doğrular (whitelist'e ekli refactor edilmiş slice'lar için)
+
+### Örnek Endpoint
+
+```csharp
+// Models.cs
+public record CreateCategoryRequest(string Name, string? Slug, Guid? ParentId);
+public record CreateCategoryResponse(Guid Id, string Name, string Slug);
+
+// Validator.cs
+public class CreateCategoryValidator : AbstractValidator<CreateCategoryRequest>
+{
+    public CreateCategoryValidator()
+    {
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(100);
+    }
+}
+
+// Endpoint.cs
+public class CreateCategoryEndpoint(LivestockDbContext db) 
+    : Endpoint<CreateCategoryRequest, CreateCategoryResponse>
+{
+    public override void Configure()
+    {
+        Post("/livestocktrading/Categories/Create");  // module prefix zorunlu
+        Roles("Admin", "Moderator");      // JWT role-based auth
+        Tags("Categories");
+    }
+
+    public override async Task HandleAsync(CreateCategoryRequest req, CancellationToken ct)
+    {
+        var entity = new Category { Id = Guid.NewGuid(), Name = req.Name, ... };
+        db.Categories.Add(entity);
+        await db.SaveChangesAsync(ct);
+        await SendAsync(new CreateCategoryResponse(entity.Id, entity.Name, entity.Slug), cancellation: ct);
+    }
+}
+```
+
+### Route Convention
+
+`POST /{modulePrefix}/{Entity}/{Action}` — legacy Ocelot gateway uyumluluğu
+için tüm endpoint'ler POST + module prefix kullanır. Tek prefix:
+- `iam` — IAM modülü endpoint'leri
+- `fileprovider` — Files modülü endpoint'leri
+- `livestocktrading` — Livestock modülü endpoint'leri (en yoğun, tüm ticaret)
+
+Örnekler:
+- `POST /iam/Auth/Login` — kullanıcı girişi
+- `POST /iam/Push/RegisterToken` — mobil push token kaydı
+- `POST /fileprovider/Files/Upload` — dosya yükleme
+- `POST /livestocktrading/Products/All` — ürün listele/filtrele
+- `POST /livestocktrading/Products/Detail` — tekil ürün
+- `POST /livestocktrading/Products/Create` — oluştur
+- `POST /livestocktrading/Products/Update` — güncelle (id body'de)
+- `POST /livestocktrading/Products/Delete` — soft delete (id body'de)
+- `POST /livestocktrading/Sellers/Nearby` — Haversine geo-search
+- `POST /livestocktrading/Admin/Products/Approve` — admin onayı
+
+`tests/Architecture.Tests/RouteConventionTests` her endpoint'in bu kalıpta
+olduğunu derleme zamanı koruyucusu olarak doğrular.
+
+---
+
+## 6. Kurallar
+
+### Kesin Kurallar
+
+- Her endpoint **FastEndpoints** `Endpoint<TReq, TRes>` kullanmalı — controller yok
+- Request doğrulama **FluentValidation** ile (`AbstractValidator<T>`)
+- Silme işlemleri **soft delete**: `entity.IsDeleted = true; entity.DeletedAt = DateTime.UtcNow`
+- Architecture testleri her değişiklikte geçmeli: `dotnet test tests/Architecture.Tests`
+- Eski ArfBlocks koduna ihtiyacın olursa `main` branch'ine bak (bu branch'te yok)
+
+### Build ve Test Komutları
 
 ```bash
-# Build the solution
-dotnet build LivestockTrading.sln
+# Solution build
+dotnet build LivestockTrading.slnx
 
-# Run tests
-dotnet test LivestockTrading.sln
+# Sadece architecture testleri
+dotnet test tests/Architecture.Tests
 
-# Run specific API locally
-dotnet run --project BaseModules/IAM/BaseModules.IAM.Api
-dotnet run --project BusinessModules/LivestockTrading/LivestockTrading.Api
-dotnet run --project BaseModules/FileProvider/BaseModules.FileProvider.Api
+# Tüm testler
+dotnet test LivestockTrading.slnx
+
+# Host'u çalıştır
+dotnet run --project src/Bootstrapper/Livestock.Host
+
+# Dev stack (Postgres, Redis, NATS, Jaeger, Seq, MinIO)
+cd deploy/docker/compose
+docker compose -f docker-compose.dev.yml up -d
+
+# TypeScript client üret + web ve mobile'a kopyala
+bash scripts/generate-api-client.sh
+
+# EF migration ekle (örn: Iam modülü)
+cd src/Modules/Iam/Iam.Persistence
+dotnet ef migrations add MyMigration --startup-project ../../../Bootstrapper/Livestock.Host
 ```
 
-### Database Migrations
+### Configuration (appsettings.json)
 
-```bash
-# Run migrations (from Jobs/RelationalDB/MigrationJob directory)
-cd Jobs/RelationalDB/MigrationJob
-dotnet run development
-
-# Force re-seed country data (updates existing records without deleting)
-dotnet run development --force-country-reseed
-
-# Add a new migration
-dotnet ef migrations add <MigrationName>
-```
-
-### Docker Local Development
-```bash
-cd _devops/docker/compose
-cp ../env/.env.example .env.dev
-# Edit .env.dev with your local settings
-
-# Start all services
-docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.dev up -d
-
-# View logs
-docker compose -p livestock_dev logs -f api-gateway
-
-# Restart specific service
-docker compose -p livestock_dev restart iam-api
-```
-
-## Architecture Overview
-
-This is a **modular monolith** .NET 8.0 backend for an agricultural livestock trading platform using Clean Architecture principles.
-
-### Module Structure
-
-```
-BaseModules/           # Platform infrastructure
-  ├── IAM/            # Identity & Access Management (auth, users, roles)
-  └── FileProvider/   # File storage service (MinIO/S3)
-
-BusinessModules/
-  └── LivestockTrading/  # Core trading domain
-
-Common/               # Shared code
-  ├── Definitions/    # Base entities, DbContext, Seed data configurations
-  ├── Services/       # Auth, Caching, Logging, Messaging, Environment, Notification
-  ├── Contracts/      # Event/Queue/PubSub contracts
-  ├── Connectors/     # External service connectors
-  └── Helpers/        # Utility functions
-
-Gateways/
-  └── Api/            # Ocelot API Gateway (routes /iam/*, /fileprovider/*, /livestocktrading/*)
-
-Jobs/
-  ├── RelationalDB/MigrationJob/  # EF Core migrations & seed data
-  └── BackgroundJobs/HangfireScheduler/  # Scheduled tasks
-
-Workers/              # Background services (per module)
-  ├── BaseModules.IAM.Workers/          # MailSender, SmsSender
-  └── BusinessModules.LivestockTrading.Workers/  # MailSender, SmsSender, NotificationSender
-
-_devops/              # CI/CD & Infrastructure
-  ├── docker/         # Dockerfiles, compose files, env templates
-  └── jenkins/        # Jenkinsfile.dev, Jenkinsfile.prod
-```
-
-### Request Handler Pattern (ArfBlocks Framework)
-
-**KURAL: Her endpoint MUTLAKA 6 dosya/class icerir. Eksik dosya OLAMAZ.**
-
-`Application/RequestHandlers/{Feature}/{Commands|Queries}/{OperationName}/` altinda:
-
-```
-Handler.cs       → Is mantigi (IRequestHandler)
-Models.cs        → Request/Response DTO'lari
-DataAccess.cs    → Veritabani islemleri (IDataAccess)
-Mapper.cs        → Entity ↔ DTO donusumleri
-Validator.cs     → FluentValidation + DbValidationService (IRequestValidator)
-Verificator.cs   → Yetkilendirme + DbVerificationService (IRequestVerificator)
-```
-
-Detaylar:
-- **Handler.cs** - Implements `IRequestHandler`, constructor takes `(ArfBlocksDependencyProvider, object dataAccess)`
-- **Models.cs** - `RequestModel` (IRequestModel) and `ResponseModel` (IResponseModel or IResponseModel<Array>)
-- **DataAccess.cs** - Implements `IDataAccess`, receives `ArfBlocksDependencyProvider` to resolve DbContext
-- **Mapper.cs** - Entity ↔ DTO mapping (enum ↔ int cast'leri burada yapilir)
-- **Validator.cs** - FluentValidation (ValidateRequestModel) + domain validation (ValidateDomain) using `LivestockTradingModuleDbValidationService`
-- **Verificator.cs** - Authorization (VerificateActor) + domain verification (VerificateDomain) using `LivestockTradingModuleDbVerificationService`
-
-> Yeni bir endpoint olusturulurken bu 6 dosyanin hepsi olusturulmalidir. Hicbiri atlanamaz.
-
-### Standard CRUD Endpoint Patterns
-
-Her entity icin asagidaki 6 endpoint olusturulmalidir (Create, Update, Delete, All, Detail, Pick):
-
-#### Handler Constructor (tum handler'larda ayni):
-```csharp
-public class Handler : IRequestHandler
-{
-    private readonly DataAccess _dataAccessLayer;
-
-    public Handler(ArfBlocksDependencyProvider dependencyProvider, object dataAccess)
-    {
-        _dataAccessLayer = (DataAccess)dataAccess;
-    }
-}
-```
-
-#### 1. ALL (Queries/All) - Listeleme (Sayfalama, Siralama, Filtreleme)
-```csharp
-// Models.cs
-public class RequestModel : IRequestModel
-{
-    public XSorting Sorting { get; set; }
-    public List<XFilterItem> Filters { get; set; }
-    public XPageRequest PageRequest { get; set; }
-}
-
-public class ResponseModel : IResponseModel<Array>
-{
-    public Guid Id { get; set; }
-    // ... entity alanlari ...
-    public DateTime CreatedAt { get; set; }
-}
-
-// Handler.cs - return ile page bilgisi dondurulur
-var (items, page) = await _dataAccessLayer.All(req.Sorting, req.Filters, req.PageRequest, cancellationToken);
-var response = mapper.MapToResponse(items);
-return ArfBlocksResults.Success(response, page);
-
-// DataAccess.cs - Sort, Filter, Paginate kullanilir
-public async Task<(List<Entity> Items, XPageResponse Page)> All(
-    XSorting sorting, List<XFilterItem> filters, XPageRequest pageRequest, CancellationToken ct)
-{
-    var query = _dbContext.Entities
-        .AsNoTracking()
-        .Where(e => !e.IsDeleted)
-        .Sort(sorting)
-        .Filter(filters);
-
-    if (sorting == null)
-        query = query.OrderByDescending(e => e.CreatedAt);
-
-    var page = query.GetPage(pageRequest);
-    var items = await query.Paginate(page).ToListAsync(ct);
-    return (items, page);
-}
-
-// Mapper.cs - List<ResponseModel> dondurur
-public List<ResponseModel> MapToResponse(List<Entity> items) { ... }
-```
-
-#### 2. DETAIL (Queries/Detail) - Tekil Kayit
-```csharp
-// Models.cs
-public class RequestModel : IRequestModel
-{
-    public Guid Id { get; set; }
-}
-
-// Handler.cs
-var entity = await _dataAccessLayer.GetById(req.Id, cancellationToken);
-if (entity == null)
-    throw new ArfBlocksValidationException(
-        ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.CommonErrors.IdNotValid));
-return ArfBlocksResults.Success(mapper.MapToResponse(entity));
-
-// DataAccess.cs - AsNoTracking ile
-public async Task<Entity> GetById(Guid id, CancellationToken ct)
-{
-    return await _dbContext.Entities
-        .AsNoTracking()
-        .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted, ct);
-}
-```
-
-#### 3. PICK (Queries/Pick) - Dropdown/Select Listesi
-```csharp
-// Models.cs
-public class RequestModel : IRequestModel
-{
-    public List<Guid> SelectedIds { get; set; }
-    public string Keyword { get; set; }
-    public int Limit { get; set; } = 10;
-}
-
-public class ResponseModel : IResponseModel<Array>
-{
-    public Guid Id { get; set; }
-    public string Name { get; set; }
-    // minimal alanlar
-}
-
-// DataAccess.cs - Oncelik: SelectedIds > Keyword > default
-public async Task<List<Entity>> Pick(List<Guid> selectedIds, string keyword, int limit, CancellationToken ct)
-{
-    var query = _dbContext.Entities.AsNoTracking().Where(e => !e.IsDeleted && e.IsActive);
-
-    if (selectedIds != null && selectedIds.Any())
-        return await query.Where(e => selectedIds.Contains(e.Id))
-            .OrderByDescending(e => e.CreatedAt).ToListAsync(ct);
-
-    if (!string.IsNullOrWhiteSpace(keyword))
-    {
-        var lowerKeyword = keyword.ToLower();
-        query = query.Where(e => e.Name.ToLower().Contains(lowerKeyword));
-    }
-
-    return await query.OrderByDescending(e => e.CreatedAt)
-        .Take(limit > 0 ? limit : 10).ToListAsync(ct);
-}
-```
-
-#### 4. CREATE (Commands/Create)
-```csharp
-// Models.cs - RequestModel: entity alanlari, ResponseModel: olusturulan entity bilgileri
-// Handler.cs
-var entity = mapper.MapToEntity(request);
-await _dataAccessLayer.Add(entity);
-return ArfBlocksResults.Success(mapper.MapToResponse(entity));
-```
-
-#### 5. UPDATE (Commands/Update)
-```csharp
-// Models.cs - RequestModel: Guid Id + guncellenecek alanlar
-// Handler.cs
-var entity = await _dataAccessLayer.GetById(request.Id);
-if (entity == null) throw new ArfBlocksValidationException(
-    ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.CommonErrors.IdNotValid));
-mapper.MapToEntity(request, entity);
-await _dataAccessLayer.SaveChanges();
-return ArfBlocksResults.Success(mapper.MapToResponse(entity));
-```
-
-#### 6. DELETE (Commands/Delete) - Soft Delete
-```csharp
-// Models.cs - RequestModel: Guid Id, ResponseModel: bool Success
-// Handler.cs
-var entity = await _dataAccessLayer.GetById(request.Id);
-if (entity == null) throw new ArfBlocksValidationException(
-    ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.CommonErrors.IdNotValid));
-entity.IsDeleted = true;
-entity.DeletedAt = DateTime.UtcNow;
-await _dataAccessLayer.SaveChanges();
-return ArfBlocksResults.Success(new ResponseModel { Success = true });
-```
-
-### Verificator & Validator Pattern
-
-Her endpoint'te Verificator.cs ve Validator.cs dosyalari bulunur:
-
-#### Verificator.cs - Yetkilendirme ve varlik kontrolu
-```csharp
-using {Module}.Infrastructure.Services;
-
-public class Verificator : IRequestVerificator
-{
-    private readonly AuthorizationService _authorizationService;
-    private readonly LivestockTradingModuleDbVerificationService _dbVerification;
-
-    public Verificator(ArfBlocksDependencyProvider dependencyProvider)
-    {
-        _authorizationService = dependencyProvider.GetInstance<AuthorizationService>();
-        _dbVerification = dependencyProvider.GetInstance<LivestockTradingModuleDbVerificationService>();
-    }
-
-    public async Task VerificateActor(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
-    {
-        await _authorizationService
-            .ForResource(typeof(Verificator).Namespace)
-            .VerifyActor()
-            .Assert();
-    }
-
-    public async Task VerificateDomain(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
-    {
-        var request = (RequestModel)payload;
-        // Varlik kontrolu (entity mevcut mu?)
-        await _dbVerification.ValidateCategoryExists(request.Id, cancellationToken);
-    }
-}
-```
-
-- **Commands (Create/Update/Delete)**: VerificateDomain icinde entity varlik kontrolu yapilir
-- **Queries (All/Detail/Pick)**: VerificateDomain genellikle `await Task.CompletedTask;` olarak birakilir
-
-#### Validator.cs - Is kurallari ve FluentValidation
-```csharp
-using FluentValidation;
-using {Module}.Domain.Errors;
-using {Module}.Infrastructure.Services;
-using Common.Services.ErrorCodeGenerator;
-
-public class Validator : IRequestValidator
-{
-    private readonly LivestockTradingModuleDbValidationService _dbValidator;
-
-    public Validator(ArfBlocksDependencyProvider dependencyProvider)
-    {
-        _dbValidator = dependencyProvider.GetInstance<LivestockTradingModuleDbValidationService>();
-    }
-
-    public void ValidateRequestModel(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
-    {
-        var request = (RequestModel)payload;
-        var result = new RequestModel_Validator().Validate(request);
-        if (!result.IsValid)
-            throw new ArfBlocksValidationException(result.ToString("~"));
-    }
-
-    public async Task ValidateDomain(IRequestModel payload, EndpointContext context, CancellationToken cancellationToken)
-    {
-        var request = (RequestModel)payload;
-        await _dbValidator.ValidateCategoryExists(request.Id, cancellationToken);
-        await _dbValidator.ValidateCategorySlugUnique(request.Slug, request.Id, cancellationToken);
-    }
-}
-
-public class RequestModel_Validator : AbstractValidator<RequestModel>
-{
-    public RequestModel_Validator()
-    {
-        RuleFor(x => x.Name)
-            .NotEmpty()
-            .WithMessage(ErrorCodeGenerator.GetErrorCode(() => LivestockTradingDomainErrors.CategoryErrors.NameRequired));
-    }
-}
-```
-
-#### DbVerificationService vs DbValidationService
-
-| | DbVerificationService | DbValidationService |
-|---|---|---|
-| Kullanim yeri | Verificator.VerificateDomain | Validator.ValidateDomain |
-| Amac | Yetki + hizli varlik kontrolu | Is kurallari + state kontrolu |
-| Constructor | `(ModuleDbContext dbContext)` | `(ArfBlocksDependencyProvider dp)` |
-| Base class | `DefinitionDbValidationService` | `DefinitionDbValidationService` |
-| Konum | `Infrastructure/Services/` | `Infrastructure/Services/` |
-
-#### DomainErrors Pattern
-
-**KRITIK KURAL: Tum error property isimleri BENZERSIZ olmalidir!**
-
-ErrorCodeExporter, tum hata property'lerini tek bir TypeScript dosyasina export eder. Ayni isimli property'ler TypeScript'te "duplicate key" hatasina neden olur.
-
-**Naming Convention:**
-- Her property ismi entity prefix'i ile baslamalidir
-- Format: `{EntityName}{ErrorType}` (ornek: `CategoryNameRequired`, `BrandSlugAlreadyExists`)
-- Generic isimler KULLANILMAZ: ~~`NameRequired`~~, ~~`SlugRequired`~~, ~~`ProductRequired`~~
-
-```csharp
-// Domain/Errors/DomainErrors.cs
-public class LivestockTradingDomainErrors
-{
-    public static class CommonErrors { ... }
-
-    public static class CategoryErrors
-    {
-        public static string CategoryNotFound { get; set; } = "Kategori bulunamadi.";
-        public static string CategorySlugAlreadyExists { get; set; } = "Bu slug zaten kullaniliyor.";  // DOGRU
-        public static string CategoryNameRequired { get; set; } = "Kategori adi zorunludur.";         // DOGRU
-        // public static string SlugAlreadyExists { get; set; } = "...";  // YANLIS - duplicate olur!
-        // public static string NameRequired { get; set; } = "...";       // YANLIS - duplicate olur!
-    }
-
-    public static class BrandErrors
-    {
-        public static string BrandNotFound { get; set; } = "Marka bulunamadi.";
-        public static string BrandSlugAlreadyExists { get; set; } = "Bu slug zaten kullaniliyor.";    // DOGRU
-        public static string BrandNameRequired { get; set; } = "Marka adi zorunludur.";               // DOGRU
-    }
-
-    public static class ProductPriceErrors
-    {
-        public static string PriceNotFound { get; set; } = "Fiyat bilgisi bulunamadi.";
-        public static string PriceProductRequired { get; set; } = "Urun zorunludur.";                 // DOGRU
-        public static string PriceAmountRequired { get; set; } = "Fiyat zorunludur.";                 // DOGRU
-    }
-}
-```
-
-**Yeni hata eklerken kontrol listesi:**
-1. Ayni isimde baska bir property var mi? (`Ctrl+F` ile ara)
-2. Property ismi entity prefix'i ile basliyor mu?
-3. Generic isim kullanilmamis mi? (`NameRequired`, `SlugRequired` gibi)
-
-#### DI Kaydi (ApplicationDependencyProvider)
-```csharp
-// Services
-base.Add<LivestockTradingModuleDbVerificationService>();
-base.Add<LivestockTradingModuleDbValidationService>();
-```
-
-### Mapper.cs - Enum Type Casting Kurali
-
-Entity'lerdeki enum property'leri, Models.cs'te `int` olarak tanimlanir. Mapper'da explicit cast yapilmalidir:
-
-```csharp
-// Entity → Response (enum → int)
-Status = (int)entity.Status,
-
-// Request → Entity (int → enum)
-Status = (ConversationStatus)request.Status,
-```
-
-Enum'lar Entity dosyalarinda tanimlidir (`Domain/Entities/`), ayri bir Enums namespace'i YOKTUR:
-- `ConversationStatus` → `Entities/Messaging.cs`
-- `OfferStatus` → `Entities/Messaging.cs`
-- `ProductStatus`, `ProductCondition` → `Entities/Product.cs`
-- `SellerStatus` → `Entities/Seller.cs`
-- `BannerPosition` → `Entities/Banner.cs`
-- `TaxType` → `Entities/TaxRate.cs`
-- `OrderStatus`, `PaymentStatus` → `Entities/Order.cs`
-
-> **ONEMLI**: `using LivestockTrading.Domain.Enums;` seklinde bir namespace YOKTUR. Enum'lar `using LivestockTrading.Domain.Entities;` ile gelir.
-
-### Entity Property Referansi
-
-Bazi entity'lerde property isimleri beklenenden farkli olabilir:
-- **Seller**: `BusinessName` (~~Name~~ degil)
-- **Category**: `Name`, `Slug`, `ParentCategoryId`
-- **Brand**: `Name`, `Slug`
-- **Product**: `Title`, `Slug`, `SellerId`, `CategoryId`, `BrandId`
-
-Navigation property'ler Mapper'da null-safe kullanilir:
-```csharp
-CategoryName = entity.Category?.Name,
-BrandName = entity.Brand?.Name,
-SellerName = entity.Seller?.BusinessName,
-```
-
-### Çok Ülkeli Filtreleme (Multi-Country Filtering)
-
-Platform 50+ dil ve çok sayıda ülkeyi destekler. Kullanıcılar default ülkelerinin ilanlarını görür veya frontend'den başka bir ülke seçebilir.
-
-**Temel Kurallar:**
-1. Ürünler `Location.CountryCode` (ISO 3166-1 alpha-2) üzerinden ülkeye bağlıdır
-2. Frontend `countryCode` parametresi gönderirse sadece o ülkenin ürünleri döner
-3. `countryCode` boş ise tüm ürünler döner (global görünüm)
-
-**Listeleme Endpoint'lerinde Kullanım:**
-```csharp
-// Models.cs
-public class RequestModel : IRequestModel
-{
-    /// <summary>Ülke kodu filtresi (ISO 3166-1 alpha-2, örn: "TR", "US", "DE")</summary>
-    public string CountryCode { get; set; }
-    public XSorting Sorting { get; set; }
-    public List<XFilterItem> Filters { get; set; }
-    public XPageRequest PageRequest { get; set; }
-}
-
-// DataAccess.cs - Include ile Location yüklenir
-var query = _dbContext.Products
-    .AsNoTracking()
-    .Include(p => p.Location)
-    .Where(p => !p.IsDeleted);
-
-// Ülke filtresi uygulanır
-if (!string.IsNullOrWhiteSpace(countryCode))
-{
-    query = query.Where(p => p.Location != null && p.Location.CountryCode == countryCode);
-}
-```
-
-**ResponseModel'de Ülke Bilgisi:**
-```csharp
-public class ResponseModel : IResponseModel<Array>
-{
-    // ... diğer alanlar ...
-    public Guid LocationId { get; set; }
-    public string LocationCountryCode { get; set; }
-    public string LocationCity { get; set; }
-}
-
-// Mapper'da
-LocationCountryCode = entity.Location?.CountryCode,
-LocationCity = entity.Location?.City,
-```
-
-**Kullanıcı Ülke Tercihi:**
-- `User.CountryId`: Kullanıcının varsayılan ülkesi
-- `User.LastViewingCountryId`: Son görüntülediği ülke (frontend güncelleyebilir)
-- Frontend ülke değiştirdiğinde `countryCode` parametresini request body'de gönderir
-
-### Çoklu Dil Desteği (Multi-Language Translations)
-
-Kategoriler ve diğer global entity'ler çoklu dil desteğine sahiptir. Çeviriler JSON formatında saklanır.
-
-**Entity'de Çeviri Alanları:**
-```csharp
-// Category entity örneği
-public string Name { get; set; }  // Varsayılan isim
-public string NameTranslations { get; set; }  // JSON: {"en":"Livestock","tr":"Hayvancılık","de":"Viehzucht"}
-public string DescriptionTranslations { get; set; }  // JSON çevirileri
-```
-
-**Backend Çeviri Çözümleme:**
-```csharp
-// Models.cs - LanguageCode parametresi ekle
-public class RequestModel : IRequestModel
-{
-    /// <summary>Dil kodu (ISO 639-1, örn: "tr", "en", "de")</summary>
-    public string LanguageCode { get; set; }
-    // ... diğer alanlar
-}
-
-// Mapper.cs - TranslationHelper kullan
-using LivestockTrading.Application.Extensions;
-
-public ResponseModel MapToResponse(Category entity, string languageCode = null)
-{
-    return new ResponseModel
-    {
-        Name = GetTranslatedName(entity, languageCode),
-        // ...
-    };
-}
-
-private static string GetTranslatedName(Category c, string languageCode)
-{
-    if (string.IsNullOrWhiteSpace(languageCode))
-        return c.Name;
-    return TranslationHelper.GetTranslation(c.NameTranslations, languageCode, c.Name);
-}
-
-// Handler.cs - languageCode'u Mapper'a geç
-var response = mapper.MapToResponse(entity, req.LanguageCode);
-```
-
-**TranslationHelper Davranışı:**
-1. `languageCode` ile tam eşleşme arar (örn: "tr")
-2. Bulamazsa büyük/küçük harf duyarsız arar
-3. Bulamazsa İngilizce ("en") fallback
-4. O da yoksa ilk mevcut çeviriyi döndürür
-5. Hiçbiri yoksa `fallbackValue` (genellikle entity.Name) döner
-
-**Çeviri Destekleyen Entity'ler:**
-- `Category`: NameTranslations, DescriptionTranslations
-- Diğer entity'lere aynı pattern ile eklenebilir
-
-### .http Test Dosyasi Kurali
-
-Her entity icin CRUD endpoint'leri gelistirildiginde, `_doc/Http/BusinessModules/LivestockTrading/{EntityName}.http` dosyasi olusturulmalidir. Ornek: `_doc/Http/BusinessModules/LivestockTrading/Categories.http`
-
-```http
-@BaseUrl = http://localhost:5221
-
-### Create
-POST {{BaseUrl}}/{Entity}/Create
-
-### All (sayfalama, siralama)
-POST {{BaseUrl}}/{Entity}/All
-
-### Detail
-POST {{BaseUrl}}/{Entity}/Detail
-{ "id": "..." }
-
-### Pick (dropdown icin)
-POST {{BaseUrl}}/{Entity}/Pick
-{ "keyword": "...", "limit": 10 }
-
-### Update
-POST {{BaseUrl}}/{Entity}/Update
-{ "id": "...", ... }
-
-### Delete
-POST {{BaseUrl}}/{Entity}/Delete
-{ "id": "..." }
-```
-
-### Handler Registration & Discovery
-
-Handlers are auto-discovered by ArfBlocks based on namespace convention. No manual route registration needed.
-
-```csharp
-// In Program.cs
-builder.Services.AddArfBlocks(options => {
-    options.ApplicationProjectNamespace = "BaseModules.IAM.Application";
-});
-
-// Middleware (must be last)
-app.UseArfBlocksRequestHandlers();
-```
-
-ArfBlocks maps HTTP paths to handlers: `POST /Auth/Login` → `RequestHandlers/Auth/Commands/Login/Handler.cs`
-
-### Program.cs Middleware Order
-
-```csharp
-builder.AddSerilogLogging("ModuleName.Api");
-builder.Services.AddMadenCaching(builder.Configuration);
-builder.Services.AddArfBlocks(options => { ... });
-
-app.UseCorrelationId();
-app.UseSerilogRequestLogging();
-app.UseArfBlocksRequestHandlers(); // Must be last
-```
-
-### DbContext Pattern (Multi-Module)
-
-```
-DefinitionDbContext (Common.Definitions.Infrastructure)  ← Base: User, Role, Module, Country, AuditLog
-    ├── IamDbContext (extends DefinitionDbContext)       ← AppRefreshToken, etc.
-    └── LivestockTradingModuleDbContext                  ← Business entities
-```
-
-- `ApplicationDbContext` in MigrationJob aggregates all module contexts for migration generation
-- `CommonModelBuilder.Build(ModelBuilder)` configures shared entity relationships
-- `LivestockTradingModelBuilder.Build(ModelBuilder)` configures business entity relationships
-- Country entity is managed by `DefinitionDbContext` - use `modelBuilder.Ignore<Country>()` in module builders
-
-### Dependency Injection (ApplicationDependencyProvider)
-
-Each module has `ApplicationDependencyProvider` extending `ArfBlocksDependencyProvider`:
-
-```csharp
-// Located at {Module}.Application/Configuration/ApplicationDependencyProvider.cs
-// Registers: DbContext, IJwtService, ICacheService, AuthorizationService, RabbitMqPublisher
-```
-
-### Key Technologies
-
-- **Arfware.ArfBlocks.Core** - Custom CQRS-like framework (replaces MediatR/traditional controllers)
-- **Ocelot** - API Gateway routing
-- **Entity Framework Core 8.0** - ORM with SQL Server
-- **Redis** - Distributed cache (L2), with in-memory L1 cache
-- **RabbitMQ** - Message queue for async operations (workers consume via exchanges)
-- **FluentValidation** - Request validation
-- **Serilog** - Structured logging
-- **NetTopologySuite** - Spatial data support
-
-### Authentication & JWT
-
-- JWT-based with refresh tokens stored in `AppRefreshTokens` table
-- Multi-provider: Native (email/password), Google OAuth, Apple Sign-In
-- Roles stored per module in `UserRole` entity with `ModuleId`
-- JWT role claims format: `"ModuleName.RoleName"` (e.g., `"LivestockTrading.Seller"`)
-- Platform tracking: Web=0, Android=1, iOS=2
-
-### Role-Based Authorization (RBAC)
-
-Platform 5 temel rol ile çalışır. Roller `Jobs/RelationalDB/MigrationJob/SeedData/roles.json` dosyasında tanımlıdır.
-
-**Roller ve Yetkileri:**
-
-| Rol | ID | Açıklama |
-|-----|-----|----------|
-| Admin | `a1000000-0000-0000-0000-000000000001` | Tam yetki, tüm işlemler |
-| Moderator | `a1000000-0000-0000-0000-000000000002` | İçerik moderasyonu, onay/red |
-| Seller | `a1000000-0000-0000-0000-000000000003` | Ürün satışı, çiftlik yönetimi |
-| Transporter | `a1000000-0000-0000-0000-000000000004` | Nakliye hizmetleri |
-| Buyer | `a1000000-0000-0000-0000-000000000006` | Ürün satın alma (varsayılan rol) |
-
-**Otomatik Rol Atama:**
-- Yeni kayıt olan kullanıcılara otomatik olarak `Buyer` rolü atanır
-- `User/Commands/Create/Handler.cs` içinde `UserRole` kaydı oluşturulur
-
-#### PermissionService Kullanımı
-
-Verificator'larda rol kontrolü için `PermissionService` kullanılır:
-
-```csharp
-// Application/Authorization/PermissionService.cs
-using LivestockTrading.Application.Authorization;
-
-public class Verificator : IRequestVerificator
-{
-    private readonly AuthorizationService _authorizationService;
-    private readonly PermissionService _permissionService;
-
-    public Verificator(ArfBlocksDependencyProvider dependencyProvider)
-    {
-        _authorizationService = dependencyProvider.GetInstance<AuthorizationService>();
-        _permissionService = dependencyProvider.GetInstance<PermissionService>();
-    }
-
-    public async Task VerificateActor(IRequestModel payload, EndpointContext context, CancellationToken ct)
-    {
-        await _authorizationService
-            .ForResource(typeof(Verificator).Namespace)
-            .VerifyActor()
-            .Assert();
-
-        // Rol kontrolü - aşağıdaki methodlardan birini kullan
-        _permissionService.RequireAdmin();           // Sadece Admin
-        _permissionService.RequireModerator();       // Admin veya Moderator
-        _permissionService.RequireSeller();          // Admin, Moderator veya Seller
-        _permissionService.RequireTransporter();     // Admin, Moderator veya Transporter
-        _permissionService.RequireAnyRole(RoleConstants.Seller, RoleConstants.Buyer);  // Belirtilen rollerden biri
-    }
-}
-```
-
-#### Endpoint Rol Gereksinimleri
-
-| Endpoint Tipi | Gerekli Rol | Method |
-|---------------|-------------|--------|
-| Products/Approve, Products/Reject | Admin, Moderator | `RequireModerator()` |
-| Sellers/Verify, Sellers/Suspend | Admin, Moderator | `RequireModerator()` |
-| Transporters/Verify, Transporters/Suspend | Admin, Moderator | `RequireModerator()` |
-| Brands, Banners, Currencies, FAQs CRUD | Admin, Moderator | `RequireModerator()` |
-| Products/Create, Products/Update | Seller | `RequireSeller()` |
-| Farms, ProductImages, ProductPrices CRUD | Seller (kendi kaynakları) | `RequireSeller()` |
-| TransportRequests CRUD | Transporter | `RequireTransporter()` |
-| FavoriteProducts, ProductReviews CRUD | Buyer | `RequireAnyRole(Buyer, Seller)` |
-
-#### Yeni Moderasyon Endpoint'leri
-
-**Products:**
-- `POST /Products/Approve` - Ürünü onayla (Status → Approved)
-- `POST /Products/Reject` - Ürünü reddet (Status → Rejected, reason kaydedilir)
-
-**Sellers:**
-- `POST /Sellers/Verify` - Satıcıyı doğrula (Status → Verified)
-- `POST /Sellers/Suspend` - Satıcıyı askıya al (Status → Suspended, reason kaydedilir)
-
-**Transporters:**
-- `POST /Transporters/Verify` - Taşıyıcıyı doğrula (Status → Verified)
-- `POST /Transporters/Suspend` - Taşıyıcıyı askıya al (Status → Suspended, reason kaydedilir)
-
-#### DI Kaydı
-
-```csharp
-// ApplicationDependencyProvider.cs
-base.Add<PermissionService>();
-```
-
-#### İlgili Dosyalar
-
-- `Application/Authorization/PermissionService.cs` - Rol kontrol servisi
-- `Application/Authorization/RoleConstants.cs` - Rol sabitleri
-- `Application/Authorization/RequirePermissionAttribute.cs` - Attribute (opsiyonel)
-- `Domain/Enums/Permission.cs` - Permission enum'ları
-- `Jobs/RelationalDB/MigrationJob/SeedData/roles.json` - Rol seed data
-
-### Error Handling
-
-```csharp
-// Throw validation errors
-throw new ArfBlocksValidationException(ErrorCodeGenerator.GetErrorCode(() => DomainErrors.UserErrors.InvalidCredentials));
-
-// Return success
-return ArfBlocksResults.Success(responseModel);
-```
-
-### API Gateway & Routing
-
-**Production/Dev Architecture:**
-```
-Internet → Nginx (443) → API Gateway (Ocelot) → Backend APIs
-                              ↓
-                    ┌─────────┼─────────┐
-                    ↓         ↓         ↓
-               IAM API   FileProvider  LivestockTrading
-```
-
-**Ocelot Gateway** (`Gateways/Api/Gateways.ApiGateway.Api/ocelot.json`):
-- Routes requests based on URL prefix
-- Handles JWT authentication centrally
-- Public endpoints (no auth): `/iam/Auth/*`, `/iam/Users/Create`, `/iam/Countries/All`
-- Protected endpoints: All others require valid JWT
-
-**Route Mappings:**
-- `/iam/*` → `iam-api-container:8080`
-- `/fileprovider/*` → `fileprovider-api-container:8080`
-- `/livestocktrading/*` → `livestocktrading-api-container:8080`
-
-**Port Configuration (Docker):**
-| Service | Default Port | Container Port |
-|---------|-------------|----------------|
-| API Gateway | 5000 (GATEWAY_PORT) | 8080 |
-| LivestockTrading API | 5001 (GLOBALLIVESTOCK_API_PORT) | 8080 |
-| IAM API | 5002 (IAM_API_PORT) | 8080 |
-| FileProvider API | 5003 (FILEPROVIDER_API_PORT) | 8080 |
-
-No traditional controllers - ArfBlocks middleware discovers handlers based on request path.
-
-### Caching Strategy
-
-Two-tier caching via `Common.Services.Caching`:
-1. L1 (Memory): Fast, in-process, short TTL (~5 min)
-2. L2 (Redis): Distributed, longer TTL (configurable)
-
-```csharp
-await _cacheService.GetOrCreateAsync(cacheKey, factoryFunc, timespan);
-await _cacheService.RemoveByPatternAsync("pattern:*");
-```
-
-Use `ICacheService` with `CacheKeys` class for standardized key management.
-
-### Workers (Background Services)
-
-IHostedService pattern consuming RabbitMQ messages:
-- `BaseModules.IAM.Workers.MailSender` - Sends email via Brevo SMTP
-- `BaseModules.IAM.Workers.SmsSender` - Sends SMS via NetGSM
-- `LivestockTrading.Workers.NotificationSender` - Push notifications & real-time events
-
-Workers consume from RabbitMQ exchanges (e.g., `iam.notification.sms`, `iam.notification.email`, `livestocktrading.notification.push`).
-
-### Real-Time Messaging (SignalR)
-
-Platform, kullanıcılar arası gerçek zamanlı mesajlaşma için SignalR kullanır.
-
-#### SignalR Hub
-
-**Dosya:** `LivestockTrading.Api/Hubs/ChatHub.cs`
-
-```csharp
-// Hub endpoint: /hubs/chat
-// JWT Authentication gerekli
-
-// Client → Server Methods:
-Task JoinConversation(Guid conversationId)      // Conversation'a katıl
-Task LeaveConversation(Guid conversationId)     // Conversation'dan ayrıl
-Task SendTypingIndicator(Guid conversationId, bool isTyping)  // Yazıyor göstergesi
-Task MarkMessageAsRead(Guid messageId)          // Mesajı okundu işaretle
-Task<List<Guid>> GetOnlineUsers(List<Guid> userIds)  // Online kullanıcıları sorgula
-
-// Server → Client Events:
-ReceiveMessage(message)        // Yeni mesaj geldi
-TypingIndicator(indicator)     // Yazıyor göstergesi
-MessageRead(data)              // Mesaj okundu
-UserOnline(userId)             // Kullanıcı çevrimiçi
-UserOffline(userId)            // Kullanıcı çevrimdışı
-```
-
-#### Domain Events
-
-**Dosya:** `LivestockTrading.Domain/Events/MessagingEvents.cs`
-
-| Event | Tetikleyen | Açıklama |
-|-------|------------|----------|
-| `MessageCreatedEvent` | Messages/Create/Handler | Yeni mesaj gönderildi |
-| `MessageReadEvent` | Messages/Update/Handler | Mesaj okundu |
-| `ConversationCreatedEvent` | Conversations/Create/Handler | Yeni konuşma başlatıldı |
-| `TypingIndicatorEvent` | Messages/SendTypingIndicator/Handler | Yazıyor göstergesi |
-
-#### Event Publishing Pattern
-
-Handler'larda RabbitMQ ile event publish:
-
-```csharp
-// Handler.cs
-private readonly IRabbitMqPublisher _publisher;
-private readonly CurrentUserService _currentUserService;
-
-public async Task<ArfBlocksRequestResult> Handle(...)
-{
-    // ... entity oluştur/güncelle ...
-
-    // Event publish (NotificationSender Worker dinler)
-    await _publisher.PublishFanout("livestocktrading.notification.push", new MessageCreatedEvent
-    {
-        MessageId = entity.Id,
-        ConversationId = entity.ConversationId,
-        SenderUserId = entity.SenderUserId,
-        RecipientUserId = entity.RecipientUserId,
-        SenderName = _currentUserService.GetCurrentUserDisplayName(),  // ÖNEMLİ
-        Content = entity.Content,
-        CreatedAt = entity.SentAt
-    });
-}
-```
-
-#### Notification Worker Event Handlers
-
-**Konum:** `Workers/NotificationSender/EventHandlers/`
-
-| Handler | Event | İşlem |
-|---------|-------|-------|
-| `MessageCreatedNotificationHandler` | MessageCreatedEvent | Push notification gönder |
-| `MessageReadNotificationHandler` | MessageReadEvent | SignalR ile bildir |
-| `ConversationCreatedNotificationHandler` | ConversationCreatedEvent | Push notification gönder |
-
-#### Presence Service
-
-**Dosya:** `LivestockTrading.Application/Services/PresenceService.cs`
-
-Redis ile online/offline durum takibi:
-
-```csharp
-// Kullanıcıyı online yap
-await _presenceService.SetUserOnlineAsync(userId, connectionId);
-
-// Kullanıcıyı offline yap
-await _presenceService.SetUserOfflineAsync(userId, connectionId);
-
-// Online durumu kontrol et
-bool isOnline = await _presenceService.IsUserOnlineAsync(userId);
-```
-
-#### Messaging Endpoint'leri
-
-| Endpoint | Açıklama |
-|----------|----------|
-| `POST /Conversations/Create` | Yeni konuşma başlat |
-| `POST /Conversations/All` | Konuşma listesi |
-| `POST /Conversations/Detail` | Konuşma detayı |
-| `POST /Messages/Create` | Mesaj gönder |
-| `POST /Messages/All` | Mesaj listesi |
-| `POST /Messages/Update` | Mesajı güncelle (okundu) |
-| `POST /Messages/SendTypingIndicator` | Yazıyor göstergesi |
-
-#### İlgili Dosyalar
-
-```
-LivestockTrading.Api/
-├── Hubs/ChatHub.cs                          # SignalR Hub
-└── Program.cs                               # SignalR DI & MapHub
-
-LivestockTrading.Domain/
-└── Events/MessagingEvents.cs                # Domain events
-
-LivestockTrading.Application/
-├── Services/PresenceService.cs              # Online/offline tracking
-└── RequestHandlers/
-    ├── Conversations/Commands/Create/       # Konuşma oluştur
-    └── Messages/
-        ├── Commands/Create/                 # Mesaj gönder
-        ├── Commands/Update/                 # Mesaj güncelle
-        └── Commands/SendTypingIndicator/    # Yazıyor göstergesi
-
-Workers/NotificationSender/
-├── EventHandlers/
-│   ├── MessageCreatedNotificationHandler.cs
-│   ├── MessageReadNotificationHandler.cs
-│   └── ConversationCreatedNotificationHandler.cs
-└── Workers/NotificationWorker.cs            # Event consumer
-
-Gateways/Api/ocelot.json                     # WebSocket route
-```
-
-### Configuration
-
-- `appsettings.json` / `appsettings.Development.json` - Standard config
-- `appsettings.local.json` - Local overrides (gitignored)
-- Environment variables for Docker deployment (see `_devops/docker/env/.env.example`)
-
-Key config sections:
 ```json
 {
-  "ProjectConfigurations": {
-    "RelationalDbConfiguration": { "SqlConnectionString": "..." },
-    "EnvironmentConfiguration": { "EnvironmentName": "...", "ApiUrl": "..." },
-    "ExternalAuth": { "Google": {...}, "Apple": {...} }
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Database=livestock;Username=postgres;Password=...",
+    "Redis": "localhost:6379",
+    "Nats": "nats://localhost:4222"
   },
-  "Caching": {
-    "Redis": { "ConnectionString": "...", "InstanceName": "globallivestock:" },
-    "Memory": { "SizeLimitMB": 1024 }
-  }
+  "Jwt": { "SigningKey": "..." },
+  "Seq": { "ServerUrl": "http://localhost:5341" },
+  "OpenTelemetry": { "OtlpEndpoint": "http://localhost:4317" },
+  "Minio": { "Endpoint": "localhost:9000", "AccessKey": "...", "SecretKey": "..." }
 }
 ```
 
-### Seed Data
+### Soft Delete Pattern
 
-- Country data: `Jobs/RelationalDB/MigrationJob/SeedData/countries.json` (196 countries with currency info)
-- `CountrySeeder` handles insert (new DB) or update (existing data with `--force-country-reseed`)
-- Seed runs automatically after migrations in `Program.cs`
-
-## DevOps & Deployment
-
-### Docker Structure
-
-```
-_devops/
-├── docker/
-│   ├── compose/
-│   │   ├── docker-compose.yml          # Base services
-│   │   ├── docker-compose.dev.yml      # Dev overrides
-│   │   └── docker-compose.prod.yml     # Prod overrides (resource limits)
-│   ├── env/
-│   │   └── .env.example                # Environment template
-│   ├── Dockerfile.api-gateway
-│   ├── Dockerfile.livestocktrading-api
-│   ├── Dockerfile.iam-api
-│   ├── Dockerfile.fileprovider-api
-│   ├── Dockerfile.iam-mail-worker
-│   ├── Dockerfile.iam-sms-worker
-│   └── Dockerfile.resource-seeder
-└── jenkins/
-    ├── Jenkinsfile.dev                 # Dev pipeline (dev branch)
-    └── Jenkinsfile.prod                # Prod pipeline (main branch)
+Tüm entity'lerde `BaseEntity`'den gelen:
+```csharp
+public bool IsDeleted { get; set; }
+public DateTime? DeletedAt { get; set; }
 ```
 
-### Docker Compose Usage
+Sorgularda her zaman filtrele: `.Where(e => !e.IsDeleted)`
 
-```bash
-# Development
-cd _devops/docker/compose
-docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.dev up -d
+### Multi-Country / Multi-Language
 
-# Production
-docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod up -d
-```
+- Ürünler `Location.CountryCode` (ISO 3166-1 alpha-2) üzerinden ülkeye bağlı
+- Kategoriler `NameTranslations` (JSON) ile çoklu dil destekler: `{"en":"...","tr":"...","de":"..."}`
+- `countryCode` boş ise global görünüm (tüm ürünler)
 
-### Jenkins CI/CD
+---
 
-**Dev Pipeline (`Jenkinsfile.dev`):**
-- Triggers on `dev` branch
-- Builds all images with `dev-latest` tag
-- Deploys to dev server
-- Runs migrations/seeders automatically
+## 7. Architecture Test Kuralları
 
-**Prod Pipeline (`Jenkinsfile.prod`):**
-- Triggers on `main` branch
-- Builds with `latest` + immutable tag (`prod-{BUILD_ID}-{COMMIT}`)
-- Deploys to production server
-- Migrations require explicit parameter
+`tests/Architecture.Tests/ModuleDependencyTests.cs` içindeki 5 kural (hepsi geçmeli):
 
-**Build Modules:**
-```
-api-gateway, livestocktrading-api, iam-api, fileprovider-api,
-iam-mail-worker, iam-sms-worker, resource-seeder
-```
+1. **Domain projeleri infrastructure'a bağımlı olamaz** — `Iam.Domain`, `Files.Domain`, `Livestock.Domain` içinde EF Core / FastEndpoints / NATS kullanılamaz
+2. **`Iam.Domain`** → `Files.Domain` veya `Livestock.Domain` referans alamaz
+3. **`Files.Domain`** → `Iam.Domain` veya `Livestock.Domain` referans alamaz
+4. **`Livestock.Domain`** → `Iam.Domain` veya `Files.Domain` referans alamaz
+5. **`Shared.Abstractions`** → sadece .NET runtime (FastEndpoints, EF, NATS, Serilog YASAK)
 
-### Server Paths
+Modüller arası iletişim: `Shared.Contracts` üzerinden `IIntegrationEvent` ile.
 
-```
-/opt/livestocktrading/
-├── repo/                    # Git repository
-├── .env.dev                 # Dev environment variables
-└── .env.prod                # Prod environment variables
-```
+---
 
-### Adding New Route to Gateway
+## 8. Event / Messaging Pattern
 
-1. Edit `Gateways/Api/Gateways.ApiGateway.Api/ocelot.json`
-2. Add public route BEFORE catch-all routes:
-```json
+### Event Publish (Features katmanında)
+
+```csharp
+// Constructor injection
+public class CreateProductEndpoint(LivestockDbContext db, IEventPublisher events) 
+    : Endpoint<CreateProductRequest, CreateProductResponse>
 {
-    "DownstreamPathTemplate": "/NewEndpoint/Action",
-    "DownstreamScheme": "http",
-    "DownstreamHostAndPorts": [{ "Host": "iam-api-container", "Port": 8080 }],
-    "UpstreamPathTemplate": "/iam/NewEndpoint/Action",
-    "UpstreamHttpMethod": ["POST"]
+    public override async Task HandleAsync(CreateProductRequest req, CancellationToken ct)
+    {
+        // ... entity oluştur, kaydet ...
+
+        await events.PublishAsync("livestock.product.created", new ProductCreatedEvent
+        {
+            ProductId = entity.Id,
+            SellerId = entity.SellerId,
+            Title = entity.Title
+        }, ct);
+    }
 }
 ```
-3. For authenticated endpoints, add `AuthenticationOptions` with the secret key
-4. Rebuild and deploy API Gateway
 
-## Frontend Entegrasyonu
+### Event Subject Convention
 
-Frontend projesi (`D:\Projects\GlobalLivestock\web`) backend API'lerini `arf-cli` ile olusturulan TypeScript client uzerinden tuketir.
+`{module}.{entity}.{action}` formatı:
 
-## Mobil Uygulama
+| Subject | Event |
+|---------|-------|
+| `iam.user.registered` | `UserRegisteredEvent` |
+| `iam.otp.email-requested` | `EmailOtpRequestedEvent` |
+| `iam.otp.sms-requested` | `OtpSmsRequestedEvent` |
+| `livestock.product.created` | `ProductCreatedEvent` |
+| `livestock.product.approved` | `ProductApprovedEvent` |
+| `livestock.product.rejected` | `ProductRejectedEvent` |
+| `livestock.offer.created` | `OfferCreatedEvent` |
+| `livestock.offer.accepted` | `OfferAcceptedEvent` |
+| `livestock.message.sent` | `MessageSentEvent` |
+| `livestock.conversation.created` | `ConversationCreatedEvent` |
+| `livestock.seller.registered` | `SellerRegisteredEvent` |
+| `livestock.seller.verified` | `SellerVerifiedEvent` |
+| `livestock.transporter.registered` | `TransporterRegisteredEvent` |
+| `livestock.transporter.verified` | `TransporterVerifiedEvent` |
 
-Mobil uygulama projesi: `D:\Projects\GlobalLivestock\mobil`
+### Consumer Yazma (Workers katmanında)
 
-### Frontend API Dokumantasyonu
+```csharp
+// src/Workers/Livestock.Workers/Consumers/
+public class ProductCreatedConsumer(IEmailService email) 
+    : NatsConsumerBase<ProductCreatedEvent>(nats)
+{
+    protected override string Subject => "livestock.product.created";
 
-Frontend gelisitiriciler icin API kullanim dokumani: `D:\Projects\GlobalLivestock\web\common\API-INTEGRATION.md`
-
-**Bu dokuman asagidaki konulari kapsar:**
-- Kimlik dogrulama (Login, Register, Logout, Token yonetimi)
-- JWT ve Refresh Token akislari
-- API cagirma kaliplari (All, Detail, Pick, Create, Update, Delete)
-- Hata yonetimi
-- Dosya yukleme
-- Real-Time Mesajlasma (SignalR Hub baglantisi, event dinleme, typing indicator)
-- React ornekleri (AuthContext, ProtectedRoute, useChat hook)
-
-### Frontend'i Etkileyen Degisiklikler
-
-Asagidaki degisiklikler yapildiginda `API-INTEGRATION.md` dosyasi MUTLAKA guncellenmelidir:
-
-| Degisiklik Tipi | Guncellenmesi Gereken Bolum |
-|-----------------|----------------------------|
-| Yeni Auth endpoint (OTP, sosyal login, vb.) | Kimlik Dogrulama bolumu |
-| JWT claim yapisi degisikligi | Token Yonetimi bolumu |
-| Token suresi degisikligi | Token Yonetimi bolumu |
-| Yeni public endpoint eklenmesi | Public/Protected Endpoint listesi |
-| Response model formati degisikligi | Ilgili API kullanim ornekleri |
-| Yeni hata kodlari | Hata Yonetimi bolumu |
-| Dosya yukleme API degisikligi | Dosya Yukleme bolumu |
-| Platform enum degisikligi | Platform Degerleri bolumu |
-| SignalR Hub event degisikligi | Real-Time Mesajlasma bolumu |
-| Yeni messaging endpoint'i | Real-Time Mesajlasma bolumu |
-| Domain event yapisi degisikligi | Real-Time Mesajlasma bolumu |
-
-### arf-cli ile API Client Guncelleme
-
-Backend'de endpoint degisikligi yapildiginda frontend API client'i guncellenmelidir:
-
-```bash
-# arf-cli ile TypeScript client olustur
-arf-cli generate --output D:\Projects\GlobalLivestock\web\common\livestock-api
+    protected override async Task HandleAsync(ProductCreatedEvent msg, CancellationToken ct)
+    {
+        await email.SendProductCreatedNotificationAsync(msg.SellerId, msg.Title, ct);
+    }
+}
 ```
 
-Bu komut asagidaki dosyalari gunceller:
-- `src/api/base_modules/iam/index.ts`
-- `src/api/base_modules/FileProvider/index.ts`
-- `src/api/business_modules/livestocktrading/index.ts`
-- `src/errors/locales/modules/backend/*/tr.ts`
+---
 
-### Frontend'den Gelen Talepler
+## 9. Mevcut Durum
 
-Frontend ekibinden gelen backend gelistirme talepleri asagidaki dosyada dokumante edilir:
+### Tamamlanan PR'lar (10+ adet)
 
-**Dosya:** `D:\Projects\GlobalLivestock\web\common\API-INTEGRATION.md`
+| PR | İçerik |
+|----|--------|
+| #1 | Solution iskeleti — Shared katmanı, Bootstrapper, Architecture testleri |
+| #2 | IAM modülü — Auth (Login/Register/Refresh/Logout/OTP), Users, Admin/Users |
+| #3 | Files modülü — Upload/Download/Delete/Presigned URL/Reorder/SetCover + MinIO |
+| #4 | Livestock Core — Categories, Brands, Products, Sellers, Farms, Offers, Deals, Favorites |
+| #5 | Livestock Messaging — Conversations, Messages, SignalR Hub, NATS event'ler |
+| #6 | Workers — Email/SMS/Push notification consumer'ları, PriceConversionService |
+| #7 | Admin/Moderation — Approve/Reject/Verify/Suspend + tüm admin endpoint'leri |
+| #8 | **Route refactor** — tüm 209 endpoint `POST /{prefix}/{Entity}/{Action}` kalıbına; RouteConventionTests guard testi eklendi |
+| #9 | **P0 düzeltmeleri** — Subscribe IAP receipt + duplicate guard, Sellers/Transporters IsActive/IsVerified flag'leri (NotMapped computed), `/iam/Push/RegisterToken+RevokeToken`, Login UserName + Google/Apple OAuth, Register admin email whitelist, SignalR `/hubs/chat` (FusionCache presence) |
+| #10 | **P1 düzeltmeleri** — `/livestocktrading/Conversations/UnreadCount`, `/livestocktrading/Sellers/Nearby` (Haversine), Reviews CRUD (Update + Delete + TransporterReview Create), SkiaSharp image processing pipeline (WebP + thumbnail), Shipping domain (Carriers + Zones + Rates, 3 entity + 15 endpoint) |
+| #11 | **EF migrations** — `Iam.Persistence`, `Files.Persistence`, `Livestock.Persistence` için `InitialCreate` baseline migration'ları + `IDesignTimeDbContextFactory`'ler |
+| #12 | **NSwag pipeline** — `nswag.json` + `scripts/generate-api-client.sh` + `RouteBasedOperationIdProcessor` + `NoopEventPublisher` (codegen guard); 39 typed client class + 209 method `generated/api-client.ts`'de, web ve mobile'a otomatik kopyalanır |
 
-Bu dosyanin "Backend Gelistirme Talimatlari" bolumunde:
-- Kritik buglar ve cozum onerileri
-- Yeni endpoint talepleri
-- Mevcut endpoint iyilestirme onerileri
-- Oncelik tablosu
+### Business Logic Düzeltmeleri (Son merge)
 
-**"Frontend'den gelen taleplere bak"** denildiginde bu dosya incelenmelidir.
+- **Auto-seller**: Ürün oluşturan kullanıcıya otomatik Seller rolü atanır
+- **Subscription limits**: Ürün oluşturmadan önce aktif abonelik limiti kontrol edilir
+- **Multi-currency**: Fiyatlar kullanıcının para birimine dönüştürülür (PriceConversionService)
+- **Timezone expiry**: Abonelik ve token süreleri UTC yerine kullanıcı timezone'una göre hesaplanır
+- **Role assignment**: Yeni kayıtta Buyer rolü otomatik atanır
+- **Typing indicator**: SignalR üzerinden doğru gönderilir
+- **Unread count**: Conversation listesinde doğru hesaplanır
+- **Slug detail**: Ürün slug'a göre de sorgulanabilir
+- **Nearby sellers**: Coğrafi yakınlık filtrelemesi
+- **Soft-delete**: Tüm entity'lerde tutarlı uygulandı
+
+### Konuşma / Mesajlaşma (SignalR)
+
+Hub endpoint: `/hubs/chat` — JWT auth gerekli
+
+Client → Server: `JoinConversation`, `LeaveConversation`, `SendTypingIndicator`, `MarkMessageAsRead`, `GetOnlineUsers`
+
+Server → Client: `ReceiveMessage`, `TypingIndicator`, `MessageRead`, `UserOnline`, `UserOffline`
+
+---
+
+## 10. Bilinen Limitasyonlar / TODO
+
+- **Production deploy**: Dev sunucu (`dev-api.livestock-trading.com`) yeni mimaride çalışıyor (Jenkinsfile.dev → otomatik deploy). Production için ayrı `Jenkinsfile.prod` + production compose overlay henüz yok.
+- **E2E testler**: Henüz yok. Architecture testleri var (`tests/Architecture.Tests` — 6 test: 5 dependency + 1 route convention), integration/E2E altyapısı eksik.
+- **IAP receipt verification**: Apple App Store / Google Play receipt'i Subscribe endpoint'inde sadece kayıt + duplicate check; gerçek doğrulama API çağrısı henüz yok (P2'de planlandı).
+- **OAuth provider verification**: Login Google/Apple `ExternalProviderUserId`'yi doğrulanmış kabul ediyor — gerçek JWT verification eklenmeli.
+
+## 11. Branch Stratejisi
+
+- **`main`** — `ab0b0d1` commit'inde (eski ArfBlocks mimarisi, canlıdaki stack'in karşılığı). Yeni geliştirme için ASLA kullanılmaz.
+- **`dev`** — `331253c` ve sonrası (Vertical Slice + FastEndpoints + tüm yeni geliştirme). Tüm feature work burada.
+- Yeni feature için: `git checkout dev && git checkout -b feat/X` → PR `dev`'e açılır.
+- Hazır olunca `dev → main` merge tek bir büyük review oturumunda yapılır.
+
+Aynı strateji `livestock-frontend` ve `livestock-mobile` repo'larında geçerli — üç repo da `dev` branch'inde paralel ilerler.
+
+## 12. Migration Gaps Raporu
+
+`_doc/MIGRATION_GAPS.md` ESKİ ArfBlocks (artık `main` branch'te durur — bu repo'da silindi)
+ile yeni FastEndpoints arasındaki endpoint kapsamı + davranış delta'sını listeler.
+Her yeni feature başlamadan önce bu raporu kontrol et — P2 listesinde hâlâ açık
+maddeler var (Banners, FAQs, Languages, PaymentMethods, TaxRates, ContactForms,
+GeoIp/Geolocation, Audit log altyapısı, FusionCache referans veriler için).
+
+## 13. CI/CD
+
+- **`Jenkinsfile.dev`** (repo root) — `dev` branch'e push tetikler:
+  1. `mstfaock/livestocktrading-backend:dev-latest` (host) ve
+     `mstfaock/livestocktrading-backend-workers:dev-latest` (workers)
+     image'larını build edip Docker Hub'a push eder
+  2. Compose dosyalarını sunucuda `/opt/livestocktrading/dev-app/`'e scp eder
+  3. `docker compose pull + up` ile uygulama container'larını yeniden başlatır
+     (infra container'larına dokunmaz)
+  4. `/health` ve `/swagger/v1/swagger.json` smoke test
+- Gerekli Jenkins credential'ları:
+  `dockerhub-credentials`, `maden-server-key`, `dev-server-host`.
+- Production için ayrı `Jenkinsfile.prod` henüz yok.
+
+## Eski Mimari Notu
+
+ArfBlocks tabanlı eski kod (`BaseModules/`, `BusinessModules/`, `Common/`,
+`Gateways/`, `Jobs/`, eski `_devops/`) bu branch'ten temizlendi. Tarihsel
+referans için `main` branch'inde (`ab0b0d1`) saf eski hali korunuyor —
+SQL Server, RabbitMQ, Ocelot Gateway, ArfBlocks CQRS, Redis, Serilog stack'i.

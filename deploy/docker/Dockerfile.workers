@@ -1,0 +1,28 @@
+# syntax=docker/dockerfile:1.7
+# Livestock.Workers — background NATS consumers (Email, SMS, Push, PriceConversion).
+# Runs as a separate container so HTTP load and consumer load scale independently.
+
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+COPY LivestockTrading.slnx Directory.Build.props Directory.Packages.props global.json ./
+COPY src/ src/
+COPY tests/ tests/
+
+RUN dotnet restore src/Workers/Livestock.Workers/Livestock.Workers.csproj
+RUN dotnet publish src/Workers/Livestock.Workers/Livestock.Workers.csproj \
+    -c Release -o /app/publish --no-restore \
+    /p:DebugType=None /p:DebugSymbols=false
+
+# Workers transitively reference Microsoft.AspNetCore.App through
+# Shared.Infrastructure (FastEndpoints.Swagger pulls it in), so aspnet
+# runtime is required even though no HTTP listener is exposed.
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+WORKDIR /app
+
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+USER appuser
+
+COPY --from=build /app/publish .
+
+ENTRYPOINT ["dotnet", "Livestock.Workers.dll"]
