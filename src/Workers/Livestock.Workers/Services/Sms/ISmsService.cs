@@ -1,0 +1,6 @@
+namespace Livestock.Workers.Services.Sms;
+
+public interface ISmsService
+{
+    Task SendAsync(string phoneNumber, string message, CancellationToken ct = default);
+}

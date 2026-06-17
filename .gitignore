@@ -57,3 +57,8 @@ node_modules/
 _doc/excel/node_modules/
 _doc/excel/package-lock.json
 nul
+
+# Claude harness state
+.claude/worktrees/
+.claude/scheduled_tasks.lock
+.claire/

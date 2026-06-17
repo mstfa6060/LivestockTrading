@@ -1,0 +1,54 @@
+# Build artifacts
+**/bin/
+**/obj/
+**/publish/
+**/*.dll
+**/*.pdb
+
+# IDE / VCS
+.git/
+.vscode/
+.vs/
+.idea/
+*.user
+*.suo
+
+# Legacy ArfBlocks code — never ships in the new image
+legacy/
+BaseModules/
+BusinessModules/
+Common/
+Gateways/
+Jobs/
+LivestockTrading.sln
+
+# Old PS test scripts
+comprehensive-crud-test*.ps1
+fix-crud-test.ps1
+table-counts.ps1
+
+# Generated artifacts (TypeScript client) — not needed at runtime
+generated/
+livestock-frontend/
+livestock-mobile/
+
+# Docs / claude
+_doc/
+.claude/
+.claire/
+*.md
+!CLAUDE.md
+!README.md
+
+# Compose / deploy config (host-side, not image-side)
+deploy/
+
+# Env / secrets
+.env
+.env.*
+*.env
+
+# Misc
+node_modules/
+TestResults/
+*.log
